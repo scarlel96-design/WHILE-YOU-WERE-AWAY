@@ -99,7 +99,7 @@ var e = data.entry(t.getUUID("id"));
 e.progress = new Progress(t.getInt("clues"), t.getLong("next"), t.getInt("events"), t.getBoolean("complete"));
 if (t.contains("station")) e.station = BlockPos.of(t.getLong("station"));
 if (t.hasUUID("encounter")) e.encounter = t.getUUID("encounter");
-e.readingUntil = t.getLOng("readingUntil");
+e.readingUntil = t.getLong("readingUntil");
 e.cityVisited=t.getBoolean("cityVisited");e.cityClues=t.getInt("cityClues")&7;
 e.cityShockTriggered=t.getBoolean("cityShockTriggered");
 e.investigation=CityInvestigation.load(t.getCompound("investigation"),e.cityClues,t.contains("investigation",Tag.TAG_COMPOUND));
@@ -120,8 +120,8 @@ if(e.cityVisited&&!e.scenes.containsKey(2)) {
 var legacy=SceneRecord.migrated(2,CityDistrict.ARRIVAL,t.getUUID("id"));legacy.progress.restore("COMPLETED",4,127,0);e.scenes.put(2,legacy);
 }
 }
-if(t.contains("returnPosition"))e.returnPosition=BlockPos.of(t.getLOng("returnPosition"));
-e.returnYaw=t.getFloat("returnYaw");e.returnPitch=t.getFloat("returnPitch");e.transitAfter=Math.max(0,t.getLOng("transitAfter"));
+if(t.contains("returnPosition"))e.returnPosition=BlockPos.of(t.getLong("returnPosition"));
+e.returnYaw=t.getFloat("returnYaw");e.returnPitch=t.getFloat("returnPitch");e.transitAfter=Math.max(0,t.getLong("transitAfter"));
 }
 
 if(root.getInt("actorSchema")>1)throw new IllegalStateException("MANUAL_DIAGNOSTIC Unsupported actor schema");

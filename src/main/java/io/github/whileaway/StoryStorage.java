@@ -84,7 +84,19 @@ public final class StoryStorage {
             format=root.getInt("schema");schema=root.contains("actorSchema")?root.getInt("actorSchema"):0;
             if(format<1||format>5||schema<0||schema>1){failure=Outcome.UNSUPPORTED;throw new IllegalStateException("field=schema unsupported_version");}
             if(root.contains("actorSchema")&&!root.contains("actorSchema",Tag.TAG_INT))throw new IllegalStateException("field=actorSchema wrong_type");
-            if(format==5&&!root.contains("returnNetwork",Tag.TAG_COMPOUND))throw new IllegalStateException("field=returnNetwork missing_or_wrong_type");
+            if(format<5&&root.contains("returnNetwork"))
+      throw new IllegalStateException("field=returnNetwork incompatible_format");
+  if(format==5&&root.contains("returnNetwork")) {
+      if(!root.contains("returnNetwork",Tag.TAG_COMPOUND))
+          throw new IllegalStateException("field=returnNetwork missing_or_wrong_type");
+      var network=root.getCompound("returnNetwork");
+      if(!network.contains("schema",Tag.TAG_INT)||network.getInt("schema")<=0)
+          throw new IllegalStateException("field=returnNetwork.schema missing_or_invalid");
+      if(network.getInt("schema")>1) {
+          failure=Outcome.UNSUPPORTED;
+          throw new IllegalStateException("field=returnNetwork.schema unsupported_version");
+      }
+  }
             listType(root,"players",Tag.TAG_COMPOUND);listType(root,"actors",Tag.TAG_COMPOUND);
             var playerIds=new HashSet<UUID>();
             for(var raw:root.getList("players",Tag.TAG_COMPOUND)) {
