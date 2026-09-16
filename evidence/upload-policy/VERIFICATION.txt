@@ -1,0 +1,12 @@
+{
+  "changed": [
+    "AGENTS.md",
+    "README.md"
+  ],
+  "policy": "all work products uploaded to GitHub and documented with branch/commit/path",
+  "code_changed": false,
+  "builds": 0,
+  "tests": 0,
+  "clients": 0,
+  "remote_upload": "NOT RUN in this change"
+}

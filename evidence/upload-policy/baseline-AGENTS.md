@@ -70,11 +70,3 @@
 - npc-world uses immutable npc-exceptions baseline (19636c1b... JAR / d34f61ad... source). Only new opt-in NpcWorldSmoke plus isolated tool/config changes; every existing 83 compiled class is byte-identical. Safe pause marker at evidence/npc-world/PAUSE_REQUESTED stops new launches. Check GATES.json and current client command ledger before resuming; next expected Chunk4, not full NPC closure.
 
 - npc-world continuation completed travel9 + divergent-copy5 actual clients (12 new this continuation). Copy harness is opt-in; baseline83 classes unchanged, current85. Rerun verify-npc-world.py THEN verify-npc-copy.py, as the first writes travel-only gates. Current build evidence tests-4.log; tests-2/3 are preserved build-tool failures. The old two-case pause verifier is historical only. Next NpcEvents.update residence/path/return-light environment classification; NPC corruption clients and combined regression remain, so no composite/0.3.2/art expansion. Preserve dist/npc-world before the next production change.
-
-
-## GitHub 업로드 정책
-
-- 앞으로 생성·수정·검증한 모든 작업물은 작업 완료 후 GitHub 저장소 `https://github.com/scarlel96-design/WHILE-YOU-WERE-AWAY`에 업로드한다.
-- 업로드 대상은 코드, 문서, 테스트 결과, 검증 보고서, 변경 내역, 패키지 산출물 및 관련 상태 기록이다.
-- 각 작업 보고서와 관련 문서에는 업로드 여부, 브랜치, 커밋 SHA, 업로드 대상 경로를 구체적으로 기록한다.
-- 로컬 작업만 완료된 상태는 원격 업로드 완료로 표시하지 않는다.

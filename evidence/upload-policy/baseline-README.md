@@ -119,11 +119,3 @@ python .\tools\verify-assets.py .\build\libs\whileaway-0.3.1-dev.1.jar
 구현 정책은 [RECOVERY_031.md](docs/RECOVERY_031.md), 항목별 완료/미검증 구분은 [GATES.md](evidence/stability/GATES.md), 현재 검증 기록은 [VERIFICATION.txt](evidence/stability/VERIFICATION.txt)입니다. 전체 안정화 완료나 모든 주요 사건의 예외 QA 완료를 뜻하지 않습니다. 최종 아트는 계속 보류합니다.
 
 설계 추가 33–81은 [리소스·퍼즐·미스터리 기준](docs/MYSTERY_RESOURCE_EXTENSION.md)에 반영했습니다. [임시 자산 목록](docs/asset-contract.json)과 [떡밥 관리 초안](docs/foreshadow-registry.json)은 교체/후속 개발용 문서이며 새 리소스팩이나 퍼즐이 구현되었다는 뜻은 아닙니다.
-
-
-## GitHub 업로드 정책
-
-- 앞으로 생성·수정·검증한 모든 작업물은 작업 완료 후 GitHub 저장소 `https://github.com/scarlel96-design/WHILE-YOU-WERE-AWAY`에 업로드한다.
-- 업로드 대상은 코드, 문서, 테스트 결과, 검증 보고서, 변경 내역, 패키지 산출물 및 관련 상태 기록이다.
-- 각 작업 보고서와 관련 문서에는 업로드 여부, 브랜치, 커밋 SHA, 업로드 대상 경로를 구체적으로 기록한다.
-- 로컬 작업만 완료된 상태는 원격 업로드 완료로 표시하지 않는다.
