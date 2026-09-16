@@ -32,6 +32,17 @@ def gametest_counts():
     if not p.is_file():
         return None
     text = p.read_text(encoding="utf-8", errors="replace")
+
+    required = [int(x) for x in re.findall(r"(?i)\bAll\s+(\d+)\s+required\s+tests\s+passed\b", text)]
+    complete = [int(x) for x in re.findall(r"(?i)\b(\d+)\s+GAME\s+TESTS\s+COMPLETE\b", text)]
+
+    required_count = required[-1] if required else None
+    complete_count = complete[-1] if complete else None
+    if required_count is not None and complete_count is not None and required_count != complete_count:
+        return None
+    if required_count is not None:
+        return {"total": required_count, "passed": required_count, "failed": 0}
+
     patterns = [
         re.compile(r"(?i)(\d+)\s+tests?\s+passed(?:,\s*(\d+)\s+failed)?"),
         re.compile(r"(?i)passed\s*[:=]\s*(\d+).*?failed\s*[:=]\s*(\d+)"),
@@ -60,7 +71,11 @@ def jar_info():
         candidates.extend(sorted(x for x in libs.glob("*.jar") if "-sources" not in x.name and "-javadoc" not in x.name))
     for p in candidates:
         if p.is_file():
-            return {"name": p.name, "size": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+            return {
+                "name": p.name,
+                "size": p.stat().st_size,
+                "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+            }
     return {"name": None, "size": None, "sha256": None}
 
 checks = {k: status(k) for k in ("json", "design", "build", "gametest", "asset", "audio")}
@@ -115,6 +130,6 @@ CI/headless GameTest evidence is not REAL CLIENT evidence.
 (CI / "summary.md").write_text(md, encoding="utf-8")
 step_summary = os.getenv("GITHUB_STEP_SUMMARY")
 if step_summary:
-    with Path(step_summary).open("a", encoding="utf-8") as f:
+    with Path(step_summary).open("a",encoding="utf-8") as f:
         f.write(md)
-print(md, end="")
+print(md,end="")
