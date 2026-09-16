@@ -6,24 +6,47 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
+
 public final class NarrativeData extends SavedData {
 public static final int SCHEMA = 5;
 private java.nio.file.Path storageFile;
 private String expectedHash;
 private boolean storySaveWritable=true;
 private ReturnNetworkState returnNetwork=ReturnNetworkState.notStarted();
+
 @FunctionalInterface
 interface StoryWriter {
 void write(CompoundTag root, java.nio.file.Path file) throws java.io.IOException;
 }
 private StoryWriter storyWriter=net.neoforged.neoforge.common.IOUtilities::writeNbtCompressed;
-public record ReturnNetworkCommit(ReturnNetworkState state,String durableHash) {}
+
+public enum ReturnNetworkBoundary {
+NO_CHANGE,
+DISCOVERED,
+NPC_JOINED,
+SIGNAL_OBSERVED,
+INTERVENTION_COMMITTED,
+PRESENTATION_STARTED,
+RESPONSE_OBSERVED,
+SHARED_EXPERIENCE,
+COMPLETED
+}
+
+public record ReturnNetworkCommit(
+ReturnNetworkBoundary boundary,
+ReturnNetworkState state,
+String durableHash,
+boolean wrote
+) {}
+
 void bindStorage(java.nio.file.Path file,String hash){storageFile=file;expectedHash=hash;}
 public boolean storySaveWritable(){return storySaveWritable;}
 void blockStoryWrites(){storySaveWritable=false;}
 void setStoryWriterForTest(StoryWriter writer){storyWriter=Objects.requireNonNull(writer);}
+
 private final Map<UUID, Entry> players = new TreeMap<>();
 public final Map<String,StoryActorRecord> actors=new TreeMap<>();
+
 public static final class Entry {
 public Progress progress = Progress.empty();
 public BlockPos station;
@@ -38,24 +61,36 @@ public BlockPos returnPosition;
 public float returnYaw,returnPitch;
 public long transitAfter;
 }
+
 public Entry entry(UUID id) { return players.computeIfAbsent(id, ignored -> new Entry()); }
+
 public synchronized ReturnNetworkState returnNetwork(){return returnNetwork;}
+
 public void discover(UUID id, Clue clue) {
 var e = entry(id); e.progress = e.progress.discover(clue); setDirty();
 }
+
 public static NarrativeData get(MinecraftServer server) {
 return StoryStorage.open(server.overworld().getDataStorage(),server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("data"),
 server.registryAccess(),server.levelKeys().stream().map(k->k.location().toString()).collect(java.util.stream.Collectors.toSet()));
 }
+
 static NarrativeData load(CompoundTag root, HolderLookup.Provider registry) {
 int schema=root.getInt("schema");
 if (schema > SCHEMA) throw new IllegalStateException("Story save uses a newer schema; restore the matching mod version.");
 var data = new NarrativeData();
-if(schema>=5) {
+
+if(schema<5 && root.contains("returnNetwork"))
+throw new IllegalStateException("field=returnNetwork incompatible_format");
+if(schema>=5 && root.contains("returnNetwork")) {
 if(!root.contains("returnNetwork",Tag.TAG_COMPOUND))
 throw new IllegalStateException("field=returnNetwork missing_or_wrong_type");
-data.returnNetwork=ReturnNetworkState.load(root.getCompound("returnNetwork"));
+var parsed=ReturnNetworkState.load(root.getCompound("returnNetwork"));
+if(parsed.stage==ReturnNetworkState.Stage.NOT_STARTED)
+throw new IllegalStateException("field=returnNetwork materialized_not_started");
+data.returnNetwork=parsed;
 }
+
 var list = root.getList("players", Tag.TAG_COMPOUND);
 for (int i = 0; i < list.size(); i++) {
 var t = list.getCompound(i);
@@ -64,7 +99,7 @@ var e = data.entry(t.getUUID("id"));
 e.progress = new Progress(t.getInt("clues"), t.getLong("next"), t.getInt("events"), t.getBoolean("complete"));
 if (t.contains("station")) e.station = BlockPos.of(t.getLong("station"));
 if (t.hasUUID("encounter")) e.encounter = t.getUUID("encounter");
-e.readingUntil = t.getLong("readingUntil");
+e.readingUntil = t.getLOng("readingUntil");
 e.cityVisited=t.getBoolean("cityVisited");e.cityClues=t.getInt("cityClues")&7;
 e.cityShockTriggered=t.getBoolean("cityShockTriggered");
 e.investigation=CityInvestigation.load(t.getCompound("investigation"),e.cityClues,t.contains("investigation",Tag.TAG_COMPOUND));
@@ -85,10 +120,10 @@ if(e.cityVisited&&!e.scenes.containsKey(2)) {
 var legacy=SceneRecord.migrated(2,CityDistrict.ARRIVAL,t.getUUID("id"));legacy.progress.restore("COMPLETED",4,127,0);e.scenes.put(2,legacy);
 }
 }
-if(t.contains("returnPosition"))e.returnPosition=BlockPos.of(t.getLong("returnPosition"));
-e.returnYaw=t.getFloat("returnYaw");e.returnPitch=t.getFloat("returnPitch");
-e.transitAfter=Math.max(0,t.getLong("transitAfter"));
+if(t.contains("returnPosition"))e.returnPosition=BlockPos.of(t.getLOng("returnPosition"));
+e.returnYaw=t.getFloat("returnYaw");e.returnPitch=t.getFloat("returnPitch");e.transitAfter=Math.max(0,t.getLOng("transitAfter"));
 }
+
 if(root.getInt("actorSchema")>1)throw new IllegalStateException("MANUAL_DIAGNOSTIC Unsupported actor schema");
 var actors=root.getList("actors",Tag.TAG_COMPOUND);
 if(actors.size()>256)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor registry exceeds bounded capacity");
@@ -99,24 +134,84 @@ if(data.actors.putIfAbsent(actor.storyId,actor)!=null)throw new IllegalStateExce
 if(!data.save(new CompoundTag(),registry).equals(root))data.setDirty();
 return data;
 }
+
 private void verifySourceUnchanged() throws java.io.IOException {
 if(storageFile==null)return;
 if(expectedHash==null?!java.nio.file.Files.notExists(storageFile):!expectedHash.equals(StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile))))
 throw new java.io.IOException("source_changed_since_load");
 }
+
+private ReturnNetworkBoundary validateDirectTransition(ReturnNetworkState before, ReturnNetworkState after) {
+if(before.save().equals(after.save()))return ReturnNetworkBoundary.NO_CHANGE;
+
+ReturnNetworkState expected;
+ReturnNetworkBoundary boundary;
+try {
+switch(before.stage) {
+case NOT_STARTED -> {
+expected=before.discover(new ReturnNetworkState.Prerequisite(4,true,true,true),after.instance,after.location);
+boundary=ReturnNetworkBoundary.DISCOVERED;
+}
+case DISCOVERED -> {
+expected=before.join(Objects.requireNonNull(after.participant,"participant"));
+boundary=ReturnNetworkBoundary.NPC_JOINED;
+}
+case NPC_JOINED -> {
+expected=before.observePattern();
+boundary=ReturnNetworkBoundary.SIGNAL_OBSERVED;
+}
+case SIGNAL_OBSERVED -> {
+expected=before.intervene();
+boundary=ReturnNetworkBoundary.INTERVENTION_COMMITTED;
+}
+case INTERVENTION_COMMITTED -> {
+if(before.presentation==ReturnNetworkState.Presentation.NONE) {
+expected=before.beginPresentation();
+boundary=ReturnNetworkBoundary.PRESENTATION_STARTED;
+} else if(before.presentation==ReturnNetworkState.Presentation.PRESENTING) {
+expected=before.observeResponse();
+boundary=ReturnNetworkBoundary.RESPONSE_OBSERVED;
+} else throw new IllegalStateException("unexpected_intervention_presentation="+before.presentation);
+}
+case RESPONSE_OBSERVED -> {
+if(!before.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)) {
+expected=before.shareExperience();
+boundary=ReturnNetworkBoundary.SHARED_EXPERIENCE;
+} else {
+expected=before.complete();
+boundary=ReturnNetworkBoundary.COMPLETED;
+}
+}
+case COMPLETED -> throw new IllegalStateException("completed_is_terminal");
+default -> throw new IllegalStateException("unknown_return_network_stage");
+}
+} catch(RuntimeException ex) {
+throw new IllegalStateException("RETURN_NETWORK_ILLEGAL_TRANSITION "+ex.getMessage(),ex);
+}
+if(!expected.save().equals(after.save()))
+throw new IllegalStateException("RETURN_NETWORK_ILLEGAL_TRANSITION expected="+boundary);
+return boundary;
+}
+
 public synchronized ReturnNetworkCommit commitReturnNetwork(ReturnNetworkState expected,ReturnNetworkState draft,HolderLookup.Provider registry) {
 if(!storySaveWritable)throw new IllegalStateException("STORY_WRITE_BLOCKED previous_guard_failure");
 Objects.requireNonNull(expected,"expected");
 Objects.requireNonNull(draft,"draft");
 if(storageFile==null)throw new IllegalStateException("RETURN_NETWORK_STORAGE_NOT_BOUND");
 if(!returnNetwork.save().equals(expected.save()))throw new IllegalStateException("RETURN_NETWORK_STALE_DRAFT");
+
 var validated=ReturnNetworkState.load(draft.save());
+var boundary=validateDirectTransition(returnNetwork,validated);
 try {
 verifySourceUnchanged();
 } catch(java.io.IOException ex) {
 storySaveWritable=false;
 throw new java.io.UncheckedIOException("STORY_WRITE_BLOCKED original preserved",ex);
 }
+
+if(boundary==ReturnNetworkBoundary.NO_CHANGE)
+return new ReturnNetworkCommit(boundary,returnNetwork,expectedHash,false);
+
 var envelope=new CompoundTag();
 envelope.put("data",savePayload(new CompoundTag(),registry,validated));
 NbtUtils.addCurrentDataVersion(envelope);
@@ -126,11 +221,13 @@ String durableHash=StoryStorage.digest(java.nio.file.Files.readAllBytes(storageF
 expectedHash=durableHash;
 returnNetwork=validated;
 setDirty(false);
-return new ReturnNetworkCommit(validated,durableHash);
+return new ReturnNetworkCommit(boundary,validated,durableHash,true);
 } catch(java.io.IOException ex) {
+storySaveWritable=false;
 throw new java.io.UncheckedIOException("RETURN_NETWORK_COMMIT_FAILED original_or_atomic_target_preserved",ex);
 }
 }
+
 @Override public synchronized void save(java.io.File file,HolderLookup.Provider registry) {
 if(!storySaveWritable)throw new IllegalStateException("STORY_WRITE_BLOCKED previous_guard_failure");
 if(!isDirty())return;
@@ -145,12 +242,15 @@ storyWriter.write(root,file.toPath());
 if(storageFile!=null)expectedHash=StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile));
 setDirty(false);
 } catch(java.io.IOException ex) {
+storySaveWritable=false;
 throw new java.io.UncheckedIOException("Story checkpoint commit failed: "+file,ex);
 }
 }
+
 @Override public synchronized CompoundTag save(CompoundTag root, HolderLookup.Provider registry) {
 return savePayload(root,registry,returnNetwork);
 }
+
 private CompoundTag savePayload(CompoundTag root,HolderLookup.Provider registry,ReturnNetworkState returnNetworkSnapshot) {
 root.putInt("schema", SCHEMA);
 var list = new ListTag();
@@ -170,8 +270,10 @@ t.putFloat("returnYaw",e.returnYaw);t.putFloat("returnPitch",e.returnPitch);t.pu
 list.add(t);
 });
 root.put("players", list);
-root.putInt("actorSchema",1);var actorList=new ListTag();actors.values().forEach(a->actorList.add(a.save()));root.put("actors",actorList);
-root.put("returnNetwork",returnNetworkSnapshot.save());
+root.putInt("actorSchema",1);
+var actorList=new ListTag();actors.values().forEach(a->actorList.add(a.save()));root.put("actors",actorList);
+if(returnNetworkSnapshot.stage==ReturnNetworkState.Stage.NOT_STARTED)root.remove("returnNetwork");
+else root.put("returnNetwork",returnNetworkSnapshot.save());
 return root;
 }
 }
