@@ -1,0 +1,641 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+version = mod_version
+group = 'io.github.whileaway'
+base { archivesName = 'whileaway' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
+repositories {
+    mavenCentral()
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'; content { includeGroup('software.bernie.geckolib') } }
+}
+dependencies {
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
+tasks.named('test') { useJUnitPlatform() }
+neoForge {
+    version = neo_version
+    runs {
+        client { client() }
+        clientSmoke {
+            client()
+            gameDirectory = file('../../work/client-smoke')
+            systemProperty 'whileaway.clientSmoke', 'true'
+            systemProperty 'whileaway.evidence', file('evidence').absolutePath
+        }
+        citySmoke {
+            client()
+            gameDirectory = file('../../work/city-smoke')
+            systemProperty 'whileaway.citySmoke', 'true'
+            systemProperty 'whileaway.evidence', file('evidence/stability/regression').absolutePath
+            systemProperty 'whileaway.artSmoke', 'true'
+        }
+        cityReload {
+            client()
+            gameDirectory = file('../../work/city-smoke')
+            systemProperty 'whileaway.citySmoke', 'true'
+            systemProperty 'whileaway.cityReload', 'true'
+            systemProperty 'whileaway.evidence', file('evidence/stability/regression').absolutePath
+            systemProperty 'whileaway.artSmoke', 'true'
+        }
+        [1,2].each { repetition ->
+            ['Cut','Copy','Resume'].each { mode ->
+                create("recovery${mode}${repetition}") {
+                    client()
+                    gameDirectory = file('../../work/recovery-smoke')
+                    systemProperty 'whileaway.recovery', mode == 'Cut' ? 'cut' : mode == 'Copy' ? 'copy' : 'resume'
+                    systemProperty 'whileaway.recoveryTask', "runRecovery${mode}${repetition}"
+                    systemProperty 'whileaway.repeat', repetition.toString()
+                    systemProperty 'whileaway.evidence', file('evidence/stability').absolutePath
+                }
+            }
+        }
+        [1,2,4].each { kind ->
+            def steps = kind == 4 ? ['A','B','D','E','Verify'] : ['D','E','Verify']
+            steps.each { boundary ->
+            create("boundary${kind}${boundary}") {
+                client()
+                gameDirectory = file('../../work/boundary-smoke')
+                systemProperty 'whileaway.boundary', boundary
+                systemProperty 'whileaway.boundaryKind', kind.toString()
+                systemProperty 'whileaway.evidence', file('evidence/reuse').absolutePath
+            }
+        } }
+        [1,2].each { repetition -> ['A','B','C','D','E','Verify'].each { boundary ->
+            create("actor${boundary}${repetition}") {
+                client()
+                gameDirectory = file('../../work/canonical-recovery-crash')
+                systemProperty 'whileaway.actorBoundary', boundary
+                systemProperty 'whileaway.actorRepeat', repetition.toString()
+                systemProperty 'whileaway.evidence', file('evidence/canonical-recovery/crash').absolutePath
+            }
+        } }
+        [1,2].each { repetition -> ['Seed','Original','Copy','Reload','CopyReload'].each { mode ->
+            create("actorExceptions${mode}${repetition}") {
+                client(); gameDirectory=file('../../work/canonical-recovery-exceptions')
+                systemProperty 'whileaway.actorExceptions',mode
+                systemProperty 'whileaway.actorRepeat',repetition.toString()
+                systemProperty 'whileaway.evidence',file('evidence/canonical-recovery/exceptions').absolutePath
+            }
+        } }
+        ['Control','Recover','RecoverReload','Blocked','Unsupported'].each { mode ->
+            create("loadGuard${mode}") {
+                client(); gameDirectory=file('../../work/canonical-recovery-client-final')
+                systemProperty 'whileaway.loadSmoke',mode
+                systemProperty 'whileaway.evidence',file('evidence/canonical-recovery/client-final').absolutePath
+            }
+        }
+        (['Exact','ExactReload','Ambiguous','Unloaded','NoCandidate','Duplicate','Late'] + (1..6).collect { "Cut${it}" } + (1..6).collect { "Resume${it}" }).each { mode ->
+            create("canonical${mode}") {
+                client(); gameDirectory=file('../../work/canonical-client-final')
+                systemProperty 'whileaway.canonicalSmoke',mode
+                systemProperty 'whileaway.evidence',file('evidence/canonical-recovery/canonical-final').absolutePath
+            }
+        }
+        (['Seed'] + ['A','B','C','D','E'].collectMany { ["Cut${it}","Resume${it}"] }).each { mode ->
+            create("npc${mode}") {
+                client(); gameDirectory=file('../../work/npc-lifecycle')
+                systemProperty 'whileaway.npcSmoke',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-lifecycle/client').absolutePath
+            }
+        }
+        (['Off','On'].collectMany { k -> (1..5).collect { "Death${it}${k}" } } + ['ReloadOff','ReloadOn']).each { mode ->
+            create("npcException${mode}") {
+                client(); gameDirectory=file('../../work/npc-exceptions')
+                systemProperty 'whileaway.npcException',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-exceptions/client').absolutePath
+            }
+        }
+        ['A','B','C','D','E'].collectMany { ["Cut${it}","Resume${it}"] }.each { mode ->
+            create("npcRegression${mode}") {
+                client(); gameDirectory=file('../../work/npc-exceptions-regression')
+                systemProperty 'whileaway.npcSmoke',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-exceptions/regression').absolutePath
+            }
+        }
+        ['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2'].each { mode ->
+            create("npcWorld${mode}") {
+                client(); gameDirectory=file('../../work/npc-world')
+                systemProperty 'whileaway.npcWorld',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-world/client').absolutePath
+            }
+        }
+        ['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB'].each { mode ->
+            create("npcCopy${mode}") {
+                client(); gameDirectory=file('../../work/npc-copy')
+                systemProperty 'whileaway.npcCopy',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-world/copy-client').absolutePath
+            }
+        }
+        ['MissingHome','BlockedHome','ConflictHome','WrongLight','CompletedLight','CutPath','ResumePath','ReloadPath','CutLight','ResumeLight','ReloadLight'].each { mode ->
+            create("npcEnvironment${mode}") {
+                client(); gameDirectory=file('../../work/npc-path')
+                systemProperty 'whileaway.npcEnvironment',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-path/client').absolutePath
+            }
+        }
+        ['Control','MissingHome','MissingExperience','WrongWork','Recover','RecoverReload'].each { mode ->
+            create("npcCorruption${mode}") {
+                client(); gameDirectory=file('../../work/npc-corruption')
+                systemProperty 'whileaway.npcCorruption',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-path/corrupt-client').absolutePath
+            }
+        }
+        ['CutA','ResumeA','CutB','ResumeB','CutC','ResumeC','CutD','ResumeD','CutE','ResumeE'].each { mode ->
+            create("npcPathLifecycle${mode}") {
+                client(); gameDirectory=file('../../work/npc-path-lifecycle')
+                systemProperty 'whileaway.npcSmoke',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-path/closure/lifecycle/regression').absolutePath
+            }
+        }
+        ['Death1Off','Death2Off','Death3Off','Death4Off','Death5Off','Death1On','Death2On','Death3On','Death4On','Death5On','ReloadOff','ReloadOn'].each { mode ->
+            create("npcPathDeath${mode}") {
+                client(); gameDirectory=file('../../work/npc-path-death')
+                systemProperty 'whileaway.npcException',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-path/closure/death/client').absolutePath
+            }
+        }
+        ['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2'].each { mode ->
+            create("npcPathTravel${mode}") {
+                client(); gameDirectory=file('../../work/npc-path-travel')
+                systemProperty 'whileaway.npcWorld',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-path/closure/travel/client').absolutePath
+            }
+        }
+        ['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB'].each { mode ->
+            create("npcPathCopy${mode}") {
+                client(); gameDirectory=file('../../work/npc-path-copy')
+                systemProperty 'whileaway.npcCopy',mode
+                systemProperty 'whileaway.evidence',file('evidence/npc-path/closure/copy/copy-client').absolutePath
+            }
+        }
+        recoveryLegacy {
+            client()
+            gameDirectory = file('../../work/recovery-smoke')
+            systemProperty 'whileaway.recovery', 'legacy'
+            systemProperty 'whileaway.recoveryTask', 'runRecoveryLegacy'
+            systemProperty 'whileaway.evidence', file('evidence/stability').absolutePath
+        }
+        server { server(); programArgument '--nogui' }
+        gameTestServer {
+            type = 'gameTestServer'
+            // GameTests reserve durable actors. Each invocation needs an independent world,
+            // otherwise old test reservations accumulate into the production capacity guard.
+            def invocation=java.util.UUID.randomUUID().toString()
+            gameDirectory=file('../../work/gametest-isolated/'+invocation)
+            systemProperty 'whileaway.testEvidence',file('evidence/return-network-contract/gametest/'+invocation).absolutePath
+            systemProperty 'whileaway.testFixtures',file('evidence/reuse/baseline').absolutePath
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'whileaway'
+        }
+    }
+    mods { whileaway { sourceSet sourceSets.main } }
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('processResources') {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') { expand version: project.version }
+}
+tasks.register('coreTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'io.github.whileaway.core.CoreTests'
+}
+tasks.named('check') { dependsOn 'coreTest' }
+tasks.withType(Jar).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
+
+// Developer clients are muted BEFORE launch, including the title/onboarding screens.
+// Only isolated development options are changed, never the user's normal .minecraft profile.
+['runClient': file('run'), 'runClientSmoke': file('../../work/client-smoke'), 'runCitySmoke':file('../../work/city-smoke'),'runCityReload':file('../../work/city-smoke')].each { taskName, gameDir ->
+    tasks.named(taskName).configure {
+        doFirst {
+            gameDir.mkdirs()
+            def options = new File(gameDir, 'options.txt')
+            def lines = options.exists() ? options.readLines('UTF-8') : []
+            def overrides = ['soundCategory_master':'0.0','soundCategory_music':'0.0',
+                'soundCategory_record':'0.0','soundCategory_weather':'0.0','soundCategory_block':'0.0',
+                'soundCategory_hostile':'0.0','soundCategory_neutral':'0.0','soundCategory_player':'0.0',
+                'soundCategory_ambient':'0.0','soundCategory_voice':'0.0','narrator':'0',
+                'onboardAccessibility':'false','tutorialStep':'none','pauseOnLostFocus':'false']
+            lines.removeAll { line -> overrides.containsKey(line.split(':', 2)[0]) }
+            if (taskName != 'runClient') { lines.removeAll { it.startsWith('lang:') || it.startsWith('renderDistance:') || it.startsWith('simulationDistance:') }; lines.add('lang:ko_kr') }
+            overrides.each { k,v -> lines.add("${k}:${v}") }
+            options.setText(lines.join('\n')+'\n','UTF-8')
+            if (!options.text.contains('soundCategory_master:0.0')) throw new GradleException('Prelaunch mute verification failed')
+            logger.lifecycle("VERIFIED MUTED before launch: ${options.absolutePath}")
+            if (taskName == 'runClientSmoke') file('evidence/client-smoke.txt').setText('RUNNING: awaiting client checks\n', 'UTF-8')
+            if (taskName.startsWith('runCity')) file('evidence/stability/regression/'+taskName+'.txt').setText('RUNNING\n','UTF-8')
+        }
+        if (taskName.startsWith('runCity')) {
+            doLast {
+                if(!file('evidence/stability/regression/'+taskName+'.txt').getText('UTF-8').contains('PASS '+taskName))
+                    throw new GradleException('City client did not finish every gate')
+            }
+        }
+        if (taskName == 'runClientSmoke') {
+            doLast {
+                def evidence = file('evidence/client-smoke.txt').getText('UTF-8')
+                if (!evidence.contains('PASS tracked custom entity present with camera line of sight') ||
+                    !evidence.contains('PASS scene S2C starts, reaches caption phase and ends; master volume remains zero')) {
+                    throw new GradleException('Client smoke did not reach every required gate; inspect runtime log')
+                }
+            }
+        }
+    }
+}
+
+// Fault-injection clients use the same prelaunch mute implementation as every other test client.
+['Cut','Copy','Resume'].each { mode -> (1..2).each { repetition ->
+    tasks.named("runRecovery${mode}${repetition}").configure {
+        if(mode == 'Cut') ignoreExitValue = true
+        doFirst {
+            def gameDir=file('../../work/recovery-smoke');gameDir.mkdirs()
+            def options=new File(gameDir,'options.txt')
+            def lines=options.exists()?options.readLines('UTF-8'):[]
+            def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
+            lines.removeAll { it.startsWith('soundCategory_') || it.startsWith('narrator:') || it.startsWith('onboardAccessibility:') || it.startsWith('tutorialStep:') || it.startsWith('pauseOnLostFocus:') || it.startsWith('lang:') || it.startsWith('renderDistance:') || it.startsWith('simulationDistance:') }
+            muted.each { lines.add("soundCategory_${it}:0.0") }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5'])
+            options.setText(lines.join('\n')+'\n','UTF-8')
+            if(!muted.every { options.text.contains("soundCategory_${it}:0.0") })throw new GradleException('Recovery mute failed')
+            logger.lifecycle("VERIFIED MUTED before launch: ${options.absolutePath}")
+            file("evidence/stability/runRecovery${mode}${repetition}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            if(mode == 'Cut') logger.lifecycle("EXPECTED_FAULT_PROCESS_EXIT=${executionResult.get().exitValue}")
+            if(!file("evidence/stability/runRecovery${mode}${repetition}.txt").text.contains("PASS runRecovery${mode}${repetition}"))throw new GradleException('Recovery fault gate did not finish')
+        }
+    }
+} }
+
+tasks.named('runRecoveryLegacy').configure {
+    doFirst {
+        def options=file('../../work/recovery-smoke/options.txt')
+        // Reuse only the already isolated profile, and re-verify ALL sound categories before this launch.
+        if(!options.exists() || !['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].every { options.text.contains("soundCategory_${it}:0.0") } || !options.text.contains('narrator:0'))throw new GradleException('Legacy mute gate failed')
+        logger.lifecycle("VERIFIED MUTED before launch: ${options.absolutePath}")
+        file('evidence/stability/runRecoveryLegacy.txt').setText('RUNNING\n','UTF-8')
+    }
+    doLast { if(!file('evidence/stability/runRecoveryLegacy.txt').text.contains('PASS runRecoveryLegacy'))throw new GradleException('Legacy migration gate failed') }
+}
+
+// New evidence and profile: adopted 0.3.1 fixtures are never overwritten.
+[1,2,4].each { kind ->
+            def steps = kind == 4 ? ['A','B','D','E','Verify'] : ['D','E','Verify']
+            steps.each { boundary ->
+    tasks.named("runBoundary${kind}${boundary}").configure {
+        if(boundary!='Verify') ignoreExitValue=true
+        doFirst {
+            def dir=file('../../work/boundary-smoke');dir.mkdirs()
+            def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
+            def values=muted.collect { "soundCategory_${it}:0.0" }
+            values.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5'])
+            def options=new File(dir,'options.txt');options.setText(values.join('\n')+'\n','UTF-8')
+            if(!muted.every { options.text.contains("soundCategory_${it}:0.0") } || !options.text.contains('narrator:0'))throw new GradleException('Boundary mute gate failed')
+            logger.lifecycle('VERIFIED MUTED before boundary client launch')
+            file("evidence/reuse/runBoundary${kind}${boundary}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            if(boundary!='Verify')logger.lifecycle("EXPECTED_FAULT_PROCESS_EXIT=${executionResult.get().exitValue}")
+            if(!file("evidence/reuse/runBoundary${kind}${boundary}.txt").text.contains("PASS runBoundary${kind}${boundary}"))throw new GradleException('Boundary gate did not finish')
+        }
+    }
+} }
+
+// Actor cuts use a new, isolated profile. No audio may be emitted even before the world opens.
+[1,2].each { repetition -> ['A','B','C','D','E','Verify'].each { boundary ->
+    tasks.named("runActor${boundary}${repetition}").configure {
+        if(boundary!='Verify')ignoreExitValue=true
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            systemProperty 'whileaway.monitorLeft',monitor.left.toString()
+            systemProperty 'whileaway.monitorTop',monitor.top.toString()
+            systemProperty 'whileaway.monitorWidth',monitor.width.toString()
+            systemProperty 'whileaway.monitorHeight',monitor.height.toString()
+            file('evidence/canonical-recovery/crash').mkdirs()
+            def dir=file('../../work/canonical-recovery-crash');dir.mkdirs()
+            def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
+            def lines=muted.collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5'])
+            def options=new File(dir,'options.txt');options.setText(lines.join('\n')+'\n','UTF-8')
+            if(!muted.every { options.text.contains("soundCategory_${it}:0.0") } || !options.text.contains('narrator:0'))throw new GradleException('Actor mute failed')
+            logger.lifecycle("VERIFIED MUTED before actor client launch: ${options.absolutePath}")
+            file("evidence/canonical-recovery/crash/runActor${boundary}${repetition}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            if(boundary!='Verify')logger.lifecycle("EXPECTED_FAULT_PROCESS_EXIT=${executionResult.get().exitValue}")
+            if(!file("evidence/canonical-recovery/crash/runActor${boundary}${repetition}.txt").text.contains("PASS runActor${boundary}${repetition}"))throw new GradleException('Actor boundary gate did not finish')
+        }
+    }
+} }
+
+[1,2].each { repetition -> ['Seed','Original','Copy','Reload','CopyReload'].each { mode ->
+    tasks.named("runActorExceptions${mode}${repetition}").configure {
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            systemProperty 'whileaway.monitorLeft',monitor.left.toString()
+            systemProperty 'whileaway.monitorTop',monitor.top.toString()
+            systemProperty 'whileaway.monitorWidth',monitor.width.toString()
+            systemProperty 'whileaway.monitorHeight',monitor.height.toString()
+            file('evidence/canonical-recovery/exceptions').mkdirs()
+            def dir=file('../../work/canonical-recovery-exceptions');dir.mkdirs()
+            def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
+            def lines=muted.collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            logger.lifecycle("VERIFIED MUTED; requested right secondary DISPLAY1 ${monitor.x},${monitor.y}")
+            file("evidence/canonical-recovery/exceptions/runActorExceptions${mode}${repetition}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            if(!file("evidence/canonical-recovery/exceptions/runActorExceptions${mode}${repetition}.txt").text.contains("PASS runActorExceptions${mode}${repetition}"))throw new GradleException('Actor exception gates incomplete')
+        }
+    }
+} }
+
+
+['Control','Recover','RecoverReload','Blocked','Unsupported'].each { mode ->
+    tasks.named("runLoadGuard${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/canonical-recovery-client-final');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/canonical-recovery/client-final').mkdirs();file("evidence/canonical-recovery/client-final/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/canonical-recovery/client-final/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('Load guard smoke failed')
+        }
+    }
+}
+
+
+(['Exact','ExactReload','Ambiguous','Unloaded','NoCandidate','Duplicate','Late'] + (1..6).collect { "Cut${it}" } + (1..6).collect { "Resume${it}" }).each { mode ->
+    tasks.named("runCanonical${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/canonical-client-final');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/canonical-recovery/canonical-final').mkdirs();file("evidence/canonical-recovery/canonical-final/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/canonical-recovery/canonical-final/${mode}.txt").text
+            logger.lifecycle("ACTUAL_CHILD_EXIT=${executionResult.get().exitValue}")
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('Canonical smoke failed')
+        }
+    }
+}
+
+(['Seed'] + ['A','B','C','D','E'].collectMany { ["Cut${it}","Resume${it}"] }).each { mode ->
+    tasks.named("runNpc${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-lifecycle/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-lifecycle/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-lifecycle');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-lifecycle/client').mkdirs();file("evidence/npc-lifecycle/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-lifecycle/client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+(['Off','On'].collectMany { k -> (1..5).collect { "Death${it}${k}" } } + ['ReloadOff','ReloadOn']).each { mode ->
+    tasks.named("runNpcException${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-exceptions/PAUSE_REQUESTED').exists() && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-exceptions/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-exceptions');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-exceptions/client').mkdirs();file("evidence/npc-exceptions/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-exceptions/client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+(['A','B','C','D','E'].collectMany { ["Cut${it}","Resume${it}"] }).each { mode ->
+    tasks.named("runNpcRegression${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-exceptions/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-exceptions/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-exceptions-regression');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-exceptions/regression').mkdirs();file("evidence/npc-exceptions/regression/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-exceptions/regression/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2'].each { mode ->
+    tasks.named("runNpcWorld${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-world/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-world/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-world');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-world/client').mkdirs();file("evidence/npc-world/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-world/client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB'].each { mode ->
+    tasks.named("runNpcCopy${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-world/PAUSE_REQUESTED').exists() && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-world/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-copy');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-world/copy-client').mkdirs();file("evidence/npc-world/copy-client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-world/copy-client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['MissingHome','BlockedHome','ConflictHome','WrongLight','CompletedLight','CutPath','ResumePath','ReloadPath','CutLight','ResumeLight','ReloadLight'].each { mode ->
+    tasks.named("runNpcEnvironment${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-path/PAUSE_REQUESTED').exists() && !mode.startsWith('Reload') && !mode.startsWith('Resume'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-path/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-path');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-path/client').mkdirs();file("evidence/npc-path/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-path/client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+
+['Control','MissingHome','MissingExperience','WrongWork','Recover','RecoverReload'].each { mode ->
+    tasks.named("runNpcCorruption${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-path/PAUSE_REQUESTED').exists() && mode!='RecoverReload')throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-path/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-corruption');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-path/corrupt-client').mkdirs();file("evidence/npc-path/corrupt-client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-path/corrupt-client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['CutA','ResumeA','CutB','ResumeB','CutC','ResumeC','CutD','ResumeD','CutE','ResumeE'].each { mode ->
+    tasks.named("runNpcPathLifecycle${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-path/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume') && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-path/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-path-lifecycle');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-path/closure/lifecycle/regression').mkdirs();file("evidence/npc-path/closure/lifecycle/regression/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-path/closure/lifecycle/regression/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['Death1Off','Death2Off','Death3Off','Death4Off','Death5Off','Death1On','Death2On','Death3On','Death4On','Death5On','ReloadOff','ReloadOn'].each { mode ->
+    tasks.named("runNpcPathDeath${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-path/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume') && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-path/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-path-death');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-path/closure/death/client').mkdirs();file("evidence/npc-path/closure/death/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-path/closure/death/client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2'].each { mode ->
+    tasks.named("runNpcPathTravel${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-path/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume') && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-path/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-path-travel');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-path/closure/travel/client').mkdirs();file("evidence/npc-path/closure/travel/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-path/closure/travel/client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+
+
+['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB'].each { mode ->
+    tasks.named("runNpcPathCopy${mode}").configure {
+        ignoreExitValue=true
+        doFirst {
+            if(file('evidence/npc-path/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume') && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-path/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/npc-path-copy');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/npc-path/closure/copy/copy-client').mkdirs();file("evidence/npc-path/closure/copy/copy-client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            def text=file("evidence/npc-path/closure/copy/copy-client/${mode}.txt").text
+            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
+        }
+    }
+}
+

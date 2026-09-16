@@ -1,0 +1,37 @@
+{
+  "world_operations": "none",
+  "baseline_hash": "80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51",
+  "restored_hash": "80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51",
+  "modified_hash": "19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19",
+  "commands": [
+    {
+      "command": "java -cp build/npc-exception-archive-probe NpcExceptionArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-exceptions\\baseline\\previous.jar\" baseline",
+      "label": "BASELINE",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard expected only in modified; canonical recovery retained in both",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=false",
+      "exit": 0
+    },
+    {
+      "command": "java -cp build/npc-exception-archive-probe NpcExceptionArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-exceptions\\whileaway-0.3.1-npc-exceptions.jar\" modified",
+      "label": "MODIFIED",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard expected only in modified; canonical recovery retained in both",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true",
+      "exit": 0
+    },
+    {
+      "command": "bash -lc \"chmod +x evidence/npc-exceptions/ROLLBACK.sh && test -x evidence/npc-exceptions/ROLLBACK.sh && evidence/npc-exceptions/ROLLBACK.sh build/rollback-npc-exceptions/test.jar\"",
+      "label": "ROLLBACK",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc-exceptions\\test.jar",
+      "output": "ROLLBACK PASS: npc-lifecycle JAR restored; world files untouched",
+      "exit": 0
+    },
+    {
+      "command": "java -cp build/npc-exception-archive-probe NpcExceptionArchiveProbe build/rollback-npc-exceptions/test.jar baseline",
+      "label": "RESTORED",
+      "input": "same 8 policy cases and baseline fixture revision",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=false",
+      "exit": 0
+    }
+  ],
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites."
+}

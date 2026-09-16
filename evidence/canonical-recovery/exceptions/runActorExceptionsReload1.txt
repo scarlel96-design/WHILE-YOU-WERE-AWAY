@@ -1,0 +1,3 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=45708
+PASS runActorExceptionsReload1 checkpoint=4 generation=0 instance=754019f2-d156-44b6-8b37-e2df1cf833c6 actor=3a68f9cf-df79-46a4-ae9e-15861f97e4c8

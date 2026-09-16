@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="whileaway"
+version="${version}"
+displayName="While You Were Away / 네가 없는 동안"
+description='''Discovery-driven narrative horror. Development slice: the abandoned station.'''
+[[dependencies.whileaway]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.249,21.2)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.whileaway]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
+[[dependencies.whileaway]]
+modId="geckolib"
+type="required"
+versionRange="[4.9.2,5)"
+ordering="AFTER"
+side="BOTH"

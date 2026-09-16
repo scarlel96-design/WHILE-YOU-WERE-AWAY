@@ -1,0 +1,10 @@
+{"mode": "Seed", "command": "./gradlew.bat --offline runNpcSeed", "exit": 0, "pid": 42480, "processExited": true, "seconds": 108.86885857582092, "pass": true}
+{"mode": "CutA", "command": "./gradlew.bat --offline runNpcCutA", "exit": 0, "pid": 48584, "processExited": true, "seconds": 82.45110535621643, "pass": true}
+{"mode": "ResumeA", "command": "./gradlew.bat --offline runNpcResumeA", "exit": 0, "pid": 18004, "processExited": true, "seconds": 104.9602062702179, "pass": true}
+{"mode": "CutB", "command": "./gradlew.bat --offline runNpcCutB", "exit": 0, "pid": 52620, "processExited": true, "seconds": 67.57248425483704, "pass": true}
+{"mode": "ResumeB", "command": "./gradlew.bat --offline runNpcResumeB", "exit": 0, "pid": 34580, "processExited": true, "seconds": 108.29034161567688, "pass": true}
+{"mode": "CutC", "command": "./gradlew.bat --offline runNpcCutC", "exit": 0, "pid": 53212, "processExited": true, "seconds": 83.55154752731323, "pass": true}
+{"mode": "ResumeC", "command": "./gradlew.bat --offline runNpcResumeC", "exit": 0, "pid": 49880, "processExited": true, "seconds": 65.63319849967957, "pass": true}
+{"mode": "CutD", "command": "./gradlew.bat --offline runNpcCutD", "exit": 0, "pid": 14104, "processExited": true, "seconds": 97.38786292076111, "pass": true}
+{"mode": "ResumeD", "command": "./gradlew.bat --offline runNpcResumeD", "exit": 0, "pid": 50480, "processExited": true, "seconds": 72.28083372116089, "pass": true}
+{"mode": "CutE", "command": "./gradlew.bat --offline runNpcCutE", "exit": 1, "pid": 0, "processExited": false, "seconds": 11.828771591186523, "pass": false}

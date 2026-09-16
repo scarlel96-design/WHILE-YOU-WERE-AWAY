@@ -1,0 +1,4 @@
+RUNNING
+PASS reload C checkpoint=1 facts=[]
+PASS runActorC1 boundary=CHECKPOINT_COMMITTED checkpoint=2 generation=2 instance=598fed6a-a4ac-4d24-b1b0-3258f16aea14
+FAULT Runtime.halt after durable story write; no shutdown save

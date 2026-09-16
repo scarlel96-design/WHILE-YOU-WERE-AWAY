@@ -1,0 +1,214 @@
+# NPC lifecycle slice — implementation contract
+
+Current: 0.3.1-dev.1 / npc-lifecycle / PARTIAL. The previous usage-threshold shutdown was revoked. A later instruction adds usage-aware safe pause without shutdown. No automatic shutdown remains armed.
+
+## Baseline and scope
+Input is immutable canonical-recovery JAR 82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542 and source ZIP 987953a2ceaa5edd0a97f5c285015d3e5611e685566182618b6910d6857eaaee, copied to evidence/npc-lifecycle/baseline. New distributions belong only in dist/npc-lifecycle.
+Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21; save format 4; actorSchema optional 1; art revision 2. No 0.3.2.
+
+## Real event
+Yeoul is a registered whileaway:story_npc PathfinderMob, not a Villager fixture. When a living non-spectator approaches the completed city's arrival area, the world-local npc:yeoul reservation is created once. The NPC waits for interaction, walks to a place beside the existing return light, observes that actual block, and starts a new maintenance routine. The block must actually exist; no success by elapsed timer. No block edits or forced NPC teleporting are used to clear a route.
+Placeholder appearance references Minecraft's villager texture/model without copying the asset. The placeholder register includes its final replacement requirement. No final skin/model/art production occurred.
+
+## State and commit sequence
+0 PREPARED: UUID/instance/home/goal/work reserved atomically before spawn.
+1 PHASE_1: actual entity appeared; waits for player interaction.
+2 PHASE_2: introduction receipt and met-player/shared-conversation relation committed before the line; actual pathfinding to residence.
+3 RESOLVING: arrival and actual return-light observation committed; completion has not yet been confirmed.
+4 COMPLETED: settled fact, shared-event relation receipt, next-link receipt, and new work state committed together. Actor stays ACTIVE, non-temporary and unowned; finishing the event does not retire the resident.
+
+NpcState stores its contract in the existing actor facts set. npc.home/goal/work are single-valued state fields; met/dialogue/arrival/observed/relationship/settled/link are event receipts. Work deliberately changes from check_return_light to maintain_return_light. It is not a lost permanent event fact. NPC and player counterpart identifiers share the relationship key format, but no full NPC-to-NPC simulation is claimed.
+The initial facts initializer is a common StoryActors.prepare overload. It runs before the actor is registered or any reservation is saved, so failure cannot leave a half-initialized NPC. Existing call sites use an empty initializer and retain their former behavior.
+
+## Recovery and integrity
+Identity, generation, spawn retry and stale-generation decisions remain in the existing Actor layer. NPC code does not select canonical entities. StoryStorage applies NPC semantic validation after normal parsing and blocks contradictory residence/completion facts. StoryActors.integrity includes those diagnostics. AI and interactions respect the existing write/activation guard.
+No new top-level schema was introduced. Existing actor facts serialization retains these strings; new readers add NPC-specific validation. NPC-free legacy worlds do not invent NPC records on load. They may discover the event normally on entering the city. JAR rollback is copy-only; removing a registered entity type from an NPC world is not a supported save downgrade.
+
+The essential resident currently rejects ordinary damage. This is an explicit provisional gameplay policy, not evidence for void/command removal, every modded damage source, or a finished NPC death/rescue system. Absence suspends event movement without failing the story. Completed residents can keep their loaded routine without a player owner. Obstructed routes wait rather than destroying player builds; robust alternate residence/path recovery is still pending.
+
+## Verification separation
+Four new GameTests exercise relation/residence NBT, conflicting home/premature link detection, initializer failure atomicity, and a completed real StoryNpc remaining canonical. All 52 prior GameTests remain unchanged. The storage probe reruns prior 580 cases; those are not 580 new NPC cases.
+NpcSmoke is a scripted integrated-client fixture. Seed constructs the actual city as a spectator (no NPC trigger). Five copies independently run A/B/C/D/E cuts, each followed by a new process. Gameplay NPC creation uses the normal proximity hook; interaction calls the actual mobInteract entry point. Only the fixture player is positioned by the harness. This is not natural survival, human mouse-input QA, or general NPC exception certification.
+Normal milestone reports must distinguish game tests, actual clients, PID exits, saved NBT, and copied seed preservation. Never promote the historical canonical 35 processes into this slice's current evidence.
+
+## Remaining and next
+NPC A/B/C/D/E is one bounded milestone. Overall NPC stability stays PARTIAL until NPC-specific player death, chunk unload/reload, Nether/End travel, divergent copy-world progression, missing/blocked residence/return-light recovery, and load-guard/canonical integration risks are tested. Natural survival and composite/item/reward/fallback systems remain NOT STARTED/NOT TESTED as applicable. Next work starts with the real NPC exception matrix, not a composite event or final art.
+Caveman remains HOLD. No Terra/Luna delegation or model-routing experiment; no token savings measured.
+
+## Usage-aware pause
+User added safe pause near either active usage limit. Observed five-hour usage 96%, weekly 15%. Complete the in-flight C recovery, then stop before D; preserve all evidence. The Gradle gate PAUSED_AT_SAFE_BOUNDARY deliberately prevents a new client, and is not a gameplay test failure. Automatic computer shutdown remains disabled. Resume only after checking available usage and removing the explicit pause marker; D/E are unverified until actually run.
+
+Observed pause correction: D was already dispatched before the newly edited Gradle gate was loaded. CutD and ResumeD finished normally; CutE was then blocked before any client PID existed. Original command history and pause log are retained. Resume on 2026-09-14 found five-hour usage 2%, weekly 16%; remaining work is CutE/ResumeE. The runner now also checks the pause marker before dispatching a new pair (in addition to the Gradle gate).
+
+## Additional environment attempt
+First ResumeE launch failed before world opening: window outside requested right monitor. Failure recorded no PID (PID recording follows environment verification); this was a launched client, not a blocked dispatch. The failing bounds were not captured, so displacement cause is unconfirmed. No java processes remained at inspection. Story file still matched the CutE snapshot (5810ecef0dafdbbcffe346fbb5a2d512a938ef408534c594cbed65153daaa6e0). The failure and unchanged disk proof are retained under environment-resumeE-attempt1. Retest uses the same world and unmodified runtime/strict environment gate.
+
+## Verified closeout on 2026-09-14
+CutE and the repeated ResumeE completed. Final evidence now contains 11 successful distinct exited client PIDs: Seed plus five cut/restart pairs. The first ResumeE environment failure remains separately preserved (not counted as PASS). All five pairs passed independent saved-NBT checks and unchanged seed manifests; final NPC UUID/instance/generation survived, generation remained zero, checkpoint reached four and current work became maintain_return_light. NPC A/B/C/D/E PASS; NPC full stability and campaign PARTIAL. Next first task is NPC-specific player death/respawn, followed by actual chunk unload, Nether/End and divergent copied-world progression.
+
+## Observed final gates
+{
+  "version": "0.3.1-dev.1",
+  "work": "npc-lifecycle",
+  "saveFormat": 4,
+  "actorSchema": 1,
+  "artRevision": 2,
+  "npc_abcde": "PASS",
+  "npc_full_stability": "PARTIAL",
+  "campaign": "PARTIAL",
+  "gameTests": 56,
+  "unchangedGameTests": 52,
+  "coreAssertions": 176857,
+  "storageCases": 580,
+  "storageAssertions": 2161,
+  "npcStorageCases": 8,
+  "npcSemanticBlockedCases": 6,
+  "realClients": 11,
+  "processRestartPairs": 5,
+  "npc_death_dimension_chunk_copy_progress": "NOT TESTED",
+  "natural_survival": "NOT TESTED",
+  "composite": "NOT STARTED"
+}
+
+## Baseline, changed fields, artifacts
+Baseline canonical-recovery copied byte-identically; new work never republished baseline.
+Changed branch: NPC adapter facts initialize before common PREPARED persist; NPC-specific semantic load validation; interaction/checkpoint/living-state commits. No canonical/generation policy change.
+BASELINE_JAR: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\baseline\previous.jar
+SHA256=82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542
+BASELINE_SOURCE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\baseline\previous-source.zip
+SHA256=987953a2ceaa5edd0a97f5c285015d3e5611e685566182618b6910d6857eaaee
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\npc-lifecycle\whileaway-0.3.1-npc-lifecycle.jar
+SHA256=80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\DIFF.patch
+SHA256=d0f17af241199801dc0635ad38b3ea826b1bacc46fcbb0fe5d94ab7e33d89725
+ROLLBACK.sh: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\ROLLBACK.sh
+SHA256=ce16a0203bc35a7a583e40a725da12e11d66211ed81cadbed3d6a87c36137306
+VERIFICATION.txt: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\VERIFICATION.txt
+Source ZIP digest is in dist/npc-lifecycle/SHA256SUMS.txt (outside archive; avoids circular self-hash).
+
+## Commands and literal results
+Working directory: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+command: ./gradlew.bat --offline runGameTestServer
+input/log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\baseline-tests.log
+[19:19:09] [Server thread/INFO] [minecraft/GameTestServer]: All 52 required tests passed :)
+BUILD SUCCESSFUL in 1m 7s
+exit: 0
+command: ./gradlew.bat --offline compileJava runGameTestServer build
+input/log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\tests-1.log
+[19:33:05] [Server thread/INFO] [minecraft/GameTestServer]: All 56 required tests passed :)
+PASS core assertions=176857
+BUILD SUCCESSFUL in 1m 27s
+exit: 0
+command: pwsh -NoProfile -File tools/probe-npc-storage.ps1
+input/log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\probe.log
+PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false
+exit: 0
+command: java @evidence/npc-lifecycle/npc-fact-run.args
+input/log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-lifecycle\npc-fact-probe.log
+PASS NPC storage cases=8 semanticBlocked=6 normalRoundTrips=2 originalsPreserved=true actualClient=false
+exit: 0
+{
+  "label": "BASELINE",
+  "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=false",
+  "exit": 0,
+  "command": "java -cp build/npc-archive-probe NpcArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-lifecycle\\baseline\\previous.jar\" baseline",
+  "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC expected only in modified; canonical recovery retained in both"
+}
+{
+  "label": "MODIFIED",
+  "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified canonicalRecovery=true writeGuard=true campaignNpc=true",
+  "exit": 0,
+  "command": "java -cp build/npc-archive-probe NpcArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-lifecycle\\whileaway-0.3.1-npc-lifecycle.jar\" modified",
+  "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC expected only in modified; canonical recovery retained in both"
+}
+{
+  "label": "ROLLBACK",
+  "output": "ROLLBACK PASS: canonical-recovery JAR restored; world files untouched",
+  "exit": 0,
+  "command": "bash -lc \"chmod +x evidence/npc-lifecycle/ROLLBACK.sh && test -x evidence/npc-lifecycle/ROLLBACK.sh && evidence/npc-lifecycle/ROLLBACK.sh build/rollback-npc/test.jar\"",
+  "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc\\test.jar"
+}
+{
+  "label": "RESTORED",
+  "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=false",
+  "exit": 0,
+  "command": "java -cp build/npc-archive-probe NpcArchiveProbe build/rollback-npc/test.jar baseline",
+  "input": "same 8 policy cases and baseline fixture revision"
+}
+Restored JAR hash=82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542; modified JAR remains=80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51; world operations=none; archive probe is not gameplay proof.
+
+## Actual integrated clients
+All 11 final PIDs exited. All muted/right secondary DISPLAY1. Five independent seed copies, cut + new-process resume, same identity/generation 0, final checkpoint 4 and new work state.
+{"mode": "Seed", "command": "./gradlew.bat --offline runNpcSeed", "exit": 0, "pid": 42480, "processExited": true, "seconds": 108.86885857582092, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=42480
+PASS Seed real city ready; no NPC; artRevision=2
+
+{"mode": "CutA", "command": "./gradlew.bat --offline runNpcCutA", "exit": 0, "pid": 48584, "processExited": true, "seconds": 82.45110535621643, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=48584
+PASS CutA boundary=NPC_A_PREPARED checkpoint=0 generation=0 uuid=d629c159-f844-49be-bc62-d897f51a18b3 facts=[npc.goal=choose_evening_routine, npc.home=10445360758849, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeA", "command": "./gradlew.bat --offline runNpcResumeA", "exit": 0, "pid": 18004, "processExited": true, "seconds": 104.9602062702179, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=18004
+INPUT checkpoint=0 generation=0 uuid=d629c159-f844-49be-bc62-d897f51a18b3
+PASS ResumeA canonical=1 generation=0 uuid=d629c159-f844-49be-bc62-d897f51a18b3 checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutB", "command": "./gradlew.bat --offline runNpcCutB", "exit": 0, "pid": 52620, "processExited": true, "seconds": 67.57248425483704, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=52620
+PASS CutB boundary=NPC_B_APPEARED checkpoint=1 generation=0 uuid=75951f86-21bd-4696-bdb7-582666b3bcea facts=[npc.goal=choose_evening_routine, npc.home=10445360758849, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeB", "command": "./gradlew.bat --offline runNpcResumeB", "exit": 0, "pid": 34580, "processExited": true, "seconds": 108.29034161567688, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=34580
+INPUT checkpoint=1 generation=0 uuid=75951f86-21bd-4696-bdb7-582666b3bcea
+PASS ResumeB canonical=1 generation=0 uuid=75951f86-21bd-4696-bdb7-582666b3bcea checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutC", "command": "./gradlew.bat --offline runNpcCutC", "exit": 0, "pid": 53212, "processExited": true, "seconds": 83.55154752731323, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53212
+PASS CutC boundary=NPC_C_CONVERSATION_COMMITTED checkpoint=2 generation=0 uuid=82f14f61-9eca-457c-b2ac-f8045621724a facts=[npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeC", "command": "./gradlew.bat --offline runNpcResumeC", "exit": 0, "pid": 49880, "processExited": true, "seconds": 65.63319849967957, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=49880
+INPUT checkpoint=2 generation=0 uuid=82f14f61-9eca-457c-b2ac-f8045621724a
+PASS ResumeC canonical=1 generation=0 uuid=82f14f61-9eca-457c-b2ac-f8045621724a checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutD", "command": "./gradlew.bat --offline runNpcCutD", "exit": 0, "pid": 14104, "processExited": true, "seconds": 97.38786292076111, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=14104
+PASS CutD boundary=NPC_D_BEFORE_COMPLETE checkpoint=3 generation=0 uuid=a449e460-68a4-4ce4-b506-8dd58df2488e facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeD", "command": "./gradlew.bat --offline runNpcResumeD", "exit": 0, "pid": 50480, "processExited": true, "seconds": 72.28083372116089, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=50480
+INPUT checkpoint=3 generation=0 uuid=a449e460-68a4-4ce4-b506-8dd58df2488e
+PASS ResumeD canonical=1 generation=0 uuid=a449e460-68a4-4ce4-b506-8dd58df2488e checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutE", "command": "./gradlew.bat --offline runNpcCutE", "exit": 0, "pid": 12636, "processExited": true, "seconds": 113.90492463111877, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=12636
+PASS CutE boundary=NPC_E_AFTER_COMPLETE checkpoint=4 generation=0 uuid=365fad09-e746-43d8-9131-621dc83ad424 facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light]
+
+{"mode": "ResumeE", "command": "./gradlew.bat --offline runNpcResumeE", "exit": 0, "pid": 43700, "processExited": true, "seconds": 114.70437502861023, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=43700
+INPUT checkpoint=4 generation=0 uuid=365fad09-e746-43d8-9131-621dc83ad424
+PASS ResumeE canonical=1 generation=0 uuid=365fad09-e746-43d8-9131-621dc83ad424 checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+Client launcher time sum=1019.606 seconds. Not development duration or natural survival time.
+
+## Failure history
+Development ResumeA failed with literal IllegalStateException: permanent facts lost. The harness treated npc.work=check_return_light as immutable, although completion deliberately changes current work to maintain_return_light. Production event receipts and identity were not lost. Harness now checks all non-work facts survive and separately requires exactly one expected new work state. Development Seed/CutA/ResumeA logs and old fixture profile retained; final full 11 clients rerun, not combined with development attempts.
+Git Bash in sandbox failed startup with -1073741502; original failure log retained; same copy-only JAR rollback retried in approved execution context and passed exit 0. Not a gameplay failure.
+
+Pause history: The first requested pause intended to stop after C, but D was already dispatched. D and ResumeD completed; E was blocked before client launch (PID 0, PAUSED_AT_SAFE_BOUNDARY). The original failed-dispatch row and log are preserved separately and are not counted as a real-client failure. Work resumed on 2026-09-14 at five-hour usage 2%, weekly 16%, then E was run.
+
+Additional environment failure: the first ResumeE attempt launched Minecraft but failed ClientTestEnvironment before openWorld with IllegalStateException: window outside requested right monitor. The verifier writes PID only after the environment checks, so PID=0 in this failed row is unrecorded, not proof that no JVM launched. No java process remained at inspection. Actual failed window bounds were not recorded; cause of displacement remains unconfirmed. Story bytes still exactly matched CutE (SHA256 5810ecef0dafdbbcffe346fbb5a2d512a938ef408534c594cbed65153daaa6e0). Log, marker and command retained in environment-resumeE-attempt1. The same untouched world was retried with the original strict monitor/audio gates; no runtime source or gate was weakened. This extra attempt is excluded from the 11 successful final processes and is reported separately.
+
+## Model, scope and next
+Current primary agent performed implementation/review; no Terra/Luna delegation, no routing experiment, no per-model token measurement. Caveman HOLD/off. Automatic shutdown was revoked and remains disabled. Usage-aware safe pause was subsequently added and remains active; it pauses at a verified boundary without powering off.
+NPC A/B/C/D/E PASS is not full NPC stability. NPC death/respawn, actual unload, dimension travel, divergent copied NPC world, missing/blocked residence/light and NPC corruption actual-client cases remain NOT TESTED. Previous canonical 35 clients are historical baseline, not rerun here. Current regression: 52 previous GameTests retained within 56; 580 prior storage cases rerun; 8 NPC storage cases separate. NPC-to-NPC key persistence is tested, not NPC social simulation. Full campaign PARTIAL; composite/item/reward/fallback and natural survival not started. Next first task: real NPC exception matrix with same identity/facts/life-state assertions; no composite or art until that gate closes.

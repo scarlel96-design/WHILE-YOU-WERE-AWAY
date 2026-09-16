@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "whileaway:station_anchor",
+    "whileaway:signal_relay"
+  ]
+}

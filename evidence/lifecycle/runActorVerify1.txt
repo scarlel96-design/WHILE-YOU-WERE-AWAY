@@ -1,0 +1,3 @@
+RUNNING
+PASS reload Verify checkpoint=4 facts=[encounter_complete, pursuit_started]
+PASS runActorVerify1 completed state stable 300 ticks; no actor or completion replay; integrity clean

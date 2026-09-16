@@ -1,0 +1,26 @@
+COMMAND: .\tools\test-core.ps1
+INPUT: current pure Java core and CoreTests
+LITERAL OUTPUT: PASS core assertions=176857
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-assets.py .\build\libs\whileaway-0.3.1-dev.1.jar
+INPUT: built JAR and source assets
+LITERAL OUTPUT: PASS asset assertions=6702; station/animation/localization/OGG/JAR
+EXIT STATUS: 0
+COMMAND: .\tools\verify-mute.ps1 -OptionsPath ..\..\work\recovery-smoke\options.txt
+INPUT: isolated recovery profile after tests
+LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-design-contract.py
+INPUT: requirements 33-81 and current placeholder inventory
+LITERAL OUTPUT: PASS design requirements=49; tracked unfinished asset groups=6; foreshadow seeds=2
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-recovery-fixtures.py
+INPUT: two completed original/copy pairs and legacy save copy
+LITERAL OUTPUT: PASS independent original/copy cityClues: 1 / 7; pair=1; both schema=4 and completed checkpoint=4
+PASS independent original/copy cityClues: 1 / 7; pair=2; both schema=4 and completed checkpoint=4
+PASS actual schema 2 -> 4 copy migration; key facts preserved; all 41 original save files byte-identical
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-design-contract.py --final-release
+INPUT: current placeholder/prototype inventory
+EXPECTED EXIT STATUS: 2 (final art not ready)
+LITERAL OUTPUT: NOT READY final art: tracked placeholders/prototypes remain

@@ -1,0 +1,2 @@
+PASS independent original/copy cityClues: 1 / 7; pair=2; both schema=4 and completed checkpoint=4
+Byte-hash-at-copy-close proof was not captured for pair 2: original had already resumed. This assertion compares both independently completed saves; Resume2 also checked original cityClues=1 before advancing.

@@ -1,0 +1,15 @@
+{
+  "status": "PAUSED_BEFORE_CLIENT_LAUNCH",
+  "records": [
+    {
+      "mode": "CutE",
+      "command": "./gradlew.bat --offline runNpcCutE",
+      "exit": 1,
+      "pid": 0,
+      "processExited": false,
+      "seconds": 11.828771591186523,
+      "pass": false
+    }
+  ],
+  "reason": "Gradle pause gate; D had already started before gate applied, so D/ResumeD completed; E blocked"
+}

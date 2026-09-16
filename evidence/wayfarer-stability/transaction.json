@@ -1,0 +1,37 @@
+{
+  "world_operations": "none",
+  "commands": [
+    {
+      "label": "BASELINE",
+      "input": "8 ActorPresencePolicy cases; actorSnapshotChunk/combatD/processGate expected false for baseline, true for modified",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline actorSnapshotChunk=false combatD=false processGate=false",
+      "command": "java -cp build/wayfarer-probe WayfarerArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\wayfarer-stability\\baseline\\previous.jar\" baseline",
+      "exit": 0
+    },
+    {
+      "label": "MODIFIED",
+      "input": "8 ActorPresencePolicy cases; actorSnapshotChunk/combatD/processGate expected false for baseline, true for modified",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified actorSnapshotChunk=true combatD=true processGate=true",
+      "command": "java -cp build/wayfarer-probe WayfarerArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\wayfarer-stability\\whileaway-0.3.1-wayfarer-stability.jar\" modified",
+      "exit": 0
+    },
+    {
+      "label": "ROLLBACK",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-wayfarer\\test.jar",
+      "output": "ROLLBACK PASS: campaign-pilot JAR restored; world files untouched",
+      "command": "bash -lc \"chmod +x evidence/wayfarer-stability/ROLLBACK.sh && test -x evidence/wayfarer-stability/ROLLBACK.sh && evidence/wayfarer-stability/ROLLBACK.sh build/rollback-wayfarer/test.jar\"",
+      "exit": 0
+    },
+    {
+      "label": "RESTORED",
+      "input": "same 8 policy cases and baseline fixture revision",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline actorSnapshotChunk=false combatD=false processGate=false",
+      "command": "java -cp build/wayfarer-probe WayfarerArchiveProbe build/rollback-wayfarer/test.jar baseline",
+      "exit": 0
+    }
+  ],
+  "restored_hash": "9c5f78105b92a1afae46b4d488fc67aff2e0288ca78fd90f84aacb9b32efedf8",
+  "modified_hash": "3d3b08beddd7e9fae87c41188c31251e941ee9da9b6697b50bcf96a2fd960766",
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate 22-client suite.",
+  "baseline_hash": "9c5f78105b92a1afae46b4d488fc67aff2e0288ca78fd90f84aacb9b32efedf8"
+}

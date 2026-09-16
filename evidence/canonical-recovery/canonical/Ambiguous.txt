@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=31900
+INPUT hash=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT same_generation_duplicate
+PASS Ambiguous MANUAL_DIAGNOSTIC AMBIGUOUS_MULTIPLE_CANDIDATES storyId=wayfarer_first:380df991-f603-344c-a090-369bad2a924a eventId=wayfarer_first instanceId=bdce090e-72c9-4922-a8bc-d0a6d3adf4da generation=0 candidates=2 stale=0 writeBlocked=true writeBlocked=true realSaveDispatches=3 originalPreserved=true noGenerationCreated=true

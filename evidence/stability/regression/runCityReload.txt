@@ -1,0 +1,6 @@
+RUNNING
+INFO isolated smoke world backup confirmed
+PASS disk reload: player dimension, return point, 3 records, construction completion and player edit preserved
+PASS return after process restart
+CAPTURE city-reloaded.png
+PASS runCityReload

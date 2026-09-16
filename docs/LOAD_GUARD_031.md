@@ -1,0 +1,137 @@
+# 0.3.1 load-guard — Fail-Closed와 제한적 snapshot 복구
+
+Current: 《네가 없는 동안》 0.3.1-dev.1 / load-guard / PARTIAL
+
+저장 로드 Fail-Closed 검증은 PASS. Actor 전체 손상/완전 소실 복구 봉인은 PARTIAL. NPC 단계 진입과 0.3.2 승격은 보류한다.
+
+## 기준점
+
+- 입력 JAR: dist/wayfarer-stability/whileaway-0.3.1-wayfarer-stability.jar
+- SHA-256: 3d3b08beddd7e9fae87c41188c31251e941ee9da9b6697b50bcf96a2fd960766
+- 입력 소스: dist/wayfarer-stability/whileaway-0.3.1-wayfarer-stability-source.zip
+- SHA-256: 21175125bdf2ac451aaabf8aaf51a2cb533f016a39aaf8df740bebbbf61785aa
+- 보존 사본: evidence/load-guard/baseline/previous.jar 및 previous-source.zip.
+- Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21.0.5.
+- save format 4 / optional actorSchema 1 / art revision 2 / mod 0.3.1-dev.1 유지.
+
+## 해결한 결함
+
+기존 NarrativeData.get은 DimensionDataStorage.computeIfAbsent에 의존했다. Minecraft의 readSavedData가 deserializer 예외를 catch하여 null로 바꾸고, computeIfAbsent가 새 데이터를 생성했다. entityUUID가 빠진 실제 checkpoint에서 actor 1개가 빈 actor 0개 상태로 반환됐었다.
+
+현재 get은 **StoryStorage.open**을 호출한다. 해당 경로에는 computeIfAbsent 또는 예외 후 빈 캠페인 반환이 없다. 잘못된 원본은 정규 SavedData로 등록하지 않는다.
+
+## 로드 결과와 쓰기 권한
+
+| Outcome | 처리 |
+|---|---|
+| ABSENT | Files.notExists가 실제 부재를 확인한 경우에만 신규 캠페인 생성 |
+| LOADED | 파일 파싱·Actor 의미 검증 후 기존 데이터 등록 |
+| RECOVERABLE_CORRUPTION | 제한적으로 누락된 snapshot.Motion을 정지 벡터로 복원, 원본 격리 후 명시적 commit |
+| CORRUPT | 원본 유지, 가능한 경우 해시 기반 격리 사본 생성, MANUAL_DIAGNOSTIC, 반환/등록/쓰기 차단 |
+| UNSUPPORTED | 지원하지 않는 save format/actor schema를 별도 분류, 원본 유지 및 차단 |
+
+Files.exists가 false라는 사실만으로 ABSENT를 판단하지 않는다. 접근 오류·일반 파일이 아닌 경로·NBT 해석 실패도 신규 월드로 바꾸지 않는다. 결과 캐시는 해당 DimensionDataStorage 객체에 귀속된 WeakHashMap이며 월드끼리 데이터 객체를 공유하지 않는다.
+
+`StoryStorage.Status`는 outcome, recovery, saveFormat, actorSchema, actorCount, writable, originalHash, detail을 노출한다. 오류에는 load phase·field·가능한 storyId/eventId/instanceId/generation이 남는다. 손상 파일을 읽은 경우 격리 파일명은 원본 내용 SHA-256이다. 별도 영구 world UUID는 추가하지 않았다.
+
+## 복구 정책 — 자동 결정을 최소화
+
+최종 코드에서 **UUID 누락/오류, generation 누락/음수는 자동 추정하지 않는다.** 원본을 유지하고 MANUAL_DIAGNOSTIC으로 차단한다. 후보를 임의로 선택하거나 generation을 0으로 초기화하지 않는다.
+
+초기 개발판에서는 generation을 일치하는 snapshot 태그에서 복원했다. 그러나 snapshot만으로 최신 epoch를 증명하기에 부족하다는 검토 결과에 따라 이 정책을 폐기했다. 해당 개발 로그는 prototype 증거이며 최종 복구 정책의 PASS로 사용하지 않는다.
+
+이번에 실제 자동 복구한 것은 **snapshot.Motion 누락**이다. 정체성·generation·위치·checkpoint·영구 사실을 유지하고 순간 이동 속도만 [0,0,0]으로 복원한다. 결과는 RECOVER_WITH_WARNING이다. 전체 snapshot 부재·snapshot.Pos 부재·잘못된 snapshot 형식은 차단한다.
+
+실제 처리 순서:
+
+원본 파일 읽기 및 원본 바이트/해시 보존 → 별도 NBT 사본에서 후보 수정 → Actor 필드·중복 정체성·차원 binding·checkpoint·chase ticket/완료 사실 검증 → 원본 격리 사본 생성 및 byte/hash 검증 → guarded atomic save → 정상 SavedData 등록.
+
+원본 파일은 격리 사본 검증 전까지 수정하지 않는다. 격리 실패도 정상 로드로 우회하지 않는다. 원본 읽기 자체가 실패하면 격리 사본을 만들었다고 주장하지 않고 original_untouched로 진단한다. Last-Known-Good 전체 파일을 자동 채택하지 않는다. 이전 저장이 더 오래된 선택·소비·완료 상태일 수 있기 때문이다.
+
+## 실제 변경 파일과 함수
+
+- **StoryStorage.java (신규):** open, status, backup, listType, Status, Blocked, Outcome, Recovery. 파일 부재/파싱/의미 검증/복구/등록을 분리한다. 지원 schema, UUID, generation, 위치, 차원, lifecycle, checkpoint, actor 중복, player ID 중복·오류, snapshot.Pos와 chase 연결을 검사한다. 저장된 값이 형식상 유효하지만 다른 실제 actor를 가리키는 모든 경우의 실시간 대조까지 구현한 것은 아니다.
+- **NarrativeData.java:** get을 명시적 로더로 교체. storageFile·expectedHash·storySaveWritable 및 bindStorage 추가. save(File, Provider)가 지정 파일 및 마지막 읽기/쓰기 해시를 검사한다. 외부 변경·파일 소실·다른 저장 경로를 발견하면 쓰기 권한을 영구 차단하고 예외를 낸다. dirty를 성공 전에 지우지 않으며 기존 동기 atomic NBT 쓰기를 유지한다.
+- **StoryActorRecord.java:** EventCheckpoint.restore가 생성한 손상 reason을 원래 NBT의 빈 reason으로 덮어쓰지 않는다.
+- **StoryActors.java:** integrity에서 차단된 load status를 먼저 반환한다. 기존 canonical 판정·generation 생성 알고리즘을 새로 변경하지 않았다.
+- **StoryEvents.java:** 개발 전용 `/whileaway debug load` 추가. 기존 debug 권한/opt-in을 유지한다.
+- **client/LoadGuardSmoke.java (신규):** Control/Recover/RecoverReload/Blocked/Unsupported 실제 복사 월드 검사. blocked 사례에서 실제 server.saveEverything 경로를 3회 실행한 후 원본 해시와 격리본을 비교한다.
+- **build.gradle:** 새 격리 profile/evidence 경로 및 다섯 load smoke task. 기존 ActorSmoke/ActorExceptionsSmoke의 게임 검사 코드는 바꾸지 않고 새 경로에서 재실행한다.
+- **도구:** LoadGuardProbe, probe-load-guard.ps1, run-load-clients.py, run-load-regression.py, verify-load-guard.py, LoadArchiveProbe, package-load-guard.py, verify-load-transaction.ps1. 과거 baseline 산출물은 새 도구의 출력 대상이 아니다.
+
+## 판정표
+
+아래 PASS는 표에 명시한 검사 범위다. 자동 차단 PASS는 해당 actor의 자동 재연결 성공과 다르다.
+
+| 항목 | 판정 | 증거/제한 |
+|---|---|---|
+| 저장 없음 → 신규 생성 | PASS | 새 실제 Wayfarer 월드 + 20개 디스크 create/save/load |
+| 정상 저장 → 정상 로드 | PASS | 실제 Control/회귀 월드 + 20개 정상 round-trip |
+| missing UUID | PASS — 차단 | 자동 20개 + 실제 Blocked 복사 월드, 재연결 구현 아님 |
+| malformed UUID | PASS — 자동 차단 | 20개 malformed 문자열; 개별 실제 클라이언트 시험은 없음 |
+| generation 누락/음수 | PASS — 자동 차단 | 각각 20개; 자동 복구하지 않음 |
+| storyId/ownerEventId 누락 | PASS — 자동 차단 | 각각 20개 |
+| lifecycle 손상 | PASS — 자동 차단 | 알 수 없는 enum 20개 |
+| instanceId 누락 | PASS — 자동 차단 | 20개; 형식상 유효한 오참조의 실시간 대조는 미완료 |
+| dimension 손상 | PASS — 자동 차단 | 등록되지 않은 차원 20개; 자동 덮어쓰기 없음 |
+| position 누락 | PASS — 자동 차단 | 20개 |
+| checkpoint 범위 오류 | PASS — 자동 차단 | 20개; 완료/보상을 임의 추론하지 않음 |
+| snapshot 손상 | PASS — 명시 사례 | wrong type/전체 누락/Pos 누락 차단, Motion 누락 제한 복구 |
+| duplicate actor | PASS — 자동 차단 | 동일 storyId 중복 20개; 실제 복수 entity 후보 선택 구현 아님 |
+| unsupported actorSchema | PASS — 차단 | 자동 20개 + 실제 Unsupported 월드 |
+| unsupported saveFormat | PASS — 자동 차단 | format 5 입력 20개 |
+| partially malformed NBT | PASS — 자동 차단 | 잘린 압축 NBT 20개, 원본 보존 |
+| corrupt → empty data 차단 | PASS | 저장 라이브러리 및 실제 Blocked/Unsupported |
+| corrupt autosave overwrite 차단 | PASS — 실제 저장 경로 | 두 실제 월드 × saveEverything 3회, 종료 후 hash 동일 |
+| recoverable corruption 복구 | PASS — Motion 한정 | 실제 Recover → 새 프로세스 RecoverReload, 동일 actor/정체성/진행 |
+| unrecoverable corruption 차단 | PASS — 명시 사례 | 강제 초기화 없음, 격리 및 writeBlocked 진단 |
+| 완전 소실 ticket | PARTIAL | 기존 GameTest primitive 회귀만 있음; 신규 실제 완전 소실 묶음 미실행 |
+| generation 복구 crash boundary 6종 | NOT TESTED | 기존 A–E를 이 여섯 지점으로 대체하지 않음 |
+| Load Integrity 재검사 | PASS — 명시 범위 | blocked status 및 실제 복구 후 integrity clean/재접속 |
+| 기존 migration | PASS — 자동 회귀 | 1/2/3 및 actor 없는 4를 각 20회; 기존 48 GameTest 유지 |
+| Wayfarer 회귀 | PASS | 최신 코드로 실제 11개 프로세스 |
+| 실제 클라이언트 corruption | PASS — 대표 범주 | 정상, Motion 복구/재접속, UUID 누락 차단, 미지원 schema 차단 |
+| Actor 손상 전체 봉인 | PARTIAL | 실시간 canonical 후보 대조/UUID 재연결/완전 소실 경계 미완료 |
+| 전체 안정화 | PARTIAL | NPC/복합 사건/아이템/보상/fallback/자연 생존 미완료 |
+
+## 검증 횟수와 의미
+
+- 기준 소스 GameTest 48개 PASS (38초), 개발 중간 48개 PASS (40초), 최종 코드 GameTest 48개 + core 176857 assertions + build PASS (43초). 기존 GameTest 두 파일을 삭제하거나 수정하지 않았다.
+- 최종 저장 probe: **580 cases / 2161 assertions / 20 repetitions**, 19종 차단 경로를 포함. 1→4, 2→4, 3→4, actor 없는 4가 포함된다. 과거 450회 또는 이전 개발 probe를 이번 최종 횟수에 합산하지 않는다.
+- 최종 실제 클라이언트: **16개 독립 종료 프로세스**. Load 5회 + Wayfarer 11회. 모두 무음, 오른쪽 보조 DISPLAY1, 실제 window bounds와 PID 종료 확인.
+- Load 5회: Control, Motion 복구, 복구본 새 프로세스 재접속, UUID 누락 차단, actorSchema 2 차단. 정상/복구에서는 actor 1개, 같은 UUID/instance/generation 0/checkpoint 2, 100 ticks 안정 및 integrity clean.
+- 차단 사례는 테스트 hook에서 **실제 Minecraft 서버 저장 함수**를 3회 호출했다. 자연 플레이의 주기적 autosave 타이머를 기다린 시험은 아니며 저장 라이브러리 probe만으로 대체한 것도 아니다. startup 전체 진입을 막는 fail-closed 정책을 채택했고 제한 플레이 모드는 아직 없다.
+- Wayfarer 11회: A/B/C/D/E/Verify 6회 + Seed/Original/Copy/Reload/CopyReload 5회. 새 월드, KeepInventory OFF/ON, 실제 actor chunk 100 ticks 언로드, Nether/End, 전체 세이브 66파일 복사 후 서로 다른 분기 및 재접속을 검사했다.
+- 최종 클라이언트 합계 925.005초(15분 25초). Load 273.609초 + Wayfarer 651.396초. 전체 개발 시간/토큰 절감/자연 플레이 시간으로 해석하지 않는다.
+
+## 실패·재작업 이력
+
+1. **기존 빈 데이터 결함:** malformed actor → parser 예외 → Minecraft catch/null → 신규 생성. NarrativeData.get/StoryStorage.open에서 명시적 결과와 등록 차단으로 교체. 최신 probe와 실제 차단/저장 함수/파일 해시 검사로 재검증. 해당 경계 PASS.
+2. **초기 generation 복구 정책의 검토 결함:** 일치 snapshot으로 generation을 재구성했지만 최신 epoch와 실제 엔티티를 충분히 대조하지 않았다. 손상된 snapshot이 더 오래된 세대일 가능성을 배제하지 못해 최종 정책에서 자동 복구를 제거했다. 초기 3개 클라이언트 성공을 최종 정책 증거로 사용하지 않는다. 최종 정책은 missing/negative generation 차단이며 20회씩 재검증했다.
+3. **Blocked smoke 종료 교착:** 서버 시작 이벤트에서 server.halt와 client main-thread stop을 예약했더니 준비 완료를 기다리는 client startup loop 때문에 종료가 지연됐다. marker는 나왔지만 프로세스가 끝나지 않아 PASS로 인정하지 않았다. 해당 실행을 중단하고 로그를 보존했다. 테스트 전용 차단 경로는 동기 save/hash 검증 후 Runtime.halt로 종료하도록 수정했다. 최종 Blocked/Unsupported 모두 종료 PID와 원본 hash를 재확인했다. 이는 테스트 하네스 수정이며 production fail-closed를 우회하지 않는다.
+4. **손상 reason 덮어쓰기:** EventCheckpoint.restore의 새 reason을 원본 reason이 덮던 코드를 수정했다. 기존 회귀를 그대로 유지했다.
+5. 최종 검증 묶음에서 미해결 테스트 FAIL은 없다. 다만 미실행/미구현 경로를 PASS로 승격하지 않는다. 개발 prototype 로그는 evidence/load-guard/client 및 prototype에, 최종 로그는 client-final에 분리했다.
+
+## 저장·아트·모델 정책
+
+새 상태/쓰기 guard는 runtime 객체에만 존재한다. 기존 저장 필드 의미와 actor 정체성/generation 의미를 바꾸지 않았으므로 format 4 및 actorSchema 1을 유지한다. 복구한 Motion은 기존 Minecraft snapshot 필드다. 세이브 다운그레이드 기능은 추가하지 않았다. JAR 롤백은 이전 로더 동작까지 되돌리며 복구 기능의 유지 또는 월드 downgrade를 뜻하지 않는다.
+
+원본 wayfarer-stability JAR/source, 그 이전 산출물, 정상 테스트 원본 월드를 보존했다. 도시 revision 2, 69개 asset/data, 6그룹 placeholder, 떡밥 초안 2건, docs/DESIGN_V04.md를 유지했다. 새 Horror Activation 저장 필드, NPC, 퍼즐, 세트피스, 최종 아트를 추가하지 않았다.
+
+주력 GPT-6 Astra / High 정책을 유지했고 모델 전환·Terra/Luna 위임·Caveman 적용을 하지 않았다. 모델별 비교 실험이나 이번 토큰 절감률 측정은 없다. 검토와 최종 판정은 같은 주력 작업에서 수행했다. 과거 Caveman 수치를 이번 절감률로 재사용하지 않는다.
+
+## 정확한 다음 시작점
+
+**missing UUID를 안전하게 차단하는 현재 동작을 보존한 채, 실제 canonical entity 후보와 event/instance/generation journal을 함께 대조하는 복구 경로부터 구현한다.** 로드되지 않은 청크를 누락으로 판단하지 않고, 후보가 복수면 계속 MANUAL_DIAGNOSTIC을 유지한다. snapshot만으로 generation을 확정했던 초기 정책으로 되돌리지 않는다.
+
+이후 완전 소실 ticket의 CONFIRM_MISSING → generation 예약/PERSIST → 이전 세대 fencing → SPAWN → VERIFY/BIND_UUID/PERSIST → CHECKPOINT → INTEGRITY 전 구간과 여섯 crash boundary를 실제 클라이언트로 검사한다. 이 두 축이 충분히 검증되기 전에는 NPC 단계로 이동하지 않는다.
+
+0.3.2에는 이후 실제 NPC·복합 사건·Item/Reward Transaction·Structure Fallback·통합 Integrity·자연 생존 진행도 필요하다. 이번 로드 결함 수정만으로 버전을 승격하지 않는다.
+
+```text
+load-guard 산출물과 evidence를 새 기준으로 보존한다. 버전은 0.3.1-dev.1, 전체 PARTIAL이다.
+StoryStorage의 ABSENT 전용 신규 생성 및 write guard를 유지한다.
+missing UUID의 실제 canonical 후보 대조부터 구현하고, snapshot 단독 generation 복구는 금지한다.
+완전 소실 ticket과 6개 crash boundary까지 검사한 뒤 Actor 봉인 여부를 판정한다.
+새 출력 경로, 무음, 오른쪽 DISPLAY1, 직렬 클라이언트 실행, Caveman HOLD를 유지한다.
+```

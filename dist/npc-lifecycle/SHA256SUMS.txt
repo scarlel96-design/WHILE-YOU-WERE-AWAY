@@ -1,0 +1,2 @@
+80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51  whileaway-0.3.1-npc-lifecycle.jar
+eba768dec2a1784f71fe371573a92daa9f1cc92b8f3a5cb40463cf9d958ff736  whileaway-0.3.1-npc-lifecycle-source.zip

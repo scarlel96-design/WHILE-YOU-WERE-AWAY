@@ -1,0 +1,8 @@
+{
+  "symptom": "2 GameTests fail: Actor capacity reached",
+  "source": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\run\\world\\data\\whileaway_story.dat",
+  "sha256": "60055902447febe8150f7354a9f22c4198f5aa273ea2db25fef88bf6b514a616",
+  "actors": 256,
+  "fix": "independent GameTest gameDirectory each invocation; production capacity unchanged",
+  "failedLog": "tests-2.log"
+}

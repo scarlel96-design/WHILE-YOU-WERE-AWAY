@@ -1,0 +1,12 @@
+COMMAND: .\tools\test-core.ps1
+INPUT: current pure Java core sources and CoreTests
+PASS core assertions=176857
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-assets.py .\build\libs\whileaway-0.3.0-dev.1.jar
+INPUT: built JAR and generated source assets
+PASS asset assertions=6701; station/animation/localization/OGG/JAR
+EXIT STATUS: 0
+COMMAND: .\tools\verify-mute.ps1 -OptionsPath ..\..\work\city-smoke\options.txt
+INPUT: isolated client options after two client runs
+PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT STATUS: 0

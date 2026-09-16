@@ -1,0 +1,51 @@
+[
+  {
+    "label": "BASELINE",
+    "command": [
+      "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe",
+      "-cp",
+      "build/npc-world-archive-probe",
+      "PresenceArchiveProbe",
+      "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-environment\\baseline\\previous.jar",
+      "present"
+    ],
+    "exit": 0,
+    "output": "PASS archive policy=PRESENT checks=8\n"
+  },
+  {
+    "label": "MODIFIED",
+    "command": [
+      "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe",
+      "-cp",
+      "build/npc-world-archive-probe",
+      "PresenceArchiveProbe",
+      "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-environment\\whileaway-0.3.1-npc-environment.jar",
+      "present"
+    ],
+    "exit": 0,
+    "output": "PASS archive policy=PRESENT checks=8\n"
+  },
+  {
+    "label": "ROLLBACK",
+    "command": [
+      "C:\\Program Files\\Git\\bin\\bash.exe",
+      "-lc",
+      "chmod +x evidence/npc-environment/ROLLBACK.sh && test -x evidence/npc-environment/ROLLBACK.sh && evidence/npc-environment/ROLLBACK.sh build/rollback-npc-environment/test.jar"
+    ],
+    "exit": 0,
+    "output": "ROLLBACK PASS: npc-world JAR restored; world files untouched\n"
+  },
+  {
+    "label": "RESTORED",
+    "command": [
+      "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe",
+      "-cp",
+      "build/npc-world-archive-probe",
+      "PresenceArchiveProbe",
+      "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc-environment\\test.jar",
+      "present"
+    ],
+    "exit": 0,
+    "output": "PASS archive policy=PRESENT checks=8\n"
+  }
+]

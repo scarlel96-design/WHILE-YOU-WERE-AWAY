@@ -1,0 +1,12 @@
+{"mode": "Death1Off", "command": "./gradlew.bat --offline runNpcExceptionDeath1Off", "exit": 0, "pid": 46428, "processExited": true, "seconds": 86.83474349975586, "pass": true}
+{"mode": "Death2Off", "command": "./gradlew.bat --offline runNpcExceptionDeath2Off", "exit": 0, "pid": 21784, "processExited": true, "seconds": 82.32426929473877, "pass": true}
+{"mode": "Death3Off", "command": "./gradlew.bat --offline runNpcExceptionDeath3Off", "exit": 0, "pid": 30500, "processExited": true, "seconds": 80.67580604553223, "pass": true}
+{"mode": "Death4Off", "command": "./gradlew.bat --offline runNpcExceptionDeath4Off", "exit": 0, "pid": 48828, "processExited": true, "seconds": 79.16225075721741, "pass": true}
+{"mode": "Death5Off", "command": "./gradlew.bat --offline runNpcExceptionDeath5Off", "exit": 0, "pid": 20724, "processExited": true, "seconds": 79.63189029693604, "pass": true}
+{"mode": "ReloadOff", "command": "./gradlew.bat --offline runNpcExceptionReloadOff", "exit": 0, "pid": 26308, "processExited": true, "seconds": 54.13502597808838, "pass": true}
+{"mode": "Death1On", "command": "./gradlew.bat --offline runNpcExceptionDeath1On", "exit": 0, "pid": 48584, "processExited": true, "seconds": 81.05016493797302, "pass": true}
+{"mode": "Death2On", "command": "./gradlew.bat --offline runNpcExceptionDeath2On", "exit": 0, "pid": 10704, "processExited": true, "seconds": 77.82903861999512, "pass": true}
+{"mode": "Death3On", "command": "./gradlew.bat --offline runNpcExceptionDeath3On", "exit": 0, "pid": 47340, "processExited": true, "seconds": 78.88692879676819, "pass": true}
+{"mode": "Death4On", "command": "./gradlew.bat --offline runNpcExceptionDeath4On", "exit": 0, "pid": 10840, "processExited": true, "seconds": 79.3396680355072, "pass": true}
+{"mode": "Death5On", "command": "./gradlew.bat --offline runNpcExceptionDeath5On", "exit": 0, "pid": 39476, "processExited": true, "seconds": 79.91751909255981, "pass": true}
+{"mode": "ReloadOn", "command": "./gradlew.bat --offline runNpcExceptionReloadOn", "exit": 0, "pid": 10260, "processExited": true, "seconds": 54.00970935821533, "pass": true}

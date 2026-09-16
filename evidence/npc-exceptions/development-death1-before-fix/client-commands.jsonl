@@ -1,0 +1,1 @@
+{"mode": "Death1Off", "command": "./gradlew.bat --offline runNpcExceptionDeath1Off", "exit": 1, "pid": 34644, "processExited": true, "seconds": 137.55736231803894, "pass": false}

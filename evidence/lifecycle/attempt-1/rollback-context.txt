@@ -1,0 +1,5 @@
+First invocation: ./tools/verify-lifecycle-transaction.ps1
+Result: Rollback failed -1073741502 at Git Bash startup in restricted execution context; PowerShell exit 1.
+No gameplay assertion failed in this attempt. The hash-guarded rollback was rerun in the approved execution context.
+Approved rerun: baseline, modified, rollback and restored probes all exit 0. See ../transaction.json.
+Rollback only addressed build/rollback-lifecycle/test.jar; no world-file operation exists in the script.

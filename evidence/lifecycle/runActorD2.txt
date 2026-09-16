@@ -1,0 +1,4 @@
+RUNNING
+PASS reload D checkpoint=2 facts=[pursuit_started]
+PASS runActorD2 boundary=BEFORE_COMPLETE checkpoint=3 generation=3 instance=3d156131-a05c-4fd4-bf4b-b2507a3a9888
+FAULT Runtime.halt after durable story write; no shutdown save

@@ -1,0 +1,1 @@
+Usage-aware safe pause: finish current Chunk2; do not dispatch Chunk4. No shutdown.

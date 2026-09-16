@@ -1,0 +1,3 @@
+RUNNING
+PASS actual schema 2 save copy: migration to 4, missing flag false, revision 1 and player edit preserved
+PASS runRecoveryLegacy

@@ -1,0 +1,22 @@
+{
+  "type": "whileaway:quiet_city",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "whileaway:quiet_city",
+      "lakes": false,
+      "features": false,
+      "structure_overrides": [],
+      "layers": [
+        {
+          "height": 1,
+          "block": "minecraft:bedrock"
+        },
+        {
+          "height": 127,
+          "block": "minecraft:deepslate"
+        }
+      ]
+    }
+  }
+}

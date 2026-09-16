@@ -1,0 +1,2 @@
+PASS actor boundary snapshots=10; final client verifications=2
+PASS frozen runtime source; original legacy story files=2 unchanged; baseline archives=2 unchanged

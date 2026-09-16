@@ -1,0 +1,14 @@
+{
+  "scope": "DESIGN DOCUMENT ONLY",
+  "changed": "docs/DESIGN_V05.md",
+  "inserted": "13-A PLAYER PAST MYSTERY (exact attachment bytes)",
+  "source_sha256": "d83a17eff0779a17b9389920b13d53925d101d168a802bfd59ebcfdaeb95c488",
+  "baseline_sha256": "60f9b7ae8e0f1768cc87455ed733d027c546b51d0f289e2ba3e69179cdb44b4a",
+  "modified_sha256": "44d53916de6029f55171a9eb3144ff9b734a9ce4c9e6df1b6b2561179f7e1974",
+  "protected_code_jar_world": "PASS",
+  "protected_file_count": 187,
+  "automated_doc_checks": "PASS",
+  "builds": 0,
+  "clients": 0,
+  "overall": "PARTIAL unchanged"
+}

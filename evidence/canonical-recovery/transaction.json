@@ -1,0 +1,37 @@
+{
+  "baseline_hash": "a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03",
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.",
+  "restored_hash": "a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03",
+  "modified_hash": "82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542",
+  "world_operations": "none",
+  "commands": [
+    {
+      "command": "java -cp build/canonical-archive-probe CanonicalArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\canonical-recovery\\baseline\\previous.jar\" baseline",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; canonical recovery and generation boundaries expected only in modified",
+      "label": "BASELINE",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline explicitLoader=true writeGuard=true canonicalRecovery=false generationBoundaries=false",
+      "exit": 0
+    },
+    {
+      "command": "java -cp build/canonical-archive-probe CanonicalArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\canonical-recovery\\whileaway-0.3.1-canonical-recovery.jar\" modified",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; canonical recovery and generation boundaries expected only in modified",
+      "label": "MODIFIED",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified explicitLoader=true writeGuard=true canonicalRecovery=true generationBoundaries=true",
+      "exit": 0
+    },
+    {
+      "command": "bash -lc \"chmod +x evidence/canonical-recovery/ROLLBACK.sh && test -x evidence/canonical-recovery/ROLLBACK.sh && evidence/canonical-recovery/ROLLBACK.sh build/rollback-canonical/test.jar\"",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-canonical\\test.jar",
+      "label": "ROLLBACK",
+      "output": "ROLLBACK PASS: load-guard JAR restored; world files untouched",
+      "exit": 0
+    },
+    {
+      "command": "java -cp build/canonical-archive-probe CanonicalArchiveProbe build/rollback-canonical/test.jar baseline",
+      "input": "same 8 policy cases and baseline fixture revision",
+      "label": "RESTORED",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline explicitLoader=true writeGuard=true canonicalRecovery=false generationBoundaries=false",
+      "exit": 0
+    }
+  ]
+}

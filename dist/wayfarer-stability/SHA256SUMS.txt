@@ -1,0 +1,2 @@
+3d3b08beddd7e9fae87c41188c31251e941ee9da9b6697b50bcf96a2fd960766  whileaway-0.3.1-wayfarer-stability.jar
+21175125bdf2ac451aaabf8aaf51a2cb533f016a39aaf8df740bebbbf61785aa  whileaway-0.3.1-wayfarer-stability-source.zip

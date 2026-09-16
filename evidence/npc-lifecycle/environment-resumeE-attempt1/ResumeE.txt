@@ -1,0 +1,2 @@
+RUNNING
+FAIL java.lang.IllegalStateException: window outside requested right monitor

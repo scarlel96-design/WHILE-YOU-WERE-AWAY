@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/JuliusBrussee/caveman",
+  "commit": "15581d14007fd01fb3f132016741962f34936ca2",
+  "files": [
+    {
+      "url": "https://raw.githubusercontent.com/JuliusBrussee/caveman/15581d14007fd01fb3f132016741962f34936ca2/skills/caveman/SKILL.md",
+      "file": "UPSTREAM_SKILL.md",
+      "sha256": "c4d7354b4b063d54601fcdd5097a5b1713d1a1a2e386ac39efa438aa1ffef8ce"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/JuliusBrussee/caveman/15581d14007fd01fb3f132016741962f34936ca2/docs/HONEST-NUMBERS.md",
+      "file": "UPSTREAM_HONEST_NUMBERS.md",
+      "sha256": "4bb7d2a294d39d3b602cda67612ebaf379c7d6930b1509ea749345eddc166161"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/JuliusBrussee/caveman/15581d14007fd01fb3f132016741962f34936ca2/LICENSE",
+      "file": "UPSTREAM_LICENSE",
+      "sha256": "94fe75d355887f84ee7eefca68e06d8d082a23dad47a8e1f58a94d98900edf5b"
+    }
+  ]
+}

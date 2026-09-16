@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=50604
+PASS blocked NPC_ENV residence=UNREACHABLE path=UNREACHABLE light=VALID checkpoint=2 canonical=1 generation=0 factsUnchanged=true blocksPreserved=33 heldTicks=100 attempts=3
+PASS CutPath durable=true checkpoint=2 uuid=15c635b4-ba48-4b69-9a03-00d775de2719 generation=0

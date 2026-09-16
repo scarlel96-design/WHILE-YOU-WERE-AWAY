@@ -1,0 +1,3 @@
+RUNNING
+PASS runActorA1 boundary=PREPARED checkpoint=0 generation=0 instance=598fed6a-a4ac-4d24-b1b0-3258f16aea14
+FAULT Runtime.halt after durable story write; no shutdown save

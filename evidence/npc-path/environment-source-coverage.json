@@ -1,0 +1,10 @@
+{
+  "productionUnchanged": true,
+  "qaChanges": [
+    {
+      "file": "src/main/java/io/github/whileaway/StoryGameTests.java",
+      "tested": "c587822dafb5c6343cf7c135d552f6a1bf92098997c7c60b5165cbd06f6a397d",
+      "current": "312f9ffd82c334ecd7f46fc373c431cdeefe86a2867ebf14a04dca1659969a79"
+    }
+  ]
+}

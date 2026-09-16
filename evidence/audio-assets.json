@@ -1,0 +1,44 @@
+{
+  "distant_knock": {
+    "seconds": 4.0,
+    "channels": 1,
+    "peak": 0.57244,
+    "origin": "original deterministic synthesis; prototype"
+  },
+  "returning_steps": {
+    "seconds": 6.0,
+    "channels": 1,
+    "peak": 0.40481,
+    "origin": "original deterministic synthesis; prototype"
+  },
+  "wayfarer_breath": {
+    "seconds": 3.0,
+    "channels": 1,
+    "peak": 0.5032,
+    "origin": "original deterministic synthesis; prototype"
+  },
+  "wayfarer_attack": {
+    "seconds": 2.0,
+    "channels": 1,
+    "peak": 0.47836,
+    "origin": "original deterministic synthesis; prototype"
+  },
+  "signal_wake": {
+    "seconds": 5.0,
+    "channels": 1,
+    "peak": 0.39127,
+    "origin": "original deterministic synthesis; prototype"
+  },
+  "station_unease": {
+    "seconds": 20.0,
+    "channels": 1,
+    "peak": 0.15306,
+    "origin": "original deterministic synthesis; prototype"
+  },
+  "homeward": {
+    "seconds": 22.0,
+    "channels": 1,
+    "peak": 0.1766,
+    "origin": "original deterministic synthesis; prototype"
+  }
+}

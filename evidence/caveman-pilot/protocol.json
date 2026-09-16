@@ -1,0 +1,19 @@
+{
+  "task": "Extract the actual StoryActors.ownerPresent decision into Minecraft-independent ActorPresencePolicy and integrate the adapter without changing save fields or encounter outcomes.",
+  "signature": "public static boolean canRun(boolean ownerRequired, boolean online, boolean alive, boolean sameDimension, boolean rangeLimited, double distanceSquared, double radius)",
+  "requirements": [
+    "Unowned actor remains runnable without consulting player facts.",
+    "Owned actor requires online, alive and bound dimension.",
+    "Unbounded events do not require distance data.",
+    "Bounded events require finite nonnegative distanceSquared and radius.",
+    "Boundary is inclusive; use distanceSquared <= radius * radius without square-overflow false positives.",
+    "No event completion, UUID, generation, checkpoint, persistence, inventory or rendering mutations.",
+    "StoryActors adapter must preserve home snapshot fallback, CHASE-only 42-block bound and null-owner/player handling.",
+    "Existing 48 tests remain unchanged; add independent pure Java boundary tests.",
+    "Keep full code, commands, exception messages and final handoff."
+  ],
+  "design": "Same task sequential A then B in one current model/session, baseline restored before B. Not randomized, independent or causal; learning, cache, growing context and skill pre-exposure are confounds. A deliberately not made verbose.",
+  "treatment": "A: ordinary existing concise coding workflow. B: pinned JuliusBrussee/caveman Skill full rules limited to coding prose; explicit user-required progress and detailed final report override no-progress and whole-session persistence. No proxy, install, account, auth copying or global configuration.",
+  "metric": "Raw token_usage_record per response, not character estimates; input includes cached input; reasoning is subset of output. Total=input+output. Setup, common test authoring, final integration and report measured separately/outside paired intervals.",
+  "baseline_storyactors_sha256": "93263c709aea0b128562c114e3d06ee1deb6a984d6799c771482b6c06956fa15"
+}

@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=54320
+PASS reload B checkpoint=0 facts=[]
+PASS runActorB1 boundary=FACT_COMMITTED checkpoint=1 generation=0 instance=af4e48f3-ef91-4fd6-8865-bef38c4b50b4
+FAULT Runtime.halt after durable story write; no shutdown save

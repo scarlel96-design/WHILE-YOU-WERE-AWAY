@@ -1,0 +1,65 @@
+{
+  "distant_knock": {
+    "subtitle": "subtitles.whileaway.distant_knock",
+    "sounds": [
+      {
+        "name": "whileaway:distant_knock",
+        "stream": false
+      }
+    ]
+  },
+  "returning_steps": {
+    "subtitle": "subtitles.whileaway.returning_steps",
+    "sounds": [
+      {
+        "name": "whileaway:returning_steps",
+        "stream": false
+      }
+    ]
+  },
+  "wayfarer_breath": {
+    "subtitle": "subtitles.whileaway.wayfarer_breath",
+    "sounds": [
+      {
+        "name": "whileaway:wayfarer_breath",
+        "stream": false
+      }
+    ]
+  },
+  "wayfarer_attack": {
+    "subtitle": "subtitles.whileaway.wayfarer_attack",
+    "sounds": [
+      {
+        "name": "whileaway:wayfarer_attack",
+        "stream": false
+      }
+    ]
+  },
+  "signal_wake": {
+    "subtitle": "subtitles.whileaway.signal_wake",
+    "sounds": [
+      {
+        "name": "whileaway:signal_wake",
+        "stream": false
+      }
+    ]
+  },
+  "station_unease": {
+    "subtitle": "subtitles.whileaway.station_unease",
+    "sounds": [
+      {
+        "name": "whileaway:station_unease",
+        "stream": true
+      }
+    ]
+  },
+  "homeward": {
+    "subtitle": "subtitles.whileaway.homeward",
+    "sounds": [
+      {
+        "name": "whileaway:homeward",
+        "stream": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,1676 @@
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -51,3 +51,11 @@
+ - Final load-guard policy blocks missing UUID and missing/negative generation. Do not reuse the discarded prototype that inferred generation from snapshot alone. Only missing snapshot.Motion receives the tested stationary runtime-default repair; this is not a complete actor reconstruction policy.
+ - Latest evidence is evidence/load-guard/client-final plus crash/exceptions. evidence/load-guard/client and prototype contain development attempts, including the startup-stop deadlock; do not count them as final PASS. Blocked client smoke uses explicit real-server save dispatch and then test-only halt, not a normal survival autosave-timer playthrough.
+ - Actor recovery remains PARTIAL. Next is unique live canonical evidence for missing UUID, then confirmed-missing generation transaction/crash boundaries. No NPC/item/reward/fallback expansion before Actor recovery sealing.
++
++- New immutable input is dist/load-guard (JAR a66cf057..., source c5d0161e...). Current work/output is canonical-recovery; use tools/package-canonical.py and never republish the load-guard baseline.
++- CanonicalRecovery may repair a missing UUID only through the existing event ticket plus one exact live identity. It keeps a private strict-loader preflight draft, requires both position chunks/entity stores ready and distinct loaded observations, quarantines the unchanged original, and commits only after agreement. Malformed UUID/generation remain manual; ambiguity never chooses a winner.
++- PREPARED + generation + entityUUID is a durable reservation, not proof of entity existence. Retry it with the same epoch/UUID. Never turn PREPARED into SUSPENDED merely for owner absence. Actual replacement entity storage is flushed before ACTIVE binding commit; preserve six GENERATION_* observation boundaries.
++- A known older generation is fenced on entity join. Same-generation/other identity conflicts poison story writes and pause AI instead of silently selecting/discarding a winner. Story activation guards never return an empty campaign.
++- Final current evidence is evidence/canonical-recovery/canonical-final, client-final, crash and exceptions. canonical/ contains six development clients and must not be counted as final. Use GATES.json and VERIFICATION.txt after their current verifier succeeds; no historical PASS promotion.
++- tools/LateActorFixture.java writes only an explicitly named copied fixture world. Late mode verifies actual entity-chunk deserialization after a generation-1 replacement; verify-late-region.py checks persisted cleanup. No normal world mutation or broad region scan is authorized by this fixture.
++- Keep save format 4 / actorSchema 1 / art revision 2 and mod 0.3.1-dev.1. No new recovery fields changed permanent storage meaning. Next campaign work after the current Actor gates is a real NPC event; no 0.3.2, transactions, fallback, art or Caveman expansion yet.
+--- a/build.gradle
++++ b/build.gradle
+@@ -67,25 +67,32 @@
+         [1,2].each { repetition -> ['A','B','C','D','E','Verify'].each { boundary ->
+             create("actor${boundary}${repetition}") {
+                 client()
+-                gameDirectory = file('../../work/load-guard-crash')
++                gameDirectory = file('../../work/canonical-recovery-crash')
+                 systemProperty 'whileaway.actorBoundary', boundary
+                 systemProperty 'whileaway.actorRepeat', repetition.toString()
+-                systemProperty 'whileaway.evidence', file('evidence/load-guard/crash').absolutePath
++                systemProperty 'whileaway.evidence', file('evidence/canonical-recovery/crash').absolutePath
+             }
+         } }
+         [1,2].each { repetition -> ['Seed','Original','Copy','Reload','CopyReload'].each { mode ->
+             create("actorExceptions${mode}${repetition}") {
+-                client(); gameDirectory=file('../../work/load-guard-exceptions')
++                client(); gameDirectory=file('../../work/canonical-recovery-exceptions')
+                 systemProperty 'whileaway.actorExceptions',mode
+                 systemProperty 'whileaway.actorRepeat',repetition.toString()
+-                systemProperty 'whileaway.evidence',file('evidence/load-guard/exceptions').absolutePath
++                systemProperty 'whileaway.evidence',file('evidence/canonical-recovery/exceptions').absolutePath
+             }
+         } }
+         ['Control','Recover','RecoverReload','Blocked','Unsupported'].each { mode ->
+             create("loadGuard${mode}") {
+-                client(); gameDirectory=file('../../work/load-guard-client-final')
++                client(); gameDirectory=file('../../work/canonical-recovery-client-final')
+                 systemProperty 'whileaway.loadSmoke',mode
+-                systemProperty 'whileaway.evidence',file('evidence/load-guard/client-final').absolutePath
++                systemProperty 'whileaway.evidence',file('evidence/canonical-recovery/client-final').absolutePath
++            }
++        }
++        (['Exact','ExactReload','Ambiguous','Unloaded','NoCandidate','Duplicate','Late'] + (1..6).collect { "Cut${it}" } + (1..6).collect { "Resume${it}" }).each { mode ->
++            create("canonical${mode}") {
++                client(); gameDirectory=file('../../work/canonical-client-final')
++                systemProperty 'whileaway.canonicalSmoke',mode
++                systemProperty 'whileaway.evidence',file('evidence/canonical-recovery/canonical-final').absolutePath
+             }
+         }
+         recoveryLegacy {
+@@ -216,25 +223,25 @@
+     tasks.named("runActor${boundary}${repetition}").configure {
+         if(boundary!='Verify')ignoreExitValue=true
+         doFirst {
+-            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/load-guard/monitor.json'))
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+             jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+             systemProperty 'whileaway.monitorLeft',monitor.left.toString()
+             systemProperty 'whileaway.monitorTop',monitor.top.toString()
+             systemProperty 'whileaway.monitorWidth',monitor.width.toString()
+             systemProperty 'whileaway.monitorHeight',monitor.height.toString()
+-            file('evidence/load-guard/crash').mkdirs()
+-            def dir=file('../../work/load-guard-crash');dir.mkdirs()
++            file('evidence/canonical-recovery/crash').mkdirs()
++            def dir=file('../../work/canonical-recovery-crash');dir.mkdirs()
+             def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
+             def lines=muted.collect { "soundCategory_${it}:0.0" }
+             lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5'])
+             def options=new File(dir,'options.txt');options.setText(lines.join('\n')+'\n','UTF-8')
+             if(!muted.every { options.text.contains("soundCategory_${it}:0.0") } || !options.text.contains('narrator:0'))throw new GradleException('Actor mute failed')
+             logger.lifecycle("VERIFIED MUTED before actor client launch: ${options.absolutePath}")
+-            file("evidence/load-guard/crash/runActor${boundary}${repetition}.txt").setText('RUNNING\n','UTF-8')
++            file("evidence/canonical-recovery/crash/runActor${boundary}${repetition}.txt").setText('RUNNING\n','UTF-8')
+         }
+         doLast {
+             if(boundary!='Verify')logger.lifecycle("EXPECTED_FAULT_PROCESS_EXIT=${executionResult.get().exitValue}")
+-            if(!file("evidence/load-guard/crash/runActor${boundary}${repetition}.txt").text.contains("PASS runActor${boundary}${repetition}"))throw new GradleException('Actor boundary gate did not finish')
++            if(!file("evidence/canonical-recovery/crash/runActor${boundary}${repetition}.txt").text.contains("PASS runActor${boundary}${repetition}"))throw new GradleException('Actor boundary gate did not finish')
+         }
+     }
+ } }
+@@ -242,23 +249,23 @@
+ [1,2].each { repetition -> ['Seed','Original','Copy','Reload','CopyReload'].each { mode ->
+     tasks.named("runActorExceptions${mode}${repetition}").configure {
+         doFirst {
+-            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/load-guard/monitor.json'))
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+             jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+             systemProperty 'whileaway.monitorLeft',monitor.left.toString()
+             systemProperty 'whileaway.monitorTop',monitor.top.toString()
+             systemProperty 'whileaway.monitorWidth',monitor.width.toString()
+             systemProperty 'whileaway.monitorHeight',monitor.height.toString()
+-            file('evidence/load-guard/exceptions').mkdirs()
+-            def dir=file('../../work/load-guard-exceptions');dir.mkdirs()
++            file('evidence/canonical-recovery/exceptions').mkdirs()
++            def dir=file('../../work/canonical-recovery-exceptions');dir.mkdirs()
+             def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
+             def lines=muted.collect { "soundCategory_${it}:0.0" }
+             lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
+             new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+             logger.lifecycle("VERIFIED MUTED; requested right secondary DISPLAY1 ${monitor.x},${monitor.y}")
+-            file("evidence/load-guard/exceptions/runActorExceptions${mode}${repetition}.txt").setText('RUNNING\n','UTF-8')
+-        }
+-        doLast {
+-            if(!file("evidence/load-guard/exceptions/runActorExceptions${mode}${repetition}.txt").text.contains("PASS runActorExceptions${mode}${repetition}"))throw new GradleException('Actor exception gates incomplete')
++            file("evidence/canonical-recovery/exceptions/runActorExceptions${mode}${repetition}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            if(!file("evidence/canonical-recovery/exceptions/runActorExceptions${mode}${repetition}.txt").text.contains("PASS runActorExceptions${mode}${repetition}"))throw new GradleException('Actor exception gates incomplete')
+         }
+     }
+ } }
+@@ -268,19 +275,40 @@
+     tasks.named("runLoadGuard${mode}").configure {
+         ignoreExitValue=true
+         doFirst {
+-            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/load-guard/monitor.json'))
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
+             jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+             ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+-            def dir=file('../../work/load-guard-client-final');dir.mkdirs()
++            def dir=file('../../work/canonical-recovery-client-final');dir.mkdirs()
+             def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+             lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
+             new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+-            file('evidence/load-guard/client-final').mkdirs();file("evidence/load-guard/client-final/${mode}.txt").setText('RUNNING\n','UTF-8')
+-        }
+-        doLast {
+-            def text=file("evidence/load-guard/client-final/${mode}.txt").text
++            file('evidence/canonical-recovery/client-final').mkdirs();file("evidence/canonical-recovery/client-final/${mode}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            def text=file("evidence/canonical-recovery/client-final/${mode}.txt").text
+             if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('Load guard smoke failed')
+         }
+     }
+ }
+ 
++
++(['Exact','ExactReload','Ambiguous','Unloaded','NoCandidate','Duplicate','Late'] + (1..6).collect { "Cut${it}" } + (1..6).collect { "Resume${it}" }).each { mode ->
++    tasks.named("runCanonical${mode}").configure {
++        ignoreExitValue=true
++        doFirst {
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/canonical-recovery/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
++            def dir=file('../../work/canonical-client-final');dir.mkdirs()
++            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
++            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
++            file('evidence/canonical-recovery/canonical-final').mkdirs();file("evidence/canonical-recovery/canonical-final/${mode}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            def text=file("evidence/canonical-recovery/canonical-final/${mode}.txt").text
++            logger.lifecycle("ACTUAL_CHILD_EXIT=${executionResult.get().exitValue}")
++            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('Canonical smoke failed')
++        }
++    }
++}
+--- a/docs/CANONICAL_RECOVERY_031.md
++++ b/docs/CANONICAL_RECOVERY_031.md
+@@ -0,0 +1,97 @@
++# 0.3.1 canonical-recovery — implementation and verification contract
++
++Current: 《네가 없는 동안》 0.3.1-dev.1 / canonical-recovery / campaign PARTIAL
++
++This document describes implemented behavior. Final gate results are generated from the current logs in VERIFICATION.txt; no count in a historical report is reused as current execution evidence.
++
++## Immutable adopted baseline
++
++- dist/load-guard/whileaway-0.3.1-load-guard.jar
++- SHA-256 a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03
++- dist/load-guard/whileaway-0.3.1-load-guard-source.zip
++- SHA-256 c5d0161e2f436dcd8cb6c10e4654c84656e5a91cf1b96991c19907e8aa1f38b0
++- Byte-identical copies: evidence/canonical-recovery/baseline/previous.jar and previous-source.zip.
++- Minecraft 1.21.1, NeoForge 21.1.249, Java 21.0.5; save format 4, optional actorSchema 1, city art revision 2; no 0.3.2.
++
++## Canonical identity and load boundary
++
++ActorCandidates.identity checks storyId, eventId, instanceId, generation (including NBT integer presence), and role. The candidate query separately checks entity type, dimension, supported lifecycle, and Wayfarer witness. Position/Motion/health never establish identity. The query enumerates currently loaded entities, never force-loads a chunk, and requires registered-position and snapshot-position terrain and entity storage to be ready.
++
++Outcomes: NO_CANDIDATE, EXACT_SINGLE_CANDIDATE, AMBIGUOUS_MULTIPLE_CANDIDATES, STALE_GENERATION_ONLY, UNLOADED_OR_UNCONFIRMED, IDENTITY_CONFLICT. No nearest/first/UUID-sorted winner exists.
++
++CanonicalRecovery attempts missing entityUUID repair only for the currently supported Wayfarer event adapter with a surviving, consistent player encounter ticket. A malformed UUID is still blocked. A valid ticket is used only to construct a private preflight draft; the same strict StoryStorage validator must accept the full data. The draft is not installed in DimensionDataStorage or returned to gameplay. Generation never comes from snapshot tags.
++
++Each missing binding must then have exactly one live candidate with the full identity and the same UUID as the event ticket. Two distinct server-tick observations must agree and both tracked chunks must have completed entity loading. Multiple candidates or identity conflicts latch MANUAL_DIAGNOSTIC for that server session. No candidate or unconfirmed chunks remain blocked without spawning or incrementing generation.
++
++The original hash is checked again before strict final parsing and commit. Original-byte quarantine is verified before guarded atomic write; only then is the recovered data registered. A new process must load the repaired file through LOADED and retain UUID/instance/generation/checkpoint/facts.
++
++StoryStorage preserves ABSENT/LOADED/RECOVERABLE_CORRUPTION/CORRUPT/UNSUPPORTED. ABSENT is the only public new-campaign path. The internal recovery path refuses missing/replaced source files and registered/poisoned live data. Runtime conflicts poison the existing NarrativeData write guard.
++
++## Loading entities without running a broken story
++
++StoryStorage.available checks the real loader; it never supplies substitute data. Story event ticks, scene ticks, city generation/horror, station tick, relevant item/block interactions and city travel pause when blocked. Wayfarer skips AI/tick progression and completion while blocked. Tagged entities may finish deserialization as recovery evidence; they are not activated as story actors before recovery succeeds.
++
++This is a narrow story activation gate, not a promise that every third-party mod or every developer command operates normally in a corrupted world. A poisoned registered SavedData can throw during saveEverything; that failure is intentional and must preserve its previous file. Load-rejected data is never registered and unrelated vanilla save dispatch can proceed.
++
++## Generation reservation, binding, and crash boundaries
++
++The existing PREPARED + generation + entityUUID + event encounter ticket already expresses a durable spawn reservation. No second large journal was added. The defect was retrying that reservation by allocating yet another generation/UUID. PREPARED retries now reuse both, including after owner absence. A non-PREPARED replacement is allowed only after valid dimension, tracked chunk/entity-storage readiness, missing recorded UUID, no exact candidate/conflict, and the loaded reconciliation checks.
++
++Replacement sequence:
++
++1. Confirm missing within the tracked/loaded evidence scope; verify type and a collision-free placement without editing blocks.
++2. Boundary 1: before generation reservation.
++3. Increment generation once; reserve a UUID; set PREPARED; update the event ticket; persist synchronously.
++4. Boundary 2: reservation saved. Old generations are fenced on join.
++5. Spawn using that reserved UUID, not a newly assigned binding UUID.
++6. Boundary 3: entity added, live binding not yet verified.
++7. Verify canonical identity and observe/bind the preallocated UUID.
++8. Boundary 4: memory binding verified, durable active binding not committed.
++9. Flush Minecraft entity/world storage while the story is still PREPARED. This rare recovery flush is not performed every tick.
++10. Set ACTIVE, capture runtime, persist binding. Boundary 5.
++11. Restore Wayfarer runtime from checkpoint facts without resetting health/inventory/world blocks. Boundary 6.
++12. Verify a single canonical candidate and confirm recovery. Story checkpoint/facts do not advance except the existing initial checkpoint-0 spawn rule.
++
++The UUID in PREPARED is a reservation, not proof that an entity exists. At boundaries 3/4 the test deliberately flushes the real entity while leaving the story PREPARED to exercise the dangerous existing-entity/unconfirmed-binding branch. The six cut runs are paired with separate resume processes and disk checks, not inferred from the older A/B/C/D/E suite.
++
++The exact Minecraft entity-storage API was inspected locally: processPendingLoads adds deserialized entities before setting ChunkLoadStatus.LOADED; areEntitiesLoaded tests that status; saveAll flushes permanent entity storage. Evidence: entity-storage-api.txt. The loaded query is not an exhaustive disk search of every unexplored chunk. Late entities outside the tracked positions are subject to the persistent generation fence and conflict guard, not silently adopted.
++
++## Late stale entities and same-generation duplicates
++
++Joining known older-family generations is canceled before AI or event ownership. Retired actor joins are also canceled. A conflicting same-generation UUID instead blocks story writes and retains evidence rather than choosing a winner. Other noncanonical identity conflicts block rather than silently becoming a replacement.
++
++The late-load fixture is written offline to a separate copied world's entity region at chunk (600,600), using Minecraft RegionFile/NBT APIs. Its generation-0 actor is then actually deserialized when the real client visits that chunk after a generation-1 recovery. This is distinct from calling addFreshEntity on a stale object. The original generation-1 world remains unmodified by preparing this copy.
++
++## Storage compatibility
++
++No permanent field meaning changed and no new recovery schema is required: PREPARED already meant a persisted not-yet-confirmed spawn. Reusing its UUID/generation fixes retry semantics. Save format 4 and actorSchema 1 remain. Legacy 1/2/3 and actor-free 4 use the existing migration; missing/malformed generation remains blocked rather than inferred. Snapshot Motion default recovery and all prior fail-closed cases remain covered by the unchanged storage probe.
++
++JAR rollback is tested on a JAR copy only. It restores load-guard behavior (including its missing-UUID manual block and old generation retry), not a world downgrade.
++
++## Code changes and reasons
++
++- ActorCandidates.java: read-only typed candidate evidence; separates identity/context/spatial readiness.
++- CanonicalRecovery.java: private validated draft, live candidate/ticket agreement, distinct loaded observations, original-hash recheck, guarded commit; no spawn operation.
++- StoryStorage.java: private preflight/final recovery path; public load remains fail-closed; activation query and runtime conflict guard.
++- NarrativeData.java: explicit write poisoning hook; previous file/hash and atomic-save safeguards retained.
++- StoryActors.java: candidate conflict guard, two-position readiness, reservation reuse, six generation boundaries, durable entity flush before ACTIVE commit, stale admission fence, duplicate diagnostics.
++- Wayfarer.java: pause before AI during blocked load; extract idempotent checkpoint runtime restoration with canonical identity validation.
++- StoryEvents/SceneRecovery/CityHorror/CityDistrict/CityTransit/StationEntity/NoteItem/RelayBlock: pause story entry points while the vanilla entity loader gathers recovery evidence.
++- WhileAway.java: register recovery coordinator.
++- CanonicalGameTests.java: four new tests; original ActorGameTests and StoryGameTests remain byte-identical.
++- CanonicalSmoke.java, build.gradle, tools/run-canonical-*.py, LateActorFixture.java: isolated muted real clients, actual process boundaries and copied-world corruption injection.
++
++## Failure and review history
++
++- Missing UUID previously blocked startup before entity evidence could be loaded. Fixed by retaining load/write blocking while pausing story activation and allowing vanilla deserialization; no empty NarrativeData was introduced.
++- PREPARED retry previously incremented generation again. Fixed by treating the already-durable identity/UUID as a reservation and persisting actual entity storage before ACTIVE binding commit.
++- Owner absence could turn a pending PREPARED reservation into SUSPENDED, losing the reservation distinction. PREPARED is now preserved while absent.
++- Same-generation conflicts were previously rejected on join without preserving an explicit ambiguity diagnosis. They now poison writes and pause AI; genuine older generations are separately fenced.
++- Local tooling had a PowerShell brace-list parse error and a Python default cp949 decoding error. They were corrected without broad filesystem changes; source edits were checked and the full final compile/tests rerun. These are tooling failures, not a repaired-gameplay PASS claim.
++- Six early development clients are preserved in canonical/ and canonical-commands.jsonl. They are not included in the final canonical-final suite.
++
++## Unchanged scope and next stage
++
++Design v0.4 remains the higher narrative contract. No new story chapters, NPC system, transactions, structure fallback, Horror Activation, final art, resource pack, sound, or setpiece was introduced. Caveman is HOLD/off; no Terra/Luna delegation or model-switch experiment occurred. No token savings are claimed.
++
++Do not promote 0.3.2. Only after the final required Actor gates pass is the next implementation task a minimal real campaign NPC event, with the same lifecycle and A/B/C/D/E proof. Campaign stabilization remains PARTIAL even if the current Actor recovery gate passes.
+--- a/src/main/java/io/github/whileaway/ActorCandidates.java
++++ b/src/main/java/io/github/whileaway/ActorCandidates.java
+@@ -0,0 +1,59 @@
++package io.github.whileaway;
++
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.nbt.Tag;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.level.ChunkPos;
++
++/** Read-only evidence. A UUID binding is not identity and a snapshot is not an identity source. */
++public final class ActorCandidates {
++    public enum Outcome { NO_CANDIDATE, EXACT_SINGLE_CANDIDATE, AMBIGUOUS_MULTIPLE_CANDIDATES,
++        STALE_GENERATION_ONLY, UNLOADED_OR_UNCONFIRMED, IDENTITY_CONFLICT }
++    public record Result(Outcome outcome,Entity exact,int matches,int stale,String detail) {}
++    private ActorCandidates() {}
++    public static boolean identity(Entity entity,StoryActorRecord r) {
++        var t=entity.getPersistentData().getCompound(StoryActors.TAG);
++        return t.getString("storyId").equals(r.storyId)&&t.getString("ownerEventId").equals(r.eventId)
++            &&t.getString("spawnRole").equals(r.role)&&t.hasUUID("instanceId")&&t.getUUID("instanceId").equals(r.instanceId)
++            &&t.contains("generation",Tag.TAG_INT)&&t.getInt("generation")==r.generation;
++    }
++    public static boolean ready(ServerLevel level,StoryActorRecord r) {
++        var pos=r.snapshot.getList("Pos",Tag.TAG_DOUBLE);
++        if(pos.size()!=3)return false;
++        for(int i=0;i<3;i++)if(!Double.isFinite(pos.getDouble(i)))return false;
++        var snapshotPos=BlockPos.containing(pos.getDouble(0),pos.getDouble(1),pos.getDouble(2));
++        return level.hasChunkAt(r.position)&&level.areEntitiesLoaded(new ChunkPos(r.position).toLong())
++            &&level.hasChunkAt(snapshotPos)&&level.areEntitiesLoaded(new ChunkPos(snapshotPos).toLong());
++    }
++    public static Result inspect(MinecraftServer server,StoryActorRecord r) {
++        int matches=0,stale=0;boolean conflict=false;Entity exact=null;ServerLevel bound=null;
++        // Loaded entities only: never load chunks, query world files or choose the nearest candidate.
++        for(var level:server.getAllLevels()) {
++            if(level.dimension().location().toString().equals(r.dimension))bound=level;
++            for(var entity:level.getAllEntities()) {
++                var t=entity.getPersistentData().getCompound(StoryActors.TAG);
++                if(!r.storyId.equals(t.getString("storyId")))continue;
++                boolean family=t.getString("ownerEventId").equals(r.eventId)&&t.getString("spawnRole").equals(r.role)
++                    &&t.hasUUID("instanceId")&&t.getUUID("instanceId").equals(r.instanceId)&&t.contains("generation",Tag.TAG_INT);
++                if(!family){conflict=true;continue;}
++                if(t.getInt("generation")<r.generation){stale++;continue;}
++                if(!identity(entity,r)){conflict=true;continue;}
++                matches++;exact=entity;
++                if(!BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString().equals(r.entityType)
++                    ||!level.dimension().location().toString().equals(r.dimension)
++                    ||!Set.of("PREPARED","ACTIVE","SUSPENDED").contains(t.getString("lifecycleState"))
++                    ||r.lifecycle==StoryActorRecord.Lifecycle.RETIRED)conflict=true;
++                if(entity instanceof io.github.whileaway.entity.Wayfarer w&&!Objects.equals(w.witness(),r.owner))conflict=true;
++            }
++        }
++        Outcome outcome=matches>1?Outcome.AMBIGUOUS_MULTIPLE_CANDIDATES:conflict?Outcome.IDENTITY_CONFLICT:
++            bound==null||!ready(bound,r)?Outcome.UNLOADED_OR_UNCONFIRMED:
++            matches==1?Outcome.EXACT_SINGLE_CANDIDATE:stale>0?Outcome.STALE_GENERATION_ONLY:Outcome.NO_CANDIDATE;
++        return new Result(outcome,outcome==Outcome.EXACT_SINGLE_CANDIDATE?exact:null,matches,stale,
++            "storyId="+r.storyId+" eventId="+r.eventId+" instanceId="+r.instanceId+" generation="+r.generation+" candidates="+matches+" stale="+stale);
++    }
++}
+--- a/src/main/java/io/github/whileaway/CanonicalGameTests.java
++++ b/src/main/java/io/github/whileaway/CanonicalGameTests.java
+@@ -0,0 +1,48 @@
++package io.github.whileaway;
++
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.gametest.framework.*;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.level.block.Blocks;
++import net.neoforged.neoforge.gametest.*;
++
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class CanonicalGameTests {
++    private static Entity entity(GameTestHelper h) {
++        var e=WhileAway.WAYFARER.get().create(h.getLevel());var p=h.absolutePos(new BlockPos(1,2,1));
++        h.setBlock(new BlockPos(1,1,1),Blocks.STONE);h.setBlock(new BlockPos(1,2,1),Blocks.AIR);h.setBlock(new BlockPos(1,3,1),Blocks.AIR);h.setBlock(new BlockPos(1,4,1),Blocks.AIR);
++        e.moveTo(p.getX()+.5,p.getY(),p.getZ()+.5,0,0);return e;
++    }
++    private static StoryActorRecord record(Entity a) {
++        var r=new StoryActorRecord("candidate:"+UUID.randomUUID(),"candidate_event","pursuer","whileaway:wayfarer","minecraft:overworld",UUID.randomUUID(),null,a.getUUID(),a.blockPosition(),true);
++        StoryActors.tag(a,r);StoryActors.capture(a,r);return r;
++    }
++    @GameTest(template="empty") public static void candidateMultiplicityNeverChoosesFirst(GameTestHelper h) {
++        var a=entity(h);var r=record(a);h.getLevel().addFreshEntity(a);
++        h.assertTrue(ActorCandidates.inspect(h.getLevel().getServer(),r).outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"single live identity");
++        var b=entity(h);StoryActors.tag(b,r);h.getLevel().addFreshEntity(b);
++        h.assertTrue(ActorCandidates.inspect(h.getLevel().getServer(),r).outcome()==ActorCandidates.Outcome.AMBIGUOUS_MULTIPLE_CANDIDATES,"two candidates never distance/UUID sorted");
++        a.discard();b.discard();h.succeed();
++    }
++    @GameTest(template="empty") public static void candidateStaleConflictAndUnloadedAreDistinct(GameTestHelper h) {
++        var a=entity(h);var r=record(a);h.getLevel().addFreshEntity(a);r.generation=1;
++        h.assertTrue(ActorCandidates.inspect(h.getLevel().getServer(),r).outcome()==ActorCandidates.Outcome.STALE_GENERATION_ONLY,"stale not canonical");
++        r.generation=0;a.getPersistentData().getCompound(StoryActors.TAG).putString("spawnRole","other");
++        h.assertTrue(ActorCandidates.inspect(h.getLevel().getServer(),r).outcome()==ActorCandidates.Outcome.IDENTITY_CONFLICT,"role conflict");
++        a.discard();r.position=new BlockPos(12000000,80,12000000);
++        h.assertTrue(ActorCandidates.inspect(h.getLevel().getServer(),r).outcome()==ActorCandidates.Outcome.UNLOADED_OR_UNCONFIRMED,"unknown is not absence");h.succeed();
++    }
++    @GameTest(template="empty") public static void preparedReservationRetriesSameEpochAndUuid(GameTestHelper h) {
++        var a=entity(h);var r=StoryActors.prepare(a,"reservation:"+UUID.randomUUID(),"candidate_event","pursuer",UUID.randomUUID(),null,true);
++        UUID reserved=r.entityId;int epoch=r.generation;
++        StoryActors.reconcile(h.getLevel().getServer(),r);var live=StoryActors.reconcile(h.getLevel().getServer(),r);
++        h.assertTrue(live!=null&&r.entityId.equals(reserved)&&r.generation==epoch,"persisted reservation retried without new epoch");
++        StoryActors.abort(h.getLevel().getServer(),r);h.succeed();
++    }
++    @GameTest(template="empty") public static void missingGenerationTagIsNotEpochZero(GameTestHelper h) {
++        var a=entity(h);var r=record(a);a.getPersistentData().getCompound(StoryActors.TAG).remove("generation");
++        h.assertTrue(!ActorCandidates.identity(a,r),"missing int tag is not generation zero");h.succeed();
++    }
++}
+--- a/src/main/java/io/github/whileaway/CanonicalRecovery.java
++++ b/src/main/java/io/github/whileaway/CanonicalRecovery.java
+@@ -0,0 +1,82 @@
++package io.github.whileaway;
++
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.nbt.*;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.neoforge.event.tick.ServerTickEvent;
++import net.neoforged.neoforge.event.server.ServerStoppedEvent;
++
++/** Missing binding recovery; deliberately never creates an entity or advances an epoch. */
++public final class CanonicalRecovery {
++    private static final Map<MinecraftServer,Pending> pending=new WeakHashMap<>();
++    private static final class Pending {
++        NarrativeData draft;Map<String,UUID> tickets;String hash,last="",diagnostic="RECOVERY_PENDING";
++        int lastTick=-1;boolean manual;
++    }
++    public static String diagnostic(MinecraftServer server){var p=pending.get(server);return p==null?"RECOVERY_NONE":p.diagnostic;}
++    public static String attempt(MinecraftServer server) {
++        if(StoryStorage.available(server))return "LOAD_OK";
++        var state=StoryStorage.status(server.overworld().getDataStorage());
++        var p=pending.computeIfAbsent(server,s->new Pending());
++        if(p.manual)return p.diagnostic;
++        try {
++            if(state.outcome()!=StoryStorage.Outcome.CORRUPT||!state.detail().contains("field=entityUUID missing_or_malformed"))
++                return manual(p,"RECOVERY_NOT_ELIGIBLE "+state.outcome());
++            Path file=server.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat");
++            if(p.draft==null) {
++                byte[] bytes=Files.readAllBytes(file);
++                if(!StoryStorage.digest(bytes).equals(state.originalHash()))return manual(p,"RECOVERY_SOURCE_CHANGED");
++                // Loader has already bounded and parsed this exact file. Only a missing field, not malformed data, is eligible.
++                CompoundTag root;
++                try(var input=new java.io.ByteArrayInputStream(bytes)) {
++                    if(bytes.length>1&&(bytes[0]&255)==31&&(bytes[1]&255)==139)root=NbtIo.readCompressed(input,NbtAccounter.create(64*1024*1024)).getCompound("data");
++                    else root=NbtIo.read(new java.io.DataInputStream(input),NbtAccounter.create(64*1024*1024)).getCompound("data");
++                }
++                var tickets=new TreeMap<String,UUID>();
++                for(var raw:root.getList("actors",Tag.TAG_COMPOUND)) {
++                    var actor=(CompoundTag)raw;if(actor.hasUUID("entityUUID"))continue;
++                    if(actor.contains("entityUUID")||!actor.hasUUID("owner")||!actor.getString("ownerEventId").equals(StoryActors.CHASE))
++                        return manual(p,"UUID_MALFORMED_OR_NO_SUPPORTED_EVENT_JOURNAL");
++                    UUID ticket=null;
++                    for(var item:root.getList("players",Tag.TAG_COMPOUND)) {
++                        var player=(CompoundTag)item;
++                        if(player.hasUUID("id")&&player.getUUID("id").equals(actor.getUUID("owner"))) {
++                            if(!player.hasUUID("encounter")||player.getBoolean("complete"))return manual(p,"EVENT_JOURNAL_CONFLICT");
++                            ticket=player.getUUID("encounter");
++                        }
++                    }
++                    if(ticket==null||tickets.putIfAbsent(actor.getString("storyId"),ticket)!=null)return manual(p,"EVENT_JOURNAL_MISSING_OR_DUPLICATE");
++                }
++                if(tickets.isEmpty())return manual(p,"UUID_MISSING_NOT_FOUND");
++                p.draft=StoryStorage.recoveryRead(server,tickets,true);p.tickets=tickets;p.hash=state.originalHash();
++            }
++            StringBuilder identity=new StringBuilder();
++            for(var entry:p.tickets.entrySet()) {
++                var record=p.draft.actors.get(entry.getKey());
++                if(record==null||record.checkpoint.terminal())return manual(p,"EVENT_CHECKPOINT_CONFLICT");
++                var candidates=ActorCandidates.inspect(server,record);
++                p.diagnostic=candidates.outcome()+" "+candidates.detail()+" writeBlocked=true";
++                if(candidates.outcome()==ActorCandidates.Outcome.AMBIGUOUS_MULTIPLE_CANDIDATES
++                    ||candidates.outcome()==ActorCandidates.Outcome.IDENTITY_CONFLICT)return manual(p,p.diagnostic);
++                if(candidates.outcome()!=ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE){p.last="";p.lastTick=-1;return p.diagnostic;}
++                if(!entry.getValue().equals(candidates.exact().getUUID()))return manual(p,"IDENTITY_CONFLICT event_ticket_uuid");
++                identity.append(entry.getKey()).append(':').append(candidates.exact().getUUID()).append(';');
++            }
++            String proof=identity.toString();int tick=server.getTickCount();
++            if(!proof.equals(p.last)||tick<=p.lastTick){p.last=proof;p.lastTick=tick;return p.diagnostic="UNLOADED_OR_UNCONFIRMED awaiting_distinct_loaded_pass writeBlocked=true";}
++            // Re-read original hash, run the same strict loader validator, quarantine, and commit on this server thread.
++            if(!StoryStorage.digest(Files.readAllBytes(file)).equals(p.hash))return manual(p,"RECOVERY_SOURCE_CHANGED");
++            StoryStorage.recoveryRead(server,p.tickets,false);
++            p.diagnostic="UUID_RELINK_COMMITTED RECOVER_WITH_WARNING generation_unchanged=true "+proof;
++            com.mojang.logging.LogUtils.getLogger().warn(p.diagnostic);
++            return p.diagnostic;
++        } catch(Exception ex){return manual(p,"RECOVERY_REJECTED "+ex.getMessage());}
++    }
++    private static String manual(Pending p,String reason){p.manual=true;p.diagnostic="MANUAL_DIAGNOSTIC "+reason+" writeBlocked=true";
++        com.mojang.logging.LogUtils.getLogger().error(p.diagnostic);return p.diagnostic;}
++    @SubscribeEvent public void tick(ServerTickEvent.Post event){var s=event.getServer();if(s.getTickCount()%20==0&&!StoryStorage.available(s))attempt(s);}
++    @SubscribeEvent public void stopped(ServerStoppedEvent event){pending.remove(event.getServer());}
++}
+--- a/src/main/java/io/github/whileaway/CityDistrict.java
++++ b/src/main/java/io/github/whileaway/CityDistrict.java
+@@ -89,6 +89,7 @@
+         };
+     }
+     @SubscribeEvent public void tick(ServerTickEvent.Post event) {
++        if(!StoryStorage.available(event.getServer()))return;
+         var level=event.getServer().getLevel(KEY);
+         if(level!=null){var data=get(level);if(data.started&&!data.ready())data.advance(level,256);}
+     }
+--- a/src/main/java/io/github/whileaway/CityHorror.java
++++ b/src/main/java/io/github/whileaway/CityHorror.java
+@@ -11,7 +11,7 @@
+ public final class CityHorror {
+     public static final BlockPos STAGE=new BlockPos(40,65,11);
+     public static boolean tryStart(ServerPlayer p) {
+-        if(!p.level().dimension().equals(CityDistrict.KEY))return false;
++        if(!p.level().dimension().equals(CityDistrict.KEY)||!StoryStorage.available(p.getServer()))return false;
+         var d=NarrativeData.get(p.getServer());var e=d.entry(p.getUUID());
+         long now=p.getServer().overworld().getGameTime();
+         if(!e.cityVisited||(e.cityClues&1)==0||e.cityShockTriggered||!p.isAlive()||p.isSleeping()||p.isSpectator()||p.isCreative()
+--- a/src/main/java/io/github/whileaway/CityTransit.java
++++ b/src/main/java/io/github/whileaway/CityTransit.java
+@@ -13,6 +13,7 @@
+ public final class CityTransit {
+     private CityTransit() {}
+     public static boolean enter(ServerPlayer p,BlockPos relay) {
++        if(!StoryStorage.available(p.getServer()))return false;
+         var data=NarrativeData.get(p.getServer());var e=data.entry(p.getUUID());
+         if(p.level().dimension()!=Level.OVERWORLD || e.station==null || e.station.distSqr(relay)>32*32
+             || p.blockPosition().distSqr(relay)>8*8 || !p.serverLevel().getBlockState(relay).is(WhileAway.RELAY.get()))return false;
+@@ -33,6 +34,7 @@
+         SceneRecovery.begin(p,2,landing);return true;
+     }
+     public static boolean leave(ServerPlayer p) {
++        if(!StoryStorage.available(p.getServer()))return false;
+         if(!p.level().dimension().equals(CityDistrict.KEY))return false;
+         var data=NarrativeData.get(p.getServer());var e=data.entry(p.getUUID());if(!eligible(p,e))return false;
+         var overworld=p.getServer().overworld();
+--- a/src/main/java/io/github/whileaway/client/CanonicalSmoke.java
++++ b/src/main/java/io/github/whileaway/client/CanonicalSmoke.java
+@@ -0,0 +1,141 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.screens.*;
++import net.minecraft.nbt.*;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
++import net.neoforged.neoforge.event.server.ServerStartedEvent;
++
++/** Opt-in fault injection in COPIED worlds. All decisions remain in production recovery code. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class CanonicalSmoke {
++    private static final String MODE=System.getProperty("whileaway.canonicalSmoke","");
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/canonical-recovery/canonical"));
++    private static boolean launched,stopped,setup,injected,loss;private static volatile boolean queued,ready;
++    private static int ticks,stable,lateStage;private static boolean lateSeen;private static UUID lateUUID;private static StoryActorRecord before;private static byte[] original;private static UUID finalUUID;
++    private static Path file(MinecraftServer s){return s.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat");}
++    private static void note(String text){try{Files.createDirectories(E);Files.writeString(E.resolve(MODE+".txt"),text+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception ex){throw new RuntimeException(ex);}}
++    private static void check(boolean value,String message){if(!value)throw new IllegalStateException(message);}
++    private static void fail(Exception ex){note("FAIL "+ex);Runtime.getRuntime().halt(8);}
++    private static void exit(MinecraftServer s){stopped=true;s.halt(false);Minecraft.getInstance().execute(()->Minecraft.getInstance().stop());}
++    @SubscribeEvent public static void started(ServerStartedEvent event) {
++        if(MODE.isEmpty())return;
++        try {
++            original=Files.readAllBytes(file(event.getServer()));
++            var root=NbtIo.readCompressed(file(event.getServer()),NbtAccounter.create(64*1024*1024)).getCompound("data");
++            var actor=root.getList("actors",Tag.TAG_COMPOUND).getCompound(0).copy();
++            if(!actor.hasUUID("entityUUID"))for(var raw:root.getList("players",Tag.TAG_COMPOUND)) {
++                var p=(CompoundTag)raw;if(p.hasUUID("id")&&p.getUUID("id").equals(actor.getUUID("owner")))actor.putUUID("entityUUID",p.getUUID("encounter"));
++            }
++            before=StoryActorRecord.load(actor);ready=true;
++            note("INPUT hash="+StoryStorage.digest(original)+" uuid="+before.entityId+" generation="+before.generation+" checkpoint="+before.checkpoint.checkpoint);
++        }catch(Exception ex){fail(ex);}
++    }
++    @SubscribeEvent(receiveCanceled=true) public static void joining(EntityJoinLevelEvent event) {
++        if(MODE.isEmpty()||!ready||injected||!(event.getLevel() instanceof ServerLevel level))return;
++        var entity=event.getEntity();
++        var tag=entity.getPersistentData().getCompound(StoryActors.TAG);
++        if(MODE.equals("Late")&&tag.getString("storyId").equals(before.storyId)&&tag.getInt("generation")<before.generation) {
++            lateSeen=true;lateUUID=entity.getUUID();note("OBSERVED real_entity_chunk_join stale_generation="+tag.getInt("generation")+" uuid="+lateUUID);return;
++        }
++        if(!ActorCandidates.identity(entity,before))return;
++        if(MODE.equals("NoCandidate")){event.setCanceled(true);injected=true;return;}
++        if(MODE.equals("Ambiguous")) {
++            injected=true;
++            // Corrupt copied-world fixture: add a second genuine Wayfarer with the same persistent identity.
++            level.getServer().execute(()->{try{var clone=entity.getType().create(level);clone.load(entity.saveWithoutId(new CompoundTag()));
++                clone.setUUID(UUID.randomUUID());check(level.addFreshEntity(clone),"ambiguous fixture admission");note("INJECT same_generation_duplicate");
++            }catch(Exception ex){fail(ex);}});
++        }
++    }
++    @SubscribeEvent public static void boundary(RecoveryBoundaryEvent event) {
++        if(!MODE.startsWith("Cut")||!loss||!event.boundary.startsWith("GENERATION_"))return;
++        int target=Integer.parseInt(MODE.substring(3));if(!event.boundary.startsWith("GENERATION_"+target+"_"))return;
++        try {
++            var s=event.player.getServer();var r=NarrativeData.get(s).actors.get(before.storyId);
++            check(r.checkpoint.checkpoint==before.checkpoint.checkpoint,"cut checkpoint drift");
++            check(r.generation==(target==1?before.generation:before.generation+1),"cut epoch");
++            // Exercise the dangerous persisted-entity / uncommitted-binding branch at 3 and 4.
++            if(target==3||target==4)s.saveEverything(true,true,true);
++            Files.copy(file(s),E.resolve(MODE+".dat"),StandardCopyOption.REPLACE_EXISTING);
++            note("PASS "+MODE+" boundary="+event.boundary+" generation="+r.generation+" uuid="+r.entityId+" checkpoint="+r.checkpoint.checkpoint+" diskHash="+StoryStorage.digest(Files.readAllBytes(file(s))));
++            Runtime.getRuntime().halt(0);
++        }catch(Exception ex){fail(ex);}
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
++        if(MODE.isEmpty()||stopped)return;var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen) {
++                launched=true;Files.createDirectories(E);note(ClientTestEnvironment.verify(E,MODE));
++                String world=MODE.equals("ExactReload")?"Exact":MODE.startsWith("Resume")?"Cut"+MODE.substring(6):MODE;
++                mc.createWorldOpenFlows().openWorld("canonical-"+world,mc::stop);
++            }
++            if(mc.screen instanceof BackupConfirmScreen screen)for(var child:screen.children())if(child instanceof net.minecraft.client.gui.components.Button b
++                &&b.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())){b.onPress();break;}
++            if(++ticks>8000)throw new IllegalStateException("timeout mode="+MODE+" stable="+stable);
++            if(!ready||mc.player==null||queued||ticks%10!=0)return;queued=true;
++            mc.getSingleplayerServer().execute(()->{try {
++                var s=mc.getSingleplayerServer();var p=s.getPlayerList().getPlayer(mc.player.getUUID());if(p==null)return;
++                if(!setup){setup=true;p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
++                    if(!MODE.equals("Unloaded")){var home=net.minecraft.core.BlockPos.of(before.snapshot.getLong("Home"));p.teleportTo(s.overworld(),home.getX()+.5,home.getY(),home.getZ()+.5,Set.of(),0,0);}
++                    else p.teleportTo(s.overworld(),12000,100,12000,Set.of(),0,0);
++                }
++                if(Set.of("Ambiguous","Unloaded","NoCandidate").contains(MODE)) {
++                    check(!StoryStorage.available(s),"unsafe automatic recovery "+MODE);
++                    String result=CanonicalRecovery.attempt(s);stable+=10;if(stable<160)return;
++                    String expected=MODE.equals("Ambiguous")?"AMBIGUOUS_MULTIPLE_CANDIDATES":MODE.equals("Unloaded")?"UNLOADED_OR_UNCONFIRMED":"NO_CANDIDATE";
++                    check(result.contains(expected),"classification "+result);
++                    for(int i=0;i<3;i++)s.saveEverything(true,true,true);
++                    check(Arrays.equals(original,Files.readAllBytes(file(s))),"blocked original changed");
++                    check(Files.exists(file(s).getParent().resolve("whileaway-quarantine/"+StoryStorage.digest(original)+".dat")),"original not quarantined");
++                    note("PASS "+MODE+" "+result+" realSaveDispatches=3 originalPreserved=true noGenerationCreated=true");Runtime.getRuntime().halt(0);return;
++                }
++                if(!StoryStorage.available(s)){if(stable++>200)throw new IllegalStateException(CanonicalRecovery.diagnostic(s));return;}
++                var data=NarrativeData.get(s);var r=data.actors.get(before.storyId);check(r!=null,"empty campaign");
++                var actor=StoryActors.find(s,r.entityId);
++                if(MODE.equals("Late")&&lateStage==1&&lateSeen){check(StoryActors.find(s,lateUUID)==null,"stale active after actual chunk join");
++                    var home=net.minecraft.core.BlockPos.of(before.snapshot.getLong("Home"));p.teleportTo(s.overworld(),home.getX()+.5,home.getY(),home.getZ()+.5,Set.of(),0,0);lateStage=2;stable=0;return;}
++                if(actor==null)return;
++                if(MODE.startsWith("Cut")&&!loss) {
++                    loss=true;actor.discard();s.saveEverything(true,true,true);note("INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained");return;
++                }
++                if(MODE.equals("Duplicate")&&!injected) {
++                    injected=true;StoryActors.persist(s);s.saveEverything(true,true,true);original=Files.readAllBytes(file(s));
++                    var clone=actor.getType().create(p.serverLevel());clone.load(actor.saveWithoutId(new CompoundTag()));clone.setUUID(UUID.randomUUID());p.serverLevel().addFreshEntity(clone);
++                    check(!StoryStorage.available(s),"duplicate not blocked");
++                    try{s.saveEverything(true,true,true);}catch(RuntimeException expected){note("EXPECTED guarded save rejected "+expected.getClass().getSimpleName());}
++                    check(Arrays.equals(original,Files.readAllBytes(file(s))),"duplicate rewrote story");
++                    note("PASS Duplicate writeBlocked=true originalPreserved=true AI_paused=true");Runtime.getRuntime().halt(0);return;
++                }
++                if(MODE.equals("Late")) {
++                    if(lateStage==0){check(before.generation==1,"late fixture needs generation one");lateStage=1;p.teleportTo(s.overworld(),9600.5,100,9600.5,Set.of(),0,0);return;}
++                    if(lateStage==1){if(!lateSeen)return;check(StoryActors.find(s,lateUUID)==null,"stale admitted as active actor");
++                        var home=net.minecraft.core.BlockPos.of(before.snapshot.getLong("Home"));p.teleportTo(s.overworld(),home.getX()+.5,home.getY(),home.getZ()+.5,Set.of(),0,0);lateStage=2;stable=0;return;}
++                    check(lateSeen&&StoryActors.find(s,lateUUID)==null,"stale revived");
++                }
++                int epoch=MODE.startsWith("Resume")?1:before.generation;
++                check(r.generation==epoch,"generation drift "+r.generation);
++                if(MODE.equals("Exact")||MODE.equals("ExactReload"))check(r.entityId.equals(before.entityId),"UUID changed instead of reconnected");
++                if(finalUUID==null)finalUUID=r.entityId;check(finalUUID.equals(r.entityId),"UUID unstable");
++                check(r.facts.equals(before.facts),"permanent facts changed");
++                check(r.instanceId.equals(before.instanceId)&&r.checkpoint.checkpoint==2&&!data.entry(r.owner).progress.encounterComplete(),"event drift");
++                var candidates=ActorCandidates.inspect(s,r);check(candidates.outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"canonical count "+candidates);
++                check(StoryActors.integrity(s).isEmpty(),"integrity "+StoryActors.integrity(s));
++                stable+=10;if(stable<160)return;
++                StoryActors.persist(s);s.saveEverything(true,true,true);Files.copy(file(s),E.resolve(MODE+".dat"),StandardCopyOption.REPLACE_EXISTING);
++                note("PASS "+MODE+" staleLateJoin="+lateSeen+" canonical=1 generation="+r.generation+" uuid="+r.entityId+" checkpoint=2 factsPreserved=true integrity=clean stableTicks="+stable);
++                exit(s);
++            }catch(Exception ex){fail(ex);}finally{queued=false;}});
++        }catch(Exception ex){fail(ex);}
++    }
++}
+--- a/src/main/java/io/github/whileaway/content/NoteItem.java
++++ b/src/main/java/io/github/whileaway/content/NoteItem.java
+@@ -25,6 +25,7 @@
+     }
+     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+         if (player instanceof ServerPlayer server) {
++            if(!io.github.whileaway.StoryStorage.available(server.getServer()))return InteractionResultHolder.fail(player.getItemInHand(hand));
+             var data = NarrativeData.get(server.getServer());
+             var e = data.entry(player.getUUID());
+             if(cityBit==0) {
+--- a/src/main/java/io/github/whileaway/content/RelayBlock.java
++++ b/src/main/java/io/github/whileaway/content/RelayBlock.java
+@@ -19,6 +19,7 @@
+     @Override protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block,BlockState> b){b.add(LIT);}
+     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+         if (player instanceof ServerPlayer server) {
++            if(!StoryStorage.available(server.getServer()))return InteractionResult.FAIL;
+             var data = NarrativeData.get(server.getServer()); var e = data.entry(player.getUUID());
+             if (e.progress.has(Clue.SIGNAL_RESTORED)) CityTransit.enter(server,pos);
+             else if (!Director.canRestore(e.progress) || e.station == null || e.station.distSqr(pos) > 32 * 32 || level.dimension() != Level.OVERWORLD)
+--- a/src/main/java/io/github/whileaway/content/StationEntity.java
++++ b/src/main/java/io/github/whileaway/content/StationEntity.java
+@@ -12,6 +12,7 @@
+     public StationEntity(BlockPos pos, BlockState state) { super(WhileAway.STATION_ENTITY.get(), pos, state); }
+     public static void tick(Level level, BlockPos pos, BlockState state, StationEntity self) {
+         if (!(level instanceof ServerLevel server) || level.dimension() != Level.OVERWORLD || level.getGameTime() % 40 != 0) return;
++        if(!StoryStorage.available(server.getServer()))return;
+         var data = NarrativeData.get(server.getServer());
+         for (ServerPlayer p : server.players()) {
+             if (p.isSpectator() || p.blockPosition().distSqr(pos) > 20 * 20) continue;
+--- a/src/main/java/io/github/whileaway/entity/Wayfarer.java
++++ b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+@@ -41,6 +41,7 @@
+     @Override public boolean removeWhenFarAway(double distance) { return false; }
+     @Override public boolean canBeLeashed() { return false; }
+     @Override public void tick() {
++        if(level() instanceof ServerLevel level&&!StoryStorage.available(level.getServer())){getNavigation().stop();return;}
+         super.tick();
+         if (!(level() instanceof ServerLevel server)) return;
+         if (home == null) home=blockPosition();
+@@ -51,15 +52,7 @@
+         var actorRecord=StoryActors.attach(this);
+         if(actorRecord==null){discard();return;}
+         if(!server.dimension().location().toString().equals(actorRecord.dimension)){getNavigation().stop();return;}
+-        if(!checkpointRestored) {
+-            // Chunk NBT may lag behind the story-file commit. Restore ONLY encounter AI,
+-            // not health, physical inventory, or a position which might now contain a player's blocks.
+-            var saved=actorRecord.snapshot;
+-            lifetime=Math.max(0,saved.getInt("StoryAge"));huntTicks=Math.max(0,saved.getInt("HuntTicks"));
+-            entityData.set(HUNTING,actorRecord.facts.contains("pursuit_started")||saved.getBoolean("Hunting"));
+-            windup=Math.max(30,saved.getInt("Windup"));attackCooldown=Math.max(20,saved.getInt("AttackCooldown"));
+-            checkpointRestored=true;
+-        }
++        restoreCheckpointRuntime(actorRecord);
+         var player = server.getServer().getPlayerList().getPlayer(witness);
+         if (player == null) { getNavigation().stop(); StoryActors.suspend(this,actorRecord,"owner_offline"); return; }
+         // Absence, death and dimension travel suspend AI and active-time budgets; they are not story failures.
+@@ -95,8 +88,20 @@
+             getNavigation().moveTo(home.getX()+side*8+.5, home.getY(), home.getZ()+3.5, .65);
+         }
+     }
++    public void restoreCheckpointRuntime(StoryActorRecord actorRecord) {
++        if(!StoryActors.canonical(this,actorRecord))throw new IllegalStateException("RUNTIME_IDENTITY_CONFLICT");
++        if(!checkpointRestored) {
++            // Chunk NBT may lag behind the story-file commit. Restore ONLY encounter AI,
++            // not health, physical inventory, or a position which might now contain a player's blocks.
++            var saved=actorRecord.snapshot;
++            lifetime=Math.max(0,saved.getInt("StoryAge"));huntTicks=Math.max(0,saved.getInt("HuntTicks"));
++            entityData.set(HUNTING,actorRecord.facts.contains("pursuit_started")||saved.getBoolean("Hunting"));
++            windup=Math.max(30,saved.getInt("Windup"));attackCooldown=Math.max(20,saved.getInt("AttackCooldown"));
++            checkpointRestored=true;
++        }
++    }
+     private void finish(boolean complete) {
+-        if(level() instanceof ServerLevel && witness!=null)StoryActors.completeChase(this);
++        if(level() instanceof ServerLevel s && witness!=null){if(StoryStorage.available(s.getServer()))StoryActors.completeChase(this);}
+         else discard();
+     }
+     @Override public void die(DamageSource source) { super.die(source); finish(true); }
+--- a/src/main/java/io/github/whileaway/NarrativeData.java
++++ b/src/main/java/io/github/whileaway/NarrativeData.java
+@@ -16,6 +16,7 @@
+     private boolean storySaveWritable=true;
+     void bindStorage(java.nio.file.Path file,String hash){storageFile=file;expectedHash=hash;}
+     public boolean storySaveWritable(){return storySaveWritable;}
++    void blockStoryWrites(){storySaveWritable=false;}
+     private final Map<UUID, Entry> players = new TreeMap<>();
+     public final Map<String,StoryActorRecord> actors=new TreeMap<>();
+     public static final class Entry {
+--- a/src/main/java/io/github/whileaway/SceneRecovery.java
++++ b/src/main/java/io/github/whileaway/SceneRecovery.java
+@@ -68,6 +68,7 @@
+     @SubscribeEvent public void stopped(ServerStoppedEvent event){sessions.remove(event.getServer());}
+     @SubscribeEvent public void tick(PlayerTickEvent.Post event) {
+         if(!(event.getEntity() instanceof ServerPlayer p)||p.tickCount%20!=0)return;
++        if(!StoryStorage.available(p.getServer()))return;
+         CityInvestigation.finish(p);
+         var s=p.getServer();var d=NarrativeData.get(s);var e=d.entry(p.getUUID());var active=sessions(s).get(p.getUUID());
+         if(active!=null) {
+--- a/src/main/java/io/github/whileaway/StoryActors.java
++++ b/src/main/java/io/github/whileaway/StoryActors.java
+@@ -51,7 +51,7 @@
+     }
+     public static boolean canonical(Entity actor,StoryActorRecord r) {
+         var t=actor.getPersistentData().getCompound(TAG);
+-        return actor.getUUID().equals(r.entityId)&&t.hasUUID("instanceId")&&t.getUUID("instanceId").equals(r.instanceId)
++        return ActorCandidates.identity(actor,r)&&actor.level().dimension().location().toString().equals(r.dimension)&&actor.getUUID().equals(r.entityId)&&t.hasUUID("instanceId")&&t.getUUID("instanceId").equals(r.instanceId)
+             &&t.getInt("generation")==r.generation&&t.getString("storyId").equals(r.storyId)
+             &&t.getString("ownerEventId").equals(r.eventId)&&t.getString("spawnRole").equals(r.role)
+             &&BuiltInRegistries.ENTITY_TYPE.getKey(actor.getType()).toString().equals(r.entityType);
+@@ -85,7 +85,15 @@
+             r.eventId.equals(CHASE),p==null?Double.NaN:p.blockPosition().distSqr(anchor),42);
+     }
+     public static Entity reconcile(MinecraftServer server,StoryActorRecord r) {
++        var evidence=r.lifecycle==StoryActorRecord.Lifecycle.RETIRED?new ActorCandidates.Result(ActorCandidates.Outcome.NO_CANDIDATE,null,0,0,"retired_cleanup"):ActorCandidates.inspect(server,r);
++        if(evidence.outcome()==ActorCandidates.Outcome.AMBIGUOUS_MULTIPLE_CANDIDATES||evidence.outcome()==ActorCandidates.Outcome.IDENTITY_CONFLICT) {
++            StoryStorage.block(server,"ACTOR_IDENTITY_BLOCKED "+evidence.outcome()+" "+evidence.detail());return null;
++        }
+         var current=find(server,r.entityId);
++        if(current==null&&evidence.outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE) {
++            // Intact UUID disagrees with a live same-epoch entity. This is not confirmed loss.
++            StoryStorage.block(server,"BINDING_IDENTITY_CONFLICT "+evidence.detail());return null;
++        }
+         if(r.eventId.equals(CHASE)&&r.owner!=null&&r.lifecycle!=StoryActorRecord.Lifecycle.RETIRED) {
+             var e=NarrativeData.get(server).entry(r.owner);
+             // Contradictory permanent facts require diagnosis, not an endless spawn/discard loop.
+@@ -97,7 +105,7 @@
+             return null;
+         }
+         if(current!=null) {
+-            if(!canonical(current,r)||!current.level().dimension().location().toString().equals(r.dimension))return null;
++            if(!canonical(current,r)||!current.level().dimension().location().toString().equals(r.dimension)){StoryStorage.block(server,"ACTOR_BINDING_IDENTITY_CONFLICT "+r.storyId);return null;}
+             readyPasses.computeIfAbsent(server,s->new HashMap<>()).remove(r.storyId);
+             if(!ownerPresent(server,r)){suspend(current,r,"owner_absent");return current;}
+             if(r.lifecycle==StoryActorRecord.Lifecycle.PREPARED) {
+@@ -110,12 +118,12 @@
+         var passes=readyPasses.computeIfAbsent(server,s->new HashMap<>());
+         if(!ownerPresent(server,r)) {
+             passes.remove(r.storyId);
+-            if(r.lifecycle!=StoryActorRecord.Lifecycle.SUSPENDED) {
++            if(r.lifecycle!=StoryActorRecord.Lifecycle.SUSPENDED&&r.lifecycle!=StoryActorRecord.Lifecycle.PREPARED) {
+                 r.lifecycle=StoryActorRecord.Lifecycle.SUSPENDED;r.checkpoint.suspend("owner_absent");persist(server);
+             }return null;
+         }
+         var level=server.getLevel(ResourceKey.create(Registries.DIMENSION,ResourceLocation.parse(r.dimension)));
+-        if(level==null||!storageReady(level,r)){passes.remove(r.storyId);return null;}
++        if(level==null||!storageReady(level,r)||!ActorCandidates.ready(level,r)){passes.remove(r.storyId);return null;}
+         if(passes.merge(r.storyId,1,Integer::sum)<2)return null;
+         // Only known registry types; unsupported types remain diagnosable, never substitute a different NPC.
+         var type=BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(r.entityType)).orElse(null);
+@@ -130,12 +138,36 @@
+             if(level.noCollision(actor)&&level.isUnobstructed(actor)){clear=true;break;}
+         }
+         if(!clear)return null;
+-        if(r.generation==Integer.MAX_VALUE)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor generation exhausted");
+-        var previous=r.lifecycle;r.generation++;r.entityId=UUID.randomUUID();actor.setUUID(r.entityId);
+-        r.lifecycle=StoryActorRecord.Lifecycle.PREPARED;tag(actor,r);capture(actor,r);
+-        if(r.eventId.equals(CHASE)&&r.owner!=null)NarrativeData.get(server).entry(r.owner).encounter=r.entityId;
+-        persist(server); // Fence a late entity from an OLD, unloaded chunk before introducing the replacement.
+-        if(!spawnPrepared(level,r,actor))return null;
++        var previous=r.lifecycle;
++        // PREPARED already IS a durable generation + UUID reservation. Retrying it never creates another epoch.
++        if(r.lifecycle!=StoryActorRecord.Lifecycle.PREPARED) {
++            if(r.generation==Integer.MAX_VALUE)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor generation exhausted");
++            emit(server,r,"GENERATION_1_BEFORE_RESERVATION");
++            r.generation++;r.entityId=UUID.randomUUID();r.lifecycle=StoryActorRecord.Lifecycle.PREPARED;
++            if(r.eventId.equals(CHASE)&&r.owner!=null)NarrativeData.get(server).entry(r.owner).encounter=r.entityId;
++            persist(server); // A late old generation is fenced before a replacement exists.
++            emit(server,r,"GENERATION_2_RESERVATION_SAVED");
++        }
++        actor.setUUID(r.entityId);tag(actor,r);capture(actor,r);
++        if(!level.addFreshEntity(actor))return null;
++        emit(server,r,"GENERATION_3_SPAWNED_UNBOUND");
++        // UUID was preallocated in the reservation; observing this entity binds that same UUID, not a new one.
++        if(!canonical(actor,r))throw new IllegalStateException("REPLACEMENT_VERIFY_FAILED");
++        r.entityId=actor.getUUID();
++        emit(server,r,"GENERATION_4_BOUND_UNSAVED");
++        // Keep the story PREPARED until Minecraft has flushed the actual entity. If interrupted, retry the reservation.
++        server.saveEverything(true,true,true);
++        r.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;tag(actor,r);capture(actor,r);
++        if(r.checkpoint.checkpoint==0)r.checkpoint.advance(1);
++        persist(server);
++        emit(server,r,"GENERATION_5_BINDING_SAVED");
++        if(actor instanceof Wayfarer wayfarer)wayfarer.restoreCheckpointRuntime(r);
++        emit(server,r,"GENERATION_6_RUNTIME_RESTORED");
++        var confirmed=ActorCandidates.inspect(server,r);
++        if(confirmed.outcome()!=ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE||!canonical(confirmed.exact(),r)) {
++            StoryStorage.block(server,"RECOVERY_INTEGRITY_FAILED "+confirmed.detail());return null;
++        }
++        emit(server,r,"FACT_COMMITTED");
+         passes.remove(r.storyId);
+         com.mojang.logging.LogUtils.getLogger().info("EVENT_RECOVERY eventId={} previousState={} restoredCheckpoint={} reason=missing_loaded_actor entitiesRemoved=0 entitiesRecreated=1 generation={}",r.eventId,previous,r.checkpoint.checkpoint,r.generation);
+         return actor;
+@@ -163,7 +195,7 @@
+         emit(((ServerLevel)actor.level()).getServer(),r,"CHECKPOINT_COMMITTED");
+     }
+     public static void suspend(Entity actor,StoryActorRecord r,String reason) {
+-        if(r.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED)return;
++        if(r.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED||r.lifecycle==StoryActorRecord.Lifecycle.PREPARED)return;
+         r.lifecycle=StoryActorRecord.Lifecycle.SUSPENDED;r.checkpoint.suspend(reason);capture(actor,r);persist(((ServerLevel)actor.level()).getServer());
+     }
+     public static void completeChase(Wayfarer actor) {
+@@ -193,18 +225,34 @@
+     @SubscribeEvent public void joining(EntityJoinLevelEvent event) {
+         if(!(event.getLevel() instanceof ServerLevel level))return;
+         var actor=event.getEntity();if(!actor.getPersistentData().contains(TAG))return;
++        if(!StoryStorage.available(level.getServer()))return; // Quarantined AI; do not discard recovery evidence.
+         var r=NarrativeData.get(level.getServer()).actors.get(actor.getPersistentData().getCompound(TAG).getString("storyId"));
+         // Pure metadata admission: no chunk loading, spawning or saving from a join callback.
+-        if(r!=null&&(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED||!canonical(actor,r)))event.setCanceled(true);
++        if(r!=null) {
++            var tag=actor.getPersistentData().getCompound(TAG);
++            if(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED){event.setCanceled(true);return;}
++            if(ActorCandidates.identity(actor,r)&&!actor.getUUID().equals(r.entityId)) {
++                StoryStorage.block(level.getServer(),"DUPLICATE_SAME_GENERATION "+r.storyId+" generation="+r.generation);
++                return; // Preserve conflicting entity as evidence. Both actors' story AI remains paused.
++            }
++            if(!canonical(actor,r)) {
++                boolean oldFamily=tag.hasUUID("instanceId")&&tag.getUUID("instanceId").equals(r.instanceId)
++                    &&tag.getString("ownerEventId").equals(r.eventId)&&tag.getString("spawnRole").equals(r.role)
++                    &&tag.contains("generation",net.minecraft.nbt.Tag.TAG_INT)&&tag.getInt("generation")<r.generation;
++                if(oldFamily)event.setCanceled(true);
++                else StoryStorage.block(level.getServer(),"IDENTITY_CONFLICT_ON_JOIN "+r.storyId+" generation="+r.generation);
++            }
++        }
+     }
+     @SubscribeEvent public void tick(ServerTickEvent.Post event) {
+         var server=event.getServer();if(server.getTickCount()%20!=0)return;
++        if(!StoryStorage.available(server))return;
+         for(var r:NarrativeData.get(server).actors.values())reconcile(server,r);
+     }
+     @SubscribeEvent public void stopped(ServerStoppedEvent event){readyPasses.remove(event.getServer());}
+     public static List<String> integrity(MinecraftServer server) {
+         var load=StoryStorage.status(server.overworld().getDataStorage());
+-        if(load!=null&&!load.writable())return List.of(load.diagnostic());
++        if(load!=null&&!load.writable())return List.of(load.diagnostic(),CanonicalRecovery.diagnostic(server));
+         var result=new ArrayList<String>();var ids=new HashSet<UUID>();var d=NarrativeData.get(server);
+         for(var r:d.actors.values()) {
+             if(!ids.add(r.entityId))result.add("MANUAL_DIAGNOSTIC duplicate canonical UUID "+r.storyId);
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -35,6 +35,7 @@
+     }
+     @SubscribeEvent public void login(PlayerEvent.PlayerLoggedInEvent event) {
+         if(event.getEntity() instanceof ServerPlayer p) {
++            if(!StoryStorage.available(p.getServer())){p.sendSystemMessage(Component.literal("WhileAway: story load blocked; original preserved; recovery pending."));return;}
+             var d=NarrativeData.get(p.getServer()); var e=d.entry(p.getUUID());
+             e.progress=e.progress.defer(p.getServer().overworld().getGameTime()+600); d.setDirty();
+             p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
+@@ -45,6 +46,7 @@
+     }
+     @SubscribeEvent public void tick(PlayerTickEvent.Post event) {
+         if(!(event.getEntity() instanceof ServerPlayer p) || p.tickCount%20!=0 || p.level().dimension()!=Level.OVERWORLD) return;
++        if(!StoryStorage.available(p.getServer()))return;
+         var server=p.serverLevel(); long now=server.getGameTime(); UUID id=p.getUUID();
+         Vec3 old=positions.put(id,p.position());
+         if(old!=null && old.distanceToSqr(p.position())>.03) activeUntil.put(id,now+100);
+@@ -103,7 +105,8 @@
+                     e.scenes.values().forEach(r->c.getSource().sendSuccess(()->Component.literal(r.eventId()+" "+r.id+" "+r.progress.state+" checkpoint="+r.progress.checkpoint+" reason="+r.progress.reason),false));return 1;
+                 }))
+                 .then(Commands.literal("integrity").executes(c->{
+-                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(SceneRecovery.integrity(NarrativeData.get(p.getServer()).entry(p.getUUID())));issues.addAll(StoryActors.integrity(p.getServer()));
++                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(StoryActors.integrity(p.getServer()));
++                    if(StoryStorage.available(p.getServer()))issues.addAll(SceneRecovery.integrity(NarrativeData.get(p.getServer()).entry(p.getUUID())));
+                     c.getSource().sendSuccess(()->Component.literal(issues.isEmpty()?"PASS scene integrity":String.join("; ",issues)),false);return issues.isEmpty()?1:0;
+                 })))
+             .then(Commands.literal("return").executes(c->CityTransit.leave(c.getSource().getPlayerOrException())?1:0))
+--- a/src/main/java/io/github/whileaway/StoryStorage.java
++++ b/src/main/java/io/github/whileaway/StoryStorage.java
+@@ -26,21 +26,44 @@
+     private record Slot(NarrativeData data,Status status) {}
+     private static final Map<DimensionDataStorage,Slot> states=new WeakHashMap<>();
+     private StoryStorage() {}
++    public static boolean available(net.minecraft.server.MinecraftServer server) {
++        try { NarrativeData.get(server); return true; } catch(Blocked rejected) { return false; }
++    }
++    public static synchronized void block(net.minecraft.server.MinecraftServer server,String reason) {
++        var storage=server.overworld().getDataStorage();var slot=states.get(storage);
++        if(slot==null)return;
++        if(slot.data!=null)slot.data.blockStoryWrites();
++        var old=slot.status;
++        states.put(storage,new Slot(slot.data,new Status(Outcome.CORRUPT,Recovery.MANUAL_DIAGNOSTIC,
++            old.saveFormat,old.actorSchema,old.actorCount,false,old.originalHash,reason)));
++        com.mojang.logging.LogUtils.getLogger().error(reason);
++    }
++    /** Explicit recovery only. Callers must provide live single-candidate evidence, never a random UUID. */
++    static synchronized NarrativeData recoveryRead(net.minecraft.server.MinecraftServer server,Map<String,UUID> bindings,boolean inspect) {
++        var storage=server.overworld().getDataStorage();
++        return openInternal(storage,server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("data"),
++            server.registryAccess(),server.levelKeys().stream().map(k->k.location().toString()).collect(java.util.stream.Collectors.toSet()),bindings,inspect);
++    }
+     public static synchronized Status status(DimensionDataStorage storage){
+         var s=states.get(storage);if(s==null)return null;
+         if(s.data!=null&&!s.data.storySaveWritable())return new Status(Outcome.CORRUPT,Recovery.MANUAL_DIAGNOSTIC,
+-            s.status.saveFormat,s.status.actorSchema,s.status.actorCount,false,s.status.originalHash,"LOAD_CORRUPT_BLOCKED write_guard_poisoned");
++            s.status.saveFormat,s.status.actorSchema,s.status.actorCount,false,s.status.originalHash,"LOAD_CORRUPT_BLOCKED write_guard_poisoned "+s.status.detail);
+         return s.status;
+     }
+ 
+     public static synchronized NarrativeData open(DimensionDataStorage storage,Path directory,HolderLookup.Provider registry,Set<String> dimensions) {
++        return openInternal(storage,directory,registry,dimensions,Map.of(),false);
++    }
++    private static NarrativeData openInternal(DimensionDataStorage storage,Path directory,HolderLookup.Provider registry,
++            Set<String> dimensions,Map<String,UUID> bindings,boolean inspect) {
+         var cached=states.get(storage);
+-        if(cached!=null){if(cached.data==null||!cached.data.storySaveWritable())throw new Blocked(status(storage),null);return cached.data;}
++        if(cached!=null&&bindings.isEmpty()){if(cached.data==null||!cached.data.storySaveWritable())throw new Blocked(status(storage),null);return cached.data;}
+         Path file=directory.resolve(KEY+".dat").toAbsolutePath().normalize();
+         int format=-1,schema=-1,count=-1;String hash="unavailable";byte[] original=null;
+         Outcome failure=Outcome.CORRUPT;
+         try {
+             if(Files.notExists(file)) {
++                if(!bindings.isEmpty())throw new IOException("recovery_source_disappeared");
+                 var data=new NarrativeData();data.bindStorage(file,null);
+                 var status=new Status(Outcome.ABSENT,Recovery.SAFE_AUTO_RECOVER,4,1,0,true,"absent","LOAD_OK new_world");
+                 states.put(storage,new Slot(data,status));storage.set(KEY,data);return data;
+@@ -49,6 +72,8 @@
+             if(!Files.isRegularFile(file,LinkOption.NOFOLLOW_LINKS))throw new IOException("field=file not_regular_or_unreadable");
+             if(Files.size(file)>16*1024*1024)throw new IOException("field=file exceeds_bounded_input");
+             original=Files.readAllBytes(file);hash=digest(original);
++            if(!bindings.isEmpty()&&(cached==null||cached.data!=null||!hash.equals(cached.status.originalHash)))
++                throw new IOException("recovery_source_changed_or_not_blocked");
+             CompoundTag envelope;
+             try(var bytes=new ByteArrayInputStream(original)) {
+                 if(original.length>=2&&(original[0]&255)==31&&(original[1]&255)==139)
+@@ -76,6 +101,10 @@
+                 String context="storyId="+t.getString("storyId")+" eventId="+t.getString("ownerEventId")
+                     +" instanceId="+(t.hasUUID("instanceId")?t.getUUID("instanceId"):"invalid")+" generation="+t.getInt("generation");
+                 try {
++                    if(!t.contains("entityUUID")&&bindings.containsKey(t.getString("storyId"))) {
++                        t.putUUID("entityUUID",bindings.get(t.getString("storyId")));
++                        notes.add(context+" field=entityUUID exact_live_candidate_relinked");
++                    }
+                     for(String key:List.of("storyId","ownerEventId","spawnRole","entityType","dimension","lifecycleState","state"))
+                         if(!t.contains(key,Tag.TAG_STRING)||t.getString(key).isBlank())throw new IllegalStateException("field="+key+" missing_or_wrong_type");
+                     for(String key:List.of("entityUUID","instanceId"))if(!t.hasUUID(key))throw new IllegalStateException("field="+key+" missing_or_malformed");
+@@ -118,6 +147,7 @@
+                 if(actor.checkpoint.state==io.github.whileaway.core.EventCheckpoint.State.COMPLETED&&!p.progress.encounterComplete())
+                     throw new IllegalStateException("storyId="+actor.storyId+" field=complete journal_fact_mismatch");
+             }
++            if(inspect)return data; // Private candidate, never installed or written.
+             data.bindStorage(file,hash);
+             if(!notes.isEmpty()) {
+                 backup(file,original,hash); // Durable original first; no live file edits before semantic checks.
+@@ -130,6 +160,7 @@
+             if(!notes.isEmpty())com.mojang.logging.LogUtils.getLogger().warn(status.diagnostic());
+             return data;
+         } catch(Exception ex) {
++            if(inspect)throw new IllegalStateException("RECOVERY_PREFLIGHT_REJECTED "+ex.getMessage(),ex);
+             String backup="original_untouched";
+             if(original!=null)try{backup(file,original,hash);backup="original_quarantined";}catch(Exception e){backup="backup_failed_original_untouched:"+e.getClass().getSimpleName();}
+             var status=new Status(failure,Recovery.MANUAL_DIAGNOSTIC,format,schema,count,false,hash,
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -85,6 +85,7 @@
+         NeoForge.EVENT_BUS.register(new CityHorror());
+         NeoForge.EVENT_BUS.register(new SceneRecovery());
+         NeoForge.EVENT_BUS.register(new StoryActors());
++        NeoForge.EVENT_BUS.register(new CanonicalRecovery());
+     }
+     private void attributes(EntityAttributeCreationEvent event) { event.put(WAYFARER.get(), Wayfarer.attributes().build()); }
+ }
+--- a/tools/CanonicalArchiveProbe.java
++++ b/tools/CanonicalArchiveProbe.java
+@@ -0,0 +1,18 @@
++import java.util.jar.JarFile;
++import java.nio.charset.StandardCharsets;
++public final class CanonicalArchiveProbe {
++    public static void main(String[] args)throws Exception {
++        PresenceArchiveProbe.main(new String[]{args[0],"present"});
++        boolean expected=args[1].equals("modified");
++        try(var jar=new JarFile(args[0])) {
++            boolean loader=jar.getEntry("io/github/whileaway/StoryStorage.class")!=null;
++            String data=new String(jar.getInputStream(jar.getEntry("io/github/whileaway/NarrativeData.class")).readAllBytes(),StandardCharsets.ISO_8859_1);
++            boolean guard=data.contains("STORY_WRITE_BLOCKED");
++            boolean canonical=jar.getEntry("io/github/whileaway/CanonicalRecovery.class")!=null;
++            String actors=new String(jar.getInputStream(jar.getEntry("io/github/whileaway/StoryActors.class")).readAllBytes(),StandardCharsets.ISO_8859_1);
++            boolean boundaries=actors.contains("GENERATION_6_RUNTIME_RESTORED");
++            if(!loader||!guard||canonical!=expected||boundaries!=expected)throw new AssertionError("Artifact revision mismatch");
++            System.out.println("PASS archive="+args[1]+" explicitLoader=true writeGuard=true canonicalRecovery="+canonical+" generationBoundaries="+boundaries);
++        }
++    }
++}
+--- a/tools/LateActorFixture.java
++++ b/tools/LateActorFixture.java
+@@ -0,0 +1,27 @@
++package io.github.whileaway;
++import java.nio.file.*;
++import net.minecraft.nbt.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.chunk.storage.*;
++
++/** Offline mutation of an explicit copied world: a stale actor in a previously untouched entity chunk. */
++public final class LateActorFixture {
++    public static void main(String[] args)throws Exception {
++        Path world=Path.of(args[0]),source=Path.of(args[1]);
++        if(!world.getFileName().toString().equals("canonical-Late"))throw new IllegalArgumentException("fixture target only");
++        var original=NbtIo.readCompressed(source,NbtAccounter.create(64*1024*1024));
++        var actor=original.getCompound("data").getList("actors",10).getCompound(0);
++        var entity=actor.getCompound("snapshot").copy();entity.putString("id",actor.getString("entityType"));entity.putUUID("UUID",actor.getUUID("entityUUID"));
++        var pos=new ListTag();pos.add(DoubleTag.valueOf(9600.5));pos.add(DoubleTag.valueOf(100));pos.add(DoubleTag.valueOf(9600.5));entity.put("Pos",pos);
++        var chunk=new CompoundTag();chunk.putInt("DataVersion",original.getInt("DataVersion"));chunk.putIntArray("Position",new int[]{600,600});
++        var entities=new ListTag();entities.add(entity);chunk.put("Entities",entities);
++        Path dir=world.resolve("entities");Files.createDirectories(dir);Path region=dir.resolve("r.18.18.mca");
++        if(Files.exists(region))throw new IllegalStateException("fixture region already exists");
++        var cp=new ChunkPos(600,600);
++        try(var file=new RegionFile(new RegionStorageInfo("copied-fixture",Level.OVERWORLD,"entities"),region,dir,true)) {
++            try(var out=file.getChunkDataOutputStream(cp)){NbtIo.write(chunk,out);}file.flush();
++            try(var in=file.getChunkDataInputStream(cp)){if(!NbtIo.read(in,NbtAccounter.create(64*1024*1024)).equals(chunk))throw new AssertionError("entity fixture readback");}
++        }
++        System.out.println("PASS offline stale entity chunk (600,600) written and reopened; generation="+actor.getInt("generation")+" uuid="+actor.getUUID("entityUUID"));System.exit(0);
++    }
++}
+--- a/tools/LoadGuardProbe.java
++++ b/tools/LoadGuardProbe.java
+@@ -20,6 +20,7 @@
+             switch(args[2]) {
+                 case "Recover"->actor(root).getCompound("snapshot").remove("Motion");
+                 case "Blocked"->actor(root).remove("entityUUID");
++                case "Malformed"->actor(root).putString("entityUUID","not-a-uuid");
+                 case "Unsupported"->root.getCompound("data").putInt("actorSchema",2);
+                 default->throw new IllegalArgumentException("Unknown fixture mutation");
+             }
+--- a/tools/package-canonical.py
++++ b/tools/package-canonical.py
+@@ -0,0 +1,91 @@
++"""Package a PARTIAL development slice; never republish the adopted lifecycle baseline."""
++from pathlib import Path
++import difflib
++import hashlib
++import shutil
++import sys
++import zipfile
++
++R = Path(__file__).resolve().parents[1]
++E = R/'evidence/canonical-recovery'
++D = R/'dist/canonical-recovery'
++BASE = E/'baseline/previous.jar'
++MOD = D/'whileaway-0.3.1-canonical-recovery.jar'
++sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
++baseline_hash = 'a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03'
++source_hash = 'c5d0161e2f436dcd8cb6c10e4654c84656e5a91cf1b96991c19907e8aa1f38b0'
++assert sha(BASE) == baseline_hash
++assert sha(E/'baseline/previous-source.zip') == source_hash
++assert sha(R/'dist/load-guard/whileaway-0.3.1-load-guard.jar') == baseline_hash
++assert sha(R/'dist/load-guard/whileaway-0.3.1-load-guard-source.zip') == source_hash
++source = [p for folder in ('src','tools','docs','gradle') for p in (R/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
++source += [R/n for n in ('README.md','AGENTS.md','build.gradle','gradle.properties','settings.gradle','gradlew','gradlew.bat','.gitignore')]
++if '--prepare' in sys.argv:
++    D.mkdir(parents=True,exist_ok=True)
++    shutil.copyfile(R/'build/libs/whileaway-0.3.1-dev.1.jar',MOD)
++    differences = []
++    with zipfile.ZipFile(E/'baseline/previous-source.zip') as old:
++        for p in sorted(source):
++            try: after = p.read_text(encoding='utf-8')
++            except UnicodeError: continue
++            name = p.relative_to(R).as_posix()
++            key = 'while-you-were-away/'+name
++            before = old.read(key).decode('utf-8').replace('\r\n','\n') if key in old.namelist() else ''
++            differences.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+name,tofile='b/'+name))
++        for name in ('ActorGameTests.java','StoryGameTests.java'):
++            key = 'while-you-were-away/src/main/java/io/github/whileaway/'+name
++            assert old.read(key) == (R/'src/main/java/io/github/whileaway'/name).read_bytes()
++    (E/'DIFF.patch').write_text(''.join(differences),encoding='utf-8')
++    rollback = '''#!/usr/bin/env bash
++set -euo pipefail
++# Restore only a caller-supplied JAR copy. No world/save operations.
++HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
++BASE="$HERE/baseline/previous.jar"
++TARGET="${1:?Pass a modified JAR copy to restore}"
++[[ -f "$TARGET" && ! -L "$TARGET" ]] || exit 2
++[[ "$(sha256sum "$BASE" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 3
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "MOD_HASH" ]] || { echo 'ERROR preserving unexpected target'; exit 4; }
++cp -- "$BASE" "$TARGET"
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 5
++echo 'ROLLBACK PASS: load-guard JAR restored; world files untouched'
++'''.replace('BASE_HASH',baseline_hash).replace('MOD_HASH',sha(MOD))
++    (E/'ROLLBACK.sh').write_text(rollback,encoding='utf-8',newline='\n')
++    with zipfile.ZipFile(BASE) as old, zipfile.ZipFile(MOD) as new:
++        assets = [n for n in old.namelist() if n.startswith(('assets/','data/')) and not n.endswith('/')]
++        assert set(assets) == {n for n in new.namelist() if n.startswith(('assets/','data/')) and not n.endswith('/')}
++        assert all(old.read(n) == new.read(n) for n in assets)
++        classes = list((R/'build/classes/java/main').rglob('*.class'))
++        assert all(new.read(p.relative_to(R/'build/classes/java/main').as_posix()) == p.read_bytes() for p in classes)
++        assert new.testzip() is None
++    text = f'PASS archive reopened; runtime classes match={len(classes)}; unchanged asset/data entries={len(assets)}; baseline GameTest sources unchanged=2\nBASE_SHA256={sha(BASE)}\nMOD_SHA256={sha(MOD)}\n'
++    (E/'ARCHIVE_PROOF.txt').write_text(text,encoding='utf-8')
++    print(text)
++else:
++    import json
++    assert json.loads((E/'GATES.json').read_text())['canonical_suite']=='PASS'
++    assert 'All 52 required tests passed' in (E/'final-tests.log').read_text(encoding='utf-8-sig')
++    assert (E/'VERIFICATION.txt').is_file()
++    assert 'ROLLBACK PASS' in (E/'rollback.log').read_text(encoding='utf-8-sig')
++    for line in (E/'RUNTIME_SOURCE.sha256').read_text().splitlines():
++        digest,name=line.split('  ',1)
++        assert sha(R/name)==digest, name
++    files = source+[BASE,E/'baseline/previous-source.zip',MOD]
++    files += [p for folder in ('canonical-recovery',) for p in (R/'evidence'/folder).rglob('*') if p.is_file() and p.suffix not in ('.jar','.zip')]
++    manifest = E/'SOURCE_MANIFEST.sha256'
++    files = sorted(set(p for p in files if p != manifest))
++    manifest.write_text(''.join(sha(p)+'  '+p.relative_to(R).as_posix()+'\n' for p in files),encoding='utf-8')
++    files.append(manifest)
++    archive = D/'whileaway-0.3.1-canonical-recovery-source.zip'
++    with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
++        for p in files:
++            info=zipfile.ZipInfo('while-you-were-away/'+p.relative_to(R).as_posix(),(2026,9,11,0,0,0))
++            info.create_system=3
++            info.external_attr=(0o100755 if p.name in ('ROLLBACK.sh','gradlew') else 0o100644)<<16
++            z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED)
++    with zipfile.ZipFile(archive) as z:
++        assert z.testzip() is None
++        for p in files: assert z.read('while-you-were-away/'+p.relative_to(R).as_posix()) == p.read_bytes()
++    for p in (MOD,E/'DIFF.patch',E/'VERIFICATION.txt',E/'ROLLBACK.sh'): assert p.read_bytes()
++    (D/'SHA256SUMS.txt').write_text(sha(MOD)+'  '+MOD.name+'\n'+sha(archive)+'  '+archive.name+'\n',encoding='utf-8')
++    print(f'PASS development archive reopened and verified; files={len(files)}; version=0.3.1-dev.1; overall=PARTIAL')
++
+--- a/tools/probe-canonical-storage.ps1
++++ b/tools/probe-canonical-storage.ps1
+@@ -0,0 +1,18 @@
++$ErrorActionPreference='Stop'
++Set-Location (Split-Path -Parent $PSScriptRoot)
++$jdk='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin'
++$folder='build/load-guard-probe'
++New-Item -ItemType Directory -Force $folder | Out-Null
++$cp=@((Resolve-Path build/classes/java/main).Path,(Resolve-Path build/moddev/artifacts/neoforge-21.1.249-merged.jar).Path)
++$cp+=Get-Content build/moddev/actorExceptionsCopy1LegacyClasspath.txt
++$cp=$cp -join ';'
++# Argument files avoid Windows command-line length limits; use slash paths for Java parsing.
++@('-encoding','UTF-8','-cp',('"'+$cp.Replace('\','/')+'"'),'-d',$folder,'tools/LoadGuardProbe.java') | Set-Content "$folder/compile.args" -Encoding utf8NoBOM
++& "$jdk/javac.exe" "@$folder/compile.args"
++if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
++@('-cp',('"'+($folder+';'+$cp).Replace('\','/')+'"'),'io.github.whileaway.LoadGuardProbe','evidence/wayfarer-stability/exceptions/runActorExceptionsSeed1.dat',("$folder/data-"+[DateTime]::UtcNow.Ticks)) | Set-Content "$folder/run.args" -Encoding utf8NoBOM
++& "$jdk/java.exe" "@$folder/run.args" *> evidence/canonical-recovery/probe.log
++$rc=$LASTEXITCODE
++Get-Content evidence/canonical-recovery/probe.log -Tail 20
++exit $rc
++
+--- a/tools/run-canonical-clients.py
++++ b/tools/run-canonical-clients.py
+@@ -0,0 +1,49 @@
++"""Serial isolated real clients; immutable source world; no mock recovery decisions."""
++from pathlib import Path
++import ctypes, hashlib, json, shutil, subprocess, sys, time
++R=Path(__file__).resolve().parents[1];E=R/'evidence/canonical-recovery';W=(R/'../../work/canonical-client-final/saves').resolve()
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++source=Path(json.loads((R/'evidence/load-guard/client-final-before-Control.json').read_text())['source'])
++def manifest(p):return {f.relative_to(p).as_posix():sha(f) for f in p.rglob('*') if f.is_file()}
++before=manifest(source);W.mkdir(parents=True,exist_ok=True)
++modes=sys.argv[1:] or ['Exact','ExactReload','Ambiguous','Unloaded','NoCandidate','Duplicate']+[m for n in range(1,7) for m in ('Cut'+str(n),'Resume'+str(n))]
++for mode in modes:
++    world='Exact' if mode=='ExactReload' else 'Cut'+mode[6:] if mode.startswith('Resume') else mode
++    target=W/('canonical-'+world)
++    if not target.exists():
++        copy_source=W/'canonical-Cut6' if mode=='Late' else source
++        copy_before=manifest(copy_source)
++        shutil.copytree(copy_source,target);assert manifest(target)==copy_before
++        if mode=='Late':
++            cp=(R/'build/load-guard-probe/run.args').read_text(encoding='utf-8-sig').splitlines()[1]
++            # Compile/run offline RegionFile fixture helper against actual Minecraft classes.
++            compile_args=E/'late-compile.args';compile_args.write_text('-encoding\nUTF-8\n-cp\n'+cp+'\n-d\nbuild/load-guard-probe\ntools/LateActorFixture.java\n')
++            java=Path(r'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin')
++            subprocess.run([str(java/'javac.exe'),'@'+str(compile_args)],cwd=R,check=True)
++            args=E/'late-run.args';args.write_text('-cp\n'+cp+'\nio.github.whileaway.LateActorFixture\n"'+str(target).replace('\\','/')+'"\nevidence/load-guard/client-final/Control.dat\n')
++            subprocess.run([str(java/'java.exe'),'@'+str(args)],cwd=R,check=True)
++            assert manifest(copy_source)==copy_before
++        if mode in ('Exact','Ambiguous','Unloaded','NoCandidate'):
++            cp=(R/'build/load-guard-probe/run.args').read_text(encoding='utf-8-sig').splitlines()[1]
++            arg=E/('mutate-canonical-'+mode+'.args')
++            arg.write_text('-cp\n'+cp+'\nio.github.whileaway.LoadGuardProbe\n--mutate\n"'+str(target/'data/whileaway_story.dat').replace('\\','/')+'"\nBlocked\n')
++            subprocess.run([r'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe','@'+str(arg)],cwd=R,check=True)
++        (E/('canonical-final-before-'+world+'.json')).write_text(json.dumps({'source':str(source),'target':str(target),'storyHash':sha(target/'data/whileaway_story.dat'),'sourceFiles':before},indent=2))
++    folder=E/'canonical-final';folder.mkdir(exist_ok=True);log=folder/(mode+'.log')
++    if log.exists():raise RuntimeError('Preserve previous attempt before retry: '+mode)
++    script="$ErrorActionPreference='Stop'; ./tools/select-test-monitor.ps1 -OutputPath evidence/canonical-recovery/monitor.json; $env:JAVA_HOME='C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot'; $env:GRADLE_USER_HOME=(Resolve-Path ../../work/gradle-home).Path; ./gradlew.bat --offline runCanonical"+mode+"; exit $LASTEXITCODE"
++    start=time.time()
++    with log.open('w',encoding='utf-8') as out:result=subprocess.run(['pwsh.exe','-NoProfile','-Command',script],cwd=R,stdout=out,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
++    marker=(folder/(mode+'.txt')).read_text() if (folder/(mode+'.txt')).exists() else ''
++    pid=int((folder/(mode+'.pid')).read_text()) if (folder/(mode+'.pid')).exists() else 0
++    kernel=ctypes.WinDLL('kernel32',use_last_error=True);kernel.OpenProcess.restype=ctypes.c_void_p;kernel.WaitForSingleObject.argtypes=[ctypes.c_void_p,ctypes.c_uint32];kernel.CloseHandle.argtypes=[ctypes.c_void_p]
++    handle=kernel.OpenProcess(0x100000,False,pid)
++    stopped=bool(pid) and ((not handle and ctypes.get_last_error()==87) or (bool(handle) and kernel.WaitForSingleObject(handle,0)==0))
++    if handle:kernel.CloseHandle(handle)
++    good=result.returncode==0 and 'PASS '+mode in marker and 'FAIL ' not in marker and stopped
++    row={'mode':mode,'command':'./gradlew.bat --offline runCanonical'+mode,'exit':result.returncode,'pid':pid,'processExited':bool(stopped),'seconds':time.time()-start,'pass':good}
++    with (E/'canonical-final-commands.jsonl').open('a') as out:out.write(json.dumps(row)+'\n')
++    print(json.dumps(row),flush=True)
++    assert manifest(source)==before,'Original world changed'
++    assert good,mode+' failed'
++print('PASS requested canonical clients and original world preservation',flush=True)
+--- a/tools/run-canonical-load-clients.py
++++ b/tools/run-canonical-load-clients.py
+@@ -0,0 +1,41 @@
++from pathlib import Path
++import ctypes,hashlib,json,shutil,subprocess,time
++R=Path(__file__).resolve().parents[1];E=R/'evidence/canonical-recovery';W=(R/'../../work/canonical-recovery-client-final/saves').resolve()
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++source=Path(json.loads((R/'evidence/wayfarer-stability/world-copy-1.json').read_text())['copy'])
++def manifest(p):return {f.relative_to(p).as_posix():sha(f) for f in p.rglob('*') if f.is_file()}
++before=manifest(source)
++cp=(R/'build/load-guard-probe/run.args').read_text(encoding='utf-8-sig').splitlines()[1]
++W.mkdir(parents=True,exist_ok=True)
++for mode in ('Control','Recover','Blocked','Unsupported'):
++    target=W/('load-'+mode)
++    if target.exists():continue
++    shutil.copytree(source,target)
++    assert manifest(target)==before
++    if mode!='Control':
++        args=E/f'mutate-{mode}.args'
++        args.write_text('-cp\n'+cp+'\nio.github.whileaway.LoadGuardProbe\n--mutate\n"'+str(target/'data/whileaway_story.dat').replace('\\','/')+'"\n'+('Malformed' if mode=='Blocked' else mode)+'\n',encoding='utf-8')
++        subprocess.run([r'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe','@'+str(args)],cwd=R,check=True)
++    (E/f'client-final-before-{mode}.json').write_text(json.dumps({'source':str(source),'target':str(target),'storyHash':sha(target/'data/whileaway_story.dat'),'sourceFiles':before},indent=2))
++for mode in ('Control','Recover','RecoverReload','Blocked','Unsupported'):
++    log=E/f'client-final/{mode}.log';log.parent.mkdir(exist_ok=True)
++    if log.exists():continue
++    script="$ErrorActionPreference='Stop'; ./tools/select-test-monitor.ps1 -OutputPath evidence/canonical-recovery/monitor.json; $env:JAVA_HOME='C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot'; $env:GRADLE_USER_HOME=(Resolve-Path ../../work/gradle-home).Path; ./gradlew.bat --offline runLoadGuard"+mode+"; exit $LASTEXITCODE"
++    start=time.time()
++    with log.open('w',encoding='utf-8') as out: result=subprocess.run(['pwsh.exe','-NoProfile','-Command',script],cwd=R,stdout=out,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
++    marker=(E/f'client-final/{mode}.txt').read_text();pid=int((E/f'client-final/{mode}.pid').read_text())
++    kernel=ctypes.WinDLL('kernel32',use_last_error=True);kernel.OpenProcess.restype=ctypes.c_void_p;kernel.WaitForSingleObject.argtypes=[ctypes.c_void_p,ctypes.c_uint32];kernel.CloseHandle.argtypes=[ctypes.c_void_p]
++    handle=kernel.OpenProcess(0x100000,False,pid)
++    stopped=(not handle and ctypes.get_last_error()==87) or (bool(handle) and kernel.WaitForSingleObject(handle,0)==0)
++    if handle:kernel.CloseHandle(handle)
++    good=result.returncode==0 and 'PASS '+mode in marker and 'FAIL ' not in marker and stopped
++    row={'mode':mode,'command':'./gradlew.bat --offline runLoadGuard'+mode,'pid':pid,'processExited':bool(stopped),'exit':result.returncode,'seconds':time.time()-start,'pass':good}
++    with (E/'load-client-final-commands.jsonl').open('a') as out:out.write(json.dumps(row)+'\n')
++    print(json.dumps(row),flush=True)
++    assert good,mode+' client failed'
++    if mode in ('Blocked','Unsupported'):
++        previous=json.loads((E/f'client-final-before-{mode}.json').read_text())
++        assert sha(W/('load-'+mode)/'data/whileaway_story.dat')==previous['storyHash']
++    assert manifest(source)==before,'Original copied-world baseline modified'
++print('PASS actual load clients=5; original source world unchanged',flush=True)
++
+--- a/tools/run-canonical-regression.py
++++ b/tools/run-canonical-regression.py
+@@ -0,0 +1,90 @@
++"""Serial real-client validation; closed-world copy only; no baseline evidence overwrite."""
++from pathlib import Path
++import argparse, ctypes, datetime, hashlib, json, os, re, shutil, subprocess, time
++
++R=Path(__file__).resolve().parents[1]
++E=R/'evidence/canonical-recovery'
++W=(R/'../../work').resolve()
++SAVES=W/'canonical-recovery-exceptions/saves'
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++
++def stopped(pid):
++    kernel=ctypes.WinDLL('kernel32',use_last_error=True)
++    kernel.OpenProcess.argtypes=[ctypes.c_uint32,ctypes.c_int,ctypes.c_uint32]
++    kernel.OpenProcess.restype=ctypes.c_void_p
++    kernel.WaitForSingleObject.argtypes=[ctypes.c_void_p,ctypes.c_uint32]
++    kernel.CloseHandle.argtypes=[ctypes.c_void_p]
++    handle=kernel.OpenProcess(0x100000,False,pid)
++    if not handle:
++        if ctypes.get_last_error()!=87:raise RuntimeError('Process status unknown')
++        return True
++    try:return kernel.WaitForSingleObject(handle,0)==0
++    finally:kernel.CloseHandle(handle)
++
++def run(task,kind):
++    folder=E/kind;folder.mkdir(parents=True,exist_ok=True)
++    log=folder/(task+'.log')
++    if log.exists():raise RuntimeError('Preserve earlier result before retry: '+str(log))
++    start=time.time()
++    script="$ErrorActionPreference='Stop'; ./tools/select-test-monitor.ps1 -OutputPath evidence/canonical-recovery/monitor.json; $env:JAVA_HOME='C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot'; $env:GRADLE_USER_HOME=(Resolve-Path ../../work/gradle-home).Path; ./gradlew.bat --offline "+task+"; exit $LASTEXITCODE"
++    with log.open('w',encoding='utf-8') as stream:
++        result=subprocess.run(['pwsh.exe','-NoProfile','-Command',script],cwd=R,stdout=stream,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
++    text=log.read_text(encoding='utf-8',errors='replace')
++    marker=(folder/(task+'.txt')).read_text(encoding='utf-8') if (folder/(task+'.txt')).exists() else ''
++    pid=int((folder/(task+'.pid')).read_text()) if (folder/(task+'.pid')).exists() else None
++    row={'task':task,'command':'./gradlew.bat --offline '+task,'exit':result.returncode,'seconds':time.time()-start,'pid':pid,
++         'process_exited':pid is not None and stopped(pid),'timestamp':datetime.datetime.now(datetime.timezone.utc).isoformat(),
++         'pass':result.returncode==0 and 'BUILD SUCCESSFUL' in text and 'PASS '+task in marker and 'FAIL ' not in marker}
++    row['pass']=row['pass'] and row['process_exited'] and 'PASS monitor DISPLAY1' in marker
++    with (E/'runtime-commands.jsonl').open('a',encoding='utf-8') as stream:stream.write(json.dumps(row)+'\n')
++    print(json.dumps(row),flush=True)
++    if not row['pass']:raise RuntimeError('Gate failed: '+task+'; see '+str(log))
++
++def manifest(folder):
++    files=list(folder.rglob('*'))
++    if folder.is_symlink() or any(p.is_symlink() or p.is_junction() for p in files):raise RuntimeError('Unexpected link in test world')
++    return {p.relative_to(folder).as_posix():sha(p) for p in files if p.is_file()}
++
++def world(repeat):
++    name=(E/'exceptions'/f'exceptions-world-{repeat}.txt').read_text().strip()
++    if not re.fullmatch(r'whileaway-exceptions-[12]-[0-9]+',name):raise RuntimeError('Unexpected world name')
++    source=(SAVES/name).resolve();target=(SAVES/(name+'-copy')).resolve()
++    if source.parent!=SAVES.resolve() or target.parent!=SAVES.resolve():raise RuntimeError('Copy escaped isolated saves')
++    return source,target
++
++def copy_world(repeat):
++    source,target=world(repeat)
++    if target.exists():raise RuntimeError('Copy target already exists')
++    before=manifest(source);shutil.copytree(source,target)
++    assert before==manifest(target)==manifest(source)
++    (E/f'world-copy-{repeat}.json').write_text(json.dumps({'source':str(source),'copy':str(target),'files':before,'byte_identical':True},indent=2),encoding='utf-8')
++    print(f'PASS entire closed world copied repeat={repeat} files={len(before)}',flush=True)
++
++parser=argparse.ArgumentParser()
++parser.add_argument('suite',choices=['crash','exceptions'])
++parser.add_argument('--repeat',type=int,choices=[1,2],required=True)
++parser.add_argument('--start',default=None)
++args=parser.parse_args()
++repeat=args.repeat
++if args.suite=='crash':
++    modes=['A','B','C','D','E','Verify']
++    if args.start:modes=modes[modes.index(args.start):]
++    for mode in modes:run(f'runActor{mode}{repeat}','crash')
++else:
++    modes=['Seed','Original','Copy','Reload','CopyReload']
++    if args.start:modes=modes[modes.index(args.start):]
++    for mode in modes:
++        if mode=='Original':
++            source,target=world(repeat)
++            if not target.exists():copy_world(repeat)
++        guard=None
++        if mode!='Seed':
++            source,target=world(repeat)
++            untouched=source if mode in ('Copy','CopyReload') else target
++            guard=manifest(untouched)
++        run(f'runActorExceptions{mode}{repeat}','exceptions')
++        if guard is not None:
++            assert manifest(untouched)==guard,'Other world changed during '+mode
++            with (E/f'world-independent-{repeat}.txt').open('a') as out:out.write('PASS '+mode+' leaves entire other world byte-identical\n')
++print('PASS suite '+args.suite+' repeat='+str(repeat),flush=True)
++
+--- a/tools/verify-canonical-transaction.ps1
++++ b/tools/verify-canonical-transaction.ps1
+@@ -0,0 +1,33 @@
++$ErrorActionPreference='Stop'
++$root=Split-Path -Parent $PSScriptRoot; Set-Location $root
++$java='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe'
++$javac='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\javac.exe'
++$e=Join-Path $root 'evidence/canonical-recovery'
++$base=Join-Path $e 'baseline/previous.jar'
++$mod=Join-Path $root 'dist/canonical-recovery/whileaway-0.3.1-canonical-recovery.jar'
++New-Item -ItemType Directory -Force build/canonical-archive-probe,build/rollback-canonical | Out-Null
++& $javac -encoding UTF-8 -d build/canonical-archive-probe tools/PresenceArchiveProbe.java tools/CanonicalArchiveProbe.java
++if($LASTEXITCODE -ne 0){throw 'Probe compilation failed'}
++$commands=@()
++foreach($label in @('BASELINE','MODIFIED')){
++    $file=if($label -eq 'BASELINE'){$base}else{$mod};$mode=$label.ToLower()
++    $result=& $java -cp build/canonical-archive-probe CanonicalArchiveProbe $file $mode 2>&1
++    $rc=$LASTEXITCODE
++    $commands+=@{label=$label;command="java -cp build/canonical-archive-probe CanonicalArchiveProbe `"$file`" $mode";input='8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; canonical recovery and generation boundaries expected only in modified';output=($result -join "`n");exit=$rc}
++    if($rc -ne 0){throw "$label probe failed"}
++}
++$target=Join-Path $root 'build/rollback-canonical/test.jar'
++Copy-Item -LiteralPath $mod -Destination $target
++$result=& 'C:\Program Files\Git\bin\bash.exe' -lc 'chmod +x evidence/canonical-recovery/ROLLBACK.sh && test -x evidence/canonical-recovery/ROLLBACK.sh && evidence/canonical-recovery/ROLLBACK.sh build/rollback-canonical/test.jar' 2>&1
++$rc=$LASTEXITCODE
++$result | Set-Content "$e/rollback.log" -Encoding utf8
++if($rc -ne 0){throw "Rollback failed $rc; preserve rollback.log before retry"}
++$commands+=@{label='ROLLBACK';command='bash -lc "chmod +x evidence/canonical-recovery/ROLLBACK.sh && test -x evidence/canonical-recovery/ROLLBACK.sh && evidence/canonical-recovery/ROLLBACK.sh build/rollback-canonical/test.jar"';input=$target;output=($result -join "`n");exit=$rc}
++$result=& $java -cp build/canonical-archive-probe CanonicalArchiveProbe $target baseline 2>&1;$rc=$LASTEXITCODE
++$commands+=@{label='RESTORED';command='java -cp build/canonical-archive-probe CanonicalArchiveProbe build/rollback-canonical/test.jar baseline';input='same 8 policy cases and baseline fixture revision';output=($result -join "`n");exit=$rc}
++if($rc -ne 0){throw 'Restored behavior mismatch'}
++$restored=(Get-FileHash $target).Hash.ToLower();$original=(Get-FileHash $base).Hash.ToLower();$changed=(Get-FileHash $mod).Hash.ToLower()
++if($restored -ne $original -or $changed -eq $original){throw 'Rollback hash mismatch or modified file no longer changed'}
++@{commands=$commands;baseline_hash=$original;modified_hash=$changed;restored_hash=$restored;world_operations='none';scope='Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.'} | ConvertTo-Json -Depth 5 | Set-Content "$e/transaction.json" -Encoding utf8
++$commands | ForEach-Object { Write-Output ($_.label+': '+$_.output+'; exit='+$_.exit) }
++
+--- a/tools/verify-canonical.py
++++ b/tools/verify-canonical.py
+@@ -0,0 +1,158 @@
++"""Independently reopen on-disk checkpoints and real closed/copy-world evidence."""
++from pathlib import Path
++import hashlib, importlib.util, json
++
++R=Path(__file__).resolve().parents[1];E=R/'evidence/canonical-recovery'
++spec=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py')
++nbt=importlib.util.module_from_spec(spec);spec.loader.exec_module(nbt)
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++commands=[json.loads(line) for line in (E/'runtime-commands.jsonl').read_text().splitlines()]
++latest={row['task']:row for row in commands}
++expected=[f'runActor{mode}{repeat}' for repeat in (1,) for mode in ('A','B','C','D','E','Verify')]
++expected += [f'runActorExceptions{mode}{repeat}' for repeat in (1,) for mode in ('Seed','Original','Copy','Reload','CopyReload')]
++for task in expected:
++    row=latest[task];assert row['pass'] and row['exit']==0 and row['process_exited'],task
++assert len({latest[task]['pid'] for task in expected})==11,'Require 11 distinct observed client processes'
++crash_snapshots=0;exceptions=[]
++for repeat in (1,):
++    instance=None;generation=-1
++    for cp,mode in enumerate(('A','B','C','D','E')):
++        data=nbt.read(E/f'crash/snapshots/actor-{repeat}-{mode}.dat')['data']
++        assert data['schema']==4 and data['actorSchema']==1 and len(data['actors'])==1
++        actor=data['actors'][0];assert actor['checkpoint']==cp
++        if instance is None:instance=actor['instanceId']
++        assert actor['instanceId']==instance and actor['generation']>=generation
++        generation=actor['generation']
++        player=next(p for p in data['players'] if p['id']==actor['owner'])
++        if cp<3:assert player['encounter']==actor['entityUUID'] and not player['complete']
++        else:assert 'encounter' not in player and player['complete'] and actor['lifecycleState']=='RETIRED' and 'encounter_complete' in actor['facts']
++        if cp>=2:assert 'pursuit_started' in actor['facts']
++        if cp==4:assert actor['state']=='COMPLETED' and actor['noticeClaimed']
++        marker=(E/f'crash/runActor{mode}{repeat}.txt').read_text()
++        assert 'FAULT Runtime.halt after durable story write' in marker
++        crash_snapshots+=1
++    assert 'completed state stable 300 ticks' in (E/f'crash/runActorVerify{repeat}.txt').read_text()
++    seed_marker=(E/f'exceptions/runActorExceptionsSeed{repeat}.txt').read_text()
++    for needle in ('PASS death_respawn keepInventory=false','PASS death_respawn keepInventory=true',
++                   'all hasChunk=false entitiesLoaded=false; canonical_absent=true','held_ticks=100',
++                   'PASS dimension_absence=Nether','PASS dimension_absence=End','PASS return scenario=1','PASS return scenario=2','PASS return scenario=3'):
++        assert needle in seed_marker,needle
++    states={}
++    for mode in ('Seed','Original','Copy','Reload','CopyReload'):
++        data=nbt.read(E/f'exceptions/runActorExceptions{mode}{repeat}.dat')['data']
++        assert data['schema']==4 and data['actorSchema']==1 and len(data['actors'])==1
++        actor=data['actors'][0]
++        states[mode]=actor
++        player=next(p for p in data['players'] if p['id']==actor['owner'])
++        if mode in ('Original','Reload'):
++            assert actor['checkpoint']==4 and actor['state']=='COMPLETED' and actor['lifecycleState']=='RETIRED'
++            assert player['complete'] and 'encounter' not in player and actor['noticeClaimed']
++        else:
++            assert actor['checkpoint']==2 and actor['state']=='SUSPENDED' and actor['lifecycleState']=='SUSPENDED'
++            assert not player['complete'] and player['encounter']==actor['entityUUID'] and not actor['noticeClaimed']
++        for key in ('storyId','instanceId','entityUUID','generation','ownerEventId','dimension'):
++            assert actor[key]==states['Seed'][key],(repeat,mode,key)
++    proof=json.loads((E/f'world-copy-{repeat}.json').read_text());assert proof['byte_identical'] and 'level.dat' in proof['files'] and 'data/whileaway_story.dat' in proof['files']
++    independent=(E/f'world-independent-{repeat}.txt').read_text()
++    for mode in ('Original','Copy','Reload','CopyReload'):
++        assert f'PASS {mode} leaves entire other world byte-identical' in independent
++    for mode in ('Original','Copy','CopyReload'):
++        assert 'PASS fresh_process_reconnected same UUID/instance/generation/checkpoint; ACTIVE; canonical_count=1' in (E/f'exceptions/runActorExceptions{mode}{repeat}.txt').read_text()
++    exceptions.append({'repeat':repeat,'original_checkpoint':states['Reload']['checkpoint'],'copy_checkpoint':states['CopyReload']['checkpoint'],
++                       'generation':states['Seed']['generation'],'same_identity_within_each_world':True,'independent_worlds':True})
++for line in (E/'RUNTIME_SOURCE.sha256').read_text().splitlines():
++    digest,name=line.split('  ',1);assert sha(R/name)==digest,'runtime source drift '+name
++for path,digest in [('dist/wayfarer-stability/whileaway-0.3.1-wayfarer-stability.jar','3d3b08beddd7e9fae87c41188c31251e941ee9da9b6697b50bcf96a2fd960766'),
++                    ('dist/wayfarer-stability/whileaway-0.3.1-wayfarer-stability-source.zip','21175125bdf2ac451aaabf8aaf51a2cb533f016a39aaf8df740bebbbf61785aa')]:assert sha(R/path)==digest
++result={'wayfarer_suite':'PASS','overall_stability':'PARTIAL','distinct_client_processes':11,'crash_snapshots':crash_snapshots,
++        'crash_final_verifies':1,'exception_processes':5,'copied_world_pairs':exceptions,
++        'scope':'Wayfarer only; no item rewards or persistent next-event dependency token exists in this adapter; not a transaction/NPC/fallback proof.'}
++
++load_rows=[json.loads(line) for line in (E/'load-client-final-commands.jsonl').read_text().splitlines()]
++assert len(load_rows)==5 and all(r['pass'] and r['processExited'] and r['exit']==0 for r in load_rows)
++assert len({r['pid'] for r in load_rows}|{latest[t]['pid'] for t in expected})==16
++for mode in ('Control','Recover','RecoverReload','Blocked','Unsupported'):
++    marker=(E/f'client-final/{mode}.txt').read_text()
++    assert 'PASS monitor DISPLAY1' in marker and 'all sound categories=0' in marker and 'FAIL ' not in marker
++    assert 'PASS '+mode in marker
++    if mode in ('Blocked','Unsupported'):
++        before=json.loads((E/f'client-final-before-{mode}.json').read_text())
++        f=Path(before['target'])/'data/whileaway_story.dat'
++        assert sha(f)==before['storyHash']
++        if mode=='Blocked':assert nbt.read(f)['data']['actors'][0]['entityUUID']=='not-a-uuid','real malformed UUID fixture missing'
++        assert sha(f.parent/'whileaway-quarantine'/f"{before['storyHash']}.dat")==before['storyHash']
++        assert 'actual_server_save_dispatches=3' in marker and 'emptyCampaignReturned=false' in marker
++    else:
++        a=nbt.read(E/f'client-final/{mode}.dat')['data']['actors']
++        assert len(a)==1 and a[0]['generation']==0 and a[0]['checkpoint']==2
++        assert 'canonical=1 sameUUID=true generation=0 checkpoint=2 stableTicks=100 integrity=clean' in marker
++        if mode=='Recover':
++            assert 'RECOVERABLE_CORRUPTION' in marker and 'snapshot.Motion' in marker
++            before=json.loads((E/'client-final-before-Recover.json').read_text())
++            backup=Path(before['target'])/'data/whileaway-quarantine'/f"{before['storyHash']}.dat"
++            assert sha(backup)==before['storyHash']
++        else:assert 'outcome=LOADED' in marker
++assert 'PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false' in (E/'probe.log').read_text(encoding='utf-8-sig')
++assert 'All 52 required tests passed' in (E/'final-tests.log').read_text(encoding='utf-8-sig')
++assert 'PASS core assertions=176857' in (E/'final-tests.log').read_text(encoding='utf-8-sig')
++
++canonical_rows=[json.loads(line) for line in (E/'canonical-final-commands.jsonl').read_text().splitlines()]
++canonical={row['mode']:row for row in canonical_rows}
++modes=['Exact','ExactReload','Ambiguous','Unloaded','NoCandidate','Duplicate','Late']+[m for n in range(1,7) for m in ('Cut'+str(n),'Resume'+str(n))]
++assert len(canonical_rows)==len(modes)==19
++for mode in modes:
++    row=canonical[mode];assert row['pass'] and row['processExited'] and row['exit']==0,mode
++    marker=(E/f'canonical-final/{mode}.txt').read_text()
++    assert 'PASS monitor DISPLAY1' in marker and 'all sound categories=0' in marker and 'FAIL ' not in marker
++    assert 'PASS '+mode in marker
++all_pids={r['pid'] for r in canonical_rows}|{r['pid'] for r in load_rows}|{latest[t]['pid'] for t in expected}
++assert len(all_pids)==35
++for mode in ('Exact','ExactReload'):
++    data=nbt.read(E/f'canonical-final/{mode}.dat')['data'];actor=data['actors'][0]
++    initial=nbt.read(R/'evidence/load-guard/client-final/Control.dat')['data']['actors'][0]
++    assert len(data['actors'])==1
++    for key in ('storyId','instanceId','ownerEventId','generation','entityUUID','checkpoint','facts'):
++        assert actor[key]==initial[key],(mode,key)
++for mode,classification in [('Ambiguous','AMBIGUOUS_MULTIPLE_CANDIDATES'),('Unloaded','UNLOADED_OR_UNCONFIRMED'),('NoCandidate','NO_CANDIDATE')]:
++    marker=(E/f'canonical-final/{mode}.txt').read_text();assert classification in marker and 'realSaveDispatches=3' in marker
++    before=json.loads((E/f'canonical-final-before-{mode}.json').read_text());f=Path(before['target'])/'data/whileaway_story.dat'
++    assert sha(f)==before['storyHash']
++    assert sha(f.parent/'whileaway-quarantine'/f"{before['storyHash']}.dat")==before['storyHash']
++recovery_before=json.loads((E/'canonical-final-before-Exact.json').read_text())
++q=Path(recovery_before['target'])/'data/whileaway-quarantine'/f"{recovery_before['storyHash']}.dat"
++assert sha(q)==recovery_before['storyHash']
++boundaries=[]
++for n in range(1,7):
++    cut=nbt.read(E/f'canonical-final/Cut{n}.dat')['data'];resumed=nbt.read(E/f'canonical-final/Resume{n}.dat')['data']
++    a=cut['actors'][0];b=resumed['actors'][0]
++    assert len(cut['actors'])==len(resumed['actors'])==1
++    assert a['generation']==(0 if n==1 else 1) and b['generation']==1
++    for key in ('storyId','instanceId','ownerEventId','checkpoint','facts'):
++        assert a[key]==b[key]==initial[key],(n,key)
++    if n>=2:assert a['entityUUID']==b['entityUUID'],'reservation UUID drift'
++    for d in (cut,resumed):
++        r=d['actors'][0];p=next(p for p in d['players'] if p['id']==r['owner'])
++        assert not p['complete'] and p['encounter']==r['entityUUID'] and r['checkpoint']==2
++    assert a['lifecycleState']==('SUSPENDED' if n==1 else 'PREPARED' if n<=4 else 'ACTIVE')
++    assert b['lifecycleState'] in ('ACTIVE','SUSPENDED')
++    if b['lifecycleState']=='SUSPENDED':
++        assert b['state']=='SUSPENDED' and b['reason'] in ('owner_absent','owner_left_region','owner_offline','owner_dead_or_other_dimension'), 'unexpected suspension'
++    # Creative fixture pauses encounter AI; fresh login can suspend before the test returns to the home chunk.
++    boundaries.append({'boundary':n,'cutGeneration':a['generation'],'resumeGeneration':b['generation'],'checkpoint':2,'reservationUUIDPreserved':n!=1,'diskVerified':True})
++late=nbt.read(E/'canonical-final/Late.dat')['data']['actors'][0]
++resume6=nbt.read(E/'canonical-final/Resume6.dat')['data']['actors'][0]
++for key in ('storyId','instanceId','generation','entityUUID','checkpoint','facts'):assert late[key]==resume6[key]
++assert 'entityCount=0' in (E/'late-cleanup.txt').read_text()
++assert 'OBSERVED real_entity_chunk_join stale_generation=0' in (E/'canonical-final/Late.txt').read_text()
++assert 'staleLateJoin=true canonical=1 generation=1' in (E/'canonical-final/Late.txt').read_text()
++assert 'writeBlocked=true originalPreserved=true AI_paused=true' in (E/'canonical-final/Duplicate.txt').read_text()
++assert sha(R/'dist/load-guard/whileaway-0.3.1-load-guard.jar')=='a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03'
++assert sha(R/'dist/load-guard/whileaway-0.3.1-load-guard-source.zip')=='c5d0161e2f436dcd8cb6c10e4654c84656e5a91cf1b96991c19907e8aa1f38b0'
++result.update({'load_guard':'PASS','canonical_suite':'PASS','actor_recovery_current_adapter':'PASS',
++    'overall_stability':'PARTIAL','npc_stage':'NOT STARTED','generation_boundaries':boundaries,
++    'canonical_clients':19,'load_clients':5,'wayfarer_clients':11,'total_current_clients':35,
++    'load_probe_cases':580,'load_probe_assertions':2161,'game_tests':52,'original_game_tests':48,
++    'scope':'Shipped Wayfarer identity recovery + current generic Actor primitives. Not NPC campaign, transactions, fallback, natural survival or arbitrary corrupt-field auto-repair.'})
++(E/'GATES.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
++print('PASS current canonical recovery: 19 canonical clients + 5 load clients + 11 Wayfarer clients = 35 distinct processes; six crash/restart boundaries; current disk and source hashes')
++print('PASS 52 GameTests (48 unchanged + 4 new), 176857 core assertions, 580 storage cases / 2161 assertions; campaign PARTIAL; NPC NOT STARTED')
+--- a/tools/verify-late-region.py
++++ b/tools/verify-late-region.py
+@@ -0,0 +1,20 @@
++"""Read-only check of actual entity-region cleanup after the late-generation client."""
++from pathlib import Path
++import hashlib,importlib.util,json,struct,zlib,gzip
++R=Path(__file__).resolve().parents[1];E=R/'evidence/canonical-recovery'
++source=json.loads((E/'canonical-final-before-Late.json').read_text())
++region=Path(source['target'])/'entities/r.18.18.mca'
++data=region.read_bytes();index=((600&31)+(600&31)*32)*4
++sector=int.from_bytes(data[index:index+3],'big')
++entities=[]
++if sector:
++    start=sector*4096;length=struct.unpack('>I',data[start:start+4])[0];compression=data[start+4]
++    raw=data[start+5:start+4+length]
++    raw=zlib.decompress(raw) if compression==2 else gzip.decompress(raw) if compression==1 else raw if compression==3 else None
++    assert raw is not None,'unsupported fixture compression'
++    p=E/'late-entity-chunk.nbt';p.write_bytes(raw)
++    spec=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py');nbt=importlib.util.module_from_spec(spec);spec.loader.exec_module(nbt)
++    entities=nbt.read(p).get('Entities',[])
++assert not entities,'stale entity NBT survived the actual client cleanup save'
++text='PASS real late-loaded entity chunk (600,600) cleanup persisted; entityCount=0; regionSHA256='+hashlib.sha256(data).hexdigest()
++(E/'late-cleanup.txt').write_text(text+'\n');print(text)
+--- a/tools/write-canonical-verification.py
++++ b/tools/write-canonical-verification.py
+@@ -0,0 +1,81 @@
++"""Final self-contained evidence composition; refuses incomplete current gates."""
++from pathlib import Path
++import hashlib,json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/canonical-recovery';D=R/'dist/canonical-recovery'
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++g=json.loads((E/'GATES.json').read_text());assert g['canonical_suite']=='PASS'
++parts=[(R/'docs/CANONICAL_RECOVERY_031.md').read_text(encoding='utf-8')]
++parts.append('\n## Final observed gates\n'+json.dumps(g,ensure_ascii=False,indent=2))
++parts.append('''\nCurrent: 0.3.1-dev.1 / canonical-recovery / current Actor adapter recovery PASS / campaign PARTIAL / NPC NOT STARTED.
++No 0.3.2 promotion. No natural survival, NPC campaign, transactions or fallback proof is implied.
++Baseline suite: 48 required GameTests. Current suite: 52 = those same 48 plus four new candidate/reservation tests.
++Final storage regression: 580 cases / 2161 assertions; 20 repetitions retained from prior probe. These are NOT 580 new failure surfaces or clients.
++Final actual clients: 19 canonical/generation + 5 load guard + 11 Wayfarer = 35 distinct fully exited processes.
++The load-suite Blocked fixture is a malformed UUID string; missing UUID blocking is independently covered by Ambiguous/Unloaded/NoCandidate.
++Six earlier development clients are separate and excluded. All clients were muted and verified inside RIGHT secondary DISPLAY1.
++Blocked load tests call actual server saveEverything 3 times; this is not a natural autosave-timer playthrough.
++The same-generation duplicate test poisons registered data; a resulting guarded save exception is an expected rejection, not a successful save.
++''')
++parts.append('\n## Acceptance matrix (separate evidence layers)\n|Item|AUTOMATED/GAME TEST/STORAGE PROBE|REAL CLIENT|Fresh process|Disk evidence|Final|\n|---|---|---|---|---|---|')
++for item,auto,real,fresh,disk,verdict in [
++ ('Load Guard','580 storage cases','5 load cases','yes','hash/quarantine','PASS'),
++ ('Missing UUID exact','candidate tests','Exact','ExactReload','original/quarantine/repaired','PASS'),
++ ('Missing UUID ambiguous','multiplicity test','Ambiguous','isolated process','unchanged after 3 saves','PASS'),
++ ('Malformed UUID','storage probe','Blocked malformed-string fixture','isolated process','unchanged after 3 saves','PASS'),
++('Missing UUID no candidate','absence classification','NoCandidate','isolated process','unchanged after 3 saves','PASS'),
++ ('Unloaded vs missing','unloaded classification','Unloaded + Wayfarer actual unload','yes','story unchanged','PASS'),
++ ('Confirmed missing / generation reservation','reservation test','Cut1-6 / Resume1-6','6 pairs','all cut/resume NBT','PASS'),
++ *[(f'Boundary {i}','shared reservation tests',f'Cut{i}',f'Resume{i}','paired NBT / UUID / generation','PASS') for i in range(1,7)],
++ ('Stale generation late-load','stale classification + old regression','Late actual entity chunk','separate copied world process','final canonical NBT','PASS'),
++ ('Same-generation duplicate','multiplicity test','Duplicate','isolated process','write guard/hash','PASS'),
++ ('Recovery fresh-process','serialization / existing tests','ExactReload + Resume1-6','yes','identity preserved','PASS'),
++ ('Write guard / original preservation','storage probe','5 load + blocked canonical cases','yes','before/quarantine/after hash','PASS'),
++ ('Story Integrity','existing + new checks','canonical stable / blocked diagnostics','yes','state assertions','PASS - current Actor/load scope'),
++ ('Migration 1 to 4','20 storage fixtures','NOT TESTED separately','NOT TESTED separately','actual NBT writes/reads','PASS - storage regression'),
++ ('Migration 2 to 4','20 storage fixtures','NOT TESTED separately','NOT TESTED separately','actual NBT writes/reads','PASS - storage regression'),
++ ('Migration 3 to 4','20 storage fixtures','NOT TESTED separately','NOT TESTED separately','actual NBT writes/reads','PASS - storage regression'),
++ ('Wayfarer regression','original 48 maintained','11 current processes','yes','actual copied world + snapshots','PASS'),
++ ('Actor recovery gate','52 tests + storage','current required failure surfaces','yes','verified','PASS - current supported Actor scope'),
++ ('NPC stage','NOT STARTED','NOT STARTED','NOT STARTED','none','NOT STARTED'),
++ ('Campaign','incomplete','natural survival NOT TESTED','not complete','not complete','PARTIAL')]:
++    parts.append('|'+ '|'.join((item,auto,real,fresh,disk,verdict))+'|')
++parts.append('\n## Absolute artifacts and hashes\n')
++for role,p in [('MODIFIED_FILE',D/'whileaway-0.3.1-canonical-recovery.jar'),('DIFF_FILE',E/'DIFF.patch'),('VERIFICATION',E/'VERIFICATION.txt'),('ROLLBACK',E/'ROLLBACK.sh'),('BASELINE_JAR',E/'baseline/previous.jar'),('BASELINE_SOURCE',E/'baseline/previous-source.zip')]:
++    parts.append(f'{role}: {p}')
++    if role!='VERIFICATION':parts.append('SHA-256: '+sha(p))
++parts.append('Source ZIP digest is in dist/canonical-recovery/SHA256SUMS.txt outside the ZIP to avoid a circular hash.')
++parts.append(f'\n## Exact commands and literal outputs\nWorking directory: {R}\nJAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\nGRADLE_USER_HOME={R.parent.parent/"work/gradle-home"}')
++for label,command,name,needles in [
++ ('BASELINE_GAME','./gradlew.bat --offline runGameTestServer','baseline-tests.log',['All 48 required tests passed','BUILD SUCCESSFUL']),
++ ('MODIFIED_GAME','./gradlew.bat --offline compileJava runGameTestServer build','final-tests.log',['All 52 required tests passed','PASS core assertions=','BUILD SUCCESSFUL']),
++ ('MODIFIED_STORAGE','pwsh -NoProfile -File tools/probe-canonical-storage.ps1','probe.log',['PASS load guard cases=580'])]:
++    lines=(E/name).read_text(encoding='utf-8-sig').splitlines();output='\n'.join(x for x in lines if any(n in x for n in needles));assert output
++    parts.append(f'\n{label}\ncommand: {command}\ninput: current isolated fixtures; log {E/name}\noutput:\n{output}\nexit: 0')
++t=json.loads((E/'transaction.json').read_text(encoding='utf-8-sig'))
++for row in t['commands']:parts.append(f'\n{row["label"]}\ncommand: {row["command"]}\ninput: {row["input"]}\noutput:\n{row["output"]}\nexit: {row["exit"]}')
++parts.append('Restored JAR hash='+t['restored_hash']+'; MODIFIED_FILE remains changed='+t['modified_hash']+'; no world operations or save downgrade.')
++parts.append('\n## Actual client executions: launcher exit, child PID exit and markers are separate gates\n')
++seconds=0
++for filename in ('canonical-final-commands.jsonl','load-client-final-commands.jsonl','runtime-commands.jsonl'):
++    for line in (E/filename).read_text().splitlines():
++        row=json.loads(line);assert row['pass'] and row['exit']==0;seconds+=row['seconds'];parts.append(line)
++parts.append(f'Final client launcher wall time sum={seconds:.3f} seconds; not total development time or natural gameplay duration.')
++for folder in ('canonical-final','client-final','crash','exceptions'):
++    for p in sorted((E/folder).glob('*.txt')):
++        if 'PASS ' in p.read_text(encoding='utf-8'):
++            parts.append(f'\nLiteral marker: {p}\n'+p.read_text(encoding='utf-8'))
++parts.append('\n## Corrupt original / quarantine / final hashes\n')
++for prefix,mode in [('canonical-final','Exact'),('canonical-final','Ambiguous'),('canonical-final','Unloaded'),('canonical-final','NoCandidate'),('client-final','Recover'),('client-final','Blocked'),('client-final','Unsupported')]:
++    before=json.loads((E/f'{prefix}-before-{mode}.json').read_text());f=Path(before['target'])/'data/whileaway_story.dat'
++    q=f.parent/'whileaway-quarantine'/f"{before['storyHash']}.dat";assert sha(q)==before['storyHash']
++    parts.append(f'{prefix}/{mode}: original={before["storyHash"]}; quarantine={sha(q)}; final={sha(f)}')
++parts.append('''\n## Additional execution issue
++Git Bash initialization under the sandbox returned -1073741502 during rollback. The failed log was preserved in rollback-sandbox-failure.log. The identical JAR-copy-only rollback ran successfully in the ordinary execution context, exit 0. No world files were part of either command.
++## Model / usage
++No Terra/Luna delegation, model-switch experiment or Caveman execution occurred. Primary-session implementation and review only. No per-model input/output/reasoning-token measurement or usage-reduction percentage is claimed.
++## Next exact starting point
++Preserve these canonical-recovery JAR/source hashes as the next immutable baseline. Keep load guard, private recovery preflight, reservation UUID reuse, two-position readiness and generation fence.
++Next functional task is a minimal REAL campaign NPC event using this lifecycle: appearance -> movement -> player interaction -> reaction to another NPC/object -> durable fact -> completion -> new residence/life state, with A/B/C/D/E and fresh-process proof. Do not start final art or promote 0.3.2.
++''')
++target=E/'VERIFICATION.txt';target.write_text('\n'.join(parts),encoding='utf-8');assert target.read_bytes()
++print('PASS VERIFICATION.txt written and reopened; acceptance matrix, exact commands, all 35 process records, hashes, failure history and next step included')

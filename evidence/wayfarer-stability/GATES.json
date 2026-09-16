@@ -1,0 +1,29 @@
+{
+  "wayfarer_suite": "PASS",
+  "overall_stability": "PARTIAL",
+  "distinct_client_processes": 22,
+  "crash_snapshots": 10,
+  "crash_final_verifies": 2,
+  "exception_processes": 10,
+  "copied_world_pairs": [
+    {
+      "repeat": 1,
+      "original_checkpoint": 4,
+      "copy_checkpoint": 2,
+      "generation": 0,
+      "same_identity_within_each_world": true,
+      "independent_worlds": true
+    },
+    {
+      "repeat": 2,
+      "original_checkpoint": 4,
+      "copy_checkpoint": 2,
+      "generation": 0,
+      "same_identity_within_each_world": true,
+      "independent_worlds": true
+    }
+  ],
+  "scope": "Wayfarer only; no item rewards or persistent next-event dependency token exists in this adapter; not a transaction/NPC/fallback proof.",
+  "actor_corruption_fail_closed": "FAIL (actual storage-library probe; production fix pending)",
+  "actor_corruption_actual_client": "NOT TESTED"
+}

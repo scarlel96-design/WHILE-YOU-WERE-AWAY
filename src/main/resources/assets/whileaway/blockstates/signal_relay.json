@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "whileaway:block/signal_relay"
+    },
+    "lit=true": {
+      "model": "whileaway:block/signal_relay_lit"
+    }
+  }
+}

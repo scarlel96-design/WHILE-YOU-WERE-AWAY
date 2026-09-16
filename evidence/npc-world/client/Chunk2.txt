@@ -1,0 +1,6 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=7032
+BEFORE live=BlockPos{x=41, y=65, z=69}/[2, 4] registered=BlockPos{x=42, y=65, z=68}/[2, 4] snapshot=BlockPos{x=42, y=65, z=68}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=42, y=65, z=68}/[2, 4] playerDimension=whileaway:quiet_city checkpoint=2 generation=0 actualMovement=true
+PASS actual_unload heldTicks=100 entityAbsent=true hasChunk=false entitiesLoaded=false allTrackedPositions=true live=BlockPos{x=41, y=65, z=69}/[2, 4] registered=BlockPos{x=41, y=65, z=69}/[2, 4] snapshot=BlockPos{x=41, y=65, z=69}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=4096, y=160, z=4096}/[256, 256] playerDimension=whileaway:quiet_city
+PASS reconnected checkpoint=2 generation=0 sameUUID=7bdc49bb-ca4a-472f-8074-551c87265eb9 canonical=1 duplicates=0
+PASS Chunk2 canonical=1 generation=0 uuid=7bdc49bb-ca4a-472f-8074-551c87265eb9 instance=ed4ac038-a1c0-407c-9a29-023c59badcec checkpoint=4 work=maintain_return_light dimension=whileaway:quiet_city stableTicks=100

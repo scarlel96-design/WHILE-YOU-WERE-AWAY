@@ -1,0 +1,6 @@
+{"mode": "Exact", "command": "./gradlew.bat --offline runCanonicalExact", "exit": 0, "pid": 36680, "processExited": true, "seconds": 63.67513990402222, "pass": true}
+{"mode": "ExactReload", "command": "./gradlew.bat --offline runCanonicalExactReload", "exit": 0, "pid": 46560, "processExited": true, "seconds": 58.19965386390686, "pass": true}
+{"mode": "Ambiguous", "command": "./gradlew.bat --offline runCanonicalAmbiguous", "exit": 0, "pid": 31900, "processExited": true, "seconds": 55.722490549087524, "pass": true}
+{"mode": "Unloaded", "command": "./gradlew.bat --offline runCanonicalUnloaded", "exit": 0, "pid": 53256, "processExited": true, "seconds": 63.556445598602295, "pass": true}
+{"mode": "NoCandidate", "command": "./gradlew.bat --offline runCanonicalNoCandidate", "exit": 0, "pid": 57640, "processExited": true, "seconds": 55.66577744483948, "pass": true}
+{"mode": "Duplicate", "command": "./gradlew.bat --offline runCanonicalDuplicate", "exit": 0, "pid": 9768, "processExited": true, "seconds": 50.58168125152588, "pass": true}

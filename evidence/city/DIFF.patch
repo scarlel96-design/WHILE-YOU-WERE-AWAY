@@ -1,0 +1,3450 @@
+--- a/src/main/java/io/github/whileaway/CityDistrict.java
++++ b/src/main/java/io/github/whileaway/CityDistrict.java
+@@ -0,0 +1,70 @@
++package io.github.whileaway;
++
++import io.github.whileaway.core.CityLayout;
++import net.minecraft.core.*;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.resources.ResourceKey;
++import net.minecraft.core.registries.Registries;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.saveddata.SavedData;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.neoforge.event.tick.ServerTickEvent;
++
++/** One shared district per world; bounded batches, persisted cursor, no rebuild on entry. */
++public final class CityDistrict extends SavedData {
++    public static final ResourceKey<Level> KEY=ResourceKey.create(Registries.DIMENSION,WhileAway.id("quiet_city"));
++    public static final BlockPos ARRIVAL=new BlockPos(40,65,68), RETURN_LIGHT=new BlockPos(40,65,72);
++    private int cursor;
++    private boolean started;
++    public boolean ready(){return cursor==CityLayout.CELLS.size();}
++    public int cursor(){return cursor;}
++    public void start(){if(!started){started=true;setDirty();}}
++    public static CityDistrict get(ServerLevel level) {
++        return level.getDataStorage().computeIfAbsent(new Factory<>(CityDistrict::new,CityDistrict::load,null),"whileaway_district_v1");
++    }
++    public static CityDistrict load(CompoundTag t,HolderLookup.Provider registry) {
++        if(t.getInt("version")!=CityLayout.VERSION)throw new IllegalStateException("District layout version mismatch");
++        var d=new CityDistrict();d.cursor=t.getInt("cursor");d.started=t.getBoolean("started");
++        if(d.cursor<0||d.cursor>CityLayout.CELLS.size())throw new IllegalStateException("District cursor invalid");
++        return d;
++    }
++    @Override public CompoundTag save(CompoundTag t,HolderLookup.Provider registry) {
++        t.putInt("version",CityLayout.VERSION);t.putInt("cursor",cursor);t.putBoolean("started",started);return t;
++    }
++    public int advance(ServerLevel level,int budget) {
++        if(!level.dimension().equals(KEY))throw new IllegalArgumentException("District placement requires quiet_city");
++        int count=0;
++        while(started&&!ready()&&count<Math.min(512,Math.max(0,budget))) {
++            var c=CityLayout.CELLS.get(cursor);var pos=new BlockPos(c.x(),CityLayout.BASE_Y+c.y(),c.z());
++            level.getChunkAt(pos);
++            level.setBlock(pos,state(c.kind()),2);
++            cursor++;count++;
++        }
++        if(count>0)setDirty();return count;
++    }
++    public static BlockState state(CityLayout.Kind kind) {
++        return switch(kind) {
++            case ROAD -> Blocks.GRAY_CONCRETE.defaultBlockState();
++            case LINE -> Blocks.YELLOW_TERRACOTTA.defaultBlockState();
++            case PAVING -> Blocks.POLISHED_ANDESITE.defaultBlockState();
++            case WALL -> Blocks.DEEPSLATE_BRICKS.defaultBlockState();
++            case TRIM -> Blocks.POLISHED_DEEPSLATE.defaultBlockState();
++            case GLASS -> Blocks.GRAY_STAINED_GLASS.defaultBlockState();
++            case FLOOR -> Blocks.DARK_OAK_PLANKS.defaultBlockState();
++            case LAMP -> Blocks.SEA_LANTERN.defaultBlockState();
++            case POST -> Blocks.DEEPSLATE_BRICK_WALL.defaultBlockState();
++            case BENCH -> Blocks.DARK_OAK_SLAB.defaultBlockState();
++            case GATE -> WhileAway.RETURN_LIGHT.get().defaultBlockState();
++            case INTAKE -> WhileAway.CITY_INTAKE.get().defaultBlockState();
++            case HOME -> WhileAway.CITY_HOME.get().defaultBlockState();
++            case SIREN -> WhileAway.CITY_SIREN.get().defaultBlockState();
++        };
++    }
++    @SubscribeEvent public void tick(ServerTickEvent.Post event) {
++        var level=event.getServer().getLevel(KEY);
++        if(level!=null){var data=get(level);if(data.started&&!data.ready())data.advance(level,256);}
++    }
++}
+--- a/src/main/java/io/github/whileaway/CityTransit.java
++++ b/src/main/java/io/github/whileaway/CityTransit.java
+@@ -0,0 +1,70 @@
++package io.github.whileaway;
++
++import io.github.whileaway.core.CityAccess;
++import java.util.Set;
++import net.minecraft.core.BlockPos;
++import net.minecraft.network.chat.Component;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.phys.AABB;
++import net.neoforged.neoforge.network.PacketDistributor;
++
++public final class CityTransit {
++    private CityTransit() {}
++    public static boolean enter(ServerPlayer p,BlockPos relay) {
++        var data=NarrativeData.get(p.getServer());var e=data.entry(p.getUUID());
++        if(p.level().dimension()!=Level.OVERWORLD || e.station==null || e.station.distSqr(relay)>32*32
++            || p.blockPosition().distSqr(relay)>8*8 || !p.serverLevel().getBlockState(relay).is(WhileAway.RELAY.get()))return false;
++        if(!CityAccess.canEnter(e.progress)||e.encounter!=null){message(p,"city.whileaway.locked");return false;}
++        if(!eligible(p,e))return false;
++        var city=p.getServer().getLevel(CityDistrict.KEY);
++        if(city==null){message(p,"city.whileaway.unavailable");return false;}
++        var district=CityDistrict.get(city);district.start();
++        if(!district.ready()){message(p,"city.whileaway.preparing");return false;}
++        var landing=findLanding(city,CityDistrict.ARRIVAL,5);
++        if(landing==null){message(p,"city.whileaway.obstructed");return false;}
++        var returnPos=p.blockPosition();float yaw=p.getYRot(),pitch=p.getXRot();
++        if(!p.teleportTo(city,landing.getX()+.5,landing.getY(),landing.getZ()+.5,Set.of(),180,0))return false;
++        p.setDeltaMovement(0,0,0);p.fallDistance=0;
++        e.returnPosition=returnPos;e.returnYaw=yaw;e.returnPitch=pitch;e.cityVisited=true;
++        e.transitAfter=p.getServer().overworld().getGameTime()+40;data.setDirty();
++        message(p,"city.whileaway.entered");
++        PacketDistributor.sendToPlayer(p,new ScenePayload(2,landing));return true;
++    }
++    public static boolean leave(ServerPlayer p) {
++        if(!p.level().dimension().equals(CityDistrict.KEY))return false;
++        var data=NarrativeData.get(p.getServer());var e=data.entry(p.getUUID());if(!eligible(p,e))return false;
++        var overworld=p.getServer().overworld();
++        BlockPos landing=e.returnPosition==null?null:findLanding(overworld,e.returnPosition,6);
++        if(landing==null) {
++            var spawn=overworld.getSharedSpawnPos();
++            var surface=overworld.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,spawn);
++            landing=findLanding(overworld,surface,8);
++        }
++        if(landing==null){message(p,"city.whileaway.obstructed");return false;}
++        if(!p.teleportTo(overworld,landing.getX()+.5,landing.getY(),landing.getZ()+.5,Set.of(),e.returnYaw,e.returnPitch))return false;
++        p.setDeltaMovement(0,0,0);p.fallDistance=0;e.transitAfter=overworld.getGameTime()+40;
++        e.progress=e.progress.defer(overworld.getGameTime()+600);data.setDirty();
++        message(p,"city.whileaway.returned");return true;
++    }
++    private static boolean eligible(ServerPlayer p,NarrativeData.Entry e) {
++        return p.isAlive()&&!p.isPassenger()&&!p.isVehicle()&&!p.isSleeping()
++            &&p.getServer().overworld().getGameTime()>=e.transitAfter;
++    }
++    /** Search without breaking blocks or moving a player's construction. */
++    public static BlockPos findLanding(ServerLevel level,BlockPos origin,int radius) {
++        for(int r=0;r<=radius;r++)for(int dx=-r;dx<=r;dx++)for(int dz=-r;dz<=r;dz++) {
++            if(Math.max(Math.abs(dx),Math.abs(dz))!=r)continue;
++            for(int dy:new int[]{0,1,-1,2,-2,3,-3}) {
++                var p=origin.offset(dx,dy,dz);level.getChunkAt(p);
++                if(p.getY()<=level.getMinBuildHeight()||p.getY()+2>=level.getMaxBuildHeight()||!level.getWorldBorder().isWithinBounds(p))continue;
++                if(!level.getBlockState(p.below()).isCollisionShapeFullBlock(level,p.below()))continue;
++                if(!level.getFluidState(p).isEmpty()||!level.getFluidState(p.above()).isEmpty())continue;
++                if(level.noCollision(new AABB(p.getX()+.2,p.getY(),p.getZ()+.2,p.getX()+.8,p.getY()+1.9,p.getZ()+.8)))return p;
++            }
++        }
++        return null;
++    }
++    private static void message(ServerPlayer p,String key){p.displayClientMessage(Component.translatable(key),false);}
++}
+--- a/src/main/java/io/github/whileaway/client/CitySmoke.java
++++ b/src/main/java/io/github/whileaway/client/CitySmoke.java
+@@ -0,0 +1,165 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.core.*;
++import com.mojang.logging.LogUtils;
++import java.nio.file.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.Screenshot;
++import net.minecraft.client.gui.screens.TitleScreen;
++import net.minecraft.core.BlockPos;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.levelgen.WorldOptions;
++import net.minecraft.world.level.levelgen.presets.WorldPresets;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in isolated world test, including a second-process reload. All sound is muted by Gradle before launch. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class CitySmoke {
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/city"));
++    private static final boolean RELOAD=Boolean.getBoolean("whileaway.cityReload");
++    private static final String TASK=RELOAD?"runCityReload":"runCitySmoke";
++    private static boolean launched,setup;
++    private static volatile boolean pending;
++    private static volatile int phase;
++    private static int ticks,frames;
++    private static volatile BlockPos relay,returnPoint;
++    private static final BlockPos MARKER=new BlockPos(42,64,68);
++    private static void check(boolean ok,String reason){if(!ok)throw new IllegalStateException(reason);}
++    private static void note(String message) {
++        try{Files.writeString(E.resolve(TASK+".txt"),message+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}
++        catch(Exception ex){throw new IllegalStateException(ex);}
++        LogUtils.getLogger().info("WHILEAWAY_CITY {}",message);
++    }
++    private static void failure(Exception ex){LogUtils.getLogger().error("WHILEAWAY_CITY_FAILED",ex);Minecraft.getInstance().stop();}
++    private static void onServer(java.util.function.Consumer<ServerPlayer> task) {
++        var mc=Minecraft.getInstance();var id=mc.player.getUUID();
++        mc.getSingleplayerServer().execute(()->{
++            try{task.accept(mc.getSingleplayerServer().getPlayerList().getPlayer(id));}
++            catch(Exception ex){mc.execute(()->failure(ex));}
++        });
++    }
++    private static void capture(String name) {
++        var mc=Minecraft.getInstance();Screenshot.grab(E.toFile(),name,mc.getMainRenderTarget(),c->note("CAPTURE "+name));
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
++        if(!Boolean.getBoolean("whileaway.citySmoke"))return;
++        var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen) {
++                launched=true;Files.createDirectories(E);
++                mc.options.renderDistance().set(8);mc.options.simulationDistance().set(5);mc.options.pauseOnLostFocus=false;
++                mc.options.hideGui=false;
++                check(mc.options.getSoundSourceVolume(net.minecraft.sounds.SoundSource.MASTER)==0,"prelaunch mute missing");
++                if(RELOAD) {
++                    var world=Files.readString(E.resolve("smoke-world.txt")).trim();
++                    check(world.matches("whileaway-city-[0-9]+"),"unexpected reload world name");
++                    mc.createWorldOpenFlows().openWorld(world,mc::stop);
++                } else {
++                    var world="whileaway-city-"+System.currentTimeMillis();Files.writeString(E.resolve("smoke-world.txt"),world);
++                    var rules=new GameRules();rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(false,null);
++                    rules.getRule(GameRules.RULE_DAYLIGHT).set(false,null);
++                    mc.createWorldOpenFlows().createFreshLevel(world,new LevelSettings("WhileAway city verification",GameType.SPECTATOR,false,Difficulty.NORMAL,true,rules,WorldDataConfiguration.DEFAULT),
++                        new WorldOptions(74192361L,true,false),WorldPresets::createNormalWorldDimensions,new TitleScreen());
++                }
++            }
++            if(!launched)return;
++            // Only the explicitly named isolated smoke save is opened here. Preserve a backup on its first experimental-dimension reload.
++            if(RELOAD&&mc.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen screen) {
++                for(var child:screen.children())if(child instanceof net.minecraft.client.gui.components.Button button
++                    &&button.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())) {
++                    note("INFO isolated smoke world backup confirmed");button.onPress();break;
++                }
++            }
++            if(++ticks>4000)throw new IllegalStateException("City smoke timed out: phase="+phase+" screen="+mc.screen);
++            if(mc.player==null||mc.level==null||mc.getSingleplayerServer()==null)return;
++            if(mc.screen instanceof net.minecraft.client.gui.screens.inventory.BookViewScreen)mc.setScreen(null);
++            if(!setup) {
++                setup=true;
++                onServer(p->{
++                    var city=p.getServer().getLevel(CityDistrict.KEY);check(city!=null,"quiet_city dimension missing");
++                    var ledger=NarrativeData.get(p.getServer());var entry=ledger.entry(p.getUUID());
++                    if(RELOAD) {
++                        check(p.level().dimension().equals(CityDistrict.KEY),"player dimension lost on reload");
++                        check(entry.cityVisited&&entry.cityClues==7&&entry.returnPosition!=null,"story state lost on reload");
++                        var district=CityDistrict.get(city);check(district.ready(),"district completion lost on reload");
++                        int cursor=district.cursor();district.start();check(district.advance(city,256)==0&&district.cursor()==cursor,"reload rebuilt city");
++                        check(city.getBlockState(MARKER).is(Blocks.GOLD_BLOCK),"player edit lost on reload");
++                        check(city.getBlockState(CityDistrict.RETURN_LIGHT).is(WhileAway.RETURN_LIGHT.get()),"return light lost");
++                        returnPoint=entry.returnPosition;
++                        note("PASS disk reload: player dimension, return point, 3 records, construction completion and player edit preserved");phase=5;
++                    } else {
++                        returnPoint=p.blockPosition();relay=returnPoint.offset(2,0,0);
++                        p.serverLevel().setBlock(relay,WhileAway.RELAY.get().defaultBlockState().setValue(io.github.whileaway.content.RelayBlock.LIT,true),3);
++                        entry.station=relay;
++                        check(!CityTransit.enter(p,relay),"locked player entered city");
++                        for(var clue:Clue.values())ledger.discover(p.getUUID(),clue);
++                        entry.progress=entry.progress.complete();ledger.setDirty();
++                        var district=CityDistrict.get(city);district.start();district.advance(city,10);
++                        var loaded=CityDistrict.load(district.save(new CompoundTag(),city.registryAccess()),city.registryAccess());
++                        check(loaded.cursor()==district.cursor(),"partial construction cursor did not round-trip");
++                        note("PASS locked access and partial construction cursor round-trip");phase=1;
++                    }
++                });
++            }
++            if(phase==1&&!pending&&ticks%20==0) {
++                pending=true;onServer(p->{
++                    var city=p.getServer().getLevel(CityDistrict.KEY);var d=CityDistrict.get(city);
++                    if(d.ready()) {
++                        check(city.getBlockState(new BlockPos(18,65,47)).is(WhileAway.CITY_INTAKE.get()),"intake record missing");
++                        check(CityTransit.enter(p,relay),"city entry failed");
++                        check(p.level().dimension().equals(CityDistrict.KEY),"wrong arrival dimension");
++                        note("PASS actual server transfer to quiet_city; cells="+d.cursor());phase=2;
++                    }
++                    pending=false;
++                });
++            }
++            if(phase==2&&mc.level.dimension().equals(CityDistrict.KEY)&&mc.screen==null) {
++                frames++;
++                if(frames==80){check(ClientScene.active(),"city arrival scene absent");mc.gui.getChat().clearMessages(false);capture("city-street.png");}
++                if(frames==180)onServer(p->p.connection.teleport(94,110,104,136,35));
++                if(frames==260) {
++                    capture("city-overview.png");phase=3;frames=0;
++                    onServer(p->{
++                        var city=p.serverLevel();city.setBlock(MARKER,Blocks.GOLD_BLOCK.defaultBlockState(),3);
++                        var d=CityDistrict.get(city);check(d.advance(city,512)==0,"finished city changed on revisit request");
++                        for(var item:java.util.List.of(WhileAway.CITY_INTAKE_BOOK.get(),WhileAway.CITY_HOME_BOOK.get(),WhileAway.CITY_SIREN_BOOK.get())) {
++                            p.setItemInHand(InteractionHand.MAIN_HAND,item.getDefaultInstance());item.use(city,p,InteractionHand.MAIN_HAND);
++                        }
++                        check(NarrativeData.get(p.getServer()).entry(p.getUUID()).cityClues==7,"city books did not record readings");
++                        check(CityTransit.leave(p),"return failed");check(p.blockPosition().equals(returnPoint),"return position changed");
++                        note("PASS three book interactions and return to original overworld position");
++                    });
++                }
++            }
++            if(phase==3&&mc.level.dimension()==Level.OVERWORLD&&mc.screen==null) {
++                if(++frames==80) {
++                    phase=4;onServer(p->{
++                        check(CityTransit.enter(p,relay),"reentry failed");
++                        check(p.serverLevel().getBlockState(MARKER).is(Blocks.GOLD_BLOCK),"reentry overwrote player edit");
++                        note("PASS reentry preserves player edits");
++                    });
++                }
++            }
++            if(phase==4&&mc.level.dimension().equals(CityDistrict.KEY)&&mc.screen==null)finish();
++            if(phase==5&&mc.level.dimension().equals(CityDistrict.KEY)&&mc.screen==null) {
++                if(++frames==100) {
++                    capture("city-reloaded.png");phase=6;
++                    onServer(p->{check(CityTransit.leave(p),"return after reload failed");check(p.blockPosition().equals(returnPoint),"saved return position changed");note("PASS return after process restart");});
++                }
++            }
++            if(phase==6&&mc.level.dimension()==Level.OVERWORLD&&mc.screen==null)finish();
++        }catch(Exception ex){failure(ex);}
++    }
++    private static void finish() {
++        var mc=Minecraft.getInstance();check(mc.options.getSoundSourceVolume(net.minecraft.sounds.SoundSource.MASTER)==0,"mute lost");
++        phase=-1;note("PASS "+TASK);mc.stop();
++    }
++}
+--- a/src/main/java/io/github/whileaway/client/ClientScene.java
++++ b/src/main/java/io/github/whileaway/client/ClientScene.java
+@@ -18,18 +18,23 @@
+ @EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
+ public final class ClientScene {
+     private static int age=-1;
++    private static int kind=1;
++    private static int loadingGrace;
+     private static BlockPos origin=BlockPos.ZERO;
+     private static ResourceKey<Level> dimension;
+     public static boolean active(){return age>=0;}
+     public static void receive(ScenePayload payload) {
+         var mc=Minecraft.getInstance();
+-        if(payload.kind()!=1||mc.level==null){cancel();return;}
++        if((payload.kind()!=1&&payload.kind()!=2)||mc.level==null){cancel();return;}
++        kind=payload.kind();
++        loadingGrace=kind==2?200:0;
+         origin=payload.origin();dimension=mc.level.dimension();age=0;
+         mc.getSoundManager().stop(null,SoundSource.MUSIC);
+     }
+     private static void cancel(){age=-1;dimension=null;}
+     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
+         if(age<0)return;var mc=Minecraft.getInstance();
++        if(loadingGrace>0&&mc.screen instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen){loadingGrace--;return;}
+         if(mc.level==null||mc.player==null||!mc.player.isAlive()||mc.level.dimension()!=dimension
+                 ||mc.screen!=null||mc.isPaused()||mc.player.blockPosition().distSqr(origin)>40*40){cancel();return;}
+         age++;
+@@ -54,6 +59,6 @@
+         int edge=Math.max(8,h/5),bar=(int)(h*frame.bars());
+         g.fillGradient(0,0,w,edge,dark,transparent);g.fillGradient(0,h-edge,w,h,transparent,dark);
+         if(bar>0){g.fill(0,0,w,bar,0xff07090d);g.fill(0,h-bar,w,h,0xff07090d);}
+-        if(frame.caption()!=0)g.drawCenteredString(mc.font,Component.translatable("scene.whileaway.signal."+frame.caption()),w/2,h-38,0xd9d1bc);
++        if(frame.caption()!=0)g.drawCenteredString(mc.font,Component.translatable((kind==2?"scene.whileaway.city.":"scene.whileaway.signal.")+frame.caption()),w/2,h-38,0xd9d1bc);
+     }
+ }
+--- a/src/main/java/io/github/whileaway/content/NoteBlock.java
++++ b/src/main/java/io/github/whileaway/content/NoteBlock.java
+@@ -15,7 +15,9 @@
+     public NoteBlock(String kind, Properties p) { super(p); this.kind = kind; }
+     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+         if (!level.isClientSide) {
+-            var item = switch(kind) { case "evacuation" -> WhileAway.EVACUATION_BOOK.get(); case "personal" -> WhileAway.PERSONAL_BOOK.get(); default -> WhileAway.WARNING_BOOK.get(); };
++            var item = switch(kind) { case "evacuation" -> WhileAway.EVACUATION_BOOK.get(); case "personal" -> WhileAway.PERSONAL_BOOK.get();
++                case "city_intake" -> WhileAway.CITY_INTAKE_BOOK.get();case "city_home" -> WhileAway.CITY_HOME_BOOK.get();case "city_siren" -> WhileAway.CITY_SIREN_BOOK.get();
++                default -> WhileAway.WARNING_BOOK.get(); };
+             if (!player.getInventory().contains(new ItemStack(item))) {
+                 var stack = new ItemStack(item);
+                 if (!player.addItem(stack)) player.drop(stack, false);
+--- a/src/main/java/io/github/whileaway/content/NoteItem.java
++++ b/src/main/java/io/github/whileaway/content/NoteItem.java
+@@ -14,18 +14,25 @@
+ 
+ public final class NoteItem extends WrittenBookItem {
+     private final Clue clue;
++    private final int cityBit;
+     public NoteItem(String kind) {
+         super(new Item.Properties().stacksTo(1).component(DataComponents.WRITTEN_BOOK_CONTENT,
+             new WrittenBookContent(Filterable.passThrough("While You Were Away"), "저녁골", 0,
+                 List.of(Filterable.passThrough(Component.translatable("record.whileaway." + kind + ".1")),
+                         Filterable.passThrough(Component.translatable("record.whileaway." + kind + ".2"))), true)));
+         clue = switch(kind) { case "evacuation" -> Clue.EVACUATION_READ; case "personal" -> Clue.PERSONAL_READ; default -> Clue.WARNING_READ; };
++        cityBit=switch(kind){case "city_intake"->1;case "city_home"->2;case "city_siren"->4;default->0;};
+     }
+     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+         if (player instanceof ServerPlayer server) {
+             var data = NarrativeData.get(server.getServer());
+             var e = data.entry(player.getUUID());
+-            if (e.progress.has(Clue.STATION)) data.discover(player.getUUID(), clue);
++            if(cityBit==0) {
++                if(e.progress.has(Clue.STATION))data.discover(player.getUUID(),clue);
++            } else if(e.cityVisited&&level.dimension().equals(io.github.whileaway.CityDistrict.KEY)) {
++                int before=e.cityClues;e.cityClues=io.github.whileaway.core.CityAccess.read(before,cityBit);
++                if(before!=7&&e.cityClues==7)player.displayClientMessage(Component.translatable("city.whileaway.records_complete"),false);
++            }
+             long now = server.getServer().overworld().getGameTime();
+             e.readingUntil = now + 1200;
+             e.progress = e.progress.defer(e.readingUntil);
+--- a/src/main/java/io/github/whileaway/content/RelayBlock.java
++++ b/src/main/java/io/github/whileaway/content/RelayBlock.java
+@@ -14,11 +14,13 @@
+ import net.minecraft.world.phys.BlockHitResult;
+ 
+ public final class RelayBlock extends Block {
+-    public RelayBlock(Properties p) { super(p); }
++    public static final net.minecraft.world.level.block.state.properties.BooleanProperty LIT=net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT;
++    public RelayBlock(Properties p) { super(p);registerDefaultState(stateDefinition.any().setValue(LIT,false)); }
++    @Override protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block,BlockState> b){b.add(LIT);}
+     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+         if (player instanceof ServerPlayer server) {
+             var data = NarrativeData.get(server.getServer()); var e = data.entry(player.getUUID());
+-            if (e.progress.has(Clue.SIGNAL_RESTORED)) player.displayClientMessage(Component.translatable("story.whileaway.already_restored"), true);
++            if (e.progress.has(Clue.SIGNAL_RESTORED)) CityTransit.enter(server,pos);
+             else if (!Director.canRestore(e.progress) || e.station == null || e.station.distSqr(pos) > 32 * 32 || level.dimension() != Level.OVERWORLD)
+                 player.displayClientMessage(Component.translatable("story.whileaway.read_first"), true);
+             else {
+@@ -28,6 +30,9 @@
+                 else {
+                     if (!player.isCreative()) player.getInventory().items.get(slot).shrink(1);
+                     data.discover(player.getUUID(), Clue.SIGNAL_RESTORED);
++                    level.setBlock(pos,state.setValue(LIT,true),3);
++                    var city=server.getServer().getLevel(CityDistrict.KEY);
++                    if(city!=null)CityDistrict.get(city).start();
+                     e.progress = e.progress.defer(level.getGameTime() + 400);
+                     data.setDirty();
+                     player.displayClientMessage(Component.translatable("story.whileaway.signal"), false);
+--- a/src/main/java/io/github/whileaway/content/ReturnLightBlock.java
++++ b/src/main/java/io/github/whileaway/content/ReturnLightBlock.java
+@@ -0,0 +1,17 @@
++package io.github.whileaway.content;
++import io.github.whileaway.CityTransit;
++import net.minecraft.core.BlockPos;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.InteractionResult;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.phys.BlockHitResult;
++public final class ReturnLightBlock extends Block {
++    public ReturnLightBlock(Properties p){super(p);}
++    @Override protected InteractionResult useWithoutItem(BlockState state,Level level,BlockPos pos,Player p,BlockHitResult hit) {
++        if(p instanceof ServerPlayer sp)CityTransit.leave(sp);
++        return InteractionResult.sidedSuccess(level.isClientSide);
++    }
++}
+--- a/src/main/java/io/github/whileaway/core/CityAccess.java
++++ b/src/main/java/io/github/whileaway/core/CityAccess.java
+@@ -0,0 +1,12 @@
++package io.github.whileaway.core;
++
++public final class CityAccess {
++    private CityAccess() {}
++    public static boolean canEnter(Progress p) {
++        return p.has(Clue.STATION) && p.has(Clue.SIGNAL_RESTORED)
++            && p.has(Clue.PERSONAL_READ) && p.encounterComplete();
++    }
++    public static int read(int current, int bit) {
++        return (current | (bit & 7)) & 7;
++    }
++}
+--- a/src/main/java/io/github/whileaway/core/CityLayout.java
++++ b/src/main/java/io/github/whileaway/core/CityLayout.java
+@@ -0,0 +1,59 @@
++package io.github.whileaway.core;
++
++import java.util.*;
++
++/** Stable v1 district plan. Never reorder this plan without migrating the saved construction cursor. */
++public final class CityLayout {
++    public enum Kind { ROAD, LINE, PAVING, WALL, TRIM, GLASS, FLOOR, LAMP, POST, BENCH, GATE, INTAKE, HOME, SIREN }
++    public record Cell(int x,int y,int z,Kind kind) {}
++    public record Building(int x,int z,int width,int depth,int floors) {}
++    public static final List<Building> BUILDINGS=List.of(
++        new Building(8,8,22,18,3),new Building(50,8,22,18,4),
++        new Building(8,34,22,18,2),new Building(50,34,22,18,3),
++        new Building(8,60,22,14,2),new Building(50,60,22,14,2));
++    public static final int SIZE=80, BASE_Y=64, VERSION=1;
++    public static final List<Cell> CELLS=build();
++    private CityLayout() {}
++    private static List<Cell> build() {
++        var cells=new LinkedHashMap<String,Cell>();
++        class Draw {
++            void at(int x,int y,int z,Kind k){cells.put(x+","+y+","+z,new Cell(x,y,z,k));}
++        }
++        var d=new Draw();
++        for(int x=0;x<SIZE;x++)for(int z=0;z<SIZE;z++) {
++            boolean road=x>=34&&x<=45 || z>=28&&z<=31 || z>=54&&z<=57;
++            d.at(x,0,z,road ? (x==40&&z%6<3?Kind.LINE:Kind.ROAD):Kind.PAVING);
++            if(x==0||z==0||x==79||z==79)for(int y=1;y<=5;y++)d.at(x,y,z,Kind.WALL);
++        }
++        for(var b:BUILDINGS) {
++            int height=b.floors*5;
++            for(int x=b.x;x<b.x+b.width;x++)for(int z=b.z;z<b.z+b.depth;z++) {
++                boolean wall=x==b.x||x==b.x+b.width-1||z==b.z||z==b.z+b.depth-1;
++                boolean doorway=z==b.z+b.depth-1 && x>=b.x+9&&x<=b.x+11;
++                for(int y=1;y<=height+1;y++) {
++                    if(doorway&&y<=3)continue;
++                    if(y%5==0||y==height+1) d.at(x,y,z,y==height+1?Kind.TRIM:Kind.FLOOR);
++                    else if(wall) {
++                        boolean window=y%5>=2&&y%5<=3&&(x+z)%5>=1&&(x+z)%5<=3;
++                        d.at(x,y,z,window?Kind.GLASS:Kind.WALL);
++                    }
++                }
++            }
++            // Ground-floor waiting benches and a dim fixture; upper floors are visual shells for now.
++            for(int x=b.x+3;x<b.x+8;x++)d.at(x,1,b.z+4,Kind.BENCH);
++            d.at(b.x+10,4,b.z+6,Kind.LAMP);
++        }
++        for(int z=8;z<75;z+=12)for(int x:new int[]{32,47}) {
++            for(int y=1;y<=5;y++)d.at(x,y,z,Kind.POST);
++            d.at(x,6,z,Kind.LAMP);
++        }
++        // Evacuation checkpoint and the return light are permanent route anchors.
++        for(int x=31;x<=48;x++)d.at(x,7,4,Kind.TRIM);
++        for(int y=1;y<=6;y++)for(int x:new int[]{31,48})d.at(x,y,4,Kind.POST);
++        d.at(40,1,72,Kind.GATE);
++        d.at(18,1,47,Kind.INTAKE);
++        d.at(60,1,69,Kind.HOME);
++        d.at(40,1,7,Kind.SIREN);
++        return List.copyOf(cells.values());
++    }
++}
+--- a/src/main/java/io/github/whileaway/NarrativeData.java
++++ b/src/main/java/io/github/whileaway/NarrativeData.java
+@@ -10,13 +10,18 @@
+ 
+ /** Overworld SavedData survives death, logout and dimension travel. Records are player-isolated. */
+ public final class NarrativeData extends SavedData {
+-    public static final int SCHEMA = 1;
++    public static final int SCHEMA = 2;
+     private final Map<UUID, Entry> players = new HashMap<>();
+     public static final class Entry {
+         public Progress progress = Progress.empty();
+         public BlockPos station;
+         public UUID encounter;
+         public long readingUntil;
++        public boolean cityVisited;
++        public int cityClues;
++        public BlockPos returnPosition;
++        public float returnYaw,returnPitch;
++        public long transitAfter;
+     }
+     public Entry entry(UUID id) { return players.computeIfAbsent(id, ignored -> new Entry()); }
+     public void discover(UUID id, Clue clue) {
+@@ -37,6 +42,10 @@
+             if (t.contains("station")) e.station = BlockPos.of(t.getLong("station"));
+             if (t.hasUUID("encounter")) e.encounter = t.getUUID("encounter");
+             e.readingUntil = t.getLong("readingUntil");
++            e.cityVisited=t.getBoolean("cityVisited");e.cityClues=t.getInt("cityClues")&7;
++            if(t.contains("returnPosition"))e.returnPosition=BlockPos.of(t.getLong("returnPosition"));
++            e.returnYaw=t.getFloat("returnYaw");e.returnPitch=t.getFloat("returnPitch");
++            e.transitAfter=Math.max(0,t.getLong("transitAfter"));
+         }
+         return data;
+     }
+@@ -50,6 +59,9 @@
+             t.putBoolean("complete", e.progress.encounterComplete()); t.putLong("readingUntil", e.readingUntil);
+             if (e.station != null) t.putLong("station", e.station.asLong());
+             if (e.encounter != null) t.putUUID("encounter", e.encounter);
++            t.putBoolean("cityVisited",e.cityVisited);t.putInt("cityClues",e.cityClues&7);
++            if(e.returnPosition!=null)t.putLong("returnPosition",e.returnPosition.asLong());
++            t.putFloat("returnYaw",e.returnYaw);t.putFloat("returnPitch",e.returnPitch);t.putLong("transitAfter",e.transitAfter);
+             list.add(t);
+         });
+         root.put("players", list); return root;
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -93,9 +93,10 @@
+     }
+     @SubscribeEvent public void commands(RegisterCommandsEvent event) {
+         event.getDispatcher().register(Commands.literal("whileaway")
++            .then(Commands.literal("return").executes(c->CityTransit.leave(c.getSource().getPlayerOrException())?1:0))
+             .then(Commands.literal("status").executes(c->{
+                 var p=c.getSource().getPlayerOrException();var e=NarrativeData.get(p.getServer()).entry(p.getUUID());
+-                c.getSource().sendSuccess(()->Component.literal("WhileAway stage="+e.progress.stage()+" clues="+e.progress.distinctClues()+" encounter="+(e.encounter!=null)+" complete="+e.progress.encounterComplete()),false);return 1;
++                c.getSource().sendSuccess(()->Component.literal("WhileAway stage="+e.progress.stage()+" clues="+e.progress.distinctClues()+" encounter="+(e.encounter!=null)+" complete="+e.progress.encounterComplete()+" city="+e.cityVisited+" cityClues="+Integer.bitCount(e.cityClues)),false);return 1;
+             }))
+             .then(Commands.literal("recover").requires(s->s.hasPermission(2)).executes(c->{
+                 var p=c.getSource().getPlayerOrException();var data=NarrativeData.get(p.getServer());var e=data.entry(p.getUUID());
+--- a/src/main/java/io/github/whileaway/StoryGameTests.java
++++ b/src/main/java/io/github/whileaway/StoryGameTests.java
+@@ -95,4 +95,56 @@
+         var pages=book.get(net.minecraft.core.component.DataComponents.WRITTEN_BOOK_CONTENT);
+         h.assertTrue(pages!=null&&pages.pages().size()==2,"localized book pages");h.succeed();
+     }
++    @GameTest(template="empty")
++    public static void schemaOneMigrates(GameTestHelper h) {
++        var id=UUID.randomUUID();var d=new NarrativeData();d.discover(id,Clue.STATION);
++        var t=d.save(new CompoundTag(),h.getLevel().registryAccess());t.putInt("schema",1);
++        var player=t.getList("players",10).getCompound(0);
++        for(var key:java.util.List.of("cityVisited","cityClues","returnPosition","returnYaw","returnPitch","transitAfter"))player.remove(key);
++        var e=NarrativeData.load(t,h.getLevel().registryAccess()).entry(id);
++        h.assertTrue(e.progress.has(Clue.STATION)&&!e.cityVisited&&e.cityClues==0&&e.returnPosition==null,"schema 1 progress retained, city defaults empty");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void cityReturnPointRoundTrip(GameTestHelper h) {
++        var d=new NarrativeData();var id=UUID.randomUUID();var e=d.entry(id);
++        e.returnPosition=new BlockPos(-333,68,-275);e.returnYaw=123.5f;e.returnPitch=-17.5f;
++        e.cityVisited=true;e.cityClues=5;e.transitAfter=321;
++        var a=NarrativeData.load(d.save(new CompoundTag(),h.getLevel().registryAccess()),h.getLevel().registryAccess()).entry(id);
++        h.assertTrue(a.returnPosition.equals(e.returnPosition)&&a.returnYaw==123.5f&&a.returnPitch==-17.5f,"return position/orientation survive reload");
++        h.assertTrue(a.cityVisited&&a.cityClues==5&&a.transitAfter==321,"city state persists");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void cityPlacementRejectsOverworld(GameTestHelper h) {
++        // Vanilla GameTestServer bakes an empty dimension registry into the FLAT preset.
++        // Actual custom-dimension generation/resume is checked by CitySmoke instead.
++        h.assertTrue(h.getLevel().registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).containsKey(WhileAway.id("quiet_city")),"city dimension type decodes");
++        h.assertTrue(h.getLevel().registryAccess().registryOrThrow(Registries.BIOME).containsKey(WhileAway.id("quiet_city")),"city biome decodes");
++        var d=new CityDistrict();d.start();boolean rejected=false;
++        try {d.advance(h.getLevel(),1);}catch(IllegalArgumentException expected){rejected=true;}
++        h.assertTrue(rejected&&d.cursor()==0,"district never writes to overworld");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void invalidCityCursorRejected(GameTestHelper h) {
++        var t=new CompoundTag();t.putInt("version",1);t.putInt("cursor",-1);boolean fail=false;
++        try{CityDistrict.load(t,h.getLevel().registryAccess());}catch(IllegalStateException expected){fail=true;}
++        h.assertTrue(fail,"invalid cursor rejected rather than overwrite district");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void relayLightAndCityBooks(GameTestHelper h) {
++        var relay=WhileAway.RELAY.get().defaultBlockState();
++        h.assertTrue(!relay.getValue(io.github.whileaway.content.RelayBlock.LIT),"relay starts unlit");
++        var p=h.absolutePos(new BlockPos(3,2,3));h.getLevel().setBlock(p,relay.setValue(io.github.whileaway.content.RelayBlock.LIT,true),3);
++        h.assertTrue(h.getLevel().getBlockState(p).getLightEmission(h.getLevel(),p)==12,"lit relay emits light");
++        for(var item:java.util.List.of(WhileAway.CITY_INTAKE_BOOK.get(),WhileAway.CITY_HOME_BOOK.get(),WhileAway.CITY_SIREN_BOOK.get()))
++            h.assertTrue(item.getDefaultInstance().get(net.minecraft.core.component.DataComponents.WRITTEN_BOOK_CONTENT).pages().size()==2,"city book two pages");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void blockedLandingRejected(GameTestHelper h) {
++        var p=h.absolutePos(new BlockPos(10,4,10));
++        for(int y=-4;y<=5;y++)h.getLevel().setBlock(p.offset(0,y,0),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
++        h.assertTrue(CityTransit.findLanding(h.getLevel(),p,0)==null,"solid shaft never accepted");
++        h.getLevel().setBlock(p,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
++        h.getLevel().setBlock(p.above(),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
++        h.assertTrue(p.equals(CityTransit.findLanding(h.getLevel(),p,0)),"clear two-block landing accepted");h.succeed();
++    }
+ }
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -35,12 +35,19 @@
+     public static final DeferredBlock<NoteBlock> WARNING = BLOCKS.register("warning_note", () -> new NoteBlock("warning", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+     public static final DeferredBlock<NoteBlock> EVACUATION = BLOCKS.register("evacuation_note", () -> new NoteBlock("evacuation", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+     public static final DeferredBlock<NoteBlock> PERSONAL = BLOCKS.register("personal_note", () -> new NoteBlock("personal", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+-    public static final DeferredBlock<RelayBlock> RELAY = BLOCKS.register("signal_relay", () -> new RelayBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).lightLevel(s -> 3)));
++    public static final DeferredBlock<RelayBlock> RELAY = BLOCKS.register("signal_relay", () -> new RelayBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).lightLevel(s -> s.getValue(RelayBlock.LIT)?12:3)));
++    public static final DeferredBlock<ReturnLightBlock> RETURN_LIGHT=BLOCKS.register("return_light",()->new ReturnLightBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SEA_LANTERN).strength(-1,3600000).lightLevel(s->15)));
++    public static final DeferredBlock<NoteBlock> CITY_INTAKE=BLOCKS.register("city_intake_note",()->new NoteBlock("city_intake",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
++    public static final DeferredBlock<NoteBlock> CITY_HOME=BLOCKS.register("city_home_note",()->new NoteBlock("city_home",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
++    public static final DeferredBlock<NoteBlock> CITY_SIREN=BLOCKS.register("city_siren_note",()->new NoteBlock("city_siren",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StationEntity>> STATION_ENTITY = BLOCK_ENTITIES.register("station_anchor", () -> BlockEntityType.Builder.of(StationEntity::new, STATION.get()).build(null));
+     public static final DeferredHolder<EntityType<?>, EntityType<Wayfarer>> WAYFARER = ENTITIES.register("wayfarer", () -> EntityType.Builder.<Wayfarer>of(Wayfarer::new, MobCategory.MONSTER).sized(0.75f, 2.6f).clientTrackingRange(10).build("whileaway:wayfarer"));
+     public static final DeferredItem<NoteItem> WARNING_BOOK = ITEMS.register("warning_record", () -> new NoteItem("warning"));
+     public static final DeferredItem<NoteItem> EVACUATION_BOOK = ITEMS.register("evacuation_record", () -> new NoteItem("evacuation"));
+     public static final DeferredItem<NoteItem> PERSONAL_BOOK = ITEMS.register("personal_record", () -> new NoteItem("personal"));
++    public static final DeferredItem<NoteItem> CITY_INTAKE_BOOK=ITEMS.register("city_intake_record",()->new NoteItem("city_intake"));
++    public static final DeferredItem<NoteItem> CITY_HOME_BOOK=ITEMS.register("city_home_record",()->new NoteItem("city_home"));
++    public static final DeferredItem<NoteItem> CITY_SIREN_BOOK=ITEMS.register("city_siren_record",()->new NoteItem("city_siren"));
+     public static final DeferredItem<Item> WAYFARER_EGG = ITEMS.register("wayfarer_spawn_egg", () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(WAYFARER, 0x23272b, 0xc6bda4, new Item.Properties()));
+     public static final DeferredHolder<SoundEvent, SoundEvent> KNOCK = sound("distant_knock");
+     public static final DeferredHolder<SoundEvent, SoundEvent> STEPS = sound("returning_steps");
+@@ -69,6 +76,7 @@
+             event.registrar("1").playToClient(ScenePayload.TYPE,ScenePayload.CODEC,
+                 (payload,context)->context.enqueueWork(()->io.github.whileaway.client.ClientScene.receive(payload))));
+         NeoForge.EVENT_BUS.register(new StoryEvents());
++        NeoForge.EVENT_BUS.register(new CityDistrict());
+     }
+     private void attributes(EntityAttributeCreationEvent event) { event.put(WAYFARER.get(), Wayfarer.attributes().build()); }
+ }
+--- a/src/main/resources/assets/whileaway/animations/wayfarer.animation.json
++++ b/src/main/resources/assets/whileaway/animations/wayfarer.animation.json
+@@ -1,107 +1,107 @@
+-{
+-  "format_version": "1.8.0",
+-  "animations": {
+-    "animation.wayfarer.idle": {
+-      "loop": true,
+-      "animation_length": 4,
+-      "bones": {
+-        "body": {
+-          "rotation": [
+-            "math.sin(query.anim_time*90)*2",
+-            0,
+-            0
+-          ]
+-        },
+-        "head": {
+-          "rotation": [
+-            0,
+-            "math.sin(query.anim_time*45)*7",
+-            0
+-          ]
+-        }
+-      }
+-    },
+-    "animation.wayfarer.walk": {
+-      "loop": true,
+-      "animation_length": 2,
+-      "bones": {
+-        "left_leg": {
+-          "rotation": [
+-            "math.sin(query.anim_time*180)*20",
+-            0,
+-            0
+-          ]
+-        },
+-        "right_leg": {
+-          "rotation": [
+-            "-math.sin(query.anim_time*180)*20",
+-            0,
+-            0
+-          ]
+-        },
+-        "body": {
+-          "rotation": [
+-            "math.sin(query.anim_time*180-35)*4",
+-            0,
+-            0
+-          ]
+-        },
+-        "left_arm": {
+-          "rotation": [
+-            "-math.sin(query.anim_time*180-40)*12",
+-            0,
+-            0
+-          ]
+-        },
+-        "right_arm": {
+-          "rotation": [
+-            "math.sin(query.anim_time*180-40)*12",
+-            0,
+-            0
+-          ]
+-        }
+-      }
+-    },
+-    "animation.wayfarer.hunt": {
+-      "loop": true,
+-      "animation_length": 1,
+-      "bones": {
+-        "left_leg": {
+-          "rotation": [
+-            "math.sin(query.anim_time*360)*35",
+-            0,
+-            0
+-          ]
+-        },
+-        "right_leg": {
+-          "rotation": [
+-            "-math.sin(query.anim_time*360)*35",
+-            0,
+-            0
+-          ]
+-        },
+-        "body": {
+-          "rotation": [
+-            20,
+-            0,
+-            0
+-          ]
+-        },
+-        "left_arm": {
+-          "rotation": [
+-            -65,
+-            0,
+-            -15
+-          ]
+-        },
+-        "right_arm": {
+-          "rotation": [
+-            -65,
+-            0,
+-            15
+-          ]
+-        }
+-      }
+-    }
+-  }
+-}
++{
++  "format_version": "1.8.0",
++  "animations": {
++    "animation.wayfarer.idle": {
++      "loop": true,
++      "animation_length": 4,
++      "bones": {
++        "body": {
++          "rotation": [
++            "math.sin(query.anim_time*90)*2",
++            0,
++            0
++          ]
++        },
++        "head": {
++          "rotation": [
++            0,
++            "math.sin(query.anim_time*45)*7",
++            0
++          ]
++        }
++      }
++    },
++    "animation.wayfarer.walk": {
++      "loop": true,
++      "animation_length": 2,
++      "bones": {
++        "left_leg": {
++          "rotation": [
++            "math.sin(query.anim_time*180)*20",
++            0,
++            0
++          ]
++        },
++        "right_leg": {
++          "rotation": [
++            "-math.sin(query.anim_time*180)*20",
++            0,
++            0
++          ]
++        },
++        "body": {
++          "rotation": [
++            "math.sin(query.anim_time*180-35)*4",
++            0,
++            0
++          ]
++        },
++        "left_arm": {
++          "rotation": [
++            "-math.sin(query.anim_time*180-40)*12",
++            0,
++            0
++          ]
++        },
++        "right_arm": {
++          "rotation": [
++            "math.sin(query.anim_time*180-40)*12",
++            0,
++            0
++          ]
++        }
++      }
++    },
++    "animation.wayfarer.hunt": {
++      "loop": true,
++      "animation_length": 1,
++      "bones": {
++        "left_leg": {
++          "rotation": [
++            "math.sin(query.anim_time*360)*35",
++            0,
++            0
++          ]
++        },
++        "right_leg": {
++          "rotation": [
++            "-math.sin(query.anim_time*360)*35",
++            0,
++            0
++          ]
++        },
++        "body": {
++          "rotation": [
++            20,
++            0,
++            0
++          ]
++        },
++        "left_arm": {
++          "rotation": [
++            -65,
++            0,
++            -15
++          ]
++        },
++        "right_arm": {
++          "rotation": [
++            -65,
++            0,
++            15
++          ]
++        }
++      }
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/city_home_note.json
++++ b/src/main/resources/assets/whileaway/blockstates/city_home_note.json
+@@ -0,0 +1,7 @@
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/city_home_note"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/city_intake_note.json
++++ b/src/main/resources/assets/whileaway/blockstates/city_intake_note.json
+@@ -0,0 +1,7 @@
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/city_intake_note"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/city_siren_note.json
++++ b/src/main/resources/assets/whileaway/blockstates/city_siren_note.json
+@@ -0,0 +1,7 @@
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/city_siren_note"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/evacuation_note.json
++++ b/src/main/resources/assets/whileaway/blockstates/evacuation_note.json
+@@ -1,7 +1,7 @@
+-{
+-  "variants": {
+-    "": {
+-      "model": "whileaway:block/evacuation_note"
+-    }
+-  }
+-}
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/evacuation_note"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/personal_note.json
++++ b/src/main/resources/assets/whileaway/blockstates/personal_note.json
+@@ -1,7 +1,7 @@
+-{
+-  "variants": {
+-    "": {
+-      "model": "whileaway:block/personal_note"
+-    }
+-  }
+-}
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/personal_note"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/return_light.json
++++ b/src/main/resources/assets/whileaway/blockstates/return_light.json
+@@ -0,0 +1,7 @@
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/return_light"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/signal_relay.json
++++ b/src/main/resources/assets/whileaway/blockstates/signal_relay.json
+@@ -1,7 +1,10 @@
+-{
+-  "variants": {
+-    "": {
+-      "model": "whileaway:block/signal_relay"
+-    }
+-  }
+-}
++{
++  "variants": {
++    "lit=false": {
++      "model": "whileaway:block/signal_relay"
++    },
++    "lit=true": {
++      "model": "whileaway:block/signal_relay_lit"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/station_anchor.json
++++ b/src/main/resources/assets/whileaway/blockstates/station_anchor.json
+@@ -1,7 +1,7 @@
+-{
+-  "variants": {
+-    "": {
+-      "model": "whileaway:block/station_anchor"
+-    }
+-  }
+-}
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/station_anchor"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/blockstates/warning_note.json
++++ b/src/main/resources/assets/whileaway/blockstates/warning_note.json
+@@ -1,7 +1,7 @@
+-{
+-  "variants": {
+-    "": {
+-      "model": "whileaway:block/warning_note"
+-    }
+-  }
+-}
++{
++  "variants": {
++    "": {
++      "model": "whileaway:block/warning_note"
++    }
++  }
++}
+--- a/src/main/resources/assets/whileaway/geo/wayfarer.geo.json
++++ b/src/main/resources/assets/whileaway/geo/wayfarer.geo.json
+@@ -1,302 +1,302 @@
+-{
+-  "format_version": "1.12.0",
+-  "minecraft:geometry": [
+-    {
+-      "description": {
+-        "identifier": "geometry.wayfarer",
+-        "texture_width": 64,
+-        "texture_height": 32,
+-        "visible_bounds_width": 3,
+-        "visible_bounds_height": 4,
+-        "visible_bounds_offset": [
+-          0,
+-          1.5,
+-          0
+-        ]
+-      },
+-      "bones": [
+-        {
+-          "name": "root",
+-          "pivot": [
+-            0,
+-            0,
+-            0
+-          ]
+-        },
+-        {
+-          "name": "body",
+-          "pivot": [
+-            0,
+-            23,
+-            0
+-          ],
+-          "parent": "root",
+-          "rotation": [
+-            27,
+-            0,
+-            0
+-          ],
+-          "cubes": [
+-            {
+-              "origin": [
+-                -4,
+-                17,
+-                -3
+-              ],
+-              "size": [
+-                8,
+-                16,
+-                6
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "neck",
+-          "pivot": [
+-            0,
+-            31,
+-            0
+-          ],
+-          "parent": "body",
+-          "rotation": [
+-            45,
+-            0,
+-            0
+-          ],
+-          "cubes": [
+-            {
+-              "origin": [
+-                -2,
+-                30,
+-                -1
+-              ],
+-              "size": [
+-                4,
+-                6,
+-                4
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "head",
+-          "pivot": [
+-            0,
+-            34,
+-            0
+-          ],
+-          "parent": "neck",
+-          "rotation": [
+-            65,
+-            0,
+-            0
+-          ],
+-          "cubes": [
+-            {
+-              "origin": [
+-                -4,
+-                33,
+-                -3
+-              ],
+-              "size": [
+-                8,
+-                7,
+-                7
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "left_leg",
+-          "pivot": [
+-            3,
+-            19,
+-            0
+-          ],
+-          "parent": "root",
+-          "cubes": [
+-            {
+-              "origin": [
+-                1,
+-                1,
+-                -2
+-              ],
+-              "size": [
+-                3,
+-                18,
+-                3
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "right_leg",
+-          "pivot": [
+-            -3,
+-            19,
+-            0
+-          ],
+-          "parent": "root",
+-          "cubes": [
+-            {
+-              "origin": [
+-                -4,
+-                1,
+-                -2
+-              ],
+-              "size": [
+-                3,
+-                18,
+-                3
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "left_foot",
+-          "pivot": [
+-            2,
+-            2,
+-            0
+-          ],
+-          "parent": "left_leg",
+-          "cubes": [
+-            {
+-              "origin": [
+-                0,
+-                0,
+-                -5
+-              ],
+-              "size": [
+-                5,
+-                2,
+-                8
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "right_foot",
+-          "pivot": [
+-            -2,
+-            2,
+-            0
+-          ],
+-          "parent": "right_leg",
+-          "rotation": [
+-            0,
+-            180,
+-            0
+-          ],
+-          "cubes": [
+-            {
+-              "origin": [
+-                -5,
+-                0,
+-                -3
+-              ],
+-              "size": [
+-                5,
+-                2,
+-                8
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "left_arm",
+-          "pivot": [
+-            5,
+-            29,
+-            0
+-          ],
+-          "parent": "body",
+-          "rotation": [
+-            12,
+-            0,
+-            -10
+-          ],
+-          "cubes": [
+-            {
+-              "origin": [
+-                4,
+-                8,
+-                -1
+-              ],
+-              "size": [
+-                2,
+-                22,
+-                2
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        },
+-        {
+-          "name": "right_arm",
+-          "pivot": [
+-            -5,
+-            29,
+-            0
+-          ],
+-          "parent": "body",
+-          "rotation": [
+-            -12,
+-            0,
+-            10
+-          ],
+-          "cubes": [
+-            {
+-              "origin": [
+-                -6,
+-                8,
+-                -1
+-              ],
+-              "size": [
+-                2,
+-                22,
+-                2
+-              ],
+-              "uv": [
+-                0,
+-                0
+-              ]
+-            }
+-          ]
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "format_version": "1.12.0",
++  "minecraft:geometry": [
++    {
++      "description": {
++        "identifier": "geometry.wayfarer",
++        "texture_width": 64,
++        "texture_height": 32,
++        "visible_bounds_width": 3,
++        "visible_bounds_height": 4,
++        "visible_bounds_offset": [
++          0,
++          1.5,
++          0
++        ]
++      },
++      "bones": [
++        {
++          "name": "root",
++          "pivot": [
++            0,
++            0,
++            0
++          ]
++        },
++        {
++          "name": "body",
++          "pivot": [
++            0,
++            23,
++            0
++          ],
++          "parent": "root",
++          "rotation": [
++            27,
++            0,
++            0
++          ],
++          "cubes": [
++            {
++              "origin": [
++                -4,
++                17,
++                -3
++              ],
++              "size": [
++                8,
++                16,
++                6
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "neck",
++          "pivot": [
++            0,
++            31,
++            0
++          ],
++          "parent": "body",
++          "rotation": [
++            45,
++            0,
++            0
++          ],
++          "cubes": [
++            {
++              "origin": [
++                -2,
++                30,
++                -1
++              ],
++              "size": [
++                4,
++                6,
++                4
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "head",
++          "pivot": [
++            0,
++            34,
++            0
++          ],
++          "parent": "neck",
++          "rotation": [
++            65,
++            0,
++            0
++          ],
++          "cubes": [
++            {
++              "origin": [
++                -4,
++                33,
++                -3
++              ],
++              "size": [
++                8,
++                7,
++                7
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "left_leg",
++          "pivot": [
++            3,
++            19,
++            0
++          ],
++          "parent": "root",
++          "cubes": [
++            {
++              "origin": [
++                1,
++                1,
++                -2
++              ],
++              "size": [
++                3,
++                18,
++                3
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "right_leg",
++          "pivot": [
++            -3,
++            19,
++            0
++          ],
++          "parent": "root",
++          "cubes": [
++            {
++              "origin": [
++                -4,
++                1,
++                -2
++              ],
++              "size": [
++                3,
++                18,
++                3
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "left_foot",
++          "pivot": [
++            2,
++            2,
++            0
++          ],
++          "parent": "left_leg",
++          "cubes": [
++            {
++              "origin": [
++                0,
++                0,
++                -5
++              ],
++              "size": [
++                5,
++                2,
++                8
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "right_foot",
++          "pivot": [
++            -2,
++            2,
++            0
++          ],
++          "parent": "right_leg",
++          "rotation": [
++            0,
++            180,
++            0
++          ],
++          "cubes": [
++            {
++              "origin": [
++                -5,
++                0,
++                -3
++              ],
++              "size": [
++                5,
++                2,
++                8
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "left_arm",
++          "pivot": [
++            5,
++            29,
++            0
++          ],
++          "parent": "body",
++          "rotation": [
++            12,
++            0,
++            -10
++          ],
++          "cubes": [
++            {
++              "origin": [
++                4,
++                8,
++                -1
++              ],
++              "size": [
++                2,
++                22,
++                2
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        },
++        {
++          "name": "right_arm",
++          "pivot": [
++            -5,
++            29,
++            0
++          ],
++          "parent": "body",
++          "rotation": [
++            -12,
++            0,
++            10
++          ],
++          "cubes": [
++            {
++              "origin": [
++                -6,
++                8,
++                -1
++              ],
++              "size": [
++                2,
++                22,
++                2
++              ],
++              "uv": [
++                0,
++                0
++              ]
++            }
++          ]
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -1,39 +1,61 @@
+-{
+-  "scene.whileaway.signal.1": "The signal returned.",
+-  "scene.whileaway.signal.2": "No name remained for the one returning.",
+-  "itemGroup.whileaway": "While You Were Away",
+-  "entity.whileaway.wayfarer": "Wayfarer",
+-  "item.whileaway.wayfarer_spawn_egg": "Wayfarer Observation Egg",
+-  "story.whileaway.welcome": "[While You Were Away] Find an abandoned station in plains or forests. Right-click record blocks to collect books.",
+-  "story.whileaway.station": "The tracks are broken. The way home remains.",
+-  "story.whileaway.record_received": "Record collected. Hold the book and right-click to read it.",
+-  "story.whileaway.read_first": "Read this station's warning record first.",
+-  "story.whileaway.need_redstone": "The relay needs 1 redstone dust. Check the station chest.",
+-  "story.whileaway.already_restored": "The signal is already awake.",
+-  "story.whileaway.signal": "The signal leaves. No one wrote who receives it.",
+-  "story.whileaway.arrival": "Leave the path clear. Something has not arrived yet.",
+-  "story.whileaway.after": "The footsteps recede. The records remain at the station. — End of first development slice",
+-  "story.whileaway.recovery_unloaded": "Encounter entity is not loaded. Return to the station and retry.",
+-  "story.whileaway.recovered": "Encounter cleared. Clues preserved; 30 seconds of grace.",
+-  "record.whileaway.warning.1": "Return point\n\nDo not open for the second knock.\nDo not trust where the footprints point.\n\nLeave the path clear.\nIt has not arrived yet.",
+-  "record.whileaway.warning.2": "The relay is still dead.\nI left red dust in the chest.\n\nFind the exit before waking it.\nKeep your distance. Leave the station.\n\n— Last night shift",
+-  "record.whileaway.evacuation.1": "Keep the third carriage empty.\nThose who cannot walk board first.\nBaggage goes on the next train.\n\nThe next train has not come.",
+-  "record.whileaway.evacuation.2": "We broke the chairs into stretchers.\nWe need more cloth.\n\nTell them there are people here.\nNot noises.\nPeople.",
+-  "record.whileaway.personal.1": "Your gloves are here.\nI mended the left thumb again.\nTake them this time.",
+-  "record.whileaway.personal.2": "The door never opened.\nWe sat with our backs to each other.\n\nSo there was someone to lean on.",
+-  "block.whileaway.station_anchor": "Return Marker",
+-  "block.whileaway.warning_note": "Warning Record",
+-  "block.whileaway.evacuation_note": "Evacuation Record",
+-  "block.whileaway.personal_note": "Personal Record",
+-  "block.whileaway.signal_relay": "Old Signal Relay",
+-  "item.whileaway.warning_record": "Night Shift Warning",
+-  "item.whileaway.evacuation_record": "Last Evacuation Order",
+-  "item.whileaway.personal_record": "Mended Gloves",
+-  "subtitles.whileaway.distant_knock": "Distant knocking",
+-  "subtitles.whileaway.returning_steps": "Dragging footsteps",
+-  "subtitles.whileaway.wayfarer_breath": "Folded breathing",
+-  "subtitles.whileaway.wayfarer_attack": "Dry joints unfolding",
+-  "subtitles.whileaway.signal_wake": "Old relay waking",
+-  "subtitles.whileaway.homeward": "Homeward",
+-  "subtitles.whileaway.station_unease": "An unsettled station"
+-}
++{
++  "scene.whileaway.signal.1": "The signal returned.",
++  "scene.whileaway.signal.2": "No name remained for the one returning.",
++  "itemGroup.whileaway": "While You Were Away",
++  "entity.whileaway.wayfarer": "Wayfarer",
++  "item.whileaway.wayfarer_spawn_egg": "Wayfarer Observation Egg",
++  "story.whileaway.welcome": "[While You Were Away] Find an abandoned station in plains or forests. Right-click record blocks to collect books.",
++  "story.whileaway.station": "The tracks are broken. The way home remains.",
++  "story.whileaway.record_received": "Record collected. Hold the book and right-click to read it.",
++  "story.whileaway.read_first": "Read this station's warning record first.",
++  "story.whileaway.need_redstone": "The relay needs 1 redstone dust. Check the station chest.",
++  "story.whileaway.already_restored": "The signal is already awake.",
++  "story.whileaway.signal": "The signal leaves. No one wrote who receives it.",
++  "story.whileaway.arrival": "Leave the path clear. Something has not arrived yet.",
++  "story.whileaway.after": "The footsteps recede. The records remain at the station. — End of first development slice",
++  "story.whileaway.recovery_unloaded": "Encounter entity is not loaded. Return to the station and retry.",
++  "story.whileaway.recovered": "Encounter cleared. Clues preserved; 30 seconds of grace.",
++  "record.whileaway.warning.1": "Return point\n\nDo not open for the second knock.\nDo not trust where the footprints point.\n\nLeave the path clear.\nIt has not arrived yet.",
++  "record.whileaway.warning.2": "The relay is still dead.\nI left red dust in the chest.\n\nFind the exit before waking it.\nKeep your distance. Leave the station.\n\n— Last night shift",
++  "record.whileaway.evacuation.1": "Keep the third carriage empty.\nThose who cannot walk board first.\nBaggage goes on the next train.\n\nThe next train has not come.",
++  "record.whileaway.evacuation.2": "We broke the chairs into stretchers.\nWe need more cloth.\n\nTell them there are people here.\nNot noises.\nPeople.",
++  "record.whileaway.personal.1": "Your gloves are here.\nI mended the left thumb again.\nTake them this time.",
++  "record.whileaway.personal.2": "The door never opened.\nWe sat with our backs to each other.\n\nSo there was someone to lean on.",
++  "block.whileaway.station_anchor": "Return Marker",
++  "block.whileaway.warning_note": "Warning Record",
++  "block.whileaway.evacuation_note": "Evacuation Record",
++  "block.whileaway.personal_note": "Personal Record",
++  "block.whileaway.signal_relay": "Old Signal Relay",
++  "item.whileaway.warning_record": "Night Shift Warning",
++  "item.whileaway.evacuation_record": "Last Evacuation Order",
++  "item.whileaway.personal_record": "Mended Gloves",
++  "subtitles.whileaway.distant_knock": "Distant knocking",
++  "subtitles.whileaway.returning_steps": "Dragging footsteps",
++  "subtitles.whileaway.wayfarer_breath": "Folded breathing",
++  "subtitles.whileaway.wayfarer_attack": "Dry joints unfolding",
++  "subtitles.whileaway.signal_wake": "Old relay waking",
++  "subtitles.whileaway.homeward": "Homeward",
++  "subtitles.whileaway.station_unease": "An unsettled station",
++  "block.whileaway.return_light": "Return Light",
++  "block.whileaway.city_intake_note": "Intake Ledger",
++  "block.whileaway.city_home_note": "Letter beneath the Table",
++  "block.whileaway.city_siren_note": "Broadcast Shift Log",
++  "item.whileaway.city_intake_record": "Torn Intake Ledger",
++  "item.whileaway.city_home_record": "Dinner Kept Warm",
++  "item.whileaway.city_siren_record": "The Last Shift",
++  "city.whileaway.locked": "After the footsteps end, read the personal record. The signal is waiting for an address.",
++  "city.whileaway.preparing": "Lights wake beyond the tracks. Touch the relay again in a moment.",
++  "city.whileaway.unavailable": "The signal has no destination in this world. Check the city dimension data.",
++  "city.whileaway.obstructed": "There is nowhere to stand. Clear the arrival area and try again.",
++  "city.whileaway.entered": "Evening Hollow / Station District. The light behind you leads home. /whileaway return also returns you.",
++  "city.whileaway.returned": "The forest moves as if nothing happened.",
++  "city.whileaway.records_complete": "No room in the ledger. An empty place at the table. Now you know why the northern broadcast room closed its doors.",
++  "scene.whileaway.city.1": "This city never made it past evening.",
++  "scene.whileaway.city.2": "I left a light behind, to find my way home.",
++  "record.whileaway.city_intake.1": "Intake closed, 18:40\n\nTwenty-four chairs. Thirty-one names. They told me to erase seven spaces. I broke my pencil.",
++  "record.whileaway.city_intake.2": "I called the northern broadcast room. One more train, I begged. Only the departure chime answered.\n\nWe began counting chairs instead of people.",
++  "record.whileaway.city_home.1": "I made two bowls of rice. If a third bowl went cold, you would truly be late.\n\nI left your shoes facing the door, so your returning feet would know the way.",
++  "record.whileaway.city_home.2": "The announcement ordered the last light in the southern block turned off. I hid a lamp under the table.\n\nPeople coming home see low lights before high windows.",
++  "record.whileaway.city_siren.1": "18:43 / Last shift\n\nOpen the doors and the crowd reaches the tracks. Close them and seven names remain at intake.\n\nI never knew a key could weigh so much.",
++  "record.whileaway.city_siren.2": "I closed the doors. I left the departure announcement on. I could not be the one to end their waiting.\n\nDo not clock me out. I am still here."
++}
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -1,39 +1,61 @@
+-{
+-  "scene.whileaway.signal.1": "신호는 돌아왔다.",
+-  "scene.whileaway.signal.2": "돌아올 사람의 이름은 없었다.",
+-  "itemGroup.whileaway": "네가 없는 동안",
+-  "entity.whileaway.wayfarer": "귀로꾼",
+-  "item.whileaway.wayfarer_spawn_egg": "귀로꾼 관찰용 생성 알",
+-  "story.whileaway.welcome": "[네가 없는 동안] 숲과 평원의 폐역을 찾아보세요. 기록 블록을 우클릭하면 책을 얻습니다.",
+-  "story.whileaway.station": "철로는 끊겼는데, 돌아오는 길은 남아 있다.",
+-  "story.whileaway.record_received": "기록을 챙겼습니다. 인벤토리의 책을 손에 들고 우클릭해 읽으세요.",
+-  "story.whileaway.read_first": "먼저 이 역의 경고 기록을 읽어야 합니다.",
+-  "story.whileaway.need_redstone": "신호기에 레드스톤 가루 1개가 필요합니다. 역의 상자를 살펴보세요.",
+-  "story.whileaway.already_restored": "신호는 이미 돌아왔다.",
+-  "story.whileaway.signal": "이제 신호가 간다. 누가 받는지는 적혀 있지 않다.",
+-  "story.whileaway.arrival": "길을 비켜라. 아직 도착하지 못한 것이 있다.",
+-  "story.whileaway.after": "발소리가 멀어졌다. 남겨진 기록은 아직 역에 있다. — 첫 개발 구간 종료",
+-  "story.whileaway.recovery_unloaded": "조우 개체가 현재 로드되어 있지 않습니다. 폐역으로 돌아온 뒤 다시 시도하세요.",
+-  "story.whileaway.recovered": "조우를 정리했습니다. 기존 단서는 유지되고 30초의 준비 시간이 생깁니다.",
+-  "record.whileaway.warning.1": "귀환 지점\n\n두 번째는 열어 주지 마.\n발자국이 향한 곳을 믿지 마.\n\n길을 막지 마라.\n저것은 아직 도착하지 못했다.",
+-  "record.whileaway.warning.2": "신호기는 아직 죽어 있다.\n상자에 붉은 가루를 남겼다.\n\n깨우기 전에 나갈 길부터 봐 둬.\n가까이 다가가지 말고, 역을 벗어나라.\n\n― 마지막 야간 근무자",
+-  "record.whileaway.evacuation.1": "세 번째 객차는 비워 둘 것.\n걷지 못하는 사람부터 태운다.\n짐은 다음 편으로 보낸다.\n\n다음 편이 오지 않는다.",
+-  "record.whileaway.evacuation.2": "의자를 뜯어서 들것을 만들었다.\n천이 더 필요하다.\n\n사람이 있다고 전해 줘.\n소리가 나는 게 아니라\n사람이 있다.",
+-  "record.whileaway.personal.1": "당신 장갑은 여기 있어.\n왼손 엄지는 또 꿰맸어.\n이번에는 가져가.",
+-  "record.whileaway.personal.2": "문은 끝내 열리지 않았다.\n우리는 서로 등을 돌리고 앉았다.\n\n기대라고.",
+-  "block.whileaway.station_anchor": "귀환 표석",
+-  "block.whileaway.warning_note": "경고 기록함",
+-  "block.whileaway.evacuation_note": "대피 기록함",
+-  "block.whileaway.personal_note": "남겨진 기록함",
+-  "block.whileaway.signal_relay": "낡은 신호기",
+-  "item.whileaway.warning_record": "야간 근무자의 경고",
+-  "item.whileaway.evacuation_record": "마지막 대피 지시",
+-  "item.whileaway.personal_record": "꿰맨 장갑",
+-  "subtitles.whileaway.distant_knock": "멀리서 문 두드리는 소리",
+-  "subtitles.whileaway.returning_steps": "늦게 따라오는 발소리",
+-  "subtitles.whileaway.wayfarer_breath": "접힌 숨소리",
+-  "subtitles.whileaway.wayfarer_attack": "마른 관절이 펼쳐지는 소리",
+-  "subtitles.whileaway.signal_wake": "오래된 신호기가 깨어나는 소리",
+-  "subtitles.whileaway.homeward": "귀환의 여운",
+-  "subtitles.whileaway.station_unease": "어긋난 역의 선율"
+-}
++{
++  "scene.whileaway.signal.1": "신호는 돌아왔다.",
++  "scene.whileaway.signal.2": "돌아올 사람의 이름은 없었다.",
++  "itemGroup.whileaway": "네가 없는 동안",
++  "entity.whileaway.wayfarer": "귀로꾼",
++  "item.whileaway.wayfarer_spawn_egg": "귀로꾼 관찰용 생성 알",
++  "story.whileaway.welcome": "[네가 없는 동안] 숲과 평원의 폐역을 찾아보세요. 기록 블록을 우클릭하면 책을 얻습니다.",
++  "story.whileaway.station": "철로는 끊겼는데, 돌아오는 길은 남아 있다.",
++  "story.whileaway.record_received": "기록을 챙겼습니다. 인벤토리의 책을 손에 들고 우클릭해 읽으세요.",
++  "story.whileaway.read_first": "먼저 이 역의 경고 기록을 읽어야 합니다.",
++  "story.whileaway.need_redstone": "신호기에 레드스톤 가루 1개가 필요합니다. 역의 상자를 살펴보세요.",
++  "story.whileaway.already_restored": "신호는 이미 돌아왔다.",
++  "story.whileaway.signal": "이제 신호가 간다. 누가 받는지는 적혀 있지 않다.",
++  "story.whileaway.arrival": "길을 비켜라. 아직 도착하지 못한 것이 있다.",
++  "story.whileaway.after": "발소리가 멀어졌다. 남겨진 기록은 아직 역에 있다. — 첫 개발 구간 종료",
++  "story.whileaway.recovery_unloaded": "조우 개체가 현재 로드되어 있지 않습니다. 폐역으로 돌아온 뒤 다시 시도하세요.",
++  "story.whileaway.recovered": "조우를 정리했습니다. 기존 단서는 유지되고 30초의 준비 시간이 생깁니다.",
++  "record.whileaway.warning.1": "귀환 지점\n\n두 번째는 열어 주지 마.\n발자국이 향한 곳을 믿지 마.\n\n길을 막지 마라.\n저것은 아직 도착하지 못했다.",
++  "record.whileaway.warning.2": "신호기는 아직 죽어 있다.\n상자에 붉은 가루를 남겼다.\n\n깨우기 전에 나갈 길부터 봐 둬.\n가까이 다가가지 말고, 역을 벗어나라.\n\n― 마지막 야간 근무자",
++  "record.whileaway.evacuation.1": "세 번째 객차는 비워 둘 것.\n걷지 못하는 사람부터 태운다.\n짐은 다음 편으로 보낸다.\n\n다음 편이 오지 않는다.",
++  "record.whileaway.evacuation.2": "의자를 뜯어서 들것을 만들었다.\n천이 더 필요하다.\n\n사람이 있다고 전해 줘.\n소리가 나는 게 아니라\n사람이 있다.",
++  "record.whileaway.personal.1": "당신 장갑은 여기 있어.\n왼손 엄지는 또 꿰맸어.\n이번에는 가져가.",
++  "record.whileaway.personal.2": "문은 끝내 열리지 않았다.\n우리는 서로 등을 돌리고 앉았다.\n\n기대라고.",
++  "block.whileaway.station_anchor": "귀환 표석",
++  "block.whileaway.warning_note": "경고 기록함",
++  "block.whileaway.evacuation_note": "대피 기록함",
++  "block.whileaway.personal_note": "남겨진 기록함",
++  "block.whileaway.signal_relay": "낡은 신호기",
++  "item.whileaway.warning_record": "야간 근무자의 경고",
++  "item.whileaway.evacuation_record": "마지막 대피 지시",
++  "item.whileaway.personal_record": "꿰맨 장갑",
++  "subtitles.whileaway.distant_knock": "멀리서 문 두드리는 소리",
++  "subtitles.whileaway.returning_steps": "늦게 따라오는 발소리",
++  "subtitles.whileaway.wayfarer_breath": "접힌 숨소리",
++  "subtitles.whileaway.wayfarer_attack": "마른 관절이 펼쳐지는 소리",
++  "subtitles.whileaway.signal_wake": "오래된 신호기가 깨어나는 소리",
++  "subtitles.whileaway.homeward": "귀환의 여운",
++  "subtitles.whileaway.station_unease": "어긋난 역의 선율",
++  "block.whileaway.return_light": "돌아가는 불빛",
++  "block.whileaway.city_intake_note": "접수대 장부",
++  "block.whileaway.city_home_note": "식탁 아래 편지",
++  "block.whileaway.city_siren_note": "방송실 교대표",
++  "item.whileaway.city_intake_record": "접수대에서 찢어진 장부",
++  "item.whileaway.city_home_record": "차려 둔 저녁",
++  "item.whileaway.city_siren_record": "마지막 교대",
++  "city.whileaway.locked": "발소리가 멎은 뒤, 남겨진 개인 기록을 읽으세요. 신호는 주소를 기다립니다.",
++  "city.whileaway.preparing": "선로 너머에서 불이 하나씩 켜집니다. 잠시 뒤 신호기를 다시 만져 보세요.",
++  "city.whileaway.unavailable": "신호가 닿는 곳이 아직 월드에 없습니다. 도시 차원 데이터를 확인해 주세요.",
++  "city.whileaway.obstructed": "발을 놓을 자리가 없습니다. 출입구 주변을 비운 뒤 다시 시도하세요.",
++  "city.whileaway.entered": "저녁골 · 역전 지구. 뒤에 남은 불빛은 돌아가는 길입니다. /whileaway return 으로도 복귀합니다.",
++  "city.whileaway.returned": "숲은 아무 일도 없었다는 듯 흔들립니다.",
++  "city.whileaway.records_complete": "장부에는 자리가 없었고, 식탁에는 자리가 남았다. 북쪽 방송실이 문을 닫은 이유를 이제 압니다.",
++  "scene.whileaway.city.1": "이 도시는 저녁을 넘기지 못했다.",
++  "scene.whileaway.city.2": "돌아갈 불빛은 뒤에 남겨 두었다.",
++  "record.whileaway.city_intake.1": "접수 마감 18:40\n\n의자는 스물넷. 이름은 서른하나. 빈칸 일곱 개를 지우라는 지시가 내려왔다. 나는 연필을 부러뜨렸다.",
++  "record.whileaway.city_intake.2": "북쪽 방송실에 전화를 걸었다. 차를 한 번만 더 보내 달라고. 수화기에서는 출발음만 났다.\n\n우리는 사람 대신 의자를 세기 시작했다.",
++  "record.whileaway.city_home.1": "밥은 두 그릇만 했다. 셋째 그릇까지 식으면 네가 정말 늦는 것 같아서.\n\n현관 신발은 돌려놓지 않았다. 돌아오는 발이 헷갈릴까 봐.",
++  "record.whileaway.city_home.2": "남쪽 동의 마지막 불을 끄라는 방송이 왔다. 나는 식탁 아래 작은 등을 숨겼다.\n\n돌아오는 사람은 높은 창보다 낮은 불빛을 먼저 본다.",
++  "record.whileaway.city_siren.1": "18:43 / 마지막 교대\n\n문을 열면 선로까지 사람이 찬다. 문을 닫으면 접수대의 일곱 이름이 남는다.\n\n열쇠가 이렇게 무거운 줄 몰랐다.",
++  "record.whileaway.city_siren.2": "나는 문을 닫았다. 출발 방송은 끄지 않았다. 기다림이 끝나는 소리를 내가 낼 수 없었다.\n\n퇴근 도장은 찍지 말아 주세요. 아직 여기 있습니다."
++}
+--- a/src/main/resources/assets/whileaway/models/block/city_home_note.json
++++ b/src/main/resources/assets/whileaway/models/block/city_home_note.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/bookshelf"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/city_intake_note.json
++++ b/src/main/resources/assets/whileaway/models/block/city_intake_note.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/chiseled_bookshelf_empty"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/city_siren_note.json
++++ b/src/main/resources/assets/whileaway/models/block/city_siren_note.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/note_block"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/evacuation_note.json
++++ b/src/main/resources/assets/whileaway/models/block/evacuation_note.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:block/cube_all",
+-  "textures": {
+-    "all": "minecraft:block/bookshelf"
+-  }
+-}
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/bookshelf"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/personal_note.json
++++ b/src/main/resources/assets/whileaway/models/block/personal_note.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:block/cube_all",
+-  "textures": {
+-    "all": "minecraft:block/bookshelf"
+-  }
+-}
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/bookshelf"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/return_light.json
++++ b/src/main/resources/assets/whileaway/models/block/return_light.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/sea_lantern"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/signal_relay.json
++++ b/src/main/resources/assets/whileaway/models/block/signal_relay.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:block/cube_all",
+-  "textures": {
+-    "all": "minecraft:block/copper_block"
+-  }
+-}
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/copper_block"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/signal_relay_lit.json
++++ b/src/main/resources/assets/whileaway/models/block/signal_relay_lit.json
+@@ -0,0 +1,8 @@
++{
++  "parent": "minecraft:block/cube_bottom_top",
++  "textures": {
++    "side": "minecraft:block/copper_block",
++    "bottom": "minecraft:block/copper_block",
++    "top": "minecraft:block/sea_lantern"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/station_anchor.json
++++ b/src/main/resources/assets/whileaway/models/block/station_anchor.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:block/cube_all",
+-  "textures": {
+-    "all": "minecraft:block/chiseled_stone_bricks"
+-  }
+-}
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/chiseled_stone_bricks"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/block/warning_note.json
++++ b/src/main/resources/assets/whileaway/models/block/warning_note.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:block/cube_all",
+-  "textures": {
+-    "all": "minecraft:block/cartography_table_top"
+-  }
+-}
++{
++  "parent": "minecraft:block/cube_all",
++  "textures": {
++    "all": "minecraft:block/cartography_table_top"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/city_home_note.json
++++ b/src/main/resources/assets/whileaway/models/item/city_home_note.json
+@@ -0,0 +1,3 @@
++{
++  "parent": "whileaway:block/city_home_note"
++}
+--- a/src/main/resources/assets/whileaway/models/item/city_home_record.json
++++ b/src/main/resources/assets/whileaway/models/item/city_home_record.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:item/generated",
++  "textures": {
++    "layer0": "minecraft:item/written_book"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/city_intake_note.json
++++ b/src/main/resources/assets/whileaway/models/item/city_intake_note.json
+@@ -0,0 +1,3 @@
++{
++  "parent": "whileaway:block/city_intake_note"
++}
+--- a/src/main/resources/assets/whileaway/models/item/city_intake_record.json
++++ b/src/main/resources/assets/whileaway/models/item/city_intake_record.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:item/generated",
++  "textures": {
++    "layer0": "minecraft:item/written_book"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/city_siren_note.json
++++ b/src/main/resources/assets/whileaway/models/item/city_siren_note.json
+@@ -0,0 +1,3 @@
++{
++  "parent": "whileaway:block/city_siren_note"
++}
+--- a/src/main/resources/assets/whileaway/models/item/city_siren_record.json
++++ b/src/main/resources/assets/whileaway/models/item/city_siren_record.json
+@@ -0,0 +1,6 @@
++{
++  "parent": "minecraft:item/generated",
++  "textures": {
++    "layer0": "minecraft:item/written_book"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/evacuation_note.json
++++ b/src/main/resources/assets/whileaway/models/item/evacuation_note.json
+@@ -1,3 +1,3 @@
+-{
+-  "parent": "whileaway:block/evacuation_note"
+-}
++{
++  "parent": "whileaway:block/evacuation_note"
++}
+--- a/src/main/resources/assets/whileaway/models/item/evacuation_record.json
++++ b/src/main/resources/assets/whileaway/models/item/evacuation_record.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:item/generated",
+-  "textures": {
+-    "layer0": "minecraft:item/written_book"
+-  }
+-}
++{
++  "parent": "minecraft:item/generated",
++  "textures": {
++    "layer0": "minecraft:item/written_book"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/personal_note.json
++++ b/src/main/resources/assets/whileaway/models/item/personal_note.json
+@@ -1,3 +1,3 @@
+-{
+-  "parent": "whileaway:block/personal_note"
+-}
++{
++  "parent": "whileaway:block/personal_note"
++}
+--- a/src/main/resources/assets/whileaway/models/item/personal_record.json
++++ b/src/main/resources/assets/whileaway/models/item/personal_record.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:item/generated",
+-  "textures": {
+-    "layer0": "minecraft:item/written_book"
+-  }
+-}
++{
++  "parent": "minecraft:item/generated",
++  "textures": {
++    "layer0": "minecraft:item/written_book"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/return_light.json
++++ b/src/main/resources/assets/whileaway/models/item/return_light.json
+@@ -0,0 +1,3 @@
++{
++  "parent": "whileaway:block/return_light"
++}
+--- a/src/main/resources/assets/whileaway/models/item/signal_relay.json
++++ b/src/main/resources/assets/whileaway/models/item/signal_relay.json
+@@ -1,3 +1,3 @@
+-{
+-  "parent": "whileaway:block/signal_relay"
+-}
++{
++  "parent": "whileaway:block/signal_relay"
++}
+--- a/src/main/resources/assets/whileaway/models/item/station_anchor.json
++++ b/src/main/resources/assets/whileaway/models/item/station_anchor.json
+@@ -1,3 +1,3 @@
+-{
+-  "parent": "whileaway:block/station_anchor"
+-}
++{
++  "parent": "whileaway:block/station_anchor"
++}
+--- a/src/main/resources/assets/whileaway/models/item/warning_note.json
++++ b/src/main/resources/assets/whileaway/models/item/warning_note.json
+@@ -1,3 +1,3 @@
+-{
+-  "parent": "whileaway:block/warning_note"
+-}
++{
++  "parent": "whileaway:block/warning_note"
++}
+--- a/src/main/resources/assets/whileaway/models/item/warning_record.json
++++ b/src/main/resources/assets/whileaway/models/item/warning_record.json
+@@ -1,6 +1,6 @@
+-{
+-  "parent": "minecraft:item/generated",
+-  "textures": {
+-    "layer0": "minecraft:item/written_book"
+-  }
+-}
++{
++  "parent": "minecraft:item/generated",
++  "textures": {
++    "layer0": "minecraft:item/written_book"
++  }
++}
+--- a/src/main/resources/assets/whileaway/models/item/wayfarer_spawn_egg.json
++++ b/src/main/resources/assets/whileaway/models/item/wayfarer_spawn_egg.json
+@@ -1,3 +1,3 @@
+-{
+-  "parent": "minecraft:item/template_spawn_egg"
+-}
++{
++  "parent": "minecraft:item/template_spawn_egg"
++}
+--- a/src/main/resources/assets/whileaway/sounds.json
++++ b/src/main/resources/assets/whileaway/sounds.json
+@@ -1,65 +1,65 @@
+-{
+-  "distant_knock": {
+-    "subtitle": "subtitles.whileaway.distant_knock",
+-    "sounds": [
+-      {
+-        "name": "whileaway:distant_knock",
+-        "stream": false
+-      }
+-    ]
+-  },
+-  "returning_steps": {
+-    "subtitle": "subtitles.whileaway.returning_steps",
+-    "sounds": [
+-      {
+-        "name": "whileaway:returning_steps",
+-        "stream": false
+-      }
+-    ]
+-  },
+-  "wayfarer_breath": {
+-    "subtitle": "subtitles.whileaway.wayfarer_breath",
+-    "sounds": [
+-      {
+-        "name": "whileaway:wayfarer_breath",
+-        "stream": false
+-      }
+-    ]
+-  },
+-  "wayfarer_attack": {
+-    "subtitle": "subtitles.whileaway.wayfarer_attack",
+-    "sounds": [
+-      {
+-        "name": "whileaway:wayfarer_attack",
+-        "stream": false
+-      }
+-    ]
+-  },
+-  "signal_wake": {
+-    "subtitle": "subtitles.whileaway.signal_wake",
+-    "sounds": [
+-      {
+-        "name": "whileaway:signal_wake",
+-        "stream": false
+-      }
+-    ]
+-  },
+-  "station_unease": {
+-    "subtitle": "subtitles.whileaway.station_unease",
+-    "sounds": [
+-      {
+-        "name": "whileaway:station_unease",
+-        "stream": true
+-      }
+-    ]
+-  },
+-  "homeward": {
+-    "subtitle": "subtitles.whileaway.homeward",
+-    "sounds": [
+-      {
+-        "name": "whileaway:homeward",
+-        "stream": true
+-      }
+-    ]
+-  }
+-}
++{
++  "distant_knock": {
++    "subtitle": "subtitles.whileaway.distant_knock",
++    "sounds": [
++      {
++        "name": "whileaway:distant_knock",
++        "stream": false
++      }
++    ]
++  },
++  "returning_steps": {
++    "subtitle": "subtitles.whileaway.returning_steps",
++    "sounds": [
++      {
++        "name": "whileaway:returning_steps",
++        "stream": false
++      }
++    ]
++  },
++  "wayfarer_breath": {
++    "subtitle": "subtitles.whileaway.wayfarer_breath",
++    "sounds": [
++      {
++        "name": "whileaway:wayfarer_breath",
++        "stream": false
++      }
++    ]
++  },
++  "wayfarer_attack": {
++    "subtitle": "subtitles.whileaway.wayfarer_attack",
++    "sounds": [
++      {
++        "name": "whileaway:wayfarer_attack",
++        "stream": false
++      }
++    ]
++  },
++  "signal_wake": {
++    "subtitle": "subtitles.whileaway.signal_wake",
++    "sounds": [
++      {
++        "name": "whileaway:signal_wake",
++        "stream": false
++      }
++    ]
++  },
++  "station_unease": {
++    "subtitle": "subtitles.whileaway.station_unease",
++    "sounds": [
++      {
++        "name": "whileaway:station_unease",
++        "stream": true
++      }
++    ]
++  },
++  "homeward": {
++    "subtitle": "subtitles.whileaway.homeward",
++    "sounds": [
++      {
++        "name": "whileaway:homeward",
++        "stream": true
++      }
++    ]
++  }
++}
+--- a/src/main/resources/data/minecraft/tags/block/mineable/pickaxe.json
++++ b/src/main/resources/data/minecraft/tags/block/mineable/pickaxe.json
+@@ -1,7 +1,7 @@
+-{
+-  "replace": false,
+-  "values": [
+-    "whileaway:station_anchor",
+-    "whileaway:signal_relay"
+-  ]
+-}
++{
++  "replace": false,
++  "values": [
++    "whileaway:station_anchor",
++    "whileaway:signal_relay"
++  ]
++}
+--- a/src/main/resources/data/whileaway/dimension/quiet_city.json
++++ b/src/main/resources/data/whileaway/dimension/quiet_city.json
+@@ -0,0 +1,22 @@
++{
++  "type": "whileaway:quiet_city",
++  "generator": {
++    "type": "minecraft:flat",
++    "settings": {
++      "biome": "whileaway:quiet_city",
++      "lakes": false,
++      "features": false,
++      "structure_overrides": [],
++      "layers": [
++        {
++          "height": 1,
++          "block": "minecraft:bedrock"
++        },
++        {
++          "height": 127,
++          "block": "minecraft:deepslate"
++        }
++      ]
++    }
++  }
++}
+--- a/src/main/resources/data/whileaway/dimension_type/quiet_city.json
++++ b/src/main/resources/data/whileaway/dimension_type/quiet_city.json
+@@ -0,0 +1,20 @@
++{
++  "ultrawarm": false,
++  "natural": false,
++  "coordinate_scale": 1.0,
++  "has_skylight": true,
++  "has_ceiling": false,
++  "ambient_light": 0.12,
++  "fixed_time": 18000,
++  "piglin_safe": false,
++  "bed_works": false,
++  "respawn_anchor_works": false,
++  "has_raids": false,
++  "logical_height": 384,
++  "min_y": -64,
++  "height": 384,
++  "infiniburn": "#minecraft:infiniburn_overworld",
++  "effects": "minecraft:overworld",
++  "monster_spawn_block_light_limit": 0,
++  "monster_spawn_light_level": 0
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/city_home_note.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/city_home_note.json
+@@ -0,0 +1,19 @@
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:city_home_note"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/city_intake_note.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/city_intake_note.json
+@@ -0,0 +1,19 @@
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:city_intake_note"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/city_siren_note.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/city_siren_note.json
+@@ -0,0 +1,19 @@
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:city_siren_note"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/evacuation_note.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/evacuation_note.json
+@@ -1,19 +1,19 @@
+-{
+-  "type": "minecraft:block",
+-  "pools": [
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "whileaway:evacuation_note"
+-        }
+-      ],
+-      "conditions": [
+-        {
+-          "condition": "minecraft:survives_explosion"
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:evacuation_note"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/personal_note.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/personal_note.json
+@@ -1,19 +1,19 @@
+-{
+-  "type": "minecraft:block",
+-  "pools": [
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "whileaway:personal_note"
+-        }
+-      ],
+-      "conditions": [
+-        {
+-          "condition": "minecraft:survives_explosion"
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:personal_note"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/signal_relay.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/signal_relay.json
+@@ -1,19 +1,19 @@
+-{
+-  "type": "minecraft:block",
+-  "pools": [
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "whileaway:signal_relay"
+-        }
+-      ],
+-      "conditions": [
+-        {
+-          "condition": "minecraft:survives_explosion"
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:signal_relay"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/station_anchor.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/station_anchor.json
+@@ -1,19 +1,19 @@
+-{
+-  "type": "minecraft:block",
+-  "pools": [
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "whileaway:station_anchor"
+-        }
+-      ],
+-      "conditions": [
+-        {
+-          "condition": "minecraft:survives_explosion"
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:station_anchor"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/blocks/warning_note.json
++++ b/src/main/resources/data/whileaway/loot_table/blocks/warning_note.json
+@@ -1,19 +1,19 @@
+-{
+-  "type": "minecraft:block",
+-  "pools": [
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "whileaway:warning_note"
+-        }
+-      ],
+-      "conditions": [
+-        {
+-          "condition": "minecraft:survives_explosion"
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "type": "minecraft:block",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "whileaway:warning_note"
++        }
++      ],
++      "conditions": [
++        {
++          "condition": "minecraft:survives_explosion"
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/loot_table/chests/station.json
++++ b/src/main/resources/data/whileaway/loot_table/chests/station.json
+@@ -1,50 +1,50 @@
+-{
+-  "type": "minecraft:chest",
+-  "pools": [
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "minecraft:redstone",
+-          "functions": [
+-            {
+-              "function": "minecraft:set_count",
+-              "count": 2
+-            }
+-          ]
+-        }
+-      ]
+-    },
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "minecraft:bread",
+-          "functions": [
+-            {
+-              "function": "minecraft:set_count",
+-              "count": 3
+-            }
+-          ]
+-        }
+-      ]
+-    },
+-    {
+-      "rolls": 1,
+-      "entries": [
+-        {
+-          "type": "minecraft:item",
+-          "name": "minecraft:torch",
+-          "functions": [
+-            {
+-              "function": "minecraft:set_count",
+-              "count": 8
+-            }
+-          ]
+-        }
+-      ]
+-    }
+-  ]
+-}
++{
++  "type": "minecraft:chest",
++  "pools": [
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "minecraft:redstone",
++          "functions": [
++            {
++              "function": "minecraft:set_count",
++              "count": 2
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "minecraft:bread",
++          "functions": [
++            {
++              "function": "minecraft:set_count",
++              "count": 3
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "rolls": 1,
++      "entries": [
++        {
++          "type": "minecraft:item",
++          "name": "minecraft:torch",
++          "functions": [
++            {
++              "function": "minecraft:set_count",
++              "count": 8
++            }
++          ]
++        }
++      ]
++    }
++  ]
++}
+--- a/src/main/resources/data/whileaway/tags/block/mineable/pickaxe.json
++++ b/src/main/resources/data/whileaway/tags/block/mineable/pickaxe.json
+@@ -1,4 +1,4 @@
+-{
+-  "replace": false,
+-  "values": []
+-}
++{
++  "replace": false,
++  "values": []
++}
+--- a/src/main/resources/data/whileaway/tags/worldgen/biome/has_station.json
++++ b/src/main/resources/data/whileaway/tags/worldgen/biome/has_station.json
+@@ -1,11 +1,11 @@
+-{
+-  "replace": false,
+-  "values": [
+-    "minecraft:plains",
+-    "minecraft:sunflower_plains",
+-    "minecraft:forest",
+-    "minecraft:birch_forest",
+-    "minecraft:taiga",
+-    "minecraft:meadow"
+-  ]
+-}
++{
++  "replace": false,
++  "values": [
++    "minecraft:plains",
++    "minecraft:sunflower_plains",
++    "minecraft:forest",
++    "minecraft:birch_forest",
++    "minecraft:taiga",
++    "minecraft:meadow"
++  ]
++}
+--- a/src/main/resources/data/whileaway/tags/worldgen/structure/stations.json
++++ b/src/main/resources/data/whileaway/tags/worldgen/structure/stations.json
+@@ -1,6 +1,6 @@
+-{
+-  "replace": false,
+-  "values": [
+-    "whileaway:abandoned_station"
+-  ]
+-}
++{
++  "replace": false,
++  "values": [
++    "whileaway:abandoned_station"
++  ]
++}
+--- a/src/main/resources/data/whileaway/worldgen/biome/quiet_city.json
++++ b/src/main/resources/data/whileaway/worldgen/biome/quiet_city.json
+@@ -0,0 +1,17 @@
++{
++  "has_precipitation": false,
++  "temperature": 0.4,
++  "downfall": 0.0,
++  "spawners": {},
++  "spawn_costs": {},
++  "carvers": {},
++  "features": [],
++  "effects": {
++    "fog_color": 2633534,
++    "water_color": 2966354,
++    "water_fog_color": 1646632,
++    "sky_color": 526862,
++    "grass_color": 5659482,
++    "foliage_color": 5002066
++  }
++}
+--- a/src/main/resources/data/whileaway/worldgen/structure/abandoned_station.json
++++ b/src/main/resources/data/whileaway/worldgen/structure/abandoned_station.json
+@@ -1,15 +1,15 @@
+-{
+-  "type": "minecraft:jigsaw",
+-  "biomes": "#whileaway:has_station",
+-  "step": "surface_structures",
+-  "spawn_overrides": {},
+-  "terrain_adaptation": "beard_thin",
+-  "start_pool": "whileaway:station",
+-  "size": 1,
+-  "start_height": {
+-    "absolute": 0
+-  },
+-  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+-  "max_distance_from_center": 80,
+-  "use_expansion_hack": false
+-}
++{
++  "type": "minecraft:jigsaw",
++  "biomes": "#whileaway:has_station",
++  "step": "surface_structures",
++  "spawn_overrides": {},
++  "terrain_adaptation": "beard_thin",
++  "start_pool": "whileaway:station",
++  "size": 1,
++  "start_height": {
++    "absolute": 0
++  },
++  "project_start_to_heightmap": "WORLD_SURFACE_WG",
++  "max_distance_from_center": 80,
++  "use_expansion_hack": false
++}
+--- a/src/main/resources/data/whileaway/worldgen/structure_set/stations.json
++++ b/src/main/resources/data/whileaway/worldgen/structure_set/stations.json
+@@ -1,14 +1,14 @@
+-{
+-  "structures": [
+-    {
+-      "structure": "whileaway:abandoned_station",
+-      "weight": 1
+-    }
+-  ],
+-  "placement": {
+-    "type": "minecraft:random_spread",
+-    "spacing": 20,
+-    "separation": 8,
+-    "salt": 74192361
+-  }
+-}
++{
++  "structures": [
++    {
++      "structure": "whileaway:abandoned_station",
++      "weight": 1
++    }
++  ],
++  "placement": {
++    "type": "minecraft:random_spread",
++    "spacing": 20,
++    "separation": 8,
++    "salt": 74192361
++  }
++}
+--- a/src/main/resources/data/whileaway/worldgen/template_pool/station.json
++++ b/src/main/resources/data/whileaway/worldgen/template_pool/station.json
+@@ -1,15 +1,15 @@
+-{
+-  "name": "whileaway:station",
+-  "fallback": "minecraft:empty",
+-  "elements": [
+-    {
+-      "weight": 1,
+-      "element": {
+-        "element_type": "minecraft:single_pool_element",
+-        "location": "whileaway:abandoned_station",
+-        "processors": "minecraft:empty",
+-        "projection": "rigid"
+-      }
+-    }
+-  ]
+-}
++{
++  "name": "whileaway:station",
++  "fallback": "minecraft:empty",
++  "elements": [
++    {
++      "weight": 1,
++      "element": {
++        "element_type": "minecraft:single_pool_element",
++        "location": "whileaway:abandoned_station",
++        "processors": "minecraft:empty",
++        "projection": "rigid"
++      }
++    }
++  ]
++}
+--- a/src/test/java/io/github/whileaway/core/CoreTests.java
++++ b/src/test/java/io/github/whileaway/core/CoreTests.java
+@@ -56,6 +56,31 @@
+         check(SceneTimeline.at(0).pressure()==0,"no sudden fade onset");
+         check(SceneTimeline.at(239).pressure()<.001,"smooth release");
+         check(SceneTimeline.at(240).caption()==0,"no stuck caption");
++        check(!CityAccess.canEnter(Progress.empty()),"city locked initially");
++        var cityReady=p.discover(Clue.PERSONAL_READ).complete();
++        check(CityAccess.canEnter(cityReady),"encounter and address unlock city");
++        check(!CityAccess.canEnter(new Progress(cityReady.clues(),0,0,false)),"encounter required");
++        check(!CityAccess.canEnter(new Progress(cityReady.clues()&~Clue.PERSONAL_READ.bit(),0,0,true)),"address required");
++        for(int bits=0;bits<8;bits++)for(int b:new int[]{1,2,4}) {
++            check(CityAccess.read(CityAccess.read(bits,b),b)==CityAccess.read(bits,b),"city records idempotent");
++            check((CityAccess.read(bits,b)&bits)==bits,"city records monotonic");
++        }
++        var positions=new java.util.HashSet<String>();
++        var ground=new java.util.HashMap<String,CityLayout.Kind>();
++        for(var c:CityLayout.CELLS) {
++            check(positions.add(c.x()+","+c.y()+","+c.z()),"city cell unique");
++            check(c.x()>=0&&c.x()<80&&c.z()>=0&&c.z()<80&&c.y()>=0&&c.y()<=21,"city bounds");
++            if(c.y()==1||c.y()==2)ground.put(c.x()+","+c.z(),c.kind());
++        }
++        // Walkable ground connectivity from arrival to the three reading positions and the return light.
++        var seen=new java.util.HashSet<String>();var queue=new java.util.ArrayDeque<int[]>();queue.add(new int[]{40,68});
++        while(!queue.isEmpty()) {
++            var at=queue.remove();String key=at[0]+","+at[1];
++            if(at[0]<1||at[0]>78||at[1]<1||at[1]>78||ground.containsKey(key)||!seen.add(key))continue;
++            for(var offset:new int[][]{{1,0},{-1,0},{0,1},{0,-1}})queue.add(new int[]{at[0]+offset[0],at[1]+offset[1]});
++        }
++        for(var target:new int[][]{{18,46},{60,68},{40,8},{40,71}})check(seen.contains(target[0]+","+target[1]),"city record route connected");
++        check(CityLayout.BUILDINGS.size()==6,"six district buildings");
+         System.out.println("PASS core assertions="+assertions);
+     }
+ }
+--- a/tools/city_assets.py
++++ b/tools/city_assets.py
+@@ -0,0 +1,73 @@
++"""Data-driven dimension and bilingual city records, called after the original asset generator."""
++import json
++from pathlib import Path
++R=Path(__file__).resolve().parents[1]/'src/main/resources'
++def write(name,obj):
++    p=R/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
++def generate():
++    write('data/whileaway/dimension_type/quiet_city.json',{
++        'ultrawarm':False,'natural':False,'coordinate_scale':1.0,'has_skylight':True,'has_ceiling':False,
++        'ambient_light':0.12,'fixed_time':18000,'piglin_safe':False,'bed_works':False,'respawn_anchor_works':False,
++        'has_raids':False,'logical_height':384,'min_y':-64,'height':384,'infiniburn':'#minecraft:infiniburn_overworld',
++        'effects':'minecraft:overworld','monster_spawn_block_light_limit':0,'monster_spawn_light_level':0})
++    write('data/whileaway/dimension/quiet_city.json',{'type':'whileaway:quiet_city','generator':{'type':'minecraft:flat','settings':{
++        'biome':'whileaway:quiet_city','lakes':False,'features':False,'structure_overrides':[],
++        'layers':[{'height':1,'block':'minecraft:bedrock'},{'height':127,'block':'minecraft:deepslate'}]}}})
++    write('data/whileaway/worldgen/biome/quiet_city.json',{
++        'has_precipitation':False,'temperature':0.4,'downfall':0.0,'spawners':{},'spawn_costs':{},'carvers':{},'features':[],
++        'effects':{'fog_color':2633534,'water_color':2966354,'water_fog_color':1646632,'sky_color':526862,
++                   'grass_color':5659482,'foliage_color':5002066}})
++    for name,texture in {'return_light':'sea_lantern','city_intake_note':'chiseled_bookshelf_empty','city_home_note':'bookshelf','city_siren_note':'note_block'}.items():
++        write(f'assets/whileaway/blockstates/{name}.json',{'variants':{'':{'model':f'whileaway:block/{name}'}}})
++        write(f'assets/whileaway/models/block/{name}.json',{'parent':'minecraft:block/cube_all','textures':{'all':f'minecraft:block/{texture}'}})
++        write(f'assets/whileaway/models/item/{name}.json',{'parent':f'whileaway:block/{name}'})
++        if name!='return_light':
++            write(f'data/whileaway/loot_table/blocks/{name}.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':f'whileaway:{name}'}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
++    for kind in ['intake','home','siren']:
++        write(f'assets/whileaway/models/item/city_{kind}_record.json',{'parent':'minecraft:item/generated','textures':{'layer0':'minecraft:item/written_book'}})
++    write('assets/whileaway/blockstates/signal_relay.json',{'variants':{'lit=false':{'model':'whileaway:block/signal_relay'},'lit=true':{'model':'whileaway:block/signal_relay_lit'}}})
++    write('assets/whileaway/models/block/signal_relay_lit.json',{'parent':'minecraft:block/cube_bottom_top','textures':{
++        'side':'minecraft:block/copper_block','bottom':'minecraft:block/copper_block','top':'minecraft:block/sea_lantern'}})
++    ko={
++      'block.whileaway.return_light':'돌아가는 불빛','block.whileaway.city_intake_note':'접수대 장부',
++      'block.whileaway.city_home_note':'식탁 아래 편지','block.whileaway.city_siren_note':'방송실 교대표',
++      'item.whileaway.city_intake_record':'접수대에서 찢어진 장부','item.whileaway.city_home_record':'차려 둔 저녁',
++      'item.whileaway.city_siren_record':'마지막 교대',
++      'city.whileaway.locked':'발소리가 멎은 뒤, 남겨진 개인 기록을 읽으세요. 신호는 주소를 기다립니다.',
++      'city.whileaway.preparing':'선로 너머에서 불이 하나씩 켜집니다. 잠시 뒤 신호기를 다시 만져 보세요.',
++      'city.whileaway.unavailable':'신호가 닿는 곳이 아직 월드에 없습니다. 도시 차원 데이터를 확인해 주세요.',
++      'city.whileaway.obstructed':'발을 놓을 자리가 없습니다. 출입구 주변을 비운 뒤 다시 시도하세요.',
++      'city.whileaway.entered':'저녁골 · 역전 지구. 뒤에 남은 불빛은 돌아가는 길입니다. /whileaway return 으로도 복귀합니다.',
++      'city.whileaway.returned':'숲은 아무 일도 없었다는 듯 흔들립니다.',
++      'city.whileaway.records_complete':'장부에는 자리가 없었고, 식탁에는 자리가 남았다. 북쪽 방송실이 문을 닫은 이유를 이제 압니다.',
++      'scene.whileaway.city.1':'이 도시는 저녁을 넘기지 못했다.',
++      'scene.whileaway.city.2':'돌아갈 불빛은 뒤에 남겨 두었다.',
++      'record.whileaway.city_intake.1':'접수 마감 18:40\n\n의자는 스물넷. 이름은 서른하나. 빈칸 일곱 개를 지우라는 지시가 내려왔다. 나는 연필을 부러뜨렸다.',
++      'record.whileaway.city_intake.2':'북쪽 방송실에 전화를 걸었다. 차를 한 번만 더 보내 달라고. 수화기에서는 출발음만 났다.\n\n우리는 사람 대신 의자를 세기 시작했다.',
++      'record.whileaway.city_home.1':'밥은 두 그릇만 했다. 셋째 그릇까지 식으면 네가 정말 늦는 것 같아서.\n\n현관 신발은 돌려놓지 않았다. 돌아오는 발이 헷갈릴까 봐.',
++      'record.whileaway.city_home.2':'남쪽 동의 마지막 불을 끄라는 방송이 왔다. 나는 식탁 아래 작은 등을 숨겼다.\n\n돌아오는 사람은 높은 창보다 낮은 불빛을 먼저 본다.',
++      'record.whileaway.city_siren.1':'18:43 / 마지막 교대\n\n문을 열면 선로까지 사람이 찬다. 문을 닫으면 접수대의 일곱 이름이 남는다.\n\n열쇠가 이렇게 무거운 줄 몰랐다.',
++      'record.whileaway.city_siren.2':'나는 문을 닫았다. 출발 방송은 끄지 않았다. 기다림이 끝나는 소리를 내가 낼 수 없었다.\n\n퇴근 도장은 찍지 말아 주세요. 아직 여기 있습니다.'}
++    en={
++      'block.whileaway.return_light':'Return Light','block.whileaway.city_intake_note':'Intake Ledger',
++      'block.whileaway.city_home_note':'Letter beneath the Table','block.whileaway.city_siren_note':'Broadcast Shift Log',
++      'item.whileaway.city_intake_record':'Torn Intake Ledger','item.whileaway.city_home_record':'Dinner Kept Warm','item.whileaway.city_siren_record':'The Last Shift',
++      'city.whileaway.locked':'After the footsteps end, read the personal record. The signal is waiting for an address.',
++      'city.whileaway.preparing':'Lights wake beyond the tracks. Touch the relay again in a moment.',
++      'city.whileaway.unavailable':'The signal has no destination in this world. Check the city dimension data.',
++      'city.whileaway.obstructed':'There is nowhere to stand. Clear the arrival area and try again.',
++      'city.whileaway.entered':'Evening Hollow / Station District. The light behind you leads home. /whileaway return also returns you.',
++      'city.whileaway.returned':'The forest moves as if nothing happened.',
++      'city.whileaway.records_complete':'No room in the ledger. An empty place at the table. Now you know why the northern broadcast room closed its doors.',
++      'scene.whileaway.city.1':'This city never made it past evening.',
++      'scene.whileaway.city.2':'I left a light behind, to find my way home.',
++      'record.whileaway.city_intake.1':'Intake closed, 18:40\n\nTwenty-four chairs. Thirty-one names. They told me to erase seven spaces. I broke my pencil.',
++      'record.whileaway.city_intake.2':'I called the northern broadcast room. One more train, I begged. Only the departure chime answered.\n\nWe began counting chairs instead of people.',
++      'record.whileaway.city_home.1':'I made two bowls of rice. If a third bowl went cold, you would truly be late.\n\nI left your shoes facing the door, so your returning feet would know the way.',
++      'record.whileaway.city_home.2':'The announcement ordered the last light in the southern block turned off. I hid a lamp under the table.\n\nPeople coming home see low lights before high windows.',
++      'record.whileaway.city_siren.1':'18:43 / Last shift\n\nOpen the doors and the crowd reaches the tracks. Close them and seven names remain at intake.\n\nI never knew a key could weigh so much.',
++      'record.whileaway.city_siren.2':'I closed the doors. I left the departure announcement on. I could not be the one to end their waiting.\n\nDo not clock me out. I am still here.'}
++    for lang,extra in [('ko_kr',ko),('en_us',en)]:
++        path=R/f'assets/whileaway/lang/{lang}.json';data=json.loads(path.read_text(encoding='utf-8'));data.update(extra);write(f'assets/whileaway/lang/{lang}.json',data)
++    print('PASS city dimension/biome/models/bilingual records generated')
++if __name__=='__main__':generate()
+--- a/tools/generate-assets.py
++++ b/tools/generate-assets.py
+@@ -236,5 +236,7 @@
+ if __name__=='__main__':
+     parser=argparse.ArgumentParser();parser.add_argument('--no-audio',action='store_true');args=parser.parse_args()
+     structure();models();language()
++    from city_assets import generate
++    generate()
+     if not args.no_audio:audio()
+     print('PASS assets: station + worldgen + model + animations + ko_kr/en_us generated')
+--- a/tools/package-city.py
++++ b/tools/package-city.py
+@@ -0,0 +1,107 @@
++"""Prepare reversible JAR artifacts, then seal only after live city/reload gates pass."""
++from pathlib import Path
++import difflib,hashlib,json,shutil,sys,zipfile
++R=Path(__file__).resolve().parents[1];E=R/'evidence/city';D=R/'dist'
++BASE=E/'baseline/whileaway-0.1.0-dev.1.jar';MOD=D/'whileaway-0.2.0-dev.1.jar'
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++assert sha(BASE)=='3a3d083731506450772d247f2a6df4bd0126db173c9b75f169b2a23e0902e49b'
++if '--prepare' in sys.argv:
++    D.mkdir(exist_ok=True);shutil.copyfile(R/'build/libs'/MOD.name,MOD)
++    changes=[]
++    with zipfile.ZipFile(E/'baseline/source.zip') as old:
++        for folder in ['src','tools','docs']:
++            for p in sorted((R/folder).rglob('*')):
++                if not p.is_file() or '__pycache__' in p.parts:continue
++                try:after=p.read_text(encoding='utf-8')
++                except UnicodeError:continue
++                rel=p.relative_to(R).as_posix();key='while-you-were-away/'+rel
++                before=old.read(key).decode('utf-8') if key in old.namelist() else ''
++                changes.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+rel,tofile='b/'+rel))
++        for rel in ['build.gradle','gradle.properties','README.md','AGENTS.md']:
++            before=old.read('while-you-were-away/'+rel).decode('utf-8');after=(R/rel).read_text(encoding='utf-8')
++            changes.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+rel,tofile='b/'+rel))
++    (E/'DIFF.patch').write_text(''.join(changes),encoding='utf-8')
++    script='''#!/usr/bin/env bash
++set -euo pipefail
++# JAR-copy rollback only. World/schema migration is not undone.
++HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
++BASE="$HERE/baseline/whileaway-0.1.0-dev.1.jar"
++TARGET="${1:?Pass an existing modified JAR copy to restore}"
++[[ -f "$TARGET" && ! -L "$TARGET" ]] || { echo 'ERROR existing regular JAR required'; exit 2; }
++[[ "$(sha256sum "$BASE" | cut -d' ' -f1)" == "BASE_HASH" ]] || { echo 'ERROR baseline changed'; exit 3; }
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "MOD_HASH" ]] || { echo 'ERROR target differs; preserving it'; exit 4; }
++cp -- "$BASE" "$TARGET"
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 5
++echo 'ROLLBACK PASS: 0.1 JAR hash restored; world files untouched'
++'''.replace('BASE_HASH',sha(BASE)).replace('MOD_HASH',sha(MOD))
++    (E/'ROLLBACK.sh').write_text(script,encoding='utf-8',newline='\n')
++    print('PASS prepared modified JAR, source diff, hash-guarded rollback')
++    print('MODIFIED_SHA256='+sha(MOD));sys.exit(0)
++
++log=(E/'runtime-final.log').read_text(encoding='utf-8-sig')
++assert 'All 15 required tests passed' in log and 'BUILD SUCCESSFUL' in log
++assert 'WHILEAWAY_CITY_FAILED' not in log
++assert log.count('VERIFIED MUTED before launch:')==2
++for task in ['runCitySmoke','runCityReload']:
++    assert ('PASS '+task) in (E/(task+'.txt')).read_text(encoding='utf-8')
++rows=json.loads((E/'transaction.json').read_text(encoding='utf-8-sig'));assert all(row['exit']==0 for row in rows)
++assert sha(MOD)==sha(R/'build/libs'/MOD.name)
++assert sha(R/'build/rollback-city/whileaway.jar')==sha(BASE)
++report=[
++    'WHILEAWAY 0.2.0-dev.1 / CITY SLICE / 2026-09-09',
++    'Changed fields: mod_version 0.1.0-dev.1 -> 0.2.0-dev.1; NarrativeData.SCHEMA 1 -> 2;',
++    'new quiet_city dimension; relay lit flag and conditional city entry; persistent city cursor/return position/records.',
++    'MODIFIED_FILE='+str(MOD),'DIFF_FILE='+str(E/'DIFF.patch'),
++    'VERIFICATION='+str(E/'VERIFICATION.txt'),'ROLLBACK='+str(E/'ROLLBACK.sh'),
++    'BASELINE_SHA256='+sha(BASE),'MODIFIED_SHA256='+sha(MOD),
++    'Working directory='+str(R),'',
++]
++for row in rows:
++    report += [row['phase'],'COMMAND: '+row['command'],'INPUT: '+row['input'],
++               'LITERAL OUTPUT: '+row['output'],'EXIT STATUS: '+str(row['exit']),'']
++report += [
++    'Restored copy: version=0.1.0-dev.1; city_dimension=false; baseline SHA256 equal.',
++    'Retained modified release: version=0.2.0-dev.1; city_dimension=true; modified SHA256 unchanged.',
++    'ROLLBACK.sh was executed with Git Bash and test -x. It restores a JAR COPY only, not sources or save data.',
++    'Do not interpret this as a schema-2 world downgrade test. Existing worlds were not downgraded.',
++    '',r'COMMAND: .\gradlew.bat build runGameTestServer runCitySmoke runCityReload --console=plain',
++    'INPUT: Java 21 / Minecraft 1.21.1 / NeoForge 21.1.249 / GeckoLib 4.9.2; isolated seed 74192361 world.',
++    'LITERAL OUTPUT: All 15 required tests passed :)',
++    'LITERAL OUTPUT: PASS runCitySmoke','LITERAL OUTPUT: PASS runCityReload',
++    next(line for line in log.splitlines() if line.startswith('BUILD SUCCESSFUL')),'EXIT STATUS: 0',
++    'Full runtime log='+str(E/'runtime-final.log'),'',
++    (E/'offline-tests.txt').read_text(encoding='utf-8-sig'),
++    (E/'runCitySmoke.txt').read_text(encoding='utf-8'),
++    (E/'runCityReload.txt').read_text(encoding='utf-8'),
++    'VISUAL REVIEW: city-street.png, city-overview.png, city-reloaded.png inspected. Prototype block architecture, not final art.',
++    'ACTUAL CLIENT: real integrated server transfer, three book-use calls, return, reentry and second-process disk reload.',
++    'NOT TESTED: two simultaneous clients, death/respawn playthrough, full natural survival quest, listening quality, modpack/shader compatibility, crash-atomic persistence.',
++    'Full city campaign / additional city monsters / multiple endings: NOT IMPLEMENTED in this slice.',
++    'First server test mistakenly expected a custom level in vanilla GameTestServer; test responsibilities corrected after source inspection.',
++    'First reload waited on experimental-world backup confirmation and timed out; harness now confirms backup only for its named isolated test save.',
++]
++(E/'VERIFICATION.txt').write_text('\n'.join(report)+'\n',encoding='utf-8')
++files=[]
++for folder in ['src','tools','docs','gradle']:
++    files += [p for p in (R/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
++files += [R/n for n in ['README.md','AGENTS.md','build.gradle','gradle.properties','settings.gradle','gradlew','gradlew.bat','.gitignore','VERIFICATION.txt','ROLLBACK.sh']]
++files += [R/'evidence'/n for n in ['baseline/ThreatPolicy.java','DIFF.patch','transaction.json']]
++files += [E/n for n in ['DIFF.patch','ROLLBACK.sh','VERIFICATION.txt','transaction.json','offline-tests.txt','runtime-final.log','runCitySmoke.txt','runCityReload.txt','smoke-world.txt','baseline/whileaway-0.1.0-dev.1.jar','baseline/source.zip']]
++files += list((E/'screenshots').glob('*.png'))
++files += [R/'evidence/audio-assets.json']
++manifest=E/'SOURCE_MANIFEST.sha256'
++manifest.write_text(''.join(f'{sha(p)}  {p.relative_to(R).as_posix()}\n' for p in sorted(files)),encoding='utf-8');files.append(manifest)
++archive=D/'whileaway-0.2.0-dev.1-source.zip'
++with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
++    for p in sorted(files):
++        info=zipfile.ZipInfo('while-you-were-away/'+p.relative_to(R).as_posix(),(2026,9,9,0,0,0));info.create_system=3
++        info.external_attr=(0o100755 if p.name in ['ROLLBACK.sh','gradlew'] else 0o100644)<<16
++        z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED)
++with zipfile.ZipFile(archive) as z:
++    assert z.testzip() is None
++    for p in files:assert z.read('while-you-were-away/'+p.relative_to(R).as_posix())==p.read_bytes()
++with zipfile.ZipFile(MOD) as z:assert z.testzip() is None
++(D/'SHA256SUMS-0.2.txt').write_text(f'{sha(MOD)}  {MOD.name}\n{sha(archive)}  {archive.name}\n',encoding='utf-8')
++for p in [E/'DIFF.patch',E/'VERIFICATION.txt',E/'ROLLBACK.sh',manifest,R/'README.md',R/'docs/CITY_SLICE.md']:assert p.read_text(encoding='utf-8').strip()
++print(f'PASS city release package files={len(files)}; source ZIP byte equality; JAR reopened; rollback copy hash verified')
++print('MODIFIED_SHA256='+sha(MOD));print('SOURCE_SHA256='+sha(archive))
+--- a/tools/package-evidence.py
++++ b/tools/package-evidence.py
+@@ -1,118 +1,4 @@
+-"""Package this first development slice only after its observed runtime gates pass."""
++"""Current release packaging. Use --prepare before verification, then run without arguments to seal."""
++import runpy
+ from pathlib import Path
+-import hashlib, json, shutil, zipfile
+-
+-root = Path(__file__).resolve().parents[1]
+-log = (root / 'evidence/runtime-final.log').read_text(encoding='utf-8-sig')
+-smoke = (root / 'evidence/client-smoke.txt').read_text(encoding='utf-8')
+-assert 'All 9 required tests passed' in log
+-assert 'WHILEAWAY_SMOKE_PASS' in log and 'WHILEAWAY_SMOKE_FAILED' not in log
+-assert 'BUILD SUCCESSFUL' in log and 'VERIFIED MUTED before launch' in log
+-assert 'PASS tracked custom entity present with camera line of sight' in smoke
+-assert 'master volume remains zero' in smoke
+-rows = json.loads((root / 'evidence/transaction.json').read_text(encoding='utf-8-sig'))
+-assert all(row['exit'] == 0 for row in rows)
+-sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+-baseline = root / 'evidence/baseline/ThreatPolicy.java'
+-modified = root / 'src/main/java/io/github/whileaway/core/ThreatPolicy.java'
+-assert sha(baseline) == '8b125547cfb45abb58a8849eeb8749582cdfcd0239f1c689c2705575505506c0'
+-assert sha(modified) == '1663ed61e6280e99f5ea0a1ac19abf9c02a5502aa9eb9cdbc30dcf775cc2b7b5'
+-assert sha(root / 'build/rollback-copy/ThreatPolicy.java') == sha(baseline)
+-dist = root / 'dist'
+-dist.mkdir(exist_ok=True)
+-jar = dist / 'whileaway-0.1.0-dev.1.jar'
+-shutil.copyfile(root / 'build/libs' / jar.name, jar)
+-
+-report = [
+-    'WHILE YOU WERE AWAY 0.1.0-dev.1 — FIRST DEVELOPMENT SLICE',
+-    'Date: 2026-09-09 KST',
+-    'Full campaign status: NOT COMPLETE. Final art / multiplayer live / full survival playthrough: NOT TESTED.',
+-    'Changed branch: ThreatPolicy.mayManifest: return false -> distinctClues >= 3 && signalRestored.',
+-    'Baseline provenance: newly created no-encounter scaffold from this development run, not an earlier shipped mod.',
+-    'Additional fixes: worldgen jigsaw size 0 -> 1; silent prelaunch options for both dev client tasks;',
+-    '12-second relay presentation, scene codec, physical generated-station and client line-of-sight tests.',
+-    'MODIFIED_FILE=' + str(modified),
+-    'DIFF_FILE=' + str(root / 'evidence/DIFF.patch'),
+-    'VERIFICATION=' + str(root / 'VERIFICATION.txt'),
+-    'ROLLBACK=' + str(root / 'ROLLBACK.sh'),
+-    'BASELINE_SHA256=' + sha(baseline),
+-    'MODIFIED_SHA256=' + sha(modified),
+-    'JAR=' + str(jar),
+-    'JAR_SHA256=' + sha(jar),
+-    '',
+-    'BASELINE / MODIFIED / ROLLBACK exact observed commands; working directory=' + str(root),
+-]
+-for row in rows:
+-    report += [row['phase'], 'COMMAND: ' + row['command'], 'INPUT: ' + row['input'],
+-               'LITERAL OUTPUT: ' + (row['output'] or '(empty)'), 'EXIT STATUS: ' + str(row['exit']), '']
+-report += [
+-    'Restored behavior: copy returns mayManifest=false for (3,true); original baseline hash matches.',
+-    'Final working status: MODIFIED_FILE remains changed, returns mayManifest=true for (3,true).',
+-    'Rollback scope: policy source only. Does not uninstall the mod, rebuild a JAR, or alter worlds.',
+-    'ROLLBACK.sh executable verified with Git Bash chmod +x and test -x. Source ZIP preserves executable mode.',
+-    'Initial sandbox Git Bash attempt failed to create signal pipe (Win32 error 5); rerun outside sandbox passed.',
+-    '',
+-    'CURRENT VALIDATION',
+-    r'COMMAND: .\gradlew.bat build runGameTestServer runClientSmoke --console=plain',
+-    'INPUT: Java 21, Minecraft 1.21.1, NeoForge 21.1.249, GeckoLib 4.9.2; isolated seed 74192361 world.',
+-    'LITERAL OUTPUT: All 9 required tests passed :)',
+-    'LITERAL OUTPUT: WHILEAWAY_SMOKE_PASS',
+-    'LITERAL OUTPUT: BUILD SUCCESSFUL in 1m 51s' if 'BUILD SUCCESSFUL in 1m 51s' in log else next(line for line in log.splitlines() if line.startswith('BUILD SUCCESSFUL')),
+-    'EXIT STATUS: 0',
+-    'Full literal log: ' + str(root / 'evidence/runtime-final.log'),
+-    r'COMMAND: .\tools\test-core.ps1',
+-    'INPUT: core policy, ledger, director, scene timeline tables.',
+-    'LITERAL OUTPUT: PASS core assertions=1571',
+-    'EXIT STATUS: 0',
+-    r'COMMAND: python .\tools\verify-assets.py .\build\libs\whileaway-0.1.0-dev.1.jar',
+-    'INPUT: generated resources plus final built JAR.',
+-    'LITERAL OUTPUT: PASS asset assertions=6654; station/animation/localization/OGG/JAR',
+-    'EXIT STATUS: 0',
+-    r'COMMAND: pwsh -NoProfile -File .\tools\verify-mute.ps1',
+-    'INPUT: ' + str(root.parent.parent / 'work/client-smoke/options.txt'),
+-    'LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile',
+-    'EXIT STATUS: 0',
+-    r"COMMAND: $env:PYTHONPATH='C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\audio-deps'; & 'C:\Users\scarl\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' .\tools\verify-audio.py",
+-    'INPUT: seven original synthesized OGG files; no playback device opened.',
+-    'LITERAL OUTPUT: PASS audio files=7; decoded/finite/duration/mono/44100Hz/peak<0.95; playback=NONE',
+-    'EXIT STATUS: 0',
+-    '',
+-    'CLIENT EVIDENCE', smoke,
+-    'Screenshot review: natural station exterior, visible prototype Wayfarer and Korean scene caption.',
+-    'Client smoke uses an observation entity and a server-sent presentation packet. It is not a complete survival-quest playthrough.',
+-    'No forced music playback. Auditory quality/listening evaluation: NOT TESTED.',
+-    'Warning: one world-generation tick delay was logged; no sustained performance or shader compatibility claim.',
+-]
+-(root / 'VERIFICATION.txt').write_text('\n'.join(report) + '\n', encoding='utf-8')
+-files = []
+-for folder in ['src', 'tools', 'docs', 'gradle']:
+-    files += [p for p in (root / folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
+-files += [root / name for name in ['README.md','AGENTS.md','.gitignore','build.gradle','gradle.properties','settings.gradle','gradlew','gradlew.bat','ROLLBACK.sh','VERIFICATION.txt']]
+-for name in ['baseline/ThreatPolicy.java','DIFF.patch','transaction.json','audio-assets.json','runtime-final.log','client-smoke.txt']:
+-    files.append(root / 'evidence' / name)
+-files += list((root / 'evidence/screenshots').glob('*.png'))
+-manifest = root / 'evidence/SOURCE_MANIFEST.sha256'
+-manifest.write_text(''.join(f'{sha(p)}  {p.relative_to(root).as_posix()}\n' for p in sorted(files)), encoding='utf-8')
+-files.append(manifest)
+-archive = dist / 'whileaway-0.1.0-dev.1-source.zip'
+-with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as z:
+-    for p in sorted(files):
+-        name = 'while-you-were-away/' + p.relative_to(root).as_posix()
+-        info = zipfile.ZipInfo(name, (2026,9,9,0,0,0))
+-        info.create_system = 3
+-        info.external_attr = (0o100755 if p.name in ['ROLLBACK.sh','gradlew'] else 0o100644) << 16
+-        z.writestr(info, p.read_bytes(), compress_type=zipfile.ZIP_DEFLATED)
+-with zipfile.ZipFile(archive) as z:
+-    assert z.testzip() is None
+-    for p in files:
+-        assert z.read('while-you-were-away/' + p.relative_to(root).as_posix()) == p.read_bytes()
+-    assert z.getinfo('while-you-were-away/ROLLBACK.sh').external_attr >> 16 & 0o111
+-with zipfile.ZipFile(jar) as z:
+-    assert z.testzip() is None
+-    assert z.read('io/github/whileaway/WhileAway.class')[:4] == bytes.fromhex('cafebabe')
+-(dist / 'SHA256SUMS.txt').write_text(f'{sha(jar)}  {jar.name}\n{sha(archive)}  {archive.name}\n', encoding='utf-8')
+-for p in [modified, root/'evidence/DIFF.patch', root/'VERIFICATION.txt', root/'ROLLBACK.sh', root/'README.md', root/'docs/DIRECTION.md', dist/'SHA256SUMS.txt']:
+-    assert p.read_text(encoding='utf-8').strip()
+-print(f'PASS package source files={len(files)}; ZIP byte equality; executable rollback; JAR reopened')
+-print('JAR SHA256=' + sha(jar))
+-print('SOURCE SHA256=' + sha(archive))
++runpy.run_path(str(Path(__file__).with_name('package-city.py')),run_name='__main__')
+--- a/tools/probe-release.py
++++ b/tools/probe-release.py
+@@ -0,0 +1,10 @@
++"""Read the built archive only; does not launch Minecraft or play audio."""
++import sys,zipfile,tomllib
++with zipfile.ZipFile(sys.argv[1]) as z:
++    assert z.testzip() is None
++    data=tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
++    version=data['mods'][0]['version']
++    city='data/whileaway/dimension/quiet_city.json' in z.namelist()
++    assert version==sys.argv[2],(version,sys.argv[2])
++    assert city==(version=='0.2.0-dev.1')
++    print(f'version={version}; city_dimension={str(city).lower()}')
+--- a/tools/verify-assets.py
++++ b/tools/verify-assets.py
+@@ -31,10 +31,19 @@
+ ko=json.loads((R/'assets/whileaway/lang/ko_kr.json').read_text(encoding='utf-8'))
+ en=json.loads((R/'assets/whileaway/lang/en_us.json').read_text(encoding='utf-8'))
+ check(ko.keys()==en.keys(),'language parity')
++vanilla=None
+ for p in (ROOT/'src/main/java').rglob('*.java'):
+     for key in re.findall(r'Component\.translatable\("([a-zA-Z0-9_.]+)"',p.read_text(encoding='utf-8')):
+         if key.endswith('.'):continue
+-        check(key in ko,'missing language key '+key)
++        if key in ko:
++            check(True,'mod language key '+key)
++        elif 'whileaway' in key:
++            check(False,'missing language key '+key)
++        else:
++            if vanilla is None:
++                resource_jar=next((ROOT/'build/moddev/artifacts').glob('*client-extra-aka-minecraft-resources.jar'))
++                with zipfile.ZipFile(resource_jar) as native:vanilla=json.loads(native.read('assets/minecraft/lang/en_us.json'))
++            check(key in vanilla,'missing native language key '+key)
+ sounds=json.loads((R/'assets/whileaway/sounds.json').read_text())
+ for name,event in sounds.items():
+     check(event['subtitle'] in ko,'sound subtitle '+name)
+--- a/tools/verify-city-transaction.ps1
++++ b/tools/verify-city-transaction.ps1
+@@ -0,0 +1,23 @@
++$ErrorActionPreference = 'Stop'
++Set-Location (Split-Path $PSScriptRoot -Parent)
++$rows=[System.Collections.Generic.List[object]]::new()
++function Probe([string]$phase,[string]$path,[string]$version) {
++    $result=(& python .\tools\probe-release.py $path $version 2>&1 | Out-String).Trim();$code=$LASTEXITCODE
++    $rows.Add(@{phase=$phase;command="python .\tools\probe-release.py $path $version";input="JAR=$path; expected version=$version";output=$result;exit=$code})
++    Write-Output "$phase $result exit=$code";if($code -ne 0){throw "$phase probe failed"}
++}
++$mod='.\dist\whileaway-0.2.0-dev.1.jar';$original=(Get-FileHash $mod).Hash
++Probe 'BASELINE' '.\evidence\city\baseline\whileaway-0.1.0-dev.1.jar' '0.1.0-dev.1'
++Probe 'MODIFIED' $mod '0.2.0-dev.1'
++New-Item -ItemType Directory -Force '.\build\rollback-city' | Out-Null
++Copy-Item -LiteralPath $mod -Destination '.\build\rollback-city\whileaway.jar' -Force
++$bash='C:\Program Files\Git\bin\bash.exe'
++$cmd='chmod +x evidence/city/ROLLBACK.sh && test -x evidence/city/ROLLBACK.sh && evidence/city/ROLLBACK.sh build/rollback-city/whileaway.jar'
++$result=(& $bash -c $cmd 2>&1 | Out-String).Trim();$code=$LASTEXITCODE
++$rows.Add(@{phase='ROLLBACK';command="& '$bash' -c '$cmd'";input='build/rollback-city/whileaway.jar (modified copy)';output=$result;exit=$code})
++Write-Output "$result exit=$code";if($code -ne 0){throw 'JAR rollback failed'}
++Probe 'ROLLBACK' '.\build\rollback-city\whileaway.jar' '0.1.0-dev.1'
++if((Get-FileHash '.\build\rollback-city\whileaway.jar').Hash -ne (Get-FileHash '.\evidence\city\baseline\whileaway-0.1.0-dev.1.jar').Hash){throw 'Baseline hash differs'}
++if((Get-FileHash $mod).Hash -ne $original){throw 'Modified release changed'}
++$rows | ConvertTo-Json -Depth 4 | Set-Content -Encoding utf8 '.\evidence\city\transaction.json'
++Write-Output 'PASS rollback copy restored; 0.2 release retained'
+--- a/docs/CITY_SLICE.md
++++ b/docs/CITY_SLICE.md
+@@ -0,0 +1,36 @@
++# 0.2 — 저녁골 역전 지구
++
++## 플레이어에게 보이는 것
++
++폐역 신호기가 켜진 뒤에도 문은 바로 열리지 않는다. 귀로꾼과의 첫 만남을 끝내고 개인 기록에서 돌아갈 주소의 흔적을 읽어야 한다. 다시 신호기를 만지면 플레이어는 저녁이 끝나지 않는 도시의 큰길에 선다. 뒤에는 복귀용 불빛을 남긴다.
++
++기록의 인과관계는 하나의 사건을 세 위치에서 드러낸다.
++
++- **접수대:** 의자 스물넷과 이름 서른하나. 지워야 했던 일곱 칸이 남는다.
++- **주거동:** 식탁에는 기다리는 사람의 빈자리가 남는다. 낮은 불빛은 복귀 동선과 연결된다.
++- **북쪽 방송 기록:** 문을 열면 선로를 덮는 군중, 닫으면 남겨지는 일곱 이름. 방송 담당자는 문을 닫고도 출발음을 끄지 못한다.
++
++세 기록을 읽으면 짧은 연결 문장을 표시한다. 이것은 첫 구역 조사 완료 표시이며 게임의 노말/배드/히든 엔딩이 아니다.
++
++## 코드로 구현한 범위
++
++- `whileaway:quiet_city` 차원·바이옴·고정 밤 설정.
++- 80×80 첫 구역, 건물 6동, 도로·등·검문 구조물·기록 블록·복귀 불빛.
++- 20,988개의 고유 배치 좌표. 틱마다 최대 256개를 배치하고 건설 커서를 저장한다.
++- 완공한 구역은 재진입 요청으로 다시 생성하지 않는다. 플레이어의 블록 변경을 덮어쓰지 않는다.
++- 개인별 도시 방문·기록·복귀 좌표/방향·이동 간격 저장. 이전 schema 1은 빈 도시 상태로 이전한다.
++- 목적지 충돌/유체/월드 경계를 확인하는 이동, 탑승·사망·수면 중 이동 억제.
++- 신호기의 복구 상태를 블록 상태·텍스처·발광에 반영.
++- 입장 시 12초 연출과 한글 문장. 차원 로딩 화면이 사라질 때까지 짧게 대기한다.
++
++## 검증 구분
++
++순수 Java 검사는 좌표 중복·범위·기록까지의 평면 보행 경로·출입 조건·기록 중복 처리를 확인한다. Minecraft GameTest는 레지스트리·책·조명·저장 데이터 이전·착지 판정 등을 확인한다.
++
++Minecraft 1.21.1의 GameTestServer는 평지 프리셋에 빈 차원 레지스트리를 결합한다. 따라서 전용 차원 자체의 생성/왕복/재접속 검사는 별도의 실제 통합 서버 클라이언트에서 수행하도록 분리했다. 상세 실행 결과는 `evidence/city/VERIFICATION.txt`에 기록한다.
++
++테스트는 개발용 진행 상태와 관전 모드를 사용한다. 자연 생존 플레이의 첫 발견부터 도시 진입까지를 사람이 끝까지 진행한 기록으로 취급하지 않는다. 두 동시 접속자, 사망 후 복귀, 서버 강제 종료 중 저장 원자성, 다른 셰이더·월드 생성 모드와의 호환은 별도 검사다.
++
++## 다음 단계
++
++지상층별 고유 소품과 동선을 늘리고, 상층 계단·방 구조를 만든다. 도시 괴물은 다음 제작 단계에서 별도의 행동 규칙으로 추가한다. 현재 이 구역은 조사 중심이며 새로운 도시 전용 적은 아직 없다. 건설이 끝난 뒤 레이아웃 순서를 변경하려면 저장 커서와 플레이어 건축물에 대한 이전 전략을 먼저 정한다.
+--- a/docs/DIRECTION.md
++++ b/docs/DIRECTION.md
+@@ -2,9 +2,9 @@
+ 
+ ## 목표와 현재 위치
+ 
+-최종 중심 무대는 거대한 고립 도시다. 일반 오버월드는 진입부다. 폐역은 도시 전체를 대체하는 축소판이 아니라, 플레이어가 자신의 월드에서 서서히 도시의 흔적을 발견하는 문턱이다. 이번 구현은 그 문턱 하나다.
++최종 중심 무대는 거대한 고립 도시다. 일반 오버월드는 진입부다. 폐역은 도시 전체를 대체하는 축소판이 아니라, 플레이어가 자신의 월드에서 서서히 도시의 흔적을 발견하는 문턱이다. 0.1은 그 문턱을 구현했다. 0.2는 그 너머의 80×80 역전 지구와 실제 왕복/재접속 검증을 추가했다. 현재 범위는 CITY_SLICE.md를 따른다.
+ 
+-기준은 연출 효과의 개수가 아니라 **앞서 본 사물이 나중에 다른 뜻으로 돌아오는가**다. 전용 차원이나 다중 엔딩은 현재 구현된 것으로 취급하지 않는다.
++기준은 연출 효과의 개수가 아니라 **앞서 본 사물이 나중에 다른 뜻으로 돌아오는가**다. 전용 차원의 첫 구역과 전체 도시 캠페인을 구분한다. 다중 엔딩은 아직 구현된 것으로 취급하지 않는다.
+ 
+ ## 공포 곡선
+ 
+@@ -36,7 +36,7 @@
+ - 슬픈 장면 직후 전리품 팝업이나 희화화된 점프스케어를 넣지 않는다.
+ - 주민의 선택에는 당시의 정보 부족, 자원 부족, 가족 관계라는 이유를 남긴다. 설명문 대신 서로 모순되는 생활 기록을 교차 배치한다.
+ 
+-## 다음 제작 순서
++## 초기 제작 순서 (0.1 계획; 최신 순서는 CITY_SLICE.md 참고)
+ 
+ 1. 현재 폐역의 생존 전체 진행, 재접속, 사망, 장거리 이탈, 두 클라이언트 조우를 검증한다.
+ 2. 역 외형과 괴물 재질을 고유 아트로 교체하고 신호기 실제 상태를 모델/빛에 연결한다.
+--- a/build.gradle
++++ b/build.gradle
+@@ -26,6 +26,19 @@
+             systemProperty 'whileaway.clientSmoke', 'true'
+             systemProperty 'whileaway.evidence', file('evidence').absolutePath
+         }
++        citySmoke {
++            client()
++            gameDirectory = file('../../work/city-smoke')
++            systemProperty 'whileaway.citySmoke', 'true'
++            systemProperty 'whileaway.evidence', file('evidence/city').absolutePath
++        }
++        cityReload {
++            client()
++            gameDirectory = file('../../work/city-smoke')
++            systemProperty 'whileaway.citySmoke', 'true'
++            systemProperty 'whileaway.cityReload', 'true'
++            systemProperty 'whileaway.evidence', file('evidence/city').absolutePath
++        }
+         server { server(); programArgument '--nogui' }
+         gameTestServer { type = 'gameTestServer'; systemProperty 'neoforge.enabledGameTestNamespaces', 'whileaway' }
+     }
+@@ -46,7 +59,7 @@
+ 
+ // Developer clients are muted BEFORE launch, including the title/onboarding screens.
+ // Only isolated development options are changed, never the user's normal .minecraft profile.
+-['runClient': file('run'), 'runClientSmoke': file('../../work/client-smoke')].each { taskName, gameDir ->
++['runClient': file('run'), 'runClientSmoke': file('../../work/client-smoke'), 'runCitySmoke':file('../../work/city-smoke'),'runCityReload':file('../../work/city-smoke')].each { taskName, gameDir ->
+     tasks.named(taskName).configure {
+         doFirst {
+             gameDir.mkdirs()
+@@ -58,12 +71,19 @@
+                 'soundCategory_ambient':'0.0','soundCategory_voice':'0.0','narrator':'0',
+                 'onboardAccessibility':'false','tutorialStep':'none','pauseOnLostFocus':'false']
+             lines.removeAll { line -> overrides.containsKey(line.split(':', 2)[0]) }
+-            if (taskName == 'runClientSmoke') { lines.removeAll { it.startsWith('lang:') }; lines.add('lang:ko_kr') }
++            if (taskName != 'runClient') { lines.removeAll { it.startsWith('lang:') }; lines.add('lang:ko_kr') }
+             overrides.each { k,v -> lines.add("${k}:${v}") }
+             options.setText(lines.join('\n')+'\n','UTF-8')
+             if (!options.text.contains('soundCategory_master:0.0')) throw new GradleException('Prelaunch mute verification failed')
+             logger.lifecycle("VERIFIED MUTED before launch: ${options.absolutePath}")
+             if (taskName == 'runClientSmoke') file('evidence/client-smoke.txt').setText('RUNNING: awaiting client checks\n', 'UTF-8')
++            if (taskName.startsWith('runCity')) file('evidence/city/'+taskName+'.txt').setText('RUNNING\n','UTF-8')
++        }
++        if (taskName.startsWith('runCity')) {
++            doLast {
++                if(!file('evidence/city/'+taskName+'.txt').getText('UTF-8').contains('PASS '+taskName))
++                    throw new GradleException('City client did not finish every gate')
++            }
+         }
+         if (taskName == 'runClientSmoke') {
+             doLast {
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -3,6 +3,6 @@
+ org.gradle.parallel=false
+ org.gradle.caching=true
+ org.gradle.workers.max=4
+-mod_version=0.1.0-dev.1
++mod_version=0.2.0-dev.1
+ neo_version=21.1.249
+ geckolib_version=4.9.2
+--- a/README.md
++++ b/README.md
+@@ -1,13 +1,13 @@
+-# 《네가 없는 동안》 — 첫 개발 빌드
++# 《네가 없는 동안》 — 도시 진입부 0.2.0-dev.1
+ 
+ **Minecraft Java 1.21.1 · NeoForge 21.1.249 · GeckoLib 4.9.2 · Java 21**
+ 
+-오버월드에서 자연 생성되는 폐역을 발견하고, 남겨진 기록을 읽고, 신호를 복구하면서 이상 현상과 첫 괴물 **귀로꾼**을 만나는 개발용 모드입니다. 거대 도시·전용 차원·전체 다중 엔딩 캠페인에 들어가기 전, 진입부와 공포 연출 기반을 실제 게임 코드로 만든 단계입니다.
++오버월드에서 자연 생성되는 폐역을 발견하고, 남겨진 기록을 읽고, 신호를 복구하면서 이상 현상과 첫 괴물 **귀로꾼**을 만나는 개발용 모드입니다. 폐역 이후에는 전용 도시 차원의 첫 80×80 구역으로 진입합니다. 전체 도시와 다중 엔딩 캠페인은 후속 개발입니다.
+ 
+ ## 설치
+ 
+ 1. 별도 테스트용 Minecraft Java **1.21.1** 프로필에 **NeoForge 21.1.249**를 설치합니다.
+-2. 해당 프로필의 `mods` 폴더에 `dist/whileaway-0.1.0-dev.1.jar`와 **GeckoLib NeoForge 1.21.1용 4.9.2**를 넣습니다. Fabric/Forge용 파일과 구분합니다.
++2. 해당 프로필의 `mods` 폴더에 `dist/whileaway-0.2.0-dev.1.jar`와 **GeckoLib NeoForge 1.21.1용 4.9.2**를 넣습니다. Fabric/Forge용 파일과 구분합니다.
+ 3. 구조물 생성을 켠 새 월드를 만듭니다. 자연 진행은 보통 난이도 생존 모드가 기준입니다.
+ 4. 평원·숲·자작나무 숲·타이가·초원에서 폐역을 찾습니다. 기존 월드라면 새로 생성되는 청크가 필요합니다.
+ 
+@@ -34,7 +34,7 @@
+ 
+ ## 무음 개발 규칙
+ 
+-**개발자가 실행하는 모든 클라이언트는 시작 전 전체 소리·모든 소리 분류·내레이터를 0으로 설정합니다.** `runClient`와 `runClientSmoke` 모두 적용합니다. 기존 개인 게임 프로필과 운영체제 볼륨은 변경하지 않습니다. 소리 파일은 재생 대신 디코딩·길이·샘플 피크·호출 시점을 검사합니다. 실제 청감 평가는 별도로 남아 있습니다.
++**개발자가 실행하는 모든 클라이언트는 시작 전 전체 소리·모든 소리 분류·내레이터를 0으로 설정합니다.** `runClient`, `runClientSmoke`, `runCitySmoke`, `runCityReload` 모두 적용합니다. 기존 개인 게임 프로필과 운영체제 볼륨은 변경하지 않습니다. 소리 파일은 재생 대신 디코딩·길이·샘플 피크·호출 시점을 검사합니다. 실제 청감 평가는 별도로 남아 있습니다.
+ 
+ 일반 설치용 JAR 자체는 플레이어의 음량 설정을 덮어쓰지 않습니다. 자동 검증용 클라이언트와 사용자가 직접 플레이하는 프로필을 분리합니다.
+ 
+@@ -45,7 +45,7 @@
+ ```powershell
+ .\gradlew.bat build runGameTestServer --console=plain
+ .\gradlew.bat runClientSmoke --console=plain
+-python .\tools\verify-assets.py .\build\libs\whileaway-0.1.0-dev.1.jar
++python .\tools\verify-assets.py .\build\libs\whileaway-0.2.0-dev.1.jar
+ ```
+ 
+ `runClientSmoke`는 별도 월드를 자동 생성하고 무음 상태에서 자연 구조물, 클라이언트 리소스, 연출 패킷, 스크린샷을 검사한 뒤 종료합니다. **Gradle 성공만으로 클라이언트 검증 통과로 판정하지 않습니다.** 로그의 `WHILEAWAY_SMOKE_PASS`, 증거 파일, 스크린샷을 함께 확인합니다.
+@@ -64,6 +64,27 @@
+ 
+ **구현:** 폐역 1종, 기록 3종, 신호 복구, 단서/조우 저장, 귀로꾼 1종, 단계형 디렉터, 12초 연출, 한·영 텍스트, 원본 오디오 7개, 자동 테스트.
+ 
+-**미구현:** 거대한 도시 차원과 구역별 생성, 나머지 괴물, 장기 퀘스트/인물 관계, 선택의 누적 결과, 배드·노말·히든 해피 엔딩, 최종 모델/텍스처/사운드, 셰이더 호환 최적화. 멀티플레이 실제 두 클라이언트와 생존 전체 진행 수동 플레이테스트도 별도입니다.
++**미구현:** 도시 전체와 나머지 구역, 나머지 괴물, 장기 퀘스트/인물 관계, 선택의 누적 결과, 배드·노말·히든 해피 엔딩, 최종 모델/텍스처/사운드, 셰이더 호환 최적화. 멀티플레이 실제 두 클라이언트와 생존 전체 진행 수동 플레이테스트도 별도입니다.
+ 
+-세부 방향은 `docs/DIRECTION.md`, 실행 결과와 되돌리기 검증은 `VERIFICATION.txt`를 참고합니다.
++0.2 도시 구역의 내용은 `docs/CITY_SLICE.md`, 최신 실행/되돌리기 기록은 `evidence/city/VERIFICATION.txt`를 참고합니다. 루트 `VERIFICATION.txt`는 이전 0.1 빌드 기록입니다.
++
++
++## 0.2: 저녁골 역전 지구
++
++1. 폐역에서 신호를 복구하고 귀로꾼과의 첫 만남을 마칩니다.
++2. **개인 기록**을 읽은 뒤 폐역 신호기를 다시 우클릭합니다. 다른 플레이어가 켠 신호기라도 개인별 진행 조건을 확인합니다.
++3. 도시 준비 중이라는 문장이 나오면 잠시 후 다시 우클릭합니다. 건설은 신호 복구 시부터 작은 묶음으로 진행하며, 준비가 끝나기 전에는 플레이어를 이동시키지 않습니다.
++4. 도시에서는 접수대 장부·식탁 아래 편지·방송실 교대표를 찾아 책을 엽니다. 읽은 기록은 개인별로 저장합니다.
++5. 도착 지점 뒤의 **돌아가는 불빛**을 우클릭하거나 `/whileaway return`을 입력하면 원래 오버월드 위치 근처로 복귀합니다. 목적지가 막혀 있으면 블록을 부수지 않고 빈 자리를 찾습니다.
++
++현재 도시에는 건물 6동, 중앙 도로와 교차로, 가로등, 접수대·주거동·북쪽 검문 구조물, 3종의 2페이지 기록이 있습니다. 건물의 지상층을 탐색할 수 있고 상층은 외관용 껍데기입니다. 80×80 크기의 한 구역이며 무한 생성 도시가 아닙니다.
++
++도시 진입은 침대/리스폰 위치를 덮어쓰지 않습니다. 현재 차원 설정에서 침대와 리스폰 앵커를 사용하면 바닐라의 차원 부적합 폭발 동작이 적용됩니다. 복귀는 돌아가는 불빛이나 복귀 명령을 사용합니다. 세계 저장 데이터는 schema 1에서 2로 이어받습니다. 0.2로 진행한 월드에 0.1을 다시 적용하는 것은 호환 검증 대상이 아닙니다. 되돌리기 스크립트는 **JAR 복사본만** 복구합니다.
++
++개발용 도시 검증:
++
++```powershell
++.\gradlew.bat build runGameTestServer runCitySmoke runCityReload --console=plain
++```
++
++첫 클라이언트는 별도 월드에서 접근 조건·도시 생성·책 사용·왕복·재방문을 검사하고 종료합니다. 두 번째 클라이언트는 같은 저장을 다시 열어 차원 위치·도시 기록·복귀 지점·블록 변경 보존을 검사합니다. 실제 소리는 재생하지 않습니다.
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -6,3 +6,7 @@
+ - Check audio by decoding files, measuring samples and checking scheduling; do not audibly preview it automatically.
+ - Distinguish unit, headless Minecraft, client-resource, screenshot and manual-playtest evidence.
+ - This is a first development slice, not the completed multi-ending campaign. Keep the documented remaining work explicit.
++- Current city slice is 0.2.0-dev.1. Preserve evidence/city/baseline and the prior 0.1 JAR.
++- runCitySmoke and runCityReload share a separate muted profile; both need explicit PASS markers, not only process exit 0.
++- Vanilla GameTestServer creates only preset dimensions. Actual city creation and persistence are checked in the isolated integrated-client runs.
++- CityLayout.VERSION=1 and its stable cell order are persisted construction data. Do not reorder a released plan without migration.

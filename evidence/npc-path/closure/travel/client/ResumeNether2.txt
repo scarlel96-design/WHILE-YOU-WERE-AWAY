@@ -1,0 +1,6 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=41460
+PASS fresh_start dimension=Nether checkpoint=2 uuid=d92e0cd5-3591-41fd-8859-36811ec9220f
+PASS dimension_absence=minecraft:the_nether checkpoint=2 unchanged=true wrongDimensionNPC=0 heldTicks=120
+PASS reconnected checkpoint=2 generation=0 sameUUID=d92e0cd5-3591-41fd-8859-36811ec9220f canonical=1 duplicates=0
+PASS ResumeNether2 canonical=1 generation=0 uuid=d92e0cd5-3591-41fd-8859-36811ec9220f instance=fb4ac531-9fdc-4b5d-a98a-871295e30737 checkpoint=4 work=maintain_return_light dimension=whileaway:quiet_city stableTicks=100

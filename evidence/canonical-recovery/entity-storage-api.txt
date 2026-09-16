@@ -1,0 +1,1043 @@
+Compiled from "PersistentEntitySectionManager.java"
+public class net.minecraft.world.level.entity.PersistentEntitySectionManager<T extends net.minecraft.world.level.entity.EntityAccess> implements java.lang.AutoCloseable {
+  static final org.slf4j.Logger LOGGER;
+
+  final java.util.Set<java.util.UUID> knownUuids;
+
+  final net.minecraft.world.level.entity.LevelCallback<T> callbacks;
+
+  private final net.minecraft.world.level.entity.EntityPersistentStorage<T> permanentStorage;
+
+  private final net.minecraft.world.level.entity.EntityLookup<T> visibleEntityStorage;
+
+  final net.minecraft.world.level.entity.EntitySectionStorage<T> sectionStorage;
+
+  private final net.minecraft.world.level.entity.LevelEntityGetter<T> entityGetter;
+
+  private final it.unimi.dsi.fastutil.longs.Long2ObjectMap<net.minecraft.world.level.entity.Visibility> chunkVisibility;
+
+  private final it.unimi.dsi.fastutil.longs.Long2ObjectMap<net.minecraft.world.level.entity.PersistentEntitySectionManager$ChunkLoadStatus> chunkLoadStatuses;
+
+  private final it.unimi.dsi.fastutil.longs.LongSet chunksToUnload;
+
+  private final java.util.Queue<net.minecraft.world.level.entity.ChunkEntities<T>> loadingInbox;
+
+  public net.minecraft.world.level.entity.PersistentEntitySectionManager(java.lang.Class<T>, net.minecraft.world.level.entity.LevelCallback<T>, net.minecraft.world.level.entity.EntityPersistentStorage<T>);
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: aload_0
+       5: invokestatic  #7                  // Method com/google/common/collect/Sets.newHashSet:()Ljava/util/HashSet;
+       8: putfield      #13                 // Field knownUuids:Ljava/util/Set;
+      11: aload_0
+      12: new           #19                 // class it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap
+      15: dup
+      16: invokespecial #21                 // Method it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap."<init>":()V
+      19: putfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      22: aload_0
+      23: new           #19                 // class it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap
+      26: dup
+      27: invokespecial #21                 // Method it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap."<init>":()V
+      30: putfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      33: aload_0
+      34: new           #29                 // class it/unimi/dsi/fastutil/longs/LongOpenHashSet
+      37: dup
+      38: invokespecial #31                 // Method it/unimi/dsi/fastutil/longs/LongOpenHashSet."<init>":()V
+      41: putfield      #32                 // Field chunksToUnload:Lit/unimi/dsi/fastutil/longs/LongSet;
+      44: aload_0
+      45: invokestatic  #36                 // Method com/google/common/collect/Queues.newConcurrentLinkedQueue:()Ljava/util/concurrent/ConcurrentLinkedQueue;
+      48: putfield      #42                 // Field loadingInbox:Ljava/util/Queue;
+      51: aload_0
+      52: new           #46                 // class net/minecraft/world/level/entity/EntityLookup
+      55: dup
+      56: invokespecial #48                 // Method net/minecraft/world/level/entity/EntityLookup."<init>":()V
+      59: putfield      #49                 // Field visibleEntityStorage:Lnet/minecraft/world/level/entity/EntityLookup;
+      62: aload_0
+      63: new           #53                 // class net/minecraft/world/level/entity/EntitySectionStorage
+      66: dup
+      67: aload_1
+      68: aload_0
+      69: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      72: invokespecial #55                 // Method net/minecraft/world/level/entity/EntitySectionStorage."<init>":(Ljava/lang/Class;Lit/unimi/dsi/fastutil/longs/Long2ObjectFunction;)V
+      75: putfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      78: aload_0
+      79: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      82: getstatic     #62                 // Field net/minecraft/world/level/entity/Visibility.HIDDEN:Lnet/minecraft/world/level/entity/Visibility;
+      85: invokeinterface #68,  2           // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.defaultReturnValue:(Ljava/lang/Object;)V
+      90: aload_0
+      91: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      94: getstatic     #74                 // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.FRESH:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      97: invokeinterface #68,  2           // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.defaultReturnValue:(Ljava/lang/Object;)V
+     102: aload_0
+     103: aload_2
+     104: putfield      #80                 // Field callbacks:Lnet/minecraft/world/level/entity/LevelCallback;
+     107: aload_0
+     108: aload_3
+     109: putfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+     112: aload_0
+     113: new           #88                 // class net/minecraft/world/level/entity/LevelEntityGetterAdapter
+     116: dup
+     117: aload_0
+     118: getfield      #49                 // Field visibleEntityStorage:Lnet/minecraft/world/level/entity/EntityLookup;
+     121: aload_0
+     122: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+     125: invokespecial #90                 // Method net/minecraft/world/level/entity/LevelEntityGetterAdapter."<init>":(Lnet/minecraft/world/level/entity/EntityLookup;Lnet/minecraft/world/level/entity/EntitySectionStorage;)V
+     128: putfield      #93                 // Field entityGetter:Lnet/minecraft/world/level/entity/LevelEntityGetter;
+     131: return
+
+  void removeSectionIfEmpty(long, net.minecraft.world.level.entity.EntitySection<T>);
+    Code:
+       0: aload_3
+       1: invokevirtual #97                 // Method net/minecraft/world/level/entity/EntitySection.isEmpty:()Z
+       4: ifeq          15
+       7: aload_0
+       8: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      11: lload_1
+      12: invokevirtual #103                // Method net/minecraft/world/level/entity/EntitySectionStorage.remove:(J)V
+      15: return
+
+  private boolean addEntityUuid(T);
+    Code:
+       0: aload_0
+       1: getfield      #13                 // Field knownUuids:Ljava/util/Set;
+       4: aload_1
+       5: invokeinterface #107,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.getUUID:()Ljava/util/UUID;
+      10: invokeinterface #113,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+      15: ifne          31
+      18: getstatic     #119                // Field LOGGER:Lorg/slf4j/Logger;
+      21: ldc           #123                // String UUID of added entity already exists: {}
+      23: aload_1
+      24: invokeinterface #125,  3          // InterfaceMethod org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;)V
+      29: iconst_0
+      30: ireturn
+      31: iconst_1
+      32: ireturn
+
+  public boolean addNewEntity(T);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iconst_0
+       3: invokevirtual #131                // Method addEntity:(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z
+       6: ireturn
+
+  public boolean addNewEntityWithoutEvent(T);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iconst_0
+       3: invokevirtual #135                // Method addEntityWithoutEvent:(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z
+       6: ireturn
+
+  private boolean addEntity(T, boolean);
+    Code:
+       0: aload_1
+       1: instanceof    #138                // class net/minecraft/world/entity/Entity
+       4: ifeq          44
+       7: aload_1
+       8: checkcast     #138                // class net/minecraft/world/entity/Entity
+      11: astore_3
+      12: getstatic     #140                // Field net/neoforged/neoforge/common/NeoForge.EVENT_BUS:Lnet/neoforged/bus/api/IEventBus;
+      15: new           #146                // class net/neoforged/neoforge/event/entity/EntityJoinLevelEvent
+      18: dup
+      19: aload_3
+      20: aload_3
+      21: invokevirtual #148                // Method net/minecraft/world/entity/Entity.level:()Lnet/minecraft/world/level/Level;
+      24: iload_2
+      25: invokespecial #152                // Method net/neoforged/neoforge/event/entity/EntityJoinLevelEvent."<init>":(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/Level;Z)V
+      28: invokeinterface #155,  2          // InterfaceMethod net/neoforged/bus/api/IEventBus.post:(Lnet/neoforged/bus/api/Event;)Lnet/neoforged/bus/api/Event;
+      33: checkcast     #146                // class net/neoforged/neoforge/event/entity/EntityJoinLevelEvent
+      36: invokevirtual #161                // Method net/neoforged/neoforge/event/entity/EntityJoinLevelEvent.isCanceled:()Z
+      39: ifeq          44
+      42: iconst_0
+      43: ireturn
+      44: aload_0
+      45: aload_1
+      46: iload_2
+      47: invokevirtual #135                // Method addEntityWithoutEvent:(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z
+      50: ireturn
+
+  private boolean addEntityWithoutEvent(T, boolean);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #164                // Method addEntityUuid:(Lnet/minecraft/world/level/entity/EntityAccess;)Z
+       5: ifne          10
+       8: iconst_0
+       9: ireturn
+      10: aload_1
+      11: invokeinterface #168,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.blockPosition:()Lnet/minecraft/core/BlockPos;
+      16: invokestatic  #172                // Method net/minecraft/core/SectionPos.asLong:(Lnet/minecraft/core/BlockPos;)J
+      19: lstore_3
+      20: aload_0
+      21: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      24: lload_3
+      25: invokevirtual #178                // Method net/minecraft/world/level/entity/EntitySectionStorage.getOrCreateSection:(J)Lnet/minecraft/world/level/entity/EntitySection;
+      28: astore        5
+      30: aload         5
+      32: aload_1
+      33: invokevirtual #182                // Method net/minecraft/world/level/entity/EntitySection.add:(Lnet/minecraft/world/level/entity/EntityAccess;)V
+      36: aload_1
+      37: new           #185                // class net/minecraft/world/level/entity/PersistentEntitySectionManager$Callback
+      40: dup
+      41: aload_0
+      42: aload_1
+      43: lload_3
+      44: aload         5
+      46: invokespecial #187                // Method net/minecraft/world/level/entity/PersistentEntitySectionManager$Callback."<init>":(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;Lnet/minecraft/world/level/entity/EntityAccess;JLnet/minecraft/world/level/entity/EntitySection;)V
+      49: invokeinterface #190,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.setLevelCallback:(Lnet/minecraft/world/level/entity/EntityInLevelCallback;)V
+      54: iload_2
+      55: ifne          68
+      58: aload_0
+      59: getfield      #80                 // Field callbacks:Lnet/minecraft/world/level/entity/LevelCallback;
+      62: aload_1
+      63: invokeinterface #194,  2          // InterfaceMethod net/minecraft/world/level/entity/LevelCallback.onCreated:(Ljava/lang/Object;)V
+      68: aload_1
+      69: aload         5
+      71: invokevirtual #199                // Method net/minecraft/world/level/entity/EntitySection.getStatus:()Lnet/minecraft/world/level/entity/Visibility;
+      74: invokestatic  #203                // Method getEffectiveStatus:(Lnet/minecraft/world/level/entity/EntityAccess;Lnet/minecraft/world/level/entity/Visibility;)Lnet/minecraft/world/level/entity/Visibility;
+      77: astore        6
+      79: aload         6
+      81: invokevirtual #207                // Method net/minecraft/world/level/entity/Visibility.isAccessible:()Z
+      84: ifeq          92
+      87: aload_0
+      88: aload_1
+      89: invokevirtual #210                // Method startTracking:(Lnet/minecraft/world/level/entity/EntityAccess;)V
+      92: aload         6
+      94: invokevirtual #213                // Method net/minecraft/world/level/entity/Visibility.isTicking:()Z
+      97: ifeq          105
+     100: aload_0
+     101: aload_1
+     102: invokevirtual #216                // Method startTicking:(Lnet/minecraft/world/level/entity/EntityAccess;)V
+     105: iconst_1
+     106: ireturn
+
+  static <T extends net.minecraft.world.level.entity.EntityAccess> net.minecraft.world.level.entity.Visibility getEffectiveStatus(T, net.minecraft.world.level.entity.Visibility);
+    Code:
+       0: aload_0
+       1: invokeinterface #219,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.isAlwaysTicking:()Z
+       6: ifeq          15
+       9: getstatic     #222                // Field net/minecraft/world/level/entity/Visibility.TICKING:Lnet/minecraft/world/level/entity/Visibility;
+      12: goto          16
+      15: aload_1
+      16: areturn
+
+  public void addLegacyChunkEntities(java.util.stream.Stream<T>);
+    Code:
+       0: aload_1
+       1: aload_0
+       2: invokedynamic #225,  0            // InvokeDynamic #0:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+       7: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+      12: return
+
+  public void addWorldGenChunkEntities(java.util.stream.Stream<T>);
+    Code:
+       0: aload_1
+       1: aload_0
+       2: invokedynamic #235,  0            // InvokeDynamic #1:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+       7: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+      12: return
+
+  void startTicking(T);
+    Code:
+       0: aload_0
+       1: getfield      #80                 // Field callbacks:Lnet/minecraft/world/level/entity/LevelCallback;
+       4: aload_1
+       5: invokeinterface #236,  2          // InterfaceMethod net/minecraft/world/level/entity/LevelCallback.onTickingStart:(Ljava/lang/Object;)V
+      10: return
+
+  void stopTicking(T);
+    Code:
+       0: aload_0
+       1: getfield      #80                 // Field callbacks:Lnet/minecraft/world/level/entity/LevelCallback;
+       4: aload_1
+       5: invokeinterface #239,  2          // InterfaceMethod net/minecraft/world/level/entity/LevelCallback.onTickingEnd:(Ljava/lang/Object;)V
+      10: return
+
+  void startTracking(T);
+    Code:
+       0: aload_0
+       1: getfield      #49                 // Field visibleEntityStorage:Lnet/minecraft/world/level/entity/EntityLookup;
+       4: aload_1
+       5: invokevirtual #242                // Method net/minecraft/world/level/entity/EntityLookup.add:(Lnet/minecraft/world/level/entity/EntityAccess;)V
+       8: aload_0
+       9: getfield      #80                 // Field callbacks:Lnet/minecraft/world/level/entity/LevelCallback;
+      12: aload_1
+      13: invokeinterface #243,  2          // InterfaceMethod net/minecraft/world/level/entity/LevelCallback.onTrackingStart:(Ljava/lang/Object;)V
+      18: return
+
+  void stopTracking(T);
+    Code:
+       0: aload_0
+       1: getfield      #80                 // Field callbacks:Lnet/minecraft/world/level/entity/LevelCallback;
+       4: aload_1
+       5: invokeinterface #246,  2          // InterfaceMethod net/minecraft/world/level/entity/LevelCallback.onTrackingEnd:(Ljava/lang/Object;)V
+      10: aload_0
+      11: getfield      #49                 // Field visibleEntityStorage:Lnet/minecraft/world/level/entity/EntityLookup;
+      14: aload_1
+      15: invokevirtual #249                // Method net/minecraft/world/level/entity/EntityLookup.remove:(Lnet/minecraft/world/level/entity/EntityAccess;)V
+      18: return
+
+  public void updateChunkStatus(net.minecraft.world.level.ChunkPos, net.minecraft.server.level.FullChunkStatus);
+    Code:
+       0: aload_2
+       1: invokestatic  #251                // Method net/minecraft/world/level/entity/Visibility.fromFullChunkStatus:(Lnet/minecraft/server/level/FullChunkStatus;)Lnet/minecraft/world/level/entity/Visibility;
+       4: astore_3
+       5: aload_0
+       6: aload_1
+       7: aload_3
+       8: invokevirtual #255                // Method updateChunkStatus:(Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/entity/Visibility;)V
+      11: return
+
+  public void updateChunkStatus(net.minecraft.world.level.ChunkPos, net.minecraft.world.level.entity.Visibility);
+    Code:
+       0: aload_1
+       1: invokevirtual #259                // Method net/minecraft/world/level/ChunkPos.toLong:()J
+       4: lstore_3
+       5: aload_2
+       6: getstatic     #62                 // Field net/minecraft/world/level/entity/Visibility.HIDDEN:Lnet/minecraft/world/level/entity/Visibility;
+       9: if_acmpne     37
+      12: aload_0
+      13: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      16: lload_3
+      17: invokeinterface #265,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.remove:(J)Ljava/lang/Object;
+      22: pop
+      23: aload_0
+      24: getfield      #32                 // Field chunksToUnload:Lit/unimi/dsi/fastutil/longs/LongSet;
+      27: lload_3
+      28: invokeinterface #268,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.add:(J)Z
+      33: pop
+      34: goto          65
+      37: aload_0
+      38: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      41: lload_3
+      42: aload_2
+      43: invokeinterface #273,  4          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.put:(JLjava/lang/Object;)Ljava/lang/Object;
+      48: pop
+      49: aload_0
+      50: getfield      #32                 // Field chunksToUnload:Lit/unimi/dsi/fastutil/longs/LongSet;
+      53: lload_3
+      54: invokeinterface #277,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.remove:(J)Z
+      59: pop
+      60: aload_0
+      61: lload_3
+      62: invokevirtual #279                // Method ensureChunkQueuedForLoad:(J)V
+      65: aload_0
+      66: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      69: lload_3
+      70: invokevirtual #282                // Method net/minecraft/world/level/entity/EntitySectionStorage.getExistingSectionsInChunk:(J)Ljava/util/stream/Stream;
+      73: aload_0
+      74: aload_2
+      75: invokedynamic #286,  0            // InvokeDynamic #2:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;Lnet/minecraft/world/level/entity/Visibility;)Ljava/util/function/Consumer;
+      80: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+      85: return
+
+  private void ensureChunkQueuedForLoad(long);
+    Code:
+       0: aload_0
+       1: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: checkcast     #75                 // class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
+      13: astore_3
+      14: aload_3
+      15: getstatic     #74                 // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.FRESH:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      18: if_acmpne     26
+      21: aload_0
+      22: lload_1
+      23: invokevirtual #292                // Method requestChunkLoad:(J)V
+      26: return
+
+  private boolean storeChunkSections(long, java.util.function.Consumer<T>);
+    Code:
+       0: aload_0
+       1: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: checkcast     #75                 // class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
+      13: astore        4
+      15: aload         4
+      17: getstatic     #295                // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.PENDING:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      20: if_acmpne     25
+      23: iconst_0
+      24: ireturn
+      25: aload_0
+      26: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      29: lload_1
+      30: invokevirtual #282                // Method net/minecraft/world/level/entity/EntitySectionStorage.getExistingSectionsInChunk:(J)Ljava/util/stream/Stream;
+      33: invokedynamic #298,  0            // InvokeDynamic #3:apply:()Ljava/util/function/Function;
+      38: invokeinterface #302,  2          // InterfaceMethod java/util/stream/Stream.flatMap:(Ljava/util/function/Function;)Ljava/util/stream/Stream;
+      43: invokestatic  #306                // Method java/util/stream/Collectors.toList:()Ljava/util/stream/Collector;
+      46: invokeinterface #312,  2          // InterfaceMethod java/util/stream/Stream.collect:(Ljava/util/stream/Collector;)Ljava/lang/Object;
+      51: checkcast     #316                // class java/util/List
+      54: astore        5
+      56: aload         5
+      58: invokeinterface #318,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+      63: ifeq          103
+      66: aload         4
+      68: getstatic     #319                // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.LOADED:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      71: if_acmpne     101
+      74: aload_0
+      75: getfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+      78: new           #322                // class net/minecraft/world/level/entity/ChunkEntities
+      81: dup
+      82: new           #260                // class net/minecraft/world/level/ChunkPos
+      85: dup
+      86: lload_1
+      87: invokespecial #324                // Method net/minecraft/world/level/ChunkPos."<init>":(J)V
+      90: invokestatic  #326                // Method com/google/common/collect/ImmutableList.of:()Lcom/google/common/collect/ImmutableList;
+      93: invokespecial #332                // Method net/minecraft/world/level/entity/ChunkEntities."<init>":(Lnet/minecraft/world/level/ChunkPos;Ljava/util/List;)V
+      96: invokeinterface #335,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityPersistentStorage.storeEntities:(Lnet/minecraft/world/level/entity/ChunkEntities;)V
+     101: iconst_1
+     102: ireturn
+     103: aload         4
+     105: getstatic     #74                 // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.FRESH:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+     108: if_acmpne     118
+     111: aload_0
+     112: lload_1
+     113: invokevirtual #292                // Method requestChunkLoad:(J)V
+     116: iconst_0
+     117: ireturn
+     118: aload_0
+     119: getfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+     122: new           #322                // class net/minecraft/world/level/entity/ChunkEntities
+     125: dup
+     126: new           #260                // class net/minecraft/world/level/ChunkPos
+     129: dup
+     130: lload_1
+     131: invokespecial #324                // Method net/minecraft/world/level/ChunkPos."<init>":(J)V
+     134: aload         5
+     136: invokespecial #332                // Method net/minecraft/world/level/entity/ChunkEntities."<init>":(Lnet/minecraft/world/level/ChunkPos;Ljava/util/List;)V
+     139: invokeinterface #335,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityPersistentStorage.storeEntities:(Lnet/minecraft/world/level/entity/ChunkEntities;)V
+     144: aload         5
+     146: aload_3
+     147: invokeinterface #341,  2          // InterfaceMethod java/util/List.forEach:(Ljava/util/function/Consumer;)V
+     152: iconst_1
+     153: ireturn
+
+  private void requestChunkLoad(long);
+    Code:
+       0: aload_0
+       1: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: getstatic     #295                // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.PENDING:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+       8: invokeinterface #273,  4          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.put:(JLjava/lang/Object;)Ljava/lang/Object;
+      13: pop
+      14: new           #260                // class net/minecraft/world/level/ChunkPos
+      17: dup
+      18: lload_1
+      19: invokespecial #324                // Method net/minecraft/world/level/ChunkPos."<init>":(J)V
+      22: astore_3
+      23: aload_0
+      24: getfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+      27: aload_3
+      28: invokeinterface #342,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityPersistentStorage.loadEntities:(Lnet/minecraft/world/level/ChunkPos;)Ljava/util/concurrent/CompletableFuture;
+      33: aload_0
+      34: getfield      #42                 // Field loadingInbox:Ljava/util/Queue;
+      37: dup
+      38: invokestatic  #346                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+      41: pop
+      42: invokedynamic #352,  0            // InvokeDynamic #4:accept:(Ljava/util/Queue;)Ljava/util/function/Consumer;
+      47: invokevirtual #355                // Method java/util/concurrent/CompletableFuture.thenAccept:(Ljava/util/function/Consumer;)Ljava/util/concurrent/CompletableFuture;
+      50: aload_3
+      51: invokedynamic #361,  0            // InvokeDynamic #5:apply:(Lnet/minecraft/world/level/ChunkPos;)Ljava/util/function/Function;
+      56: invokevirtual #364                // Method java/util/concurrent/CompletableFuture.exceptionally:(Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;
+      59: pop
+      60: return
+
+  private boolean processChunkUnload(long);
+    Code:
+       0: aload_0
+       1: lload_1
+       2: aload_0
+       3: invokedynamic #368,  0            // InvokeDynamic #6:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+       8: invokevirtual #369                // Method storeChunkSections:(JLjava/util/function/Consumer;)Z
+      11: istore_3
+      12: iload_3
+      13: ifne          18
+      16: iconst_0
+      17: ireturn
+      18: aload_0
+      19: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      22: lload_1
+      23: invokeinterface #265,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.remove:(J)Ljava/lang/Object;
+      28: pop
+      29: iconst_1
+      30: ireturn
+
+  private void unloadEntity(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_1
+       1: getstatic     #373                // Field net/minecraft/world/entity/Entity$RemovalReason.UNLOADED_TO_CHUNK:Lnet/minecraft/world/entity/Entity$RemovalReason;
+       4: invokeinterface #379,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.setRemoved:(Lnet/minecraft/world/entity/Entity$RemovalReason;)V
+       9: aload_1
+      10: getstatic     #383                // Field net/minecraft/world/level/entity/EntityInLevelCallback.NULL:Lnet/minecraft/world/level/entity/EntityInLevelCallback;
+      13: invokeinterface #190,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.setLevelCallback:(Lnet/minecraft/world/level/entity/EntityInLevelCallback;)V
+      18: return
+
+  private void processUnloads();
+    Code:
+       0: aload_0
+       1: getfield      #32                 // Field chunksToUnload:Lit/unimi/dsi/fastutil/longs/LongSet;
+       4: aload_0
+       5: invokedynamic #389,  0            // InvokeDynamic #7:test:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Lit/unimi/dsi/fastutil/longs/LongPredicate;
+      10: invokeinterface #393,  2          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.removeIf:(Lit/unimi/dsi/fastutil/longs/LongPredicate;)Z
+      15: pop
+      16: return
+
+  private void processPendingLoads();
+    Code:
+       0: aload_0
+       1: getfield      #42                 // Field loadingInbox:Ljava/util/Queue;
+       4: invokeinterface #397,  1          // InterfaceMethod java/util/Queue.poll:()Ljava/lang/Object;
+       9: checkcast     #322                // class net/minecraft/world/level/entity/ChunkEntities
+      12: dup
+      13: astore_1
+      14: ifnull        55
+      17: aload_1
+      18: invokevirtual #403                // Method net/minecraft/world/level/entity/ChunkEntities.getEntities:()Ljava/util/stream/Stream;
+      21: aload_0
+      22: invokedynamic #407,  0            // InvokeDynamic #8:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+      27: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+      32: aload_0
+      33: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      36: aload_1
+      37: invokevirtual #408                // Method net/minecraft/world/level/entity/ChunkEntities.getPos:()Lnet/minecraft/world/level/ChunkPos;
+      40: invokevirtual #259                // Method net/minecraft/world/level/ChunkPos.toLong:()J
+      43: getstatic     #319                // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.LOADED:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      46: invokeinterface #273,  4          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.put:(JLjava/lang/Object;)Ljava/lang/Object;
+      51: pop
+      52: goto          0
+      55: return
+
+  public void tick();
+    Code:
+       0: aload_0
+       1: invokevirtual #412                // Method processPendingLoads:()V
+       4: aload_0
+       5: invokevirtual #415                // Method processUnloads:()V
+       8: return
+
+  private it.unimi.dsi.fastutil.longs.LongSet getAllChunksToSave();
+    Code:
+       0: aload_0
+       1: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+       4: invokevirtual #418                // Method net/minecraft/world/level/entity/EntitySectionStorage.getAllChunksWithExistingSections:()Lit/unimi/dsi/fastutil/longs/LongSet;
+       7: astore_1
+       8: aload_0
+       9: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      12: invokestatic  #422                // Method it/unimi/dsi/fastutil/longs/Long2ObjectMaps.fastIterable:(Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;)Lit/unimi/dsi/fastutil/objects/ObjectIterable;
+      15: invokeinterface #428,  1          // InterfaceMethod it/unimi/dsi/fastutil/objects/ObjectIterable.iterator:()Lit/unimi/dsi/fastutil/objects/ObjectIterator;
+      20: astore_2
+      21: aload_2
+      22: invokeinterface #434,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+      27: ifeq          68
+      30: aload_2
+      31: invokeinterface #439,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      36: checkcast     #442                // class it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry
+      39: astore_3
+      40: aload_3
+      41: invokeinterface #444,  1          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry.getValue:()Ljava/lang/Object;
+      46: getstatic     #319                // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.LOADED:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      49: if_acmpne     65
+      52: aload_1
+      53: aload_3
+      54: invokeinterface #447,  1          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry.getLongKey:()J
+      59: invokeinterface #268,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.add:(J)Z
+      64: pop
+      65: goto          21
+      68: aload_1
+      69: areturn
+
+  public void autoSave();
+    Code:
+       0: aload_0
+       1: invokevirtual #450                // Method getAllChunksToSave:()Lit/unimi/dsi/fastutil/longs/LongSet;
+       4: aload_0
+       5: invokedynamic #453,  0            // InvokeDynamic #9:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Lit/unimi/dsi/fastutil/longs/LongConsumer;
+      10: invokeinterface #456,  2          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.forEach:(Lit/unimi/dsi/fastutil/longs/LongConsumer;)V
+      15: return
+
+  public void saveAll();
+    Code:
+       0: aload_0
+       1: invokevirtual #450                // Method getAllChunksToSave:()Lit/unimi/dsi/fastutil/longs/LongSet;
+       4: astore_1
+       5: aload_1
+       6: invokeinterface #459,  1          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.isEmpty:()Z
+      11: ifne          44
+      14: aload_0
+      15: getfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+      18: iconst_0
+      19: invokeinterface #460,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityPersistentStorage.flush:(Z)V
+      24: aload_0
+      25: invokevirtual #412                // Method processPendingLoads:()V
+      28: aload_1
+      29: aload_0
+      30: invokedynamic #464,  0            // InvokeDynamic #10:test:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Lit/unimi/dsi/fastutil/longs/LongPredicate;
+      35: invokeinterface #393,  2          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.removeIf:(Lit/unimi/dsi/fastutil/longs/LongPredicate;)Z
+      40: pop
+      41: goto          5
+      44: aload_0
+      45: getfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+      48: iconst_1
+      49: invokeinterface #460,  2          // InterfaceMethod net/minecraft/world/level/entity/EntityPersistentStorage.flush:(Z)V
+      54: return
+
+  public void close() throws java.io.IOException;
+    Code:
+       0: aload_0
+       1: invokevirtual #465                // Method saveAll:()V
+       4: aload_0
+       5: getfield      #84                 // Field permanentStorage:Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+       8: invokeinterface #468,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityPersistentStorage.close:()V
+      13: return
+
+  public boolean isLoaded(java.util.UUID);
+    Code:
+       0: aload_0
+       1: getfield      #13                 // Field knownUuids:Ljava/util/Set;
+       4: aload_1
+       5: invokeinterface #471,  2          // InterfaceMethod java/util/Set.contains:(Ljava/lang/Object;)Z
+      10: ireturn
+
+  public net.minecraft.world.level.entity.LevelEntityGetter<T> getEntityGetter();
+    Code:
+       0: aload_0
+       1: getfield      #93                 // Field entityGetter:Lnet/minecraft/world/level/entity/LevelEntityGetter;
+       4: areturn
+
+  public boolean canPositionTick(net.minecraft.core.BlockPos);
+    Code:
+       0: aload_0
+       1: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: aload_1
+       5: invokestatic  #474                // Method net/minecraft/world/level/ChunkPos.asLong:(Lnet/minecraft/core/BlockPos;)J
+       8: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      13: checkcast     #63                 // class net/minecraft/world/level/entity/Visibility
+      16: invokevirtual #213                // Method net/minecraft/world/level/entity/Visibility.isTicking:()Z
+      19: ireturn
+
+  public boolean canPositionTick(net.minecraft.world.level.ChunkPos);
+    Code:
+       0: aload_0
+       1: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: aload_1
+       5: invokevirtual #259                // Method net/minecraft/world/level/ChunkPos.toLong:()J
+       8: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      13: checkcast     #63                 // class net/minecraft/world/level/entity/Visibility
+      16: invokevirtual #213                // Method net/minecraft/world/level/entity/Visibility.isTicking:()Z
+      19: ireturn
+
+  public boolean areEntitiesLoaded(long);
+    Code:
+       0: aload_0
+       1: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: getstatic     #319                // Field net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus.LOADED:Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;
+      13: if_acmpne     20
+      16: iconst_1
+      17: goto          21
+      20: iconst_0
+      21: ireturn
+
+  public void dumpSections(java.io.Writer) throws java.io.IOException;
+    Code:
+       0: invokestatic  #475                // Method net/minecraft/util/CsvOutput.builder:()Lnet/minecraft/util/CsvOutput$Builder;
+       3: ldc_w         #481                // String x
+       6: invokevirtual #483                // Method net/minecraft/util/CsvOutput$Builder.addColumn:(Ljava/lang/String;)Lnet/minecraft/util/CsvOutput$Builder;
+       9: ldc_w         #489                // String y
+      12: invokevirtual #483                // Method net/minecraft/util/CsvOutput$Builder.addColumn:(Ljava/lang/String;)Lnet/minecraft/util/CsvOutput$Builder;
+      15: ldc_w         #491                // String z
+      18: invokevirtual #483                // Method net/minecraft/util/CsvOutput$Builder.addColumn:(Ljava/lang/String;)Lnet/minecraft/util/CsvOutput$Builder;
+      21: ldc_w         #493                // String visibility
+      24: invokevirtual #483                // Method net/minecraft/util/CsvOutput$Builder.addColumn:(Ljava/lang/String;)Lnet/minecraft/util/CsvOutput$Builder;
+      27: ldc_w         #495                // String load_status
+      30: invokevirtual #483                // Method net/minecraft/util/CsvOutput$Builder.addColumn:(Ljava/lang/String;)Lnet/minecraft/util/CsvOutput$Builder;
+      33: ldc_w         #497                // String entity_count
+      36: invokevirtual #483                // Method net/minecraft/util/CsvOutput$Builder.addColumn:(Ljava/lang/String;)Lnet/minecraft/util/CsvOutput$Builder;
+      39: aload_1
+      40: invokevirtual #499                // Method net/minecraft/util/CsvOutput$Builder.build:(Ljava/io/Writer;)Lnet/minecraft/util/CsvOutput;
+      43: astore_2
+      44: aload_0
+      45: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      48: invokevirtual #418                // Method net/minecraft/world/level/entity/EntitySectionStorage.getAllChunksWithExistingSections:()Lit/unimi/dsi/fastutil/longs/LongSet;
+      51: aload_0
+      52: aload_2
+      53: invokedynamic #503,  0            // InvokeDynamic #11:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;Lnet/minecraft/util/CsvOutput;)Lit/unimi/dsi/fastutil/longs/LongConsumer;
+      58: invokeinterface #456,  2          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.forEach:(Lit/unimi/dsi/fastutil/longs/LongConsumer;)V
+      63: return
+
+  public java.lang.String gatherStats();
+    Code:
+       0: aload_0
+       1: getfield      #13                 // Field knownUuids:Ljava/util/Set;
+       4: invokeinterface #506,  1          // InterfaceMethod java/util/Set.size:()I
+       9: aload_0
+      10: getfield      #49                 // Field visibleEntityStorage:Lnet/minecraft/world/level/entity/EntityLookup;
+      13: invokevirtual #510                // Method net/minecraft/world/level/entity/EntityLookup.count:()I
+      16: aload_0
+      17: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      20: invokevirtual #513                // Method net/minecraft/world/level/entity/EntitySectionStorage.count:()I
+      23: aload_0
+      24: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      27: invokeinterface #514,  1          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.size:()I
+      32: aload_0
+      33: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+      36: invokeinterface #514,  1          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.size:()I
+      41: aload_0
+      42: getfield      #42                 // Field loadingInbox:Ljava/util/Queue;
+      45: invokeinterface #515,  1          // InterfaceMethod java/util/Queue.size:()I
+      50: aload_0
+      51: getfield      #32                 // Field chunksToUnload:Lit/unimi/dsi/fastutil/longs/LongSet;
+      54: invokeinterface #516,  1          // InterfaceMethod it/unimi/dsi/fastutil/longs/LongSet.size:()I
+      59: invokedynamic #517,  0            // InvokeDynamic #12:makeConcatWithConstants:(IIIIIII)Ljava/lang/String;
+      64: areturn
+
+  public int count();
+    Code:
+       0: aload_0
+       1: getfield      #49                 // Field visibleEntityStorage:Lnet/minecraft/world/level/entity/EntityLookup;
+       4: invokevirtual #510                // Method net/minecraft/world/level/entity/EntityLookup.count:()I
+       7: ireturn
+
+  private void lambda$dumpSections$17(net.minecraft.util.CsvOutput, long);
+    Code:
+       0: aload_0
+       1: getfield      #26                 // Field chunkLoadStatuses:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_2
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: checkcast     #75                 // class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
+      13: astore        4
+      15: aload_0
+      16: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+      19: lload_2
+      20: invokevirtual #521                // Method net/minecraft/world/level/entity/EntitySectionStorage.getExistingSectionPositionsInChunk:(J)Ljava/util/stream/LongStream;
+      23: aload_0
+      24: aload_1
+      25: aload         4
+      27: invokedynamic #525,  0            // InvokeDynamic #13:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;Lnet/minecraft/util/CsvOutput;Lnet/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus;)Ljava/util/function/LongConsumer;
+      32: invokeinterface #528,  2          // InterfaceMethod java/util/stream/LongStream.forEach:(Ljava/util/function/LongConsumer;)V
+      37: return
+
+  private void lambda$dumpSections$16(net.minecraft.util.CsvOutput, net.minecraft.world.level.entity.PersistentEntitySectionManager$ChunkLoadStatus, long);
+    Code:
+       0: aload_0
+       1: getfield      #58                 // Field sectionStorage:Lnet/minecraft/world/level/entity/EntitySectionStorage;
+       4: lload_3
+       5: invokevirtual #533                // Method net/minecraft/world/level/entity/EntitySectionStorage.getSection:(J)Lnet/minecraft/world/level/entity/EntitySection;
+       8: astore        5
+      10: aload         5
+      12: ifnull        92
+      15: aload_1
+      16: bipush        6
+      18: anewarray     #2                  // class java/lang/Object
+      21: dup
+      22: iconst_0
+      23: lload_3
+      24: invokestatic  #536                // Method net/minecraft/core/SectionPos.x:(J)I
+      27: invokestatic  #539                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      30: aastore
+      31: dup
+      32: iconst_1
+      33: lload_3
+      34: invokestatic  #545                // Method net/minecraft/core/SectionPos.y:(J)I
+      37: invokestatic  #539                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      40: aastore
+      41: dup
+      42: iconst_2
+      43: lload_3
+      44: invokestatic  #547                // Method net/minecraft/core/SectionPos.z:(J)I
+      47: invokestatic  #539                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      50: aastore
+      51: dup
+      52: iconst_3
+      53: aload         5
+      55: invokevirtual #199                // Method net/minecraft/world/level/entity/EntitySection.getStatus:()Lnet/minecraft/world/level/entity/Visibility;
+      58: aastore
+      59: dup
+      60: iconst_4
+      61: aload_2
+      62: aastore
+      63: dup
+      64: iconst_5
+      65: aload         5
+      67: invokevirtual #549                // Method net/minecraft/world/level/entity/EntitySection.size:()I
+      70: invokestatic  #539                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      73: aastore
+      74: invokevirtual #550                // Method net/minecraft/util/CsvOutput.writeRow:([Ljava/lang/Object;)V
+      77: goto          92
+      80: astore        6
+      82: new           #556                // class java/io/UncheckedIOException
+      85: dup
+      86: aload         6
+      88: invokespecial #558                // Method java/io/UncheckedIOException."<init>":(Ljava/io/IOException;)V
+      91: athrow
+      92: return
+    Exception table:
+       from    to  target type
+          15    77    80   Class java/io/IOException
+
+  private boolean lambda$saveAll$15(long);
+    Code:
+       0: aload_0
+       1: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: getstatic     #62                 // Field net/minecraft/world/level/entity/Visibility.HIDDEN:Lnet/minecraft/world/level/entity/Visibility;
+      13: if_acmpne     20
+      16: iconst_1
+      17: goto          21
+      20: iconst_0
+      21: istore_3
+      22: iload_3
+      23: ifeq          34
+      26: aload_0
+      27: lload_1
+      28: invokevirtual #561                // Method processChunkUnload:(J)Z
+      31: goto          44
+      34: aload_0
+      35: lload_1
+      36: invokedynamic #564,  0            // InvokeDynamic #14:accept:()Ljava/util/function/Consumer;
+      41: invokevirtual #369                // Method storeChunkSections:(JLjava/util/function/Consumer;)Z
+      44: ireturn
+
+  private static void lambda$saveAll$14(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: return
+
+  private void lambda$autoSave$13(long);
+    Code:
+       0: aload_0
+       1: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: getstatic     #62                 // Field net/minecraft/world/level/entity/Visibility.HIDDEN:Lnet/minecraft/world/level/entity/Visibility;
+      13: if_acmpne     20
+      16: iconst_1
+      17: goto          21
+      20: iconst_0
+      21: istore_3
+      22: iload_3
+      23: ifeq          35
+      26: aload_0
+      27: lload_1
+      28: invokevirtual #561                // Method processChunkUnload:(J)Z
+      31: pop
+      32: goto          46
+      35: aload_0
+      36: lload_1
+      37: invokedynamic #567,  0            // InvokeDynamic #15:accept:()Ljava/util/function/Consumer;
+      42: invokevirtual #369                // Method storeChunkSections:(JLjava/util/function/Consumer;)Z
+      45: pop
+      46: return
+
+  private static void lambda$autoSave$12(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: return
+
+  private void lambda$processPendingLoads$11(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iconst_1
+       3: invokevirtual #131                // Method addEntity:(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z
+       6: pop
+       7: aload_1
+       8: instanceof    #138                // class net/minecraft/world/entity/Entity
+      11: ifeq          23
+      14: aload_1
+      15: checkcast     #138                // class net/minecraft/world/entity/Entity
+      18: astore_2
+      19: aload_2
+      20: invokevirtual #568                // Method net/minecraft/world/entity/Entity.onAddedToLevel:()V
+      23: return
+
+  private boolean lambda$processUnloads$10(long);
+    Code:
+       0: aload_0
+       1: getfield      #22                 // Field chunkVisibility:Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+       4: lload_1
+       5: invokeinterface #289,  3          // InterfaceMethod it/unimi/dsi/fastutil/longs/Long2ObjectMap.get:(J)Ljava/lang/Object;
+      10: getstatic     #62                 // Field net/minecraft/world/level/entity/Visibility.HIDDEN:Lnet/minecraft/world/level/entity/Visibility;
+      13: if_acmpeq     20
+      16: iconst_1
+      17: goto          25
+      20: aload_0
+      21: lload_1
+      22: invokevirtual #561                // Method processChunkUnload:(J)Z
+      25: ireturn
+
+  private void lambda$processChunkUnload$9(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_1
+       1: invokeinterface #571,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.getPassengersAndSelf:()Ljava/util/stream/Stream;
+       6: aload_0
+       7: invokedynamic #574,  0            // InvokeDynamic #16:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+      12: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+      17: return
+
+  private static java.lang.Void lambda$requestChunkLoad$8(net.minecraft.world.level.ChunkPos, java.lang.Throwable);
+    Code:
+       0: getstatic     #119                // Field LOGGER:Lorg/slf4j/Logger;
+       3: ldc_w         #575                // String Failed to read chunk {}
+       6: aload_0
+       7: aload_1
+       8: invokeinterface #577,  4          // InterfaceMethod org/slf4j/Logger.error:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+      13: aconst_null
+      14: areturn
+
+  private static java.util.stream.Stream lambda$storeChunkSections$7(net.minecraft.world.level.entity.EntitySection);
+    Code:
+       0: aload_0
+       1: invokevirtual #581                // Method net/minecraft/world/level/entity/EntitySection.getEntities:()Ljava/util/stream/Stream;
+       4: invokedynamic #582,  0            // InvokeDynamic #17:test:()Ljava/util/function/Predicate;
+       9: invokeinterface #585,  2          // InterfaceMethod java/util/stream/Stream.filter:(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;
+      14: areturn
+
+  private void lambda$updateChunkStatus$6(net.minecraft.world.level.entity.Visibility, net.minecraft.world.level.entity.EntitySection);
+    Code:
+       0: aload_2
+       1: aload_1
+       2: invokevirtual #589                // Method net/minecraft/world/level/entity/EntitySection.updateChunkStatus:(Lnet/minecraft/world/level/entity/Visibility;)Lnet/minecraft/world/level/entity/Visibility;
+       5: astore_3
+       6: aload_3
+       7: invokevirtual #207                // Method net/minecraft/world/level/entity/Visibility.isAccessible:()Z
+      10: istore        4
+      12: aload_1
+      13: invokevirtual #207                // Method net/minecraft/world/level/entity/Visibility.isAccessible:()Z
+      16: istore        5
+      18: aload_3
+      19: invokevirtual #213                // Method net/minecraft/world/level/entity/Visibility.isTicking:()Z
+      22: istore        6
+      24: aload_1
+      25: invokevirtual #213                // Method net/minecraft/world/level/entity/Visibility.isTicking:()Z
+      28: istore        7
+      30: iload         6
+      32: ifeq          65
+      35: iload         7
+      37: ifne          65
+      40: aload_2
+      41: invokevirtual #581                // Method net/minecraft/world/level/entity/EntitySection.getEntities:()Ljava/util/stream/Stream;
+      44: invokedynamic #592,  0            // InvokeDynamic #18:test:()Ljava/util/function/Predicate;
+      49: invokeinterface #585,  2          // InterfaceMethod java/util/stream/Stream.filter:(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;
+      54: aload_0
+      55: invokedynamic #593,  0            // InvokeDynamic #19:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+      60: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+      65: iload         4
+      67: ifeq          103
+      70: iload         5
+      72: ifne          103
+      75: aload_2
+      76: invokevirtual #581                // Method net/minecraft/world/level/entity/EntitySection.getEntities:()Ljava/util/stream/Stream;
+      79: invokedynamic #594,  0            // InvokeDynamic #20:test:()Ljava/util/function/Predicate;
+      84: invokeinterface #585,  2          // InterfaceMethod java/util/stream/Stream.filter:(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;
+      89: aload_0
+      90: invokedynamic #595,  0            // InvokeDynamic #21:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+      95: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+     100: goto          138
+     103: iload         4
+     105: ifne          138
+     108: iload         5
+     110: ifeq          138
+     113: aload_2
+     114: invokevirtual #581                // Method net/minecraft/world/level/entity/EntitySection.getEntities:()Ljava/util/stream/Stream;
+     117: invokedynamic #596,  0            // InvokeDynamic #22:test:()Ljava/util/function/Predicate;
+     122: invokeinterface #585,  2          // InterfaceMethod java/util/stream/Stream.filter:(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;
+     127: aload_0
+     128: invokedynamic #597,  0            // InvokeDynamic #23:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+     133: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+     138: iload         6
+     140: ifne          173
+     143: iload         7
+     145: ifeq          173
+     148: aload_2
+     149: invokevirtual #581                // Method net/minecraft/world/level/entity/EntitySection.getEntities:()Ljava/util/stream/Stream;
+     152: invokedynamic #598,  0            // InvokeDynamic #24:test:()Ljava/util/function/Predicate;
+     157: invokeinterface #585,  2          // InterfaceMethod java/util/stream/Stream.filter:(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;
+     162: aload_0
+     163: invokedynamic #599,  0            // InvokeDynamic #25:accept:(Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;)Ljava/util/function/Consumer;
+     168: invokeinterface #229,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+     173: return
+
+  private static boolean lambda$updateChunkStatus$5(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: invokeinterface #219,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.isAlwaysTicking:()Z
+       6: ifne          13
+       9: iconst_1
+      10: goto          14
+      13: iconst_0
+      14: ireturn
+
+  private static boolean lambda$updateChunkStatus$4(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: invokeinterface #219,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.isAlwaysTicking:()Z
+       6: ifne          13
+       9: iconst_1
+      10: goto          14
+      13: iconst_0
+      14: ireturn
+
+  private static boolean lambda$updateChunkStatus$3(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: invokeinterface #219,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.isAlwaysTicking:()Z
+       6: ifne          13
+       9: iconst_1
+      10: goto          14
+      13: iconst_0
+      14: ireturn
+
+  private static boolean lambda$updateChunkStatus$2(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: invokeinterface #219,  1          // InterfaceMethod net/minecraft/world/level/entity/EntityAccess.isAlwaysTicking:()Z
+       6: ifne          13
+       9: iconst_1
+      10: goto          14
+      13: iconst_0
+      14: ireturn
+
+  private void lambda$addWorldGenChunkEntities$1(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iconst_0
+       3: invokevirtual #131                // Method addEntity:(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z
+       6: pop
+       7: aload_1
+       8: instanceof    #138                // class net/minecraft/world/entity/Entity
+      11: ifeq          23
+      14: aload_1
+      15: checkcast     #138                // class net/minecraft/world/entity/Entity
+      18: astore_2
+      19: aload_2
+      20: invokevirtual #568                // Method net/minecraft/world/entity/Entity.onAddedToLevel:()V
+      23: return
+
+  private void lambda$addLegacyChunkEntities$0(net.minecraft.world.level.entity.EntityAccess);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iconst_1
+       3: invokevirtual #131                // Method addEntity:(Lnet/minecraft/world/level/entity/EntityAccess;Z)Z
+       6: pop
+       7: aload_1
+       8: instanceof    #138                // class net/minecraft/world/entity/Entity
+      11: ifeq          23
+      14: aload_1
+      15: checkcast     #138                // class net/minecraft/world/entity/Entity
+      18: astore_2
+      19: aload_2
+      20: invokevirtual #568                // Method net/minecraft/world/entity/Entity.onAddedToLevel:()V
+      23: return
+
+  static {};
+    Code:
+       0: invokestatic  #600                // Method com/mojang/logging/LogUtils.getLogger:()Lorg/slf4j/Logger;
+       3: putstatic     #119                // Field LOGGER:Lorg/slf4j/Logger;
+       6: return
+}

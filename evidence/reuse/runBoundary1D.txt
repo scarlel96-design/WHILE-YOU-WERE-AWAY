@@ -1,0 +1,3 @@
+RUNNING
+PASS runBoundary1D event=signal_wake boundary=BEFORE_COMPLETE checkpoint=3
+FAULT Runtime.halt; no shutdown save after tested boundary

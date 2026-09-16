@@ -1,0 +1,54 @@
+Current: 《네가 없는 동안》 0.3.1-dev.1 / return-network-contract / PARTIAL.
+First complex event: PARTIAL, semantic contract only. Not registered or playable. Campaign PARTIAL.
+Minecraft1.21.1 NeoForge21.1.249 save4 optional actorSchema1 art revision2 retained.
+Baseline JAR C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\return-network-contract\baseline\previous.jar SHA256 db567920ac9240a375a68170868cc6410dcde0a397d541a805e345e3ae88501a
+Baseline source ZIP C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\return-network-contract\baseline\previous-source.zip SHA256 5b5460ee0eab81fffe8cadbe20b3a446b2af91bad385abfd32f52aca47d695c1
+Adopted dist/npc-path original JAR/source hashes were rechecked and copied before changes. No baseline package overwritten.
+
+ACTUAL CODE
+New ReturnNetworkState.java: immutable Stage, Structure, Presentation, Fact, Location, Participant, Prerequisite and Wait types. Existing EventCheckpoint supports only0..4; it was NOT extended in a way that could alter existing events. New contract has its own0..6semantic stages.
+Methods discover/join/observePattern/intervene/beginPresentation/observeResponse/shareExperience/complete return validated immutable drafts. They do not mutate a live committed object, write to disk, grant items, change blocks or spawn entities. Duplicate later calls preserve facts; different participant binding is rejected.
+Checkpoint0 NOT_STARTED has no event identity/facts.1 DISCOVERED binds event instance/location.2 NPC_JOINED captures npc:yeoul instance/UUID/generation.3 SIGNAL_OBSERVED records old pattern evidence/READY.4 INTERVENTION_COMMITTED records intervention/ACTIVATED. Presentation NONE->PRESENTING remains checkpoint4.5 RESPONSE_OBSERVED records response and correspondence evidence/RESPONDED. F adds SHARED_EXPERIENCE while stillcheckpoint5. G completescheckpoint6 and atomically groups COMPLETE/AFTERMATH/NEXT_PREREQUISITE in a draft.
+No animation tick is a checkpoint. Waiting for player/NPC/dimension/environment is read-only; no checkpoint rollback or generation change. `Prerequisite` represents required checkpoint4/completed/shared/relationship input; future adapter MUST derive these from real NpcState rather than trust arbitrary booleans.
+Standalone NBT codec save/load uses schema1, explicit stage+checkpoint consistency, typed identity fields, participant tuple, structure/presentation enums and exact required fact set. Invalid ordering, missing permanent facts, duplicate facts, wrong structure, unknown enums/schema and bad binding are rejected, not normalized to empty state. Unknown optional keys ignored. This codec is NOT yet connected to StoryStorage, so these rejections are NOT actual saved-world fail-closed proof.
+New ReturnNetworkGameTests.java adds7 contract tests; baseline63 preserved: ordered/idempotent facts;9semantic NBT boundaries including presentation and shared substeps; prerequisites/order rejection; participant rebinding/copy isolation; read-only waits;8semantic corruption mutations; invalid schema/checkpoint/enum/duplicate plus unknown-key compatibility. In-memory copies are NOT real copy-world evidence.
+build.gradle changes only current GameTest output root to evidence/return-network-contract/gametest. Existing compiled classes unchanged;102asset/data entries byte-identical. Ten new classes (state, nested enums/records, tests).
+New docs/RETURN_NETWORK_FIRST_RESPONSE.md fixes stage/commit/adapter obligations and Foreshadow candidate RETURN_NETWORK_CURRENT_PATTERN. No final asset, automatic structure or new NPC routine introduced.
+
+EVENT DESIGN / PENDING IMPLEMENTATION
+Name 귀환망의 첫 응답; ID return_network_first_response. After return-light completion and shared relationship, player approaches a small old railway relay, Yeoul joins with the same identity, player compares rhythm and operates actual controls. Response uses restrained lights/sound plus accessible visual/text information and leaves persistent aftermath. These are specified, NOT wired into gameplay yet.
+Evidence A OLD_PATTERN_EVIDENCE: old relay's pattern. Evidence B PATTERN_MATCH_EVIDENCE: correspondence with current return signal. Neither reveals synthetic past or Continuity Graph. Foreshadow later means a present relationship/action is being registered; no Foreshadow Registry implementation.
+No-Spawn/No-Stinger/Free-Look remain scene targets, not tested player-emotion results.
+
+VALIDATION / EXACT COMMANDS
+Work directory C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+BASELINE: ./gradlew.bat --offline runGameTestServer
+Input npc-path source before added classes. Output All 63 required tests passed; BUILD SUCCESSFUL in 39s; exit0. See baseline-tests.log.
+MODIFIED: ./gradlew.bat --offline compileJava runGameTestServer build
+Output All 70 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 47s; exit0. See tests.log.
+70means63existing+7new, not70new or actual event tests. Core assertion count unchanged and rerun.
+REAL CLIENT=0 this slice. No new A-G process kill/restart, death, chunk, dimension, world-copy, corrupt-world, actual movement, light/sound or aftermath proof. Historical46 npc-path clients remain historical, not promoted to composite proof.
+Storage: standalone real Minecraft NBT in GameTest, not persistent NarrativeData extension/atomic disk commit. No deployed migration change. World save downgrade not supported/claimed.
+Baseline/modified archive probe each: java -cp build/npc-world-archive-probe PresenceArchiveProbe <explicit JAR> present -> PASS archive policy=PRESENT checks=8, exit0. This tests existing packaged policy only.
+ROLLBACK: C:/Program Files/Git/bin/bash.exe -lc 'chmod +x evidence/return-network-contract/ROLLBACK.sh && test -x evidence/return-network-contract/ROLLBACK.sh && evidence/return-network-contract/ROLLBACK.sh build/rollback-return-network-contract/test.jar'
+Input C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\build\rollback-return-network-contract\test.jar initially modified hashbf8e234052c8a33ea49cb02c3cabcd941515e29fc126280fdcfa62d4ba0db9c0. Literal output ROLLBACK PASS: npc-path JAR restored; world files untouched; exit0.
+Restored hash db567920ac9240a375a68170868cc6410dcde0a397d541a805e345e3ae88501a equals baseline. Restored policy command: java -cp build/npc-world-archive-probe PresenceArchiveProbe build/rollback-return-network-contract/test.jar present; literal PASS archive policy=PRESENT checks=8; exit0. Restored wholeJAR byte-identical to npc-path, so new contract classes removed in rollback copy. Distribution modified JAR retained.
+Exact package commands/results:
+{"label": "BASELINE", "command": ["C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe", "-cp", "build/npc-world-archive-probe", "PresenceArchiveProbe", "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\return-network-contract\\baseline\\previous.jar", "present"], "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\return-network-contract\\baseline\\previous.jar", "exit": 0, "output": "PASS archive policy=PRESENT checks=8\n", "sha256": "db567920ac9240a375a68170868cc6410dcde0a397d541a805e345e3ae88501a"}
+{"label": "MODIFIED", "command": ["C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe", "-cp", "build/npc-world-archive-probe", "PresenceArchiveProbe", "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\return-network-contract\\whileaway-0.3.1-return-network-contract.jar", "present"], "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\return-network-contract\\whileaway-0.3.1-return-network-contract.jar", "exit": 0, "output": "PASS archive policy=PRESENT checks=8\n", "sha256": "bf8e234052c8a33ea49cb02c3cabcd941515e29fc126280fdcfa62d4ba0db9c0"}
+
+
+FAILURES / MODEL
+No compile/GameTest/rollback failures observed in this slice. Template-prefix annotation was corrected during review before first modified test run; no reduced assertion or production special-case. Primary session implemented/reviewed; no Terra/Luna, Caveman or comparative token experiment. Usage sampled from account windows only: started5h7/weekly89, later5h30/weekly93. Safe pause at completed contract/build/package boundary; no shutdown and no new client batch.
+
+ARTIFACTS
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\return-network-contract\whileaway-0.3.1-return-network-contract.jar
+SHA256=bf8e234052c8a33ea49cb02c3cabcd941515e29fc126280fdcfa62d4ba0db9c0
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\return-network-contract\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\return-network-contract\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\return-network-contract\ROLLBACK.sh
+Source ZIP=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\return-network-contract\whileaway-0.3.1-return-network-contract-source.zip
+
+NEXT / GATES
+First exact next step is a strict world-local NarrativeData/StoryStorage extension and immutable draft -> integrity validation -> durable atomic write -> published state/effects commit adapter. Decide save-format/schema compatibility before adding active data; keep original quarantine/write guard. Add participant cross-validation and actual structure observations, then integrate NpcNavigation with mutually exclusive relay/home goals. Only then enable discovery/interaction/presentation and actual A-G fixtures. Do not automatically materialize this draft model as an active event.
+Full complex PARTIAL. World integration, actual Yeoul contribution, actual relay, accessible presentation, aftermath and all requested real-client exception cases NOT TESTED/NOT IMPLEMENTED. Item/Reward transaction, Structure Fallback, full investigation, natural survival and final art NOT STARTED in this stage.0.3.2 and Caveman HOLD. Existing NPC lifecycle PASS is a baseline result, not proof of this composite.

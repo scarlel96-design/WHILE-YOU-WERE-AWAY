@@ -1,0 +1,18 @@
+{
+  "scope": "DOCUMENTATION ONLY",
+  "source_sha256": "fa2add79f6488c0d9ae3634eb67b902752136ae0fa0a90cb0af8bba36b099fee",
+  "design_sha256": "fa2add79f6488c0d9ae3634eb67b902752136ae0fa0a90cb0af8bba36b099fee",
+  "modified": [
+    "README.md",
+    "docs/DIRECTION.md",
+    "docs/FUNCTION_FIRST.md",
+    "docs/DESIGN_V04.md",
+    "docs/DESIGN_V05.md"
+  ],
+  "source_byte_identity": "PASS",
+  "protected_src_dist_files": 187,
+  "protected_src_dist_unchanged": "PASS",
+  "builds_or_clients_run": 0,
+  "implementation_status": "PARTIAL unchanged",
+  "previous_documents": "preserved in baseline; old v0.4 retained as superseded history"
+}

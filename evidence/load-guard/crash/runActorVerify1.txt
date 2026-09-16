@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=28172
+PASS reload Verify checkpoint=4 facts=[encounter_complete, pursuit_started]
+PASS runActorVerify1 completed state stable 300 ticks; no actor or completion replay; integrity clean

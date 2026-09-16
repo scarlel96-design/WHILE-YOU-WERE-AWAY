@@ -1,0 +1,3 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=36360
+PASS CutB boundary=NPC_B_APPEARED checkpoint=1 generation=0 uuid=201e082c-aa93-42d8-9cae-84cc3cfebaca facts=[npc.goal=choose_evening_routine, npc.home=10445360758849, npc.schema=1, npc.work=check_return_light]

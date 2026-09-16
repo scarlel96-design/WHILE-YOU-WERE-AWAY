@@ -1,0 +1,2 @@
+READ-ONLY REVIEW, NOT A RUNTIME RESULT
+DimensionDataStorage.readSavedData catches deserializer exceptions and returns null. computeIfAbsent then invokes the default constructor. NarrativeData.load currently throws on malformed identity. Verify on an isolated copied world after Wayfarer suite closes; do not treat direct-parser rejection as proof of fail-closed world loading.

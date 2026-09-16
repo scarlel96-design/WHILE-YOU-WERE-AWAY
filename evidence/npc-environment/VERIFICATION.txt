@@ -1,0 +1,70 @@
+Current: 0.3.1-dev.1 / npc-environment / PARTIAL / safe pause at observed 5h93%, weekly61%.
+Input JAR C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-environment\baseline\previous.jar SHA256 9096e4dc9276c8d1eae7aaf2446950e4f76edc5f0f58ee906d7ae70d7268530f
+Input source C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-environment\baseline\previous-source.zip SHA256 519e7f5b12098357628b311ffa8b9ad5cd1974a2e5474751255c978318fcdc87
+Save4 / optional actorSchema1 / art2 unchanged. Original npc-world distribution preserved.
+Changes: NpcEnvironment.inspect read-only local standing geometry and return-light dependency classification. Residence VALID/TEMPORARILY_BLOCKED/MISSING/CONFLICT/CHUNK_UNAVAILABLE. Path NOT_ASSESSED/CHUNK_UNAVAILABLE/DESTINATION_BLOCKED/DESTINATION_INVALID/DESTINATION_MISSING. Light VALID/MISSING/WRONG_BLOCK/CHUNK_UNAVAILABLE.
+VALID means local standing geometry, NOT path reachability. UNREACHABLE and bounded retry/navigation policy remain unimplemented. isReturnLight centralizes logical dependency binding.
+NpcEvents.update checks dependency before reactivating suspended event; stops navigation and uses existing checkpoint suspension before completion. Completed resident facts/checkpoint are never reverted. No new permanent facts, no migration change, no block writes or NPC teleport. Only existing class changed: NpcEvents.
+NpcEnvironmentGameTests adds3 tests: geometry missing/blocked/flooded/restored; light missing/wrong/restored; actual ungenerated chunk remains ungenerated and is not labeled missing. These are GameTests, not real-client lifecycle/recovery proof.
+BASELINE ./gradlew.bat --offline runGameTestServer -> All 58 required tests passed :); BUILD SUCCESSFUL in 1m; exit0.
+MODIFIED ./gradlew.bat --offline compileJava runGameTestServer build -> All 61 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 58s; exit0.
+No new actual clients (0), no environment restart/corruption/copy/death final regression, no fresh LoadGuard/NPC storage probe this slice. Previous npc-world results are historical, not promoted to new runtime PASS. No failures in current build/GameTests.
+All environment integration/recovery gates PARTIAL or NOT TESTED. NPC/campaign PARTIAL; complex NOT STARTED;0.3.2/art/Caveman HOLD. Primary agent only; no Terra/Luna; no token saving experiment. No shutdown.
+NEXT: preserve this candidate; implement bounded path retries with CHUNK_UNAVAILABLE vs TEMPORARY_FAILURE vs UNREACHABLE; then real blocked/light-missing/wrong/fixed client + fresh-process cases; actual NPC corruption; latest full lifecycle regression. Do not use old npc-world packager/verifier against changed production source.
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\npc-environment\whileaway-0.3.1-npc-environment.jar SHA256=1fd5ef7e63960ac9e79d7ef7d11226f639457e4569e661809465b8aa6654e61b
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-environment\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-environment\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-environment\ROLLBACK.sh
+Rollback target C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\build\rollback-npc-environment\test.jar; restored hash 9096e4dc9276c8d1eae7aaf2446950e4f76edc5f0f58ee906d7ae70d7268530f. Restored whole JAR byte-equals npc-world, so environment guard removed; packaged policy checks pass. Modified JAR remains changed. No save downgrade or gameplay rollback claim.
+Exact package commands/results/exit (input each explicit JAR, present policy8 cases):
+[
+  {
+    "label": "BASELINE",
+    "command": [
+      "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe",
+      "-cp",
+      "build/npc-world-archive-probe",
+      "PresenceArchiveProbe",
+      "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-environment\\baseline\\previous.jar",
+      "present"
+    ],
+    "exit": 0,
+    "output": "PASS archive policy=PRESENT checks=8\n"
+  },
+  {
+    "label": "MODIFIED",
+    "command": [
+      "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe",
+      "-cp",
+      "build/npc-world-archive-probe",
+      "PresenceArchiveProbe",
+      "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-environment\\whileaway-0.3.1-npc-environment.jar",
+      "present"
+    ],
+    "exit": 0,
+    "output": "PASS archive policy=PRESENT checks=8\n"
+  },
+  {
+    "label": "ROLLBACK",
+    "command": [
+      "C:\\Program Files\\Git\\bin\\bash.exe",
+      "-lc",
+      "chmod +x evidence/npc-environment/ROLLBACK.sh && test -x evidence/npc-environment/ROLLBACK.sh && evidence/npc-environment/ROLLBACK.sh build/rollback-npc-environment/test.jar"
+    ],
+    "exit": 0,
+    "output": "ROLLBACK PASS: npc-world JAR restored; world files untouched\n"
+  },
+  {
+    "label": "RESTORED",
+    "command": [
+      "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot\\bin\\java.exe",
+      "-cp",
+      "build/npc-world-archive-probe",
+      "PresenceArchiveProbe",
+      "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc-environment\\test.jar",
+      "present"
+    ],
+    "exit": 0,
+    "output": "PASS archive policy=PRESENT checks=8\n"
+  }
+]

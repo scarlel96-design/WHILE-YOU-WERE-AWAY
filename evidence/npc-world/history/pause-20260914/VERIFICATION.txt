@@ -1,0 +1,128 @@
+# NPC world lifecycle safe-pause snapshot
+Current: While You Were Away / 0.3.1-dev.1 / npc-world / PARTIAL.
+Input npc-exceptions JAR 19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19; source d34f61add10bcfd2ff44fe6cfc4034f74abab503d0f074eb0940b55646afeb4d. Copied/rehashed under evidence/npc-world/baseline; original distributions untouched.
+Minecraft 1.21.1 / NeoForge 21.1.249 / save format 4 / actorSchema optional 1 / art revision 2 unchanged.
+
+Actual changes: added opt-in client/NpcWorldSmoke.java, isolated run configurations and tools. All 83 existing compiled classes are byte-identical to baseline; only the new smoke class was added. No production NPC, canonical, generation, write-guard, migration, relationship, residence/path or corruption policy changed. No final art, content, fallback or composite work.
+NpcWorldSmoke remembers persistent identity/facts/checkpoint, observes real movement at checkpoint 2, moves only the fixture player away, queries actual entity plus hasChunkAt and areEntitiesLoaded for entity/registered/snapshot/residence/light positions, holds proven unloaded state for 100 observed ticks, then returns and checks unique canonical identity and natural completion. currentTarget in diagnostics means the adapter's residence goal, not serialized path nodes. The actual positions in these two fixtures share chunk [2,4]; each source was read separately and live entity absence/storage unload were explicitly checked. This is not proof for mutually different anchor chunks.
+
+Final observed cases: Chunk1 (before dialogue), Chunk2 (actual movement after dialogue). Both preserve UUID/instance/generation 0/checkpoint/facts/work during absence, then reconnect one canonical StoryNpc and complete at checkpoint 4. No NPC teleport or forced chunk ticket; no NPC/block state edits. Fixture player moves to [4096,160,4096] in quiet_city. Original seed tree manifests unchanged. This is actual automated Minecraft, not natural survival or divergent copy-world progression.
+Baseline and modified 58 GameTests pass; modified core assertions 176857. Existing load-guard probe rerun: 580 cases/2161 assertions, including migration 1/2/3 and format4 paths. No new NPC-specific corruption probe/client. Previous death/A-E real-client results are baseline evidence, not rerun here; no full NPC closure claim.
+
+Usage pause: observed five-hour 87%, weekly45%. Finished in-flight Chunk2. Runner reported PAUSED_AT_SAFE_BOUNDARY before Chunk4; no next process launched. Both completed PIDs exited. No new corruption/environment/dimension batch. No automatic shutdown. No failures in the two executed current client cases. Tests prepared but not executed are NOT TESTED.
+
+Next exact step: check usage, preserve/rename PAUSE_REQUESTED history, then run tools/run-npc-world.py Chunk4. After that Nether1 Nether2 End1 End2 CutNether2 ResumeNether2. Do not rerun completed modes into existing evidence directories. Run verify-npc-world.py only after all nine named modes pass. The pause verifier intentionally certifies only two cases. Then implement copy-world divergence, residence/path/light classifications and recovery, representative corruption clients, and final combined NPC regression. NPC remains PARTIAL and composite NOT STARTED until every requested axis passes.
+
+Caveman HOLD/off; Terra/Luna delegation none; current primary agent handled harness/review. No model routing or token saving measurements. Save downgrade not tested/supported by rollback. Rollback restores only a supplied modified JAR copy and never changes worlds.
+
+## Gates
+{
+  "version": "0.3.1-dev.1",
+  "work": "npc-world",
+  "safePause": true,
+  "buildableCheckpoint": "PASS",
+  "saveFormat": 4,
+  "actorSchema": 1,
+  "artRevision": 2,
+  "world_travel": "PARTIAL",
+  "actualChunk1": "PASS",
+  "actualChunk2": "PASS",
+  "completedChunk4": "NOT TESTED",
+  "Nether": "NOT TESTED",
+  "End": "NOT TESTED",
+  "dimensionFreshProcess": "NOT TESTED",
+  "gameTests": 58,
+  "coreAssertions": 176857,
+  "realClients": 2,
+  "NPC_overall": "PARTIAL",
+  "campaign": "PARTIAL",
+  "copyDivergence": "NOT TESTED",
+  "residencePathLight": "NOT TESTED",
+  "NPC_corruptionClient": "NOT TESTED",
+  "composite": "NOT STARTED",
+  "next": "Chunk4 after usage check; then Nether1/2, End1/2, CutNether2+ResumeNether2"
+}
+
+## Commands/results
+CWD C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+./gradlew.bat --offline runGameTestServer
+input/log C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\baseline-tests.log
+[10:44:54] [Server thread/INFO] [minecraft/GameTestServer]: All 58 required tests passed :)
+BUILD SUCCESSFUL in 1m 16s
+exit=0
+./gradlew.bat --offline compileJava runGameTestServer build
+input/log C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\tests-1.log
+[10:49:14] [Server thread/INFO] [minecraft/GameTestServer]: All 58 required tests passed :)
+PASS core assertions=176857
+BUILD SUCCESSFUL in 1m 34s
+exit=0
+pwsh -NoProfile -File tools/probe-npc-world-storage.ps1
+input/log C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\probe.log
+PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false
+exit=0
+{
+  "modified_hash": "f5b159a950233a7c2413d2dc0d8e7b4f65287d44f728a1cd79c4323f7c02d438",
+  "world_operations": "none",
+  "restored_hash": "19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19",
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.",
+  "baseline_hash": "19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19",
+  "commands": [
+    {
+      "exit": 0,
+      "command": "java -cp build/npc-world-archive-probe NpcWorldArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-world\\baseline\\previous.jar\" baseline",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard in both; world smoke harness expected only in modified; canonical recovery retained in both",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness=false",
+      "label": "BASELINE"
+    },
+    {
+      "exit": 0,
+      "command": "java -cp build/npc-world-archive-probe NpcWorldArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-world\\whileaway-0.3.1-npc-world.jar\" modified",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard in both; world smoke harness expected only in modified; canonical recovery retained in both",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness=true",
+      "label": "MODIFIED"
+    },
+    {
+      "exit": 0,
+      "command": "bash -lc \"chmod +x evidence/npc-world/ROLLBACK.sh && test -x evidence/npc-world/ROLLBACK.sh && evidence/npc-world/ROLLBACK.sh build/rollback-npc-world/test.jar\"",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc-world\\test.jar",
+      "output": "ROLLBACK PASS: npc-exceptions JAR restored; world files untouched",
+      "label": "ROLLBACK"
+    },
+    {
+      "exit": 0,
+      "command": "java -cp build/npc-world-archive-probe NpcWorldArchiveProbe build/rollback-npc-world/test.jar baseline",
+      "input": "same 8 policy cases and baseline fixture revision",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness=false",
+      "label": "RESTORED"
+    }
+  ]
+}
+
+{"mode": "Chunk1", "command": "./gradlew.bat --offline runNpcWorldChunk1", "exit": 0, "pid": 43392, "processExited": true, "seconds": 108.46928811073303, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=43392
+BEFORE live=BlockPos{x=42, y=65, z=68}/[2, 4] registered=BlockPos{x=42, y=65, z=68}/[2, 4] snapshot=BlockPos{x=42, y=65, z=68}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=42, y=65, z=68}/[2, 4] playerDimension=whileaway:quiet_city checkpoint=1 generation=0 actualMovement=false
+PASS actual_unload heldTicks=100 entityAbsent=true hasChunk=false entitiesLoaded=false allTrackedPositions=true live=BlockPos{x=42, y=65, z=68}/[2, 4] registered=BlockPos{x=42, y=65, z=68}/[2, 4] snapshot=BlockPos{x=42, y=65, z=68}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=4096, y=160, z=4096}/[256, 256] playerDimension=whileaway:quiet_city
+PASS reconnected checkpoint=1 generation=0 sameUUID=c05d3514-491e-41a1-885f-d36540d73e68 canonical=1 duplicates=0
+PASS Chunk1 canonical=1 generation=0 uuid=c05d3514-491e-41a1-885f-d36540d73e68 instance=483d9fa1-ad04-4118-9c63-d438db7733ca checkpoint=4 work=maintain_return_light dimension=whileaway:quiet_city stableTicks=100
+
+{"mode": "Chunk2", "command": "./gradlew.bat --offline runNpcWorldChunk2", "exit": 0, "pid": 7032, "processExited": true, "seconds": 109.29812359809875, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=7032
+BEFORE live=BlockPos{x=41, y=65, z=69}/[2, 4] registered=BlockPos{x=42, y=65, z=68}/[2, 4] snapshot=BlockPos{x=42, y=65, z=68}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=42, y=65, z=68}/[2, 4] playerDimension=whileaway:quiet_city checkpoint=2 generation=0 actualMovement=true
+PASS actual_unload heldTicks=100 entityAbsent=true hasChunk=false entitiesLoaded=false allTrackedPositions=true live=BlockPos{x=41, y=65, z=69}/[2, 4] registered=BlockPos{x=41, y=65, z=69}/[2, 4] snapshot=BlockPos{x=41, y=65, z=69}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=4096, y=160, z=4096}/[256, 256] playerDimension=whileaway:quiet_city
+PASS reconnected checkpoint=2 generation=0 sameUUID=7bdc49bb-ca4a-472f-8074-551c87265eb9 canonical=1 duplicates=0
+PASS Chunk2 canonical=1 generation=0 uuid=7bdc49bb-ca4a-472f-8074-551c87265eb9 instance=ed4ac038-a1c0-407c-9a29-023c59badcec checkpoint=4 work=maintain_return_light dimension=whileaway:quiet_city stableTicks=100
+
+BASELINE_JAR C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\baseline\previous.jar
+SHA256 19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19
+BASELINE_SOURCE C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\baseline\previous-source.zip
+SHA256 d34f61add10bcfd2ff44fe6cfc4034f74abab503d0f074eb0940b55646afeb4d
+MODIFIED_FILE C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\npc-world\whileaway-0.3.1-npc-world.jar
+SHA256 f5b159a950233a7c2413d2dc0d8e7b4f65287d44f728a1cd79c4323f7c02d438
+DIFF_FILE C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\DIFF.patch
+SHA256 1a09d2e5d3c1b5c411118e83d88bcb52392b826b3b57eac2b1143a890544dc80
+ROLLBACK.sh C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\ROLLBACK.sh
+SHA256 41a96ea262f38e48633e7805481e51d63947b4afe302991127fe013ade60f0ef
+VERIFICATION C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\VERIFICATION.txt
+Source ZIP hash is outside archive in dist/npc-world/SHA256SUMS.txt.

@@ -1,0 +1,21 @@
+{
+  "version": "0.3.1-dev.1",
+  "work": "return-network-contract",
+  "complex": "PARTIAL contract only; not registered/playable",
+  "campaign": "PARTIAL",
+  "saveFormat": 4,
+  "actorSchema": 1,
+  "artRevision": 2,
+  "contractCodecSchema": 1,
+  "contractGameTests": 7,
+  "allGameTests": 70,
+  "coreAssertions": 176857,
+  "realClients": 0,
+  "changedExistingClasses": 0,
+  "A-G_realCrash": "NOT TESTED",
+  "worldSaveIntegration": "NOT IMPLEMENTED",
+  "NPC_structure_interaction_presentation": "NOT IMPLEMENTED",
+  "next": "Define StoryStorage/NarrativeData extension and durable draft commit; integrate real Yeoul and relay without enabling incomplete event",
+  "pause": "weekly usage93%, five-hour30%; no shutdown",
+  "Caveman": "HOLD"
+}

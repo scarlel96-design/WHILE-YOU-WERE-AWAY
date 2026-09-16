@@ -1,0 +1,1 @@
+PASS 19 canonical clients, six fresh-process crash pairs, exact UUID roundtrip, final runtime-source manifest; regression suite still pending

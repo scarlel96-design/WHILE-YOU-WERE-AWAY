@@ -1,0 +1,11 @@
+{"mode": "MissingHome", "command": "./gradlew.bat --offline runNpcEnvironmentMissingHome", "exit": 0, "pid": 49492, "processExited": true, "seconds": 94.20736360549927, "pass": true}
+{"mode": "BlockedHome", "command": "./gradlew.bat --offline runNpcEnvironmentBlockedHome", "exit": 0, "pid": 50312, "processExited": true, "seconds": 76.4661648273468, "pass": true}
+{"mode": "ConflictHome", "command": "./gradlew.bat --offline runNpcEnvironmentConflictHome", "exit": 0, "pid": 51212, "processExited": true, "seconds": 88.7350583076477, "pass": true}
+{"mode": "WrongLight", "command": "./gradlew.bat --offline runNpcEnvironmentWrongLight", "exit": 0, "pid": 46436, "processExited": true, "seconds": 85.55291604995728, "pass": true}
+{"mode": "CompletedLight", "command": "./gradlew.bat --offline runNpcEnvironmentCompletedLight", "exit": 0, "pid": 41512, "processExited": true, "seconds": 70.35546469688416, "pass": true}
+{"mode": "CutPath", "command": "./gradlew.bat --offline runNpcEnvironmentCutPath", "exit": 0, "pid": 50604, "processExited": true, "seconds": 68.83957815170288, "pass": true}
+{"mode": "ResumePath", "command": "./gradlew.bat --offline runNpcEnvironmentResumePath", "exit": 0, "pid": 49204, "processExited": true, "seconds": 93.86060571670532, "pass": true}
+{"mode": "ReloadPath", "command": "./gradlew.bat --offline runNpcEnvironmentReloadPath", "exit": 0, "pid": 52484, "processExited": true, "seconds": 90.86564064025879, "pass": true}
+{"mode": "CutLight", "command": "./gradlew.bat --offline runNpcEnvironmentCutLight", "exit": 0, "pid": 36612, "processExited": true, "seconds": 72.46379375457764, "pass": true}
+{"mode": "ResumeLight", "command": "./gradlew.bat --offline runNpcEnvironmentResumeLight", "exit": 0, "pid": 42152, "processExited": true, "seconds": 101.21360063552856, "pass": true}
+{"mode": "ReloadLight", "command": "./gradlew.bat --offline runNpcEnvironmentReloadLight", "exit": 0, "pid": 33812, "processExited": true, "seconds": 86.84188175201416, "pass": true}

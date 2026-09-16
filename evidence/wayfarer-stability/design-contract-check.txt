@@ -1,0 +1,1 @@
+PASS design document has ordered sections 1-25 and 10 quality gates; prior placeholder groups=6 and foreshadow drafts=2 unchanged. This is document validation, not gameplay/art PASS.

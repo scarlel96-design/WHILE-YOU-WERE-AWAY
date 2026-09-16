@@ -1,0 +1,2 @@
+9c5f78105b92a1afae46b4d488fc67aff2e0288ca78fd90f84aacb9b32efedf8  whileaway-0.3.1-campaign-pilot.jar
+81b47fcca580ac17102e0135c963bc1b2fdce638544ee5b82571b4b65fdc55ec  whileaway-0.3.1-campaign-pilot-source.zip

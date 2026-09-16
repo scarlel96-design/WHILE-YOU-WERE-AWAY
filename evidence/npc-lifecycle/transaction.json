@@ -1,0 +1,37 @@
+{
+  "restored_hash": "82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542",
+  "world_operations": "none",
+  "commands": [
+    {
+      "label": "BASELINE",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=false",
+      "exit": 0,
+      "command": "java -cp build/npc-archive-probe NpcArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-lifecycle\\baseline\\previous.jar\" baseline",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC expected only in modified; canonical recovery retained in both"
+    },
+    {
+      "label": "MODIFIED",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified canonicalRecovery=true writeGuard=true campaignNpc=true",
+      "exit": 0,
+      "command": "java -cp build/npc-archive-probe NpcArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-lifecycle\\whileaway-0.3.1-npc-lifecycle.jar\" modified",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC expected only in modified; canonical recovery retained in both"
+    },
+    {
+      "label": "ROLLBACK",
+      "output": "ROLLBACK PASS: canonical-recovery JAR restored; world files untouched",
+      "exit": 0,
+      "command": "bash -lc \"chmod +x evidence/npc-lifecycle/ROLLBACK.sh && test -x evidence/npc-lifecycle/ROLLBACK.sh && evidence/npc-lifecycle/ROLLBACK.sh build/rollback-npc/test.jar\"",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc\\test.jar"
+    },
+    {
+      "label": "RESTORED",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=false",
+      "exit": 0,
+      "command": "java -cp build/npc-archive-probe NpcArchiveProbe build/rollback-npc/test.jar baseline",
+      "input": "same 8 policy cases and baseline fixture revision"
+    }
+  ],
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.",
+  "baseline_hash": "82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542",
+  "modified_hash": "80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51"
+}

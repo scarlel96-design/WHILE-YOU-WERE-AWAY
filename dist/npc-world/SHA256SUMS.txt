@@ -1,0 +1,2 @@
+9096e4dc9276c8d1eae7aaf2446950e4f76edc5f0f58ee906d7ae70d7268530f  whileaway-0.3.1-npc-world.jar
+519e7f5b12098357628b311ffa8b9ad5cd1974a2e5474751255c978318fcdc87  whileaway-0.3.1-npc-world-source.zip

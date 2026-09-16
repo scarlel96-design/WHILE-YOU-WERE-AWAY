@@ -1,0 +1,8 @@
+{
+  "unrelated_production_changes": false,
+  "requirements_missing": [],
+  "source_debug_iterations": 0,
+  "rework_iterations": 0,
+  "manual_review": "334-case independent oracle; null owner/player, dimension gate, inclusive boundary, invalid floating inputs; no state mutation; one helper, no dependencies; Java integration and unchanged GameTests checked separately.",
+  "oracle_sha256": "437395abc00788f848dcecd2cb2bf2457432f9f341a6d353420f6d2920bbf33e"
+}

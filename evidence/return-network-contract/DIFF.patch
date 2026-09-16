@@ -1,0 +1,337 @@
+--- a/build.gradle
++++ b/build.gradle
+@@ -186,7 +186,7 @@
+             // otherwise old test reservations accumulate into the production capacity guard.
+             def invocation=java.util.UUID.randomUUID().toString()
+             gameDirectory=file('../../work/gametest-isolated/'+invocation)
+-            systemProperty 'whileaway.testEvidence',file('evidence/npc-path/gametest/'+invocation).absolutePath
++            systemProperty 'whileaway.testEvidence',file('evidence/return-network-contract/gametest/'+invocation).absolutePath
+             systemProperty 'whileaway.testFixtures',file('evidence/reuse/baseline').absolutePath
+             systemProperty 'neoforge.enabledGameTestNamespaces', 'whileaway'
+         }
+--- a/docs/RETURN_NETWORK_FIRST_RESPONSE.md
++++ b/docs/RETURN_NETWORK_FIRST_RESPONSE.md
+@@ -0,0 +1,71 @@
++# 귀환망의 첫 응답 — contract slice (not a playable event yet)
++
++Current: 0.3.1-dev.1 / return-network-contract / PARTIAL.
++Input: immutable npc-path JAR db567920ac9240a375a68170868cc6410dcde0a397d541a805e345e3ae88501a,
++source 5b5460ee0eab81fffe8cadbe20b3a446b2af91bad385abfd32f52aca47d695c1.
++
++## Scope and activation gate
++ReturnNetworkState implements an immutable semantic state + strict standalone NBT codec.
++It is NOT registered in NarrativeData, StoryStorage, NPC AI, world generation, or interaction handlers.
++No player can trigger it in this slice. Save format4, actorSchema1, art2 and every existing production
++class remain unchanged. Contract schema1 is local to the unregistered codec, NOT a deployed save extension.
++Do not claim contract tests prove actual player interaction, crash durability or live corruption handling.
++
++## Meaning and intended play
++After Yeoul's return-light checkpoint4, shared experience and relationship are confirmed, the player
++finds an old small railway relay, joins the same Yeoul, compares its rhythm with the return light,
++intervenes through an actual lever/control, then observes a distant response. A responded relay and
++a small Yeoul maintenance/reaction change remain. No item ownership, reward delivery, replacement
++structure, camera lock, monster spawn or loud stinger is involved.
++
++Evidence A: OLD_PATTERN_EVIDENCE — the old contact repeats a pattern; its author remains uncertain.
++Evidence B: PATTERN_MATCH_EVIDENCE — the current return-light rhythm corresponds to the response.
++Neither identifies the Continuity Graph, synthetic last day or the nature of Yeoul.
++
++Foreshadow candidate: RETURN_NETWORK_CURRENT_PATTERN.
++First reading: an old installation happens to echo Yeoul's signal.
++Later reading: a new present-day relationship/action is being registered by the continuity network.
++No Foreshadow Registry or final text/asset is implemented in this slice.
++
++## Checkpoints and crash contract
++|Checkpoint|Stage|Durable meaning|
++|---|---|---|
++|0|NOT_STARTED|No event/location/participant/facts|
++|1 / A|DISCOVERED|Event instance, location identity, discovered signal|
++|2 / B|NPC_JOINED|Yeoul storyId, instance, entity UUID, generation|
++|3 / C|SIGNAL_OBSERVED|Old pattern evidence; structure expected READY|
++|4 / D|INTERVENTION_COMMITTED|Intervention fact; structure expected ACTIVATED|
++|4 substep|PRESENTING|Presentation has begun; response observation is NOT inferred|
++|5 / E|RESPONSE_OBSERVED|Response and correspondence evidence; structure RESPONDED|
++|5 substep / F|SHARED_EXPERIENCE fact|Shared experience committed but event NOT yet completed|
++|6 / G|COMPLETED|Completion + aftermath + next prerequisite in one draft|
++
++F deliberately does not advance the checkpoint. This prevents confusing Yeoul's shared-experience
++commit with the later terminal commit. Stage, checkpoint, required facts, structure and presentation
++must agree on load. Missing evidence is rejected, never reconstructed from the checkpoint integer.
++Repeated already-completed transitions are no-ops; participant rebinding is rejected.
++
++## Permanent vs runtime
++Permanent draft: event/location identity, participant tuple, facts, expected structural state,
++presentation receipt state. `PRESENTING` is a receipt, not an animation frame or timer.
++Runtime-only: navigation nodes/retry clock, scene elapsed ticks, particles, player proximity,
++WAITING_NPC / WAITING_ENVIRONMENT / WRONG_DIMENSION / PLAYER_ABSENT.
++The `waiting` method is read-only. It neither decrements checkpoints nor changes generation.
++
++## Mandatory next integration work
++1. Introduce a world-local optional record in NarrativeData only after designing strict extension
++   schema handling in StoryStorage. Unsupported/corrupt data must remain guarded/quarantined.
++2. Build a draft -> validate participant and event -> durable atomic save -> publish/effect boundary.
++   Do not mutate the live committed object before successful persistence. This slice has NO disk commit API.
++3. Validate draft structure expectations against actual loaded blocks. Physical mismatch is waiting,
++   not automatic fact rollback or player-block overwrite. Reserve/commit world effects explicitly.
++4. Resolve Yeoul through current Actor identity and NpcState facts; do not trust caller booleans as
++   sufficient production proof. Use NpcNavigation without allowing return-home and relay goals to fight.
++5. Define the relay location using existing city/rail infrastructure. No automatic fallback or art revision migration.
++6. Add actual block interaction, two accessible evidence cues, restrained sound/light and persistent aftermath.
++7. Only then run actual A-G/new-process, death, chunk, dimension, environment, copy and corrupt-store tests.
++
++## Gates
++Contract/GameTest PASS can be recorded separately. All actual campaign integration, A-G process
++crashes, physical structure commits, aftermath and live Load Guard tests remain NOT TESTED.
++First complex event PARTIAL. Item/Reward transactions, Structure Fallback, final art,0.3.2 and Caveman HOLD.
+--- a/src/main/java/io/github/whileaway/ReturnNetworkGameTests.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkGameTests.java
+@@ -0,0 +1,50 @@
++package io.github.whileaway;
++import java.util.*;
++import net.minecraft.gametest.framework.*;
++import net.minecraft.nbt.*;
++import net.neoforged.neoforge.gametest.*;
++import static io.github.whileaway.ReturnNetworkState.*;
++
++/** Contract tests only: no claim of player interaction, world mutation or real-client proof. */
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class ReturnNetworkGameTests {
++    private static ReturnNetworkState discovered(){return notStarted().discover(new Prerequisite(4,true,true,true),UUID.randomUUID(),new Location("rail_relay","whileaway:quiet_city",42));}
++    private static Participant participant(){return new Participant("npc:yeoul",UUID.randomUUID(),UUID.randomUUID(),0);}
++    private static ReturnNetworkState response(){return discovered().join(participant()).observePattern().intervene().beginPresentation().observeResponse();}
++    private static void rejected(GameTestHelper h,Runnable r,String message){boolean rejected=false;try{r.run();}catch(IllegalArgumentException ex){rejected=true;}h.assertTrue(rejected,message);}
++    @GameTest(template="empty") public static void networkOrderedFactsAndIdempotence(GameTestHelper h){
++        var s=response();h.assertTrue(s.stage==Stage.RESPONSE_OBSERVED&&!s.facts.contains(Fact.SHARED_EXPERIENCE),"response is not shared/complete");
++        var shared=s.shareExperience();h.assertTrue(shared.stage==Stage.RESPONSE_OBSERVED&&shared.facts.contains(Fact.SHARED_EXPERIENCE),"F durable substep separate from G");
++        var end=shared.complete();h.assertTrue(end.complete()==end&&end.observePattern()==end&&end.shareExperience()==end,"repeat does not mutate terminal facts");
++        h.assertTrue(end.facts.containsAll(Set.of(Fact.NEXT_PREREQUISITE,Fact.AFTERMATH,Fact.COMPLETE))&&end.presentation==Presentation.AFTERMATH,"atomic completion group");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkRoundTripsEverySemanticBoundary(GameTestHelper h){
++        var s=notStarted();var list=new ArrayList<ReturnNetworkState>();list.add(s);s=discovered();list.add(s);s=s.join(participant());list.add(s);s=s.observePattern();list.add(s);s=s.intervene();list.add(s);s=s.beginPresentation();list.add(s);s=s.observeResponse();list.add(s);s=s.shareExperience();list.add(s);s=s.complete();list.add(s);
++        for(var state:list){var copy=load(state.save());h.assertTrue(copy.save().equals(state.save()),"exact NBT roundtrip "+state.stage+" "+state.presentation);}h.succeed();
++    }
++    @GameTest(template="empty") public static void networkCannotSkipPrerequisiteOrIntervention(GameTestHelper h){
++        rejected(h,()->notStarted().discover(new Prerequisite(3,true,true,true),UUID.randomUUID(),new Location("relay","minecraft:overworld",0)),"incomplete prerequisite");
++        var s=discovered();rejected(h,s::observePattern,"must join");rejected(h,s::intervene,"must observe");rejected(h,s::observeResponse,"must present");rejected(h,s::complete,"must share");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkBindingAndCopyIsolation(GameTestHelper h){
++        var s=discovered().join(participant());var b=load(s.save());var a=s.observePattern().intervene();h.assertTrue(b.stage==Stage.NPC_JOINED&&a.stage==Stage.INTERVENTION_COMMITTED,"independent immutable drafts");
++        rejected(h,()->s.join(participant()),"no UUID/instance reassignment");h.assertTrue(a.participant.equals(b.participant)&&a.participant.generation()==0,"identity stable");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkWaitsNeverRollbackFacts(GameTestHelper h){
++        var s=response();var before=s.save();h.assertTrue(s.waiting(false,true,true,true)==Wait.PLAYER_ABSENT,"death wait");h.assertTrue(s.waiting(true,false,true,true)==Wait.WRONG_DIMENSION,"dimension wait");h.assertTrue(s.waiting(true,true,false,true)==Wait.WAITING_NPC,"unconfirmed NPC wait");h.assertTrue(s.waiting(true,true,true,false)==Wait.WAITING_ENVIRONMENT,"damaged relay wait");h.assertTrue(before.equals(s.save()),"all waits read only");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkRejectsSemanticCorruption(GameTestHelper h){
++        var end=response().shareExperience().complete().save();
++        for(String fact:List.of("RESPONSE","SHARED_EXPERIENCE","AFTERMATH","PATTERN_MATCH_EVIDENCE")){var t=end.copy();t.getList("facts",8).removeIf(v->v.getAsString().equals(fact));rejected(h,()->load(t),"missing permanent fact "+fact);}
++        for(String field:List.of("participant","instance","position")){var t=end.copy();t.remove(field);rejected(h,()->load(t),"missing binding "+field);}
++        var wrong=end.copy();wrong.putString("structure","INTACT");rejected(h,()->load(wrong),"structure contradiction");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkRejectsMalformedAndUnsupportedRecords(GameTestHelper h){
++        var original=response().save();
++        for(String field:List.of("schema","checkpoint")){var t=original.copy();t.putInt(field,99);rejected(h,()->load(t),"invalid "+field);}
++        var t=original.copy();t.getList("facts",8).add(StringTag.valueOf("RESPONSE"));rejected(h,()->load(t),"duplicate not silently deduplicated");
++        var wrong=original.copy();wrong.putString("stage","UNKNOWN");rejected(h,()->load(wrong),"invalid enum");
++        var extra=original.copy();extra.putString("future_optional","ignored");h.assertTrue(load(extra).save().equals(original),"unknown optional key safe");h.assertTrue(original.equals(load(original).save()),"input unmodified");h.succeed();
++    }
++}
+--- a/src/main/java/io/github/whileaway/ReturnNetworkState.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkState.java
+@@ -0,0 +1,117 @@
++package io.github.whileaway;
++
++import java.util.*;
++import net.minecraft.nbt.*;
++
++/** Immutable event contract, not a live adapter. Never infer permanent facts on load.
++ * The future adapter must persist each returned draft BEFORE presenting its effects. */
++public final class ReturnNetworkState {
++    public static final String ID="return_network_first_response";
++    public enum Stage { NOT_STARTED, DISCOVERED, NPC_JOINED, SIGNAL_OBSERVED, INTERVENTION_COMMITTED, RESPONSE_OBSERVED, COMPLETED }
++    public enum Structure { INTACT, READY, ACTIVATED, RESPONDED }
++    public enum Presentation { NONE, PRESENTING, FACT_COMMITTED, AFTERMATH }
++    public enum Wait { NONE, PLAYER_ABSENT, WRONG_DIMENSION, WAITING_NPC, WAITING_ENVIRONMENT }
++    public enum Fact { SIGNAL_DISCOVERED, PARTICIPANT_JOINED, OLD_PATTERN_EVIDENCE, INTERVENTION, RESPONSE, PATTERN_MATCH_EVIDENCE, SHARED_EXPERIENCE, COMPLETE, AFTERMATH, NEXT_PREREQUISITE }
++    public record Location(String id,String dimension,long position) {
++        public Location { require(id!=null&&!id.isBlank(),"location_id");require(dimension!=null&&dimension.matches("[a-z0-9_.-]+:[a-z0-9_./-]+"),"dimension"); }
++    }
++    public record Participant(String storyId,UUID instance,UUID entity,int generation) {
++        public Participant { require("npc:yeoul".equals(storyId)&&instance!=null&&entity!=null&&generation>=0,"participant_identity"); }
++    }
++    public record Prerequisite(int checkpoint,boolean completed,boolean sharedExperience,boolean relationship) {
++        public boolean ready(){return checkpoint==4&&completed&&sharedExperience&&relationship;}
++    }
++    public final Stage stage;
++    public final UUID instance;
++    public final Location location;
++    public final Participant participant;
++    public final Structure structure;
++    public final Presentation presentation;
++    public final Set<Fact> facts;
++    private ReturnNetworkState(Stage stage,UUID instance,Location location,Participant participant,Structure structure,Presentation presentation,Set<Fact> facts) {
++        this.stage=Objects.requireNonNull(stage);this.instance=instance;this.location=location;this.participant=participant;
++        this.structure=Objects.requireNonNull(structure);this.presentation=Objects.requireNonNull(presentation);this.facts=Set.copyOf(facts);validate();
++    }
++    private static void require(boolean ok,String field){if(!ok)throw new IllegalArgumentException("RETURN_NETWORK_CORRUPT field="+field);}
++    private static EnumSet<Fact> expected(int cp,boolean shared){
++        var f=EnumSet.noneOf(Fact.class);
++        if(cp>=1)f.add(Fact.SIGNAL_DISCOVERED);
++        if(cp>=2)f.add(Fact.PARTICIPANT_JOINED);
++        if(cp>=3)f.add(Fact.OLD_PATTERN_EVIDENCE);
++        if(cp>=4)f.add(Fact.INTERVENTION);
++        if(cp>=5)f.addAll(Set.of(Fact.RESPONSE,Fact.PATTERN_MATCH_EVIDENCE));
++        if(shared)f.add(Fact.SHARED_EXPERIENCE);
++        if(cp==6)f.addAll(Set.of(Fact.COMPLETE,Fact.AFTERMATH,Fact.NEXT_PREREQUISITE));
++        return f;
++    }
++    private void validate(){
++        int cp=stage.ordinal();boolean shared=facts.contains(Fact.SHARED_EXPERIENCE);
++        require(cp==0?instance==null&&location==null:instance!=null&&location!=null,"event_identity");
++        require(cp<2?participant==null:participant!=null,"participant_binding");
++        require(!shared||cp>=5,"shared_before_response");require(cp!=6||shared,"completed_without_shared");
++        require(facts.equals(expected(cp,shared)),"checkpoint_evidence_order");
++        require(structure==(cp<3?Structure.INTACT:cp==3?Structure.READY:cp==4?Structure.ACTIVATED:Structure.RESPONDED),"structure_commit");
++        require(cp<4?presentation==Presentation.NONE:cp==4?(presentation==Presentation.NONE||presentation==Presentation.PRESENTING):cp==5?presentation==Presentation.FACT_COMMITTED:presentation==Presentation.AFTERMATH,"presentation_phase");
++    }
++    public static ReturnNetworkState notStarted(){return new ReturnNetworkState(Stage.NOT_STARTED,null,null,null,Structure.INTACT,Presentation.NONE,Set.of());}
++    public ReturnNetworkState discover(Prerequisite proof,UUID eventInstance,Location at){
++        require(proof.ready(),"prerequisite");
++        if(stage!=Stage.NOT_STARTED){require(instance.equals(eventInstance)&&location.equals(at),"discovery_rebind");return this;}
++        return new ReturnNetworkState(Stage.DISCOVERED,eventInstance,at,null,Structure.INTACT,Presentation.NONE,expected(1,false));
++    }
++    public ReturnNetworkState join(Participant binding){
++        if(stage.ordinal()>=2){require(participant.equals(binding),"participant_rebind");return this;}
++        require(stage==Stage.DISCOVERED,"join_order");
++        return new ReturnNetworkState(Stage.NPC_JOINED,instance,location,binding,structure,presentation,expected(2,false));
++    }
++    private ReturnNetworkState advance(Stage next,Structure physical,Presentation scene){
++        if(stage.ordinal()>=next.ordinal())return this;
++        require(stage.ordinal()+1==next.ordinal(),"advance_order");
++        return new ReturnNetworkState(next,instance,location,participant,physical,scene,expected(next.ordinal(),facts.contains(Fact.SHARED_EXPERIENCE)));
++    }
++    public ReturnNetworkState observePattern(){return advance(Stage.SIGNAL_OBSERVED,Structure.READY,Presentation.NONE);}
++    public ReturnNetworkState intervene(){return advance(Stage.INTERVENTION_COMMITTED,Structure.ACTIVATED,Presentation.NONE);}
++    public ReturnNetworkState beginPresentation(){
++        if(stage.ordinal()>4||presentation==Presentation.PRESENTING)return this;
++        require(stage==Stage.INTERVENTION_COMMITTED,"presentation_before_intervention");
++        return new ReturnNetworkState(stage,instance,location,participant,structure,Presentation.PRESENTING,facts);
++    }
++    public ReturnNetworkState observeResponse(){
++        require(stage.ordinal()>4||presentation==Presentation.PRESENTING,"response_before_presentation");
++        return advance(Stage.RESPONSE_OBSERVED,Structure.RESPONDED,Presentation.FACT_COMMITTED);
++    }
++    public ReturnNetworkState shareExperience(){
++        require(stage.ordinal()>=5,"shared_before_response");if(facts.contains(Fact.SHARED_EXPERIENCE))return this;
++        return new ReturnNetworkState(stage,instance,location,participant,structure,presentation,expected(5,true));
++    }
++    public ReturnNetworkState complete(){
++        require(facts.contains(Fact.SHARED_EXPERIENCE),"complete_before_shared");
++        return advance(Stage.COMPLETED,Structure.RESPONDED,Presentation.AFTERMATH);
++    }
++    /** Observations do not mutate durable progress or manufacture a replacement participant. */
++    public Wait waiting(boolean playerAlive,boolean correctDimension,boolean npcConfirmed,boolean environmentReady){
++        if(!playerAlive)return Wait.PLAYER_ABSENT;if(!correctDimension)return Wait.WRONG_DIMENSION;
++        if(!npcConfirmed)return Wait.WAITING_NPC;if(!environmentReady)return Wait.WAITING_ENVIRONMENT;return Wait.NONE;
++    }
++    public CompoundTag save(){
++        var t=new CompoundTag();t.putInt("schema",1);t.putString("eventId",ID);t.putString("stage",stage.name());t.putInt("checkpoint",stage.ordinal());
++        t.putString("structure",structure.name());t.putString("presentation",presentation.name());
++        var list=new ListTag();facts.stream().sorted().forEach(f->list.add(StringTag.valueOf(f.name())));t.put("facts",list);
++        if(instance!=null){t.putUUID("instance",instance);t.putString("locationId",location.id());t.putString("dimension",location.dimension());t.putLong("position",location.position());}
++        if(participant!=null){var p=new CompoundTag();p.putString("storyId",participant.storyId());p.putUUID("instance",participant.instance());p.putUUID("entity",participant.entity());p.putInt("generation",participant.generation());t.put("participant",p);}
++        return t;
++    }
++    private static void typed(CompoundTag t,String key,int type){require(t.contains(key,type),key+"_type");}
++    public static ReturnNetworkState load(CompoundTag t){
++        typed(t,"schema",Tag.TAG_INT);require(t.getInt("schema")==1,"unsupported_schema");typed(t,"eventId",Tag.TAG_STRING);require(ID.equals(t.getString("eventId")),"event_id");
++        for(String key:List.of("stage","structure","presentation"))typed(t,key,Tag.TAG_STRING);
++        typed(t,"checkpoint",Tag.TAG_INT);Stage stage=Stage.valueOf(t.getString("stage"));require(stage.ordinal()==t.getInt("checkpoint"),"checkpoint_stage");
++        typed(t,"facts",Tag.TAG_LIST);var list=(ListTag)t.get("facts");require(list.isEmpty()||list.getElementType()==Tag.TAG_STRING,"facts_element_type");
++        var facts=EnumSet.noneOf(Fact.class);for(Tag v:list)require(facts.add(Fact.valueOf(v.getAsString())),"duplicate_fact");
++        UUID instance=null;Location at=null;Participant participant=null;
++        if(stage!=Stage.NOT_STARTED){require(t.hasUUID("instance"),"event_instance");instance=t.getUUID("instance");typed(t,"locationId",Tag.TAG_STRING);typed(t,"dimension",Tag.TAG_STRING);typed(t,"position",Tag.TAG_LONG);at=new Location(t.getString("locationId"),t.getString("dimension"),t.getLong("position"));}
++        else require(!t.contains("instance")&&!t.contains("locationId")&&!t.contains("dimension")&&!t.contains("position"),"inactive_identity");
++        if(t.contains("participant")){typed(t,"participant",Tag.TAG_COMPOUND);var p=t.getCompound("participant");typed(p,"storyId",Tag.TAG_STRING);typed(p,"generation",Tag.TAG_INT);require(p.hasUUID("instance")&&p.hasUUID("entity"),"participant_uuid");participant=new Participant(p.getString("storyId"),p.getUUID("instance"),p.getUUID("entity"),p.getInt("generation"));}
++        return new ReturnNetworkState(stage,instance,at,participant,Structure.valueOf(t.getString("structure")),Presentation.valueOf(t.getString("presentation")),facts);
++    }
++}
+--- a/tools/package-return-network-contract.py
++++ b/tools/package-return-network-contract.py
+@@ -0,0 +1,76 @@
++"""Prepare a reversible candidate, then seal only observed evidence. Never touches saves."""
++from pathlib import Path
++import difflib,hashlib,json,shutil,subprocess,sys,zipfile
++R=Path(__file__).resolve().parents[1];E=R/'evidence/return-network-contract';D=R/'dist/return-network-contract';D.mkdir(exist_ok=True)
++h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++BASE='db567920ac9240a375a68170868cc6410dcde0a397d541a805e345e3ae88501a'
++SOURCE='5b5460ee0eab81fffe8cadbe20b3a446b2af91bad385abfd32f52aca47d695c1'
++b=E/'baseline/previous.jar';s=E/'baseline/previous-source.zip'
++m=D/'whileaway-0.3.1-return-network-contract.jar';a=D/'whileaway-0.3.1-return-network-contract-source.zip';target=R/'build/rollback-return-network-contract/test.jar'
++assert h(b)==BASE and h(s)==SOURCE
++assert h(R/'dist/npc-path/whileaway-0.3.1-npc-path.jar')==BASE
++assert h(R/'dist/npc-path/whileaway-0.3.1-npc-path-source.zip')==SOURCE
++java=r'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe'
++def probe(label,path):
++    cmd=[java,'-cp','build/npc-world-archive-probe','PresenceArchiveProbe',str(path),'present']
++    p=subprocess.run(cmd,cwd=R,capture_output=True,text=True)
++    row=dict(label=label,command=cmd,input=str(path),exit=p.returncode,output=p.stdout+p.stderr,sha256=h(path))
++    with (E/'package-commands.jsonl').open('a') as f:f.write(json.dumps(row)+'\n')
++    print(json.dumps(row),flush=True);assert p.returncode==0
++def source_files():
++    files=[p for d in ['src','tools','docs','gradle'] for p in (R/d).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
++    return files+[R/n for n in ['AGENTS.md','build.gradle','gradle.properties','settings.gradle','gradlew','gradlew.bat','README.md','.gitignore']]
++if len(sys.argv)==1 or sys.argv[1]=='prepare':
++    assert 'All 63 required tests passed' in (E/'baseline-tests.log').read_text(encoding='utf-8-sig')
++    for name in ['tests.log']:
++        t=(E/name).read_text(encoding='utf-8-sig');assert 'All 70 required tests passed' in t and 'PASS core assertions=176857' in t
++    shutil.copyfile(R/'build/libs/whileaway-0.3.1-dev.1.jar',m)
++    diff=[]
++    with zipfile.ZipFile(s) as z:
++        for p in sorted(source_files()):
++            key='while-you-were-away/'+p.relative_to(R).as_posix()
++            try:before=z.read(key).decode('utf-8').replace('\r\n','\n') if key in z.namelist() else '';after=p.read_text(encoding='utf-8')
++            except UnicodeError:continue
++            diff+=difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+p.relative_to(R).as_posix(),tofile='b/'+p.relative_to(R).as_posix())
++    (E/'DIFF.patch').write_text(''.join(diff),encoding='utf-8')
++    with zipfile.ZipFile(b) as old,zipfile.ZipFile(m) as new:
++        assert new.testzip() is None
++        changed=[n for n in old.namelist() if n.endswith('.class') and old.read(n)!=new.read(n)]
++        assert not changed,changed # Only new, unregistered contract classes; existing runtime remains identical.
++        art=[n for n in old.namelist() if n.startswith(('assets/','data/'))]
++        assert all(old.read(n)==new.read(n) for n in art)
++        (E/'archive-delta.json').write_text(json.dumps(dict(changedExistingClasses=changed,newClasses=[n for n in new.namelist() if n.endswith('.class') and n not in old.namelist()],unchangedArtEntries=len(art)),indent=2))
++    rb='''#!/usr/bin/env bash
++set -euo pipefail
++HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
++BASE="$HERE/baseline/previous.jar"
++TARGET="${1:?Pass modified JAR copy}"
++[[ -f "$TARGET" && ! -L "$TARGET" ]] || exit 2
++[[ "$(sha256sum "$BASE" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 3
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "MOD_HASH" ]] || exit 4
++cp -- "$BASE" "$TARGET"
++echo 'ROLLBACK PASS: npc-path JAR restored; world files untouched'
++'''.replace('BASE_HASH',BASE).replace('MOD_HASH',h(m))
++    (E/'ROLLBACK.sh').write_text(rb,newline='\n');target.parent.mkdir(exist_ok=True);shutil.copyfile(m,target)
++    probe('BASELINE',b);probe('MODIFIED',m)
++    print('PREPARED: run ROLLBACK.sh on build/rollback-return-network-contract/test.jar, then finalize with VERIFICATION.txt present')
++elif sys.argv[1]=='finalize':
++    assert target.read_bytes()==b.read_bytes() and m.read_bytes()!=b.read_bytes()
++    assert (E/'VERIFICATION.txt').stat().st_size>2000
++    probe('RESTORED',target)
++    files=sorted(set(source_files()+[p for p in E.rglob('*') if p.is_file()]+[m]))
++    manifest=E/'SOURCE_MANIFEST.sha256';files=[p for p in files if p!=manifest]
++    manifest.write_text(''.join(h(p)+'  '+p.relative_to(R).as_posix()+'\n' for p in files));files.append(manifest)
++    with zipfile.ZipFile(a,'w',zipfile.ZIP_DEFLATED) as z:
++        for p in files:
++            i=zipfile.ZipInfo('while-you-were-away/'+p.relative_to(R).as_posix());i.create_system=3
++            i.external_attr=(0o100755 if p.name in ['ROLLBACK.sh','gradlew'] else 0o100644)<<16
++            z.writestr(i,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED)
++    with zipfile.ZipFile(a) as z:
++        assert z.testzip() is None
++        for p in files:assert z.read('while-you-were-away/'+p.relative_to(R).as_posix())==p.read_bytes()
++        assert (z.getinfo('while-you-were-away/evidence/return-network-contract/ROLLBACK.sh').external_attr>>16)&0o111
++    for p in [m,a,E/'DIFF.patch',E/'VERIFICATION.txt',E/'ROLLBACK.sh']:
++        print(str(p),'SHA256='+h(p),'bytes='+str(len(p.read_bytes())))
++    print('PASS all claimed artifacts reopened; source manifest/CRC verified; rollback copy restored; modified candidate retained; overall PARTIAL')
++else:raise ValueError('expected prepare or finalize')

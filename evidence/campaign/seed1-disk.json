@@ -1,0 +1,42 @@
+{
+  "schema": 4,
+  "actorSchema": 1,
+  "actors": 1,
+  "actor": {
+    "storyId": "wayfarer_first:380df991-f603-344c-a090-369bad2a924a",
+    "owner": [
+      940439953,
+      -167562164,
+      -1601161573,
+      -1389718966
+    ],
+    "generation": 0,
+    "checkpoint": 2,
+    "temporary": 1,
+    "lifecycleState": "SUSPENDED",
+    "reason": "owner_left_region",
+    "entityUUID": [
+      -1493424367,
+      1334068245,
+      -1949353462,
+      682714360
+    ],
+    "entityType": "whileaway:wayfarer",
+    "facts": [
+      "pursuit_started"
+    ],
+    "spawnRole": "pursuer",
+    "instanceId": [
+      -1489401816,
+      -822392280,
+      -1892253549,
+      -1287179710
+    ],
+    "ownerEventId": "wayfarer_first",
+    "noticeClaimed": 0,
+    "interruptions": 5,
+    "position": 282024736718978,
+    "state": "SUSPENDED",
+    "dimension": "minecraft:overworld"
+  }
+}

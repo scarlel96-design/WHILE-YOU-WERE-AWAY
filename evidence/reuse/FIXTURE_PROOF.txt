@@ -1,0 +1,15 @@
+PASS runBoundary4A disk checkpoint=0; state=PREPARING
+PASS runBoundary4B disk checkpoint=1; state=PHASE_1
+PASS runBoundary4D disk checkpoint=3; state=RESOLVING
+PASS runBoundary4E disk checkpoint=4; state=COMPLETED
+PASS runBoundary4Verify disk checkpoint=4; state=COMPLETED
+PASS runBoundary1D disk checkpoint=3; state=RESOLVING
+PASS runBoundary1E disk checkpoint=4; state=COMPLETED
+PASS runBoundary1Verify disk checkpoint=4; state=COMPLETED
+PASS runBoundary2D disk checkpoint=3; state=RESOLVING
+PASS runBoundary2E disk checkpoint=4; state=COMPLETED
+PASS runBoundary2Verify disk checkpoint=4; state=COMPLETED
+PASS actual schema 2 identical copies=3
+PASS actual schema 3 identical copies=3
+PASS original legacy story files unchanged
+PASS final boundary snapshots=11; runtime source unchanged; overall remains PARTIAL

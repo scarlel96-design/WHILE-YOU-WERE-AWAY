@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "namespace": "whileaway",
+  "stage": "function_stabilization",
+  "final_pack_selected": false,
+  "external_packs_bundled": [],
+  "items": [
+    {
+      "id": "wayfarer.skin.default",
+      "status": "placeholder",
+      "source": "src/main/java/io/github/whileaway/client/ClientSetup.java",
+      "marker": "textures/entity/enderman/enderman.png",
+      "runtime": "minecraft:textures/entity/enderman/enderman.png",
+      "planned": "whileaway:textures/entity/wayfarer/default.png",
+      "gate": "original skin and resource reload coverage"
+    },
+    {
+      "id": "wayfarer.skin.apparition",
+      "status": "placeholder",
+      "source": "src/main/java/io/github/whileaway/client/ClientSetup.java",
+      "marker": "textures/entity/skeleton/skeleton.png",
+      "runtime": "minecraft:textures/entity/skeleton/skeleton.png",
+      "planned": "whileaway:textures/entity/wayfarer/apparition.png",
+      "gate": "named skin variant replaces negative entity-id rendering shortcut"
+    },
+    {
+      "id": "wayfarer.geometry",
+      "status": "prototype",
+      "source": "src/main/resources/assets/whileaway/geo/wayfarer.geo.json",
+      "marker": "minecraft:geometry",
+      "runtime": "whileaway:geo/wayfarer.geo.json",
+      "planned": "whileaway:geo/wayfarer.geo.json",
+      "gate": "final silhouette, collision and animation alignment"
+    },
+    {
+      "id": "wayfarer.animation",
+      "status": "prototype",
+      "source": "src/main/resources/assets/whileaway/animations/wayfarer.animation.json",
+      "marker": "animation.wayfarer.idle",
+      "runtime": "whileaway:animations/wayfarer.animation.json",
+      "planned": "whileaway:animations/wayfarer.animation.json",
+      "gate": "final locomotion and story blocking"
+    },
+    {
+      "id": "city.materials",
+      "status": "placeholder",
+      "source": "src/main/java/io/github/whileaway/CityDistrict.java",
+      "marker": "Blocks.OXIDIZED_CUT_COPPER",
+      "runtime": "native block states",
+      "planned": "whileaway:block/city/{district}/{material}/{state}",
+      "gate": "custom registered blocks, before/after state compatibility and existing save migration"
+    },
+    {
+      "id": "audio.prototype_set",
+      "status": "prototype",
+      "source": "src/main/resources/assets/whileaway/sounds.json",
+      "marker": "distant_knock",
+      "runtime": "whileaway sound event IDs",
+      "planned": "preserve registered sound IDs",
+      "gate": "final original composition, warning priority, subtitles and listening QA"
+    },
+    {
+      "id": "npc.yeoul.skin",
+      "status": "placeholder",
+      "source": "src/main/java/io/github/whileaway/client/ClientSetup.java",
+      "marker": "textures/entity/villager/villager.png",
+      "runtime": "minecraft:textures/entity/villager/villager.png",
+      "planned": "whileaway:textures/entity/yeoul/default.png",
+      "gate": "final original NPC skin, model and state animation; functional placeholder only"
+    }
+  ],
+  "planned_contracts": {
+    "block_states": [
+      "before",
+      "active",
+      "after",
+      "damaged",
+      "repaired"
+    ],
+    "entity_skins": [
+      "default",
+      "apparition"
+    ],
+    "items": "whileaway:item/{item_id}",
+    "gui": "whileaway:textures/gui/{screen}/{asset}.png",
+    "particles": "whileaway:particles/{particle_id}.json",
+    "investigation": "whileaway:textures/gui/investigation/{asset}.png"
+  }
+}

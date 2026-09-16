@@ -1,0 +1,6 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=38916
+BEFORE live=BlockPos{x=41, y=65, z=69}/[2, 4] registered=BlockPos{x=42, y=65, z=68}/[2, 4] snapshot=BlockPos{x=42, y=65, z=68}/[2, 4] residence=BlockPos{x=38, y=65, z=72}/[2, 4] currentTarget=BlockPos{x=38, y=65, z=72}/[2, 4] returnLight=BlockPos{x=40, y=65, z=72}/[2, 4] player=BlockPos{x=42, y=65, z=68}/[2, 4] playerDimension=whileaway:quiet_city checkpoint=2 generation=0 actualMovement=true
+PASS dimension_absence=minecraft:the_end checkpoint=2 unchanged=true wrongDimensionNPC=0 heldTicks=120
+PASS reconnected checkpoint=2 generation=0 sameUUID=af99b9df-db6a-4732-a1b1-ce88d7e43379 canonical=1 duplicates=0
+PASS End2 canonical=1 generation=0 uuid=af99b9df-db6a-4732-a1b1-ce88d7e43379 instance=77771262-853f-4483-9f1f-08ca1b5b297b checkpoint=4 work=maintain_return_light dimension=whileaway:quiet_city stableTicks=100

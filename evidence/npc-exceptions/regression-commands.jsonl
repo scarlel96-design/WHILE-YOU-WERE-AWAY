@@ -1,0 +1,10 @@
+{"mode": "CutA", "command": "./gradlew.bat --offline runNpcRegressionCutA", "exit": 0, "pid": 44856, "processExited": true, "seconds": 51.76023483276367, "pass": true}
+{"mode": "ResumeA", "command": "./gradlew.bat --offline runNpcRegressionResumeA", "exit": 0, "pid": 16568, "processExited": true, "seconds": 64.567880153656, "pass": true}
+{"mode": "CutB", "command": "./gradlew.bat --offline runNpcRegressionCutB", "exit": 0, "pid": 27948, "processExited": true, "seconds": 54.044233560562134, "pass": true}
+{"mode": "ResumeB", "command": "./gradlew.bat --offline runNpcRegressionResumeB", "exit": 0, "pid": 51492, "processExited": true, "seconds": 61.05319619178772, "pass": true}
+{"mode": "CutC", "command": "./gradlew.bat --offline runNpcRegressionCutC", "exit": 0, "pid": 52532, "processExited": true, "seconds": 56.358012199401855, "pass": true}
+{"mode": "ResumeC", "command": "./gradlew.bat --offline runNpcRegressionResumeC", "exit": 0, "pid": 42900, "processExited": true, "seconds": 60.434131145477295, "pass": true}
+{"mode": "CutD", "command": "./gradlew.bat --offline runNpcRegressionCutD", "exit": 0, "pid": 24736, "processExited": true, "seconds": 55.832613945007324, "pass": true}
+{"mode": "ResumeD", "command": "./gradlew.bat --offline runNpcRegressionResumeD", "exit": 0, "pid": 36328, "processExited": true, "seconds": 55.835870027542114, "pass": true}
+{"mode": "CutE", "command": "./gradlew.bat --offline runNpcRegressionCutE", "exit": 0, "pid": 52024, "processExited": true, "seconds": 55.98747420310974, "pass": true}
+{"mode": "ResumeE", "command": "./gradlew.bat --offline runNpcRegressionResumeE", "exit": 0, "pid": 50124, "processExited": true, "seconds": 56.18144226074219, "pass": true}

@@ -1,0 +1,141 @@
+{
+  "mutation_results": [
+    {
+      "arm": "A",
+      "mutation": "exclusive_boundary",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=31 distance=1764.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "ignore_online",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=13 distance=0.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "ignore_alive",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=11 distance=0.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "ignore_dimension",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=7 distance=0.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "reject_unowned",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=0 distance=0.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "reject_unbounded",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=15 distance=0.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "admit_negative_distance",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=31 distance=-1.0"
+    },
+    {
+      "arm": "A",
+      "mutation": "admit_negative_radius",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: invalid radius=-1.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "exclusive_boundary",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=31 distance=1764.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "ignore_online",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=13 distance=0.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "ignore_alive",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=11 distance=0.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "ignore_dimension",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=7 distance=0.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "reject_unowned",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=0 distance=0.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "reject_unbounded",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=15 distance=0.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "admit_negative_distance",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: flags=31 distance=-1.0"
+    },
+    {
+      "arm": "B",
+      "mutation": "admit_negative_radius",
+      "compile_exit": 0,
+      "test_exit": 1,
+      "detected": true,
+      "literal_error_line": "Exception in thread \"main\" java.lang.AssertionError: ACTOR_PRESENCE_MISMATCH: invalid radius=-1.0"
+    }
+  ],
+  "detected_per_arm": 8,
+  "adapter_byte_identical": true,
+  "oracle_unchanged": true,
+  "commands_preserved": "Both arms use identical javac/java/Gradle arguments.",
+  "error_string_preserved": "ACTOR_PRESENCE_MISMATCH: ",
+  "limitations": [
+    "Common post-pilot mutation tests demonstrate test-oracle sensitivity, not blinded model problem-detection ability.",
+    "No long-horizon session test or A/B actual-client comparison. No quality-equivalence claim."
+  ]
+}

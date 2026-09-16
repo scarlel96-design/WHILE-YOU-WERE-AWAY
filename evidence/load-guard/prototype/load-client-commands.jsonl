@@ -1,0 +1,3 @@
+{"mode": "Control", "command": "./gradlew.bat --offline runLoadGuardControl", "pid": 36644, "processExited": true, "exit": 0, "seconds": 57.757858991622925, "pass": true}
+{"mode": "Recover", "command": "./gradlew.bat --offline runLoadGuardRecover", "pid": 50212, "processExited": true, "exit": 0, "seconds": 56.27708697319031, "pass": true}
+{"mode": "RecoverReload", "command": "./gradlew.bat --offline runLoadGuardRecoverReload", "pid": 14772, "processExited": true, "exit": 0, "seconds": 60.143709897994995, "pass": true}

@@ -1,0 +1,37 @@
+{
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.",
+  "commands": [
+    {
+      "label": "BASELINE",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard in both; world/copy smoke harnesses expected only in modified; canonical recovery retained in both",
+      "command": "java -cp build/npc-world-archive-probe NpcWorldArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-world\\baseline\\previous.jar\" baseline",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness=false copyHarness=false",
+      "exit": 0
+    },
+    {
+      "label": "MODIFIED",
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard in both; world/copy smoke harnesses expected only in modified; canonical recovery retained in both",
+      "command": "java -cp build/npc-world-archive-probe NpcWorldArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-world\\whileaway-0.3.1-npc-world.jar\" modified",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness=true copyHarness=true",
+      "exit": 0
+    },
+    {
+      "label": "ROLLBACK",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc-world\\test.jar",
+      "command": "bash -lc \"chmod +x evidence/npc-world/ROLLBACK.sh && test -x evidence/npc-world/ROLLBACK.sh && evidence/npc-world/ROLLBACK.sh build/rollback-npc-world/test.jar\"",
+      "output": "ROLLBACK PASS: npc-exceptions JAR restored; world files untouched",
+      "exit": 0
+    },
+    {
+      "label": "RESTORED",
+      "input": "same 8 policy cases and baseline fixture revision",
+      "command": "java -cp build/npc-world-archive-probe NpcWorldArchiveProbe build/rollback-npc-world/test.jar baseline",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness=false copyHarness=false",
+      "exit": 0
+    }
+  ],
+  "modified_hash": "9096e4dc9276c8d1eae7aaf2446950e4f76edc5f0f58ee906d7ae70d7268530f",
+  "world_operations": "none",
+  "restored_hash": "19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19",
+  "baseline_hash": "19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19"
+}

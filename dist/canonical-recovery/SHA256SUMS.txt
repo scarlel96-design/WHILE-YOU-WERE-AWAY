@@ -1,0 +1,2 @@
+82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542  whileaway-0.3.1-canonical-recovery.jar
+987953a2ceaa5edd0a97f5c285015d3e5611e685566182618b6910d6857eaaee  whileaway-0.3.1-canonical-recovery-source.zip

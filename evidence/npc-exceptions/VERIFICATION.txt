@@ -1,0 +1,271 @@
+# NPC exception stability — death/respawn working slice
+Current: 0.3.1-dev.1 / npc-exceptions / PARTIAL. NPC exception sealing remains PARTIAL; composite NOT STARTED.
+
+## Immutable input
+npc-lifecycle JAR 80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51; source eba768dec2a1784f71fe371573a92daa9f1cc92b8f3a5cb40463cf9d958ff736. Both copied and rehashed under evidence/npc-exceptions/baseline. Do not run package-npc.py against this adopted baseline again. Only package-npc-exceptions.py publishes this working slice.
+Minecraft 1.21.1 / NeoForge 21.1.249 / save format 4 / optional actorSchema 1 / city art revision 2. No final art/resources/content expansion.
+
+## Reproduced production defect
+Actual Death1Off, NPC_A_PREPARED: player killed at checkpoint 0, remote respawn saw checkpoint 1. Literal failure: death advanced checkpoint 0 -> 1. Root cause: NpcEvents.begin continued spawn after reservation regardless of living witness; common StoryActors.ownerPresent treated owner=null as unconditional permission to reconstruct an unfinished NPC. This conflated player-independent identity with event execution eligibility.
+
+Fix: NpcEvents.witness selects a living nonspectator in the actor's actual dimension within 24 blocks. NpcEvents.hasWitness bypasses presence only for completed checkpoint 4 residents. NpcEvents.begin checks this after reservation, retaining PREPARED/UUID/generation when no witness remains. StoryActors.ownerPresent delegates only the existing NPC adapter to this context gate before the generic null-owner rule. Reconciliation still distinguishes unloaded storage from confirmed loss and keeps generation reservation semantics. NpcEvents.update uses the same eligibility rule rather than a nearest player that could be dead/spectator. No player ownership was attached to Yeoul and no NPC was moved to the respawn point.
+
+NpcState, StoryActorRecord, serialization and migration meanings unchanged. Identity/experience/relationship/residence persist. Runtime path is not serialized as permanent history. The existing work transition check_return_light -> maintain_return_light remains. General future routine switching and detailed residence/path obstacle classification are not implemented by this slice.
+
+## Harness and evidence
+NpcExceptionSmoke is opt-in, isolated. D1..D5 target reservation, appearance, actual movement after committed dialogue, observation committed before completion, and completed life. Both KeepInventory settings use actual kill/DeathScreen respawn plus actual diamond inventory count. Respawn is in Overworld at a fixture platform far from the quiet_city NPC; the NPC retains whileaway:quiet_city binding, not a fabricated Overworld origin. NPC is never teleported. Before death, remote absence and completed story NBT are separate snapshots. A living remote respawn is held 120 observed server ticks without checkpoint/fact/work changes. Return must complete through NPC navigation and actual return-light observation. D5 worlds are opened by a new PID, canonical/identity/facts checked again. Repeated completed interaction must not append history.
+Two new GameTests cover absent PREPARED reservation and active resident suspension without facts/generation changes. Existing 56 tests remain unchanged. New separate regression tasks reuse NpcSmoke A-E in new profiles/evidence only; old evidence is not overwritten.
+
+ClientTestEnvironment now records PID before environment validation and includes actual/expected bounds on failure. It does not weaken mute or right DISPLAY1 requirements. All client runs remain serial and pre-muted.
+
+## Development/environment history
+Pre-fix Death1Off failed as expected and is preserved in development-death1-before-fix, with the original failed world outside the final profile. The first post-fix launch ended before title/environment gate; marker remained RUNNING and PID was not recorded. Startup log/world preserved in startup-interrupted-attempt; root cause unconfirmed and not a completed gameplay test. At usage 92% a safe pause was announced. The packaging permission review was then rejected because usage was exhausted; that tool action did not execute. After explicit user go and usage reset (five-hour 0%, weekly 31%), the same copy-only rollback request was approved and executed. No workaround bypass and no computer shutdown.
+
+## Required remaining gates
+Until current evidence proves them: actual NPC chunk unload/reload, Nether/End at multiple checkpoints, dimension+restart, divergent NPC world copy, residence missing/blocked/conflict/unreachable, path obstruction/reopening, missing/replaced/restored return light, representative NPC-corruption clients, broader runtime work transitions remain NOT TESTED or NOT IMPLEMENTED. Do not promote death tests into those gates. No NPC overall PASS or composite implementation before the complete exception table is closed.
+
+## Routing and usage
+No Terra/Luna delegation or routing pilot. No Caveman. No per-model token savings measured. Check both usage windows at major boundaries; near depletion finish a coherent save/recovery boundary, save artifacts and exact next step, then pause. Automatic shutdown is disabled.
+
+## Current verified results
+{
+  "version": "0.3.1-dev.1",
+  "work": "npc-exceptions",
+  "saveFormat": 4,
+  "actorSchema": 1,
+  "artRevision": 2,
+  "death_bundle": "PASS",
+  "keepInventoryOff": "PASS",
+  "keepInventoryOn": "PASS",
+  "remoteRespawn": "PASS",
+  "completedFreshReload": "PASS",
+  "gameTests": 58,
+  "coreAssertions": 176857,
+  "realDeathClients": 10,
+  "realReloadClients": 2,
+  "NPC_overall": "PARTIAL",
+  "campaign": "PARTIAL",
+  "chunk": "NOT TESTED",
+  "Nether": "NOT TESTED",
+  "End": "NOT TESTED",
+  "copyDivergence": "NOT TESTED",
+  "environment": "NOT TESTED",
+  "NPC_corruptionClient": "NOT TESTED",
+  "composite": "NOT STARTED"
+}
+{
+  "npc_abcde": "PASS",
+  "realClients": 10,
+  "processRestartPairs": 5,
+  "gameTests": 58,
+  "coreAssertions": 176857,
+  "storageCases": 580,
+  "storageAssertions": 2161,
+  "overall": "PARTIAL"
+}
+
+## Exact commands, inputs, outputs and exits
+CWD=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+COMMAND ./gradlew.bat --offline runGameTestServer
+LOG C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\baseline-tests.log
+[01:16:41] [Server thread/INFO] [minecraft/GameTestServer]: All 56 required tests passed :)
+BUILD SUCCESSFUL in 1m 31s
+EXIT 0
+COMMAND ./gradlew.bat --offline compileJava runGameTestServer build
+LOG C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\tests-final.log
+[01:27:11] [Server thread/INFO] [minecraft/GameTestServer]: All 58 required tests passed :)
+PASS core assertions=176857
+BUILD SUCCESSFUL in 1m 54s
+EXIT 0
+COMMAND pwsh -NoProfile -File tools/probe-npc-exception-storage.ps1
+LOG C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\probe.log
+PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false
+EXIT 0
+{
+  "command": "java -cp build/npc-exception-archive-probe NpcExceptionArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\npc-exceptions\\baseline\\previous.jar\" baseline",
+  "label": "BASELINE",
+  "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard expected only in modified; canonical recovery retained in both",
+  "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=false",
+  "exit": 0
+}
+{
+  "command": "java -cp build/npc-exception-archive-probe NpcExceptionArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\npc-exceptions\\whileaway-0.3.1-npc-exceptions.jar\" modified",
+  "label": "MODIFIED",
+  "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard expected only in modified; canonical recovery retained in both",
+  "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true",
+  "exit": 0
+}
+{
+  "command": "bash -lc \"chmod +x evidence/npc-exceptions/ROLLBACK.sh && test -x evidence/npc-exceptions/ROLLBACK.sh && evidence/npc-exceptions/ROLLBACK.sh build/rollback-npc-exceptions/test.jar\"",
+  "label": "ROLLBACK",
+  "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-npc-exceptions\\test.jar",
+  "output": "ROLLBACK PASS: npc-lifecycle JAR restored; world files untouched",
+  "exit": 0
+}
+{
+  "command": "java -cp build/npc-exception-archive-probe NpcExceptionArchiveProbe build/rollback-npc-exceptions/test.jar baseline",
+  "label": "RESTORED",
+  "input": "same 8 policy cases and baseline fixture revision",
+  "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=false",
+  "exit": 0
+}
+Restored hash=80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51; modified hash retained=19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19; world operations=none. Archive probes are not actual gameplay rollback.
+
+## client real clients; separate exited PIDs
+{"mode": "Death1Off", "command": "./gradlew.bat --offline runNpcExceptionDeath1Off", "exit": 0, "pid": 46428, "processExited": true, "seconds": 86.83474349975586, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=46428
+DEATH boundary=NPC_A_PREPARED checkpoint=0 keepInventory=false uuid=e95225f6-aca8-4fbd-985c-347122c19b6c generation=0
+PASS remote_respawn checkpoint=0 heldTicks=120 same identity/facts; keepInventory=false diamonds=0
+PASS Death1Off canonical=1 checkpoint=4 generation=0 uuid=e95225f6-aca8-4fbd-985c-347122c19b6c instance=b5e1645c-ce6f-4ffe-a7c3-3912d98ad67c dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death2Off", "command": "./gradlew.bat --offline runNpcExceptionDeath2Off", "exit": 0, "pid": 21784, "processExited": true, "seconds": 82.32426929473877, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=21784
+DEATH boundary=NPC_B_APPEARED checkpoint=1 keepInventory=false uuid=12b416be-0551-4eaa-8ab0-01513ca1d9ea generation=0
+PASS remote_respawn checkpoint=1 heldTicks=120 same identity/facts; keepInventory=false diamonds=0
+PASS Death2Off canonical=1 checkpoint=4 generation=0 uuid=12b416be-0551-4eaa-8ab0-01513ca1d9ea instance=123eec61-95d0-4857-bb0d-8d2e244e2d5b dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death3Off", "command": "./gradlew.bat --offline runNpcExceptionDeath3Off", "exit": 0, "pid": 30500, "processExited": true, "seconds": 80.67580604553223, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=30500
+PASS moving_boundary actualMovement=true distanceSquared=0.39592235552507155
+DEATH boundary=NPC_C_ACTUAL_MOVEMENT checkpoint=2 keepInventory=false uuid=0bae01eb-5d5e-412b-b79f-6fff20d33136 generation=0
+PASS remote_respawn checkpoint=2 heldTicks=120 same identity/facts; keepInventory=false diamonds=0
+PASS Death3Off canonical=1 checkpoint=4 generation=0 uuid=0bae01eb-5d5e-412b-b79f-6fff20d33136 instance=d6ddfe09-6f9e-47b9-a19f-53d3499ebe9a dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death4Off", "command": "./gradlew.bat --offline runNpcExceptionDeath4Off", "exit": 0, "pid": 48828, "processExited": true, "seconds": 79.16225075721741, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=48828
+DEATH boundary=NPC_D_BEFORE_COMPLETE checkpoint=3 keepInventory=false uuid=2456ea0f-bcd8-448a-8a2b-79b8676b2ffd generation=0
+PASS remote_respawn checkpoint=3 heldTicks=120 same identity/facts; keepInventory=false diamonds=0
+PASS Death4Off canonical=1 checkpoint=4 generation=0 uuid=2456ea0f-bcd8-448a-8a2b-79b8676b2ffd instance=cbbe8804-0893-4a0e-b0df-fa9f4010b67b dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death5Off", "command": "./gradlew.bat --offline runNpcExceptionDeath5Off", "exit": 0, "pid": 20724, "processExited": true, "seconds": 79.63189029693604, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=20724
+DEATH boundary=NPC_E_AFTER_COMPLETE checkpoint=4 keepInventory=false uuid=d0c8b88b-69a7-4c55-88f5-1a6c87c7a5d9 generation=0
+PASS remote_respawn checkpoint=4 heldTicks=120 same identity/facts; keepInventory=false diamonds=0
+PASS Death5Off canonical=1 checkpoint=4 generation=0 uuid=d0c8b88b-69a7-4c55-88f5-1a6c87c7a5d9 instance=7ca08e10-4789-40a2-ade9-ab906094f03c dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "ReloadOff", "command": "./gradlew.bat --offline runNpcExceptionReloadOff", "exit": 0, "pid": 26308, "processExited": true, "seconds": 54.13502597808838, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=26308
+PASS ReloadOff canonical=1 checkpoint=4 generation=0 uuid=d0c8b88b-69a7-4c55-88f5-1a6c87c7a5d9 instance=7ca08e10-4789-40a2-ade9-ab906094f03c dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death1On", "command": "./gradlew.bat --offline runNpcExceptionDeath1On", "exit": 0, "pid": 48584, "processExited": true, "seconds": 81.05016493797302, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=48584
+DEATH boundary=NPC_A_PREPARED checkpoint=0 keepInventory=true uuid=f8845cf3-b420-48a5-9070-2c3e12718bf6 generation=0
+PASS remote_respawn checkpoint=0 heldTicks=120 same identity/facts; keepInventory=true diamonds=7
+PASS Death1On canonical=1 checkpoint=4 generation=0 uuid=f8845cf3-b420-48a5-9070-2c3e12718bf6 instance=d56c3ba8-9271-4966-91d4-10dc89d5fcae dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death2On", "command": "./gradlew.bat --offline runNpcExceptionDeath2On", "exit": 0, "pid": 10704, "processExited": true, "seconds": 77.82903861999512, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=10704
+DEATH boundary=NPC_B_APPEARED checkpoint=1 keepInventory=true uuid=35b06d0b-a197-49ad-80f4-c33aafa01bca generation=0
+PASS remote_respawn checkpoint=1 heldTicks=120 same identity/facts; keepInventory=true diamonds=7
+PASS Death2On canonical=1 checkpoint=4 generation=0 uuid=35b06d0b-a197-49ad-80f4-c33aafa01bca instance=082803f3-7516-4644-96a2-71cf8fc2b167 dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death3On", "command": "./gradlew.bat --offline runNpcExceptionDeath3On", "exit": 0, "pid": 47340, "processExited": true, "seconds": 78.88692879676819, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=47340
+PASS moving_boundary actualMovement=true distanceSquared=0.39592235552507155
+DEATH boundary=NPC_C_ACTUAL_MOVEMENT checkpoint=2 keepInventory=true uuid=514d15c7-93d4-4a55-aee2-8522301eb51e generation=0
+PASS remote_respawn checkpoint=2 heldTicks=120 same identity/facts; keepInventory=true diamonds=7
+PASS Death3On canonical=1 checkpoint=4 generation=0 uuid=514d15c7-93d4-4a55-aee2-8522301eb51e instance=27d6e774-36a5-46a3-b863-3cb09b65691b dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death4On", "command": "./gradlew.bat --offline runNpcExceptionDeath4On", "exit": 0, "pid": 10840, "processExited": true, "seconds": 79.3396680355072, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=10840
+DEATH boundary=NPC_D_BEFORE_COMPLETE checkpoint=3 keepInventory=true uuid=6b4c28df-35ff-4f86-94f1-b5b77dccc8d1 generation=0
+PASS remote_respawn checkpoint=3 heldTicks=120 same identity/facts; keepInventory=true diamonds=7
+PASS Death4On canonical=1 checkpoint=4 generation=0 uuid=6b4c28df-35ff-4f86-94f1-b5b77dccc8d1 instance=c720cc1d-f22c-469f-a83a-a710eb05d264 dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "Death5On", "command": "./gradlew.bat --offline runNpcExceptionDeath5On", "exit": 0, "pid": 39476, "processExited": true, "seconds": 79.91751909255981, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=39476
+DEATH boundary=NPC_E_AFTER_COMPLETE checkpoint=4 keepInventory=true uuid=b4c18c93-affd-4be9-afc4-2849076cc962 generation=0
+PASS remote_respawn checkpoint=4 heldTicks=120 same identity/facts; keepInventory=true diamonds=7
+PASS Death5On canonical=1 checkpoint=4 generation=0 uuid=b4c18c93-affd-4be9-afc4-2849076cc962 instance=dc90c604-0c80-43fb-8b28-e1704d9f6430 dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+{"mode": "ReloadOn", "command": "./gradlew.bat --offline runNpcExceptionReloadOn", "exit": 0, "pid": 10260, "processExited": true, "seconds": 54.00970935821533, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=10260
+PASS ReloadOn canonical=1 checkpoint=4 generation=0 uuid=b4c18c93-affd-4be9-afc4-2849076cc962 instance=dc90c604-0c80-43fb-8b28-e1704d9f6430 dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100
+
+Launcher duration sum seconds=913.797; not natural survival duration
+
+## regression real clients; separate exited PIDs
+{"mode": "CutA", "command": "./gradlew.bat --offline runNpcRegressionCutA", "exit": 0, "pid": 44856, "processExited": true, "seconds": 51.76023483276367, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=44856
+PASS CutA boundary=NPC_A_PREPARED checkpoint=0 generation=0 uuid=aa6c694e-ba04-43d1-8668-5dc172dbfa71 facts=[npc.goal=choose_evening_routine, npc.home=10445360758849, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeA", "command": "./gradlew.bat --offline runNpcRegressionResumeA", "exit": 0, "pid": 16568, "processExited": true, "seconds": 64.567880153656, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=16568
+INPUT checkpoint=0 generation=0 uuid=aa6c694e-ba04-43d1-8668-5dc172dbfa71
+PASS ResumeA canonical=1 generation=0 uuid=aa6c694e-ba04-43d1-8668-5dc172dbfa71 checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutB", "command": "./gradlew.bat --offline runNpcRegressionCutB", "exit": 0, "pid": 27948, "processExited": true, "seconds": 54.044233560562134, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=27948
+PASS CutB boundary=NPC_B_APPEARED checkpoint=1 generation=0 uuid=a1b49453-73da-4a11-905a-dab123a41082 facts=[npc.goal=choose_evening_routine, npc.home=10445360758849, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeB", "command": "./gradlew.bat --offline runNpcRegressionResumeB", "exit": 0, "pid": 51492, "processExited": true, "seconds": 61.05319619178772, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=51492
+INPUT checkpoint=1 generation=0 uuid=a1b49453-73da-4a11-905a-dab123a41082
+PASS ResumeB canonical=1 generation=0 uuid=a1b49453-73da-4a11-905a-dab123a41082 checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutC", "command": "./gradlew.bat --offline runNpcRegressionCutC", "exit": 0, "pid": 52532, "processExited": true, "seconds": 56.358012199401855, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=52532
+PASS CutC boundary=NPC_C_CONVERSATION_COMMITTED checkpoint=2 generation=0 uuid=4fda7222-edff-4742-a2e7-1640a36d2c5c facts=[npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeC", "command": "./gradlew.bat --offline runNpcRegressionResumeC", "exit": 0, "pid": 42900, "processExited": true, "seconds": 60.434131145477295, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=42900
+INPUT checkpoint=2 generation=0 uuid=4fda7222-edff-4742-a2e7-1640a36d2c5c
+PASS ResumeC canonical=1 generation=0 uuid=4fda7222-edff-4742-a2e7-1640a36d2c5c checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutD", "command": "./gradlew.bat --offline runNpcRegressionCutD", "exit": 0, "pid": 24736, "processExited": true, "seconds": 55.832613945007324, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=24736
+PASS CutD boundary=NPC_D_BEFORE_COMPLETE checkpoint=3 generation=0 uuid=f607a2cd-7b69-433a-9d23-df99242cf945 facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.schema=1, npc.work=check_return_light]
+
+{"mode": "ResumeD", "command": "./gradlew.bat --offline runNpcRegressionResumeD", "exit": 0, "pid": 36328, "processExited": true, "seconds": 55.835870027542114, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=36328
+INPUT checkpoint=3 generation=0 uuid=f607a2cd-7b69-433a-9d23-df99242cf945
+PASS ResumeD canonical=1 generation=0 uuid=f607a2cd-7b69-433a-9d23-df99242cf945 checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+{"mode": "CutE", "command": "./gradlew.bat --offline runNpcRegressionCutE", "exit": 0, "pid": 52024, "processExited": true, "seconds": 55.98747420310974, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=52024
+PASS CutE boundary=NPC_E_AFTER_COMPLETE checkpoint=4 generation=0 uuid=d0cf4874-54d2-4bbd-a856-0e3baef85845 facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light]
+
+{"mode": "ResumeE", "command": "./gradlew.bat --offline runNpcRegressionResumeE", "exit": 0, "pid": 50124, "processExited": true, "seconds": 56.18144226074219, "pass": true}
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=50124
+INPUT checkpoint=4 generation=0 uuid=d0cf4874-54d2-4bbd-a856-0e3baef85845
+PASS ResumeE canonical=1 generation=0 uuid=d0cf4874-54d2-4bbd-a856-0e3baef85845 checkpoint=4 life=maintain_return_light facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.link=return_light_shared, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light, npc.schema=1, npc.settled, npc.work=maintain_return_light] stableTicks=120
+
+Launcher duration sum seconds=572.055; not natural survival duration
+
+## Paths and hashes
+BASELINE_JAR C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\baseline\previous.jar
+SHA256 80a80cf1dd741744c4b6c7c2bed21264437d651c5421d9198f13b40e3ca79e51
+BASELINE_SOURCE C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\baseline\previous-source.zip
+SHA256 eba768dec2a1784f71fe371573a92daa9f1cc92b8f3a5cb40463cf9d958ff736
+MODIFIED_FILE C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\npc-exceptions\whileaway-0.3.1-npc-exceptions.jar
+SHA256 19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19
+DIFF_FILE C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\DIFF.patch
+SHA256 1ea3968799117880396b1149af2ddc6ea5e7af07a059def45a5089ac74959045
+ROLLBACK.sh C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\ROLLBACK.sh
+SHA256 6bfb1f09f319c58ce268431e7b9c0135c6a37eb0b8aaf6e56c822410ad703af9
+VERIFICATION C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-exceptions\VERIFICATION.txt
+Source ZIP SHA256 is stored outside the archive in dist/npc-exceptions/SHA256SUMS.txt to avoid circular hashing.
+
+Next first task: NPC actual entity/snapshot/residence/target/light chunks unload and reload, then Nether/End and a foreign-dimension process restart. Keep permanent identity/relationships and current runtime distinct. No composite until remaining residence/path/corruption/copy gates pass. Latest required D1-D5 death OFF/ON and A-E process pairs are current evidence only; past client counts are not included.

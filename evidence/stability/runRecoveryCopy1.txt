@@ -1,0 +1,4 @@
+RUNNING
+PASS persisted midpoint identity and facts after non-graceful JVM halt
+PASS resumed midpoint to completion without inventory change
+PASS runRecoveryCopy1

@@ -1,0 +1,104 @@
+WHILE YOU WERE AWAY 0.1.0-dev.1 — FIRST DEVELOPMENT SLICE
+Date: 2026-09-09 KST
+Full campaign status: NOT COMPLETE. Final art / multiplayer live / full survival playthrough: NOT TESTED.
+Changed branch: ThreatPolicy.mayManifest: return false -> distinctClues >= 3 && signalRestored.
+Baseline provenance: newly created no-encounter scaffold from this development run, not an earlier shipped mod.
+Additional fixes: worldgen jigsaw size 0 -> 1; silent prelaunch options for both dev client tasks;
+12-second relay presentation, scene codec, physical generated-station and client line-of-sight tests.
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\src\main\java\io\github\whileaway\core\ThreatPolicy.java
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\ROLLBACK.sh
+BASELINE_SHA256=8b125547cfb45abb58a8849eeb8749582cdfcd0239f1c689c2705575505506c0
+MODIFIED_SHA256=1663ed61e6280e99f5ea0a1ac19abf9c02a5502aa9eb9cdbc30dcf775cc2b7b5
+JAR=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\whileaway-0.1.0-dev.1.jar
+JAR_SHA256=3a3d083731506450772d247f2a6df4bd0126db173c9b75f169b2a23e0902e49b
+
+BASELINE / MODIFIED / ROLLBACK exact observed commands; working directory=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+BASELINE
+COMMAND: javac -encoding UTF-8 -d .\build\probe-baseline .\evidence\baseline\ThreatPolicy.java .\tools\PolicyProbe.java
+INPUT: .\evidence\baseline\ThreatPolicy.java
+LITERAL OUTPUT: (empty)
+EXIT STATUS: 0
+
+BASELINE
+COMMAND: java -cp .\build\probe-baseline PolicyProbe 3 true false
+INPUT: distinctClues=3; signalRestored=true; expected=false
+LITERAL OUTPUT: mayManifest=false
+EXIT STATUS: 0
+
+MODIFIED
+COMMAND: javac -encoding UTF-8 -d .\build\probe-modified .\src\main\java\io\github\whileaway\core\ThreatPolicy.java .\tools\PolicyProbe.java
+INPUT: .\src\main\java\io\github\whileaway\core\ThreatPolicy.java
+LITERAL OUTPUT: (empty)
+EXIT STATUS: 0
+
+MODIFIED
+COMMAND: java -cp .\build\probe-modified PolicyProbe 3 true true
+INPUT: distinctClues=3; signalRestored=true; expected=true
+LITERAL OUTPUT: mayManifest=true
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: & 'C:\Program Files\Git\bin\bash.exe' -c 'chmod +x ./ROLLBACK.sh && test -x ./ROLLBACK.sh && ./ROLLBACK.sh build/rollback-copy/ThreatPolicy.java'
+INPUT: build/rollback-copy/ThreatPolicy.java (modified copy)
+LITERAL OUTPUT: ROLLBACK PASS: original SHA256 restored
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: javac -encoding UTF-8 -d .\build\probe-rollback .\build\rollback-copy\ThreatPolicy.java .\tools\PolicyProbe.java
+INPUT: .\build\rollback-copy\ThreatPolicy.java
+LITERAL OUTPUT: (empty)
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: java -cp .\build\probe-rollback PolicyProbe 3 true false
+INPUT: distinctClues=3; signalRestored=true; expected=false
+LITERAL OUTPUT: mayManifest=false
+EXIT STATUS: 0
+
+Restored behavior: copy returns mayManifest=false for (3,true); original baseline hash matches.
+Final working status: MODIFIED_FILE remains changed, returns mayManifest=true for (3,true).
+Rollback scope: policy source only. Does not uninstall the mod, rebuild a JAR, or alter worlds.
+ROLLBACK.sh executable verified with Git Bash chmod +x and test -x. Source ZIP preserves executable mode.
+Initial sandbox Git Bash attempt failed to create signal pipe (Win32 error 5); rerun outside sandbox passed.
+
+CURRENT VALIDATION
+COMMAND: .\gradlew.bat build runGameTestServer runClientSmoke --console=plain
+INPUT: Java 21, Minecraft 1.21.1, NeoForge 21.1.249, GeckoLib 4.9.2; isolated seed 74192361 world.
+LITERAL OUTPUT: All 9 required tests passed :)
+LITERAL OUTPUT: WHILEAWAY_SMOKE_PASS
+BUILD SUCCESSFUL in 1m 52s
+EXIT STATUS: 0
+Full literal log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\runtime-final.log
+COMMAND: .\tools\test-core.ps1
+INPUT: core policy, ledger, director, scene timeline tables.
+LITERAL OUTPUT: PASS core assertions=1571
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-assets.py .\build\libs\whileaway-0.1.0-dev.1.jar
+INPUT: generated resources plus final built JAR.
+LITERAL OUTPUT: PASS asset assertions=6654; station/animation/localization/OGG/JAR
+EXIT STATUS: 0
+COMMAND: pwsh -NoProfile -File .\tools\verify-mute.ps1
+INPUT: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\client-smoke\options.txt
+LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT STATUS: 0
+COMMAND: $env:PYTHONPATH='C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\audio-deps'; & 'C:\Users\scarl\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' .\tools\verify-audio.py
+INPUT: seven original synthesized OGG files; no playback device opened.
+LITERAL OUTPUT: PASS audio files=7; decoded/finite/duration/mono/44100Hz/peak<0.95; playback=NONE
+EXIT STATUS: 0
+
+CLIENT EVIDENCE
+Natural world seed=74192361
+Station start=BlockPos{x=-320, y=0, z=-272}
+Piece bounds=BoundingBox{minX=-338, minY=67, minZ=-290, maxX=-320, maxY=76, maxZ=-272}
+Physical station anchor=BlockPos{x=-326, y=68, z=-281} and relay verified
+Client assets present
+PASS tracked custom entity present with camera line of sight
+PASS scene S2C starts, reaches caption phase and ends; master volume remains zero
+PASS client resource loading, natural station start, integrated world and scheduled captures
+
+Screenshot review: natural station exterior, visible prototype Wayfarer and Korean scene caption.
+Client smoke uses an observation entity and a server-sent presentation packet. It is not a complete survival-quest playthrough.
+No forced music playback. Auditory quality/listening evaluation: NOT TESTED.
+Warning: one world-generation tick delay was logged; no sustained performance or shader compatibility claim.

@@ -1,0 +1,7 @@
+{
+  "lifecycle": "all A-E crash/fresh-process pairs: reservation through completed receipt",
+  "death": "checkpoints2,3,4 x KeepInventoryOFF/ON plus completed fresh reloads: changed navigation, precommit and postcompletion. Checkpoints0/1 excluded from real resampling because movement/environment branch starts at2; all existing GameTests retained.",
+  "travel": "chunk2/4, Nether2, End2, Nether2 cut/resume: active navigation and completed residence plus cross-process dimension binding",
+  "copy": "full saved split, divergent A4/B2, fresh reload both; whole inactive directory hashes",
+  "plannedClients": 29
+}

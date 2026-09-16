@@ -1,0 +1,14 @@
+[
+  {
+    "source": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\city-smoke\\saves\\whileaway-city-1788909134199\\data\\whileaway_story.dat",
+    "copy": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\reuse\\baseline\\legacy-v2.dat",
+    "schema": 2,
+    "sha256": "758075dfb6fa933c31d4c69ee6c7adbd141f4f23948d1a49fb8e8c0f1f0215dc"
+  },
+  {
+    "source": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\city-smoke\\saves\\whileaway-city-1788910874612\\data\\whileaway_story.dat",
+    "copy": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\reuse\\baseline\\legacy-v3.dat",
+    "schema": 3,
+    "sha256": "e88039bdca7239273728dfea2584fa04f00e22fa04c703cfec4f91349880cfb4"
+  }
+]

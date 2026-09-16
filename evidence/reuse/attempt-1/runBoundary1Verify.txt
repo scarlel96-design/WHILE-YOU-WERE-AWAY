@@ -1,0 +1,2 @@
+RUNNING
+PASS runBoundary1Verify completed state stable for 300 ticks; duplicate input suppressed; no scene replay

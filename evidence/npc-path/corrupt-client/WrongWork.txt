@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=49224
+PASS load STORY_LOAD outcome=CORRUPT recovery=MANUAL_DIAGNOSTIC saveFormat=4 actorSchema=1 actors=1 writeBlocked=true phase=load original_quarantined reason=NPC_LIFE_COMMIT_MISSING storyId=npc:yeoul instance=1ce8a937-ad13-43c7-a5ab-aa852217fb3d checkpoint=4
+PASS WrongWork connectedClient=true liveNPC=1 identityUnchanged=true generation=0 checkpoint=4 saveDispatches=3 writeBlocked=true originalHash=2667a483cf38971ad9611420f9cc19cfd0a9fd9c19bae4e522530c66d8cfc92b finalHash=2667a483cf38971ad9611420f9cc19cfd0a9fd9c19bae4e522530c66d8cfc92b emptyCampaignReturned=false heldTicks=100

@@ -1,0 +1,10 @@
+{
+  "npc_abcde": "PASS",
+  "realClients": 10,
+  "processRestartPairs": 5,
+  "gameTests": 58,
+  "coreAssertions": 176857,
+  "storageCases": 580,
+  "storageAssertions": 2161,
+  "overall": "PARTIAL"
+}

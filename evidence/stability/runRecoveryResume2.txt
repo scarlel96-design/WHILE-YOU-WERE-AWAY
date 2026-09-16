@@ -1,0 +1,11 @@
+RUNNING
+PASS persisted midpoint identity and facts after non-graceful JVM halt
+CAPTURE resumed checkpoint 2
+PASS resumed midpoint to completion without inventory change
+PASS interruption=death_respawn cycle=1
+PASS interruption=chunk_unload_reload cycle=1
+PASS interruption=nether_return cycle=1
+PASS interruption=death_respawn cycle=2
+PASS interruption=chunk_unload_reload cycle=2
+PASS interruption=end_return cycle=2
+PASS runRecoveryResume2

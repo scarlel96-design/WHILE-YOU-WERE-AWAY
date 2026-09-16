@@ -1,0 +1,1 @@
+PASS adopted lifecycle JAR/source preserved; rollback touched only jar copy; original legacy story files=2 unchanged

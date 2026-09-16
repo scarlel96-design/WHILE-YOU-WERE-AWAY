@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=37780
+PASS reload E checkpoint=3 facts=[encounter_complete, pursuit_started]
+PASS runActorE2 boundary=AFTER_COMPLETE checkpoint=4 generation=3 instance=06b27f4e-4844-4fcf-bc22-4bd6c09c6adb
+FAULT Runtime.halt after durable story write; no shutdown save

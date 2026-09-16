@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=28888
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+EXPECTED guarded save rejected IllegalStateException
+PASS Duplicate writeBlocked=true originalPreserved=true AI_paused=true

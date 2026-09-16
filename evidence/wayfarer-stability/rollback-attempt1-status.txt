@@ -1,0 +1,1 @@
+Rollback launch failed before script execution: exit -1073741502 (Windows process initialization).

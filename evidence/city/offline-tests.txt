@@ -1,0 +1,14 @@
+COMMAND: & .\tools\test-core.ps1
+INPUT: Pure Java core, 20988 cell layout and route reachability
+LITERAL OUTPUT: PASS core assertions=43604
+EXIT STATUS: 0
+
+COMMAND: python tools\verify-assets.py build\libs\whileaway-0.2.0-dev.1.jar
+INPUT: Mod resources, native localization reference and compiled JAR
+LITERAL OUTPUT: PASS asset assertions=6699; station/animation/localization/OGG/JAR
+EXIT STATUS: 0
+
+COMMAND: pwsh -NoProfile -File tools\verify-mute.ps1 -OptionsPath ..\..\work\city-smoke\options.txt
+INPUT: Isolated city client options file
+LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT STATUS: 0

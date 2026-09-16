@@ -1,0 +1,1720 @@
+《네가 없는 동안》 다음 작업 지시서
+0.3.1 npc-world → NPC Environment/Corruption Closure
+→ NPC Lifecycle 최종 봉인
+→ 조건 충족 시 First Complex Campaign Event 진입
+
+
+======================================================================
+[CURRENT]
+======================================================================
+
+《네가 없는 동안》 0.3.1-dev.1 / npc-world / PARTIAL
+
+이번 작업은 반드시 현재 npc-world 수정본을 최신 기준점으로 삼아 이어간다.
+
+Minecraft:
+1.21.1
+
+NeoForge:
+21.1.249
+
+Mod:
+0.3.1-dev.1
+
+현재 작업본:
+npc-world
+
+저장 형식:
+4
+
+Actor Schema:
+optional 1
+
+도시 아트:
+revision 2
+
+
+현재 확인된 주요 결과:
+
+- Load Guard / Fail-Closed: 유지
+- Canonical Actor Recovery: 유지
+- 실제 캠페인 NPC 여울: 구현됨
+- 실제 NPC 청크 언로드/재로드: PASS
+- Unloaded NPC != Missing Actor: PASS
+- Nether: PASS
+- End: PASS
+- 차원 이동 중 프로세스 재시작: PASS
+- 실제 Copy-World divergent progression: PASS
+- NPC→NPC 관계 키 저장: PASS — 저장 범위
+- NPC 전체 lifecycle: PARTIAL
+- 환경 장애: NOT TESTED
+- NPC 손상 월드 실제 클라이언트: NOT TESTED
+- First Complex Event: NOT STARTED
+- 0.3.2 승격: 보류
+- 최종 아트: 보류
+- Caveman: HOLD
+
+
+======================================================================
+[최신 기준 SHA-256]
+======================================================================
+
+현재 npc-world JAR:
+
+9096e4dc9276c8d1eae7aaf2446950e4f76edc5f0f58ee906d7ae70d7268530f
+
+현재 npc-world SOURCE ZIP:
+
+519e7f5b12098357628b311ffa8b9ad5cd1974a2e5474751255c978318fcdc87
+
+
+증거 산출물:
+
+DIFF:
+5eff396bd84c4ee9790f13e7ceda220c0c59bb2b042983279226452c1def5d7a
+
+VERIFICATION:
+f19c17d74705d7d45d27fdfa38467767627722f61b2363133a04127374887edd
+
+ROLLBACK:
+d53dd56c7015690576cbc55145f35f46bd7fa5caedb611d582b89a7f0744efa0
+
+
+작업 시작 전에 위 JAR과 소스 ZIP을 별도 baseline으로 보존한다.
+
+현재 배포 산출물을 직접 덮어쓰지 않는다.
+
+환경 손상·세이브 손상 테스트는 반드시 복사 월드/격리 프로필에서 수행한다.
+
+
+======================================================================
+1. 이번 작업의 최우선 목표
+======================================================================
+
+이번 단계에서는 새로운 콘텐츠를 늘리지 않는다.
+
+남은 NPC lifecycle 위험 표면을 봉인한다.
+
+순서:
+
+1. NPC 환경 의존성 판정 구조
+2. residence 정상/차단/접근불가/누락/충돌
+3. 청크 미로드와 실제 path failure 구분
+4. return-light 정상/누락/오블록/복원
+5. 환경 장애 상태에서 저장·종료·새 프로세스
+6. 환경 복원 후 동일 NPC로 재개
+7. NPC 손상 저장 실제 Minecraft 클라이언트
+8. 전체 NPC lifecycle 최신 통합 회귀
+9. NPC lifecycle 최종 PASS/PARTIAL 판정
+10. 전부 PASS일 경우에만 첫 복합 캠페인 사건 진입
+
+
+======================================================================
+2. NpcEvents.update() 환경 판단부터 시작
+======================================================================
+
+현재 다음과 같은 식의 단순 판단으로 만들지 않는다.
+
+if (!pathExists) {
+    failEvent();
+}
+
+또는
+
+if (!residenceExists) {
+    spawnFallback();
+}
+
+
+환경 조건을 최소 다음 의미로 분리한다.
+
+RESIDENCE_VALID
+
+RESIDENCE_TEMPORARILY_BLOCKED
+
+RESIDENCE_UNREACHABLE
+
+RESIDENCE_MISSING
+
+RESIDENCE_CONFLICT
+
+
+필요하다면 return-light와 path는 별도 상태를 둔다.
+
+예:
+
+PATH_AVAILABLE
+PATH_TEMPORARY_FAILURE
+PATH_CHUNK_UNAVAILABLE
+PATH_BLOCKED
+PATH_DESTINATION_INVALID
+
+LIGHT_VALID
+LIGHT_MISSING
+LIGHT_WRONG_BLOCK
+LIGHT_CHUNK_UNAVAILABLE
+
+
+실제 enum/record/class 이름은 기존 코드 스타일에 맞춘다.
+
+
+======================================================================
+3. “청크 미로드”와 “경로 실패”를 절대 혼동하지 않는다
+======================================================================
+
+이번 단계에서 특히 중요하다.
+
+NPC가 path를 찾지 못한 원인이:
+
+- 목적지 청크 미로드
+- NPC 청크 미로드
+- 실제 벽/플레이어 블록
+- destination 자체 누락
+- 일시적인 pathfinder 실패
+
+중 무엇인지 구분한다.
+
+
+다음은 금지:
+
+chunk unavailable
+→ path failure
+→ residence broken
+→ 사건 실패
+
+
+또는:
+
+path null
+→ destination missing
+
+
+단일 null이나 boolean 하나로 모든 환경 상태를 처리하지 않는다.
+
+
+======================================================================
+4. 환경 상태의 저장 범위를 신중히 결정
+======================================================================
+
+모든 transient path 상태를 영구 저장하지 않는다.
+
+예:
+
+현재 A* path node
+현재 AI navigation 내부 인덱스
+일시적인 path 실패 tick
+
+등은 EPHEMERAL이다.
+
+
+반대로 필요하다면 다음 정도는 재접속을 위해 의미가 있을 수 있다.
+
+- 사건이 환경 조건 때문에 SUSPENDED였음
+- 어떤 dependency가 해결되지 않았음
+- 해당 checkpoint의 영구 상태
+
+
+단, “벽이 막혀 있었다”는 과거 사실을 영구 스토리 사실로 저장할 필요가 없는 경우에는
+월드를 다시 검사해 재구성한다.
+
+
+======================================================================
+5. Residence 정상 상태 기준 확정
+======================================================================
+
+현재 여울의 residence가 무엇을 만족해야 정상인지 명확히 한다.
+
+최소:
+
+- 올바른 dimension
+- 올바른 reference/position
+- 해당 위치가 실제 존재
+- 사건에 필요한 핵심 구조 조건 만족
+- 접근 자체가 논리적으로 가능한 상태
+
+를 검토한다.
+
+
+단순히:
+
+block at position != air
+
+수준으로 residence 전체를 검증하지 않는다.
+
+
+======================================================================
+6. Residence Missing 실제 Minecraft 검증
+======================================================================
+
+별도 복사 월드에서 여울의 residence에 필요한 핵심 환경 요소를 제거한다.
+
+다음을 확인한다.
+
+- NPC identity 유지
+- UUID 유지
+- instance 유지
+- generation 유지
+- permanent relationship facts 유지
+- shared experience 유지
+- checkpoint 임의 증가 없음
+- 사건 자동 완료 없음
+- 새 여울 생성 없음
+- 다른 집을 임의 residence로 선택하지 않음
+- 플레이어 집을 자동 residence로 사용하지 않음
+- 플레이어 건축 파괴 없음
+
+
+기대 상태:
+
+안전한 SUSPENDED 또는 diagnostic.
+
+
+======================================================================
+7. Residence 복원 후 재개
+======================================================================
+
+위 손상 월드에서 원래 환경 조건을 복원한다.
+
+그 후:
+
+환경 재검사
+→ 기존 여울 인식
+→ 같은 checkpoint 기반 재개
+→ 실제 pathfinding
+→ 기존 사건 완료
+
+
+확인:
+
+- 새 generation 없음
+- 새 instance 없음
+- duplicate NPC 없음
+- 영구 facts 중복 없음
+
+
+======================================================================
+8. Residence Temporarily Blocked
+======================================================================
+
+residence 자체는 존재하지만
+플레이어가 임시 블록으로 접근로를 막은 상태를 만든다.
+
+NPC가 실제 navigation으로 목적지에 도달할 수 없는지 확인한다.
+
+기대:
+
+- 즉시 사건 실패하지 않음
+- 즉시 완료하지 않음
+- NPC 순간이동하지 않음
+- 블록 파괴하지 않음
+- 새 NPC 생성하지 않음
+- generation 증가 없음
+
+필요한 경우:
+
+ACTIVE
+→ SUSPENDED(environment/path)
+
+로 전환 가능.
+
+
+======================================================================
+9. Path 재탐색 정책
+======================================================================
+
+일시적인 path failure 한 번으로 SUSPENDED로 확정하지 않는다.
+
+합리적인 재시도 정책을 둔다.
+
+단:
+
+무한 재탐색
+매 tick마다 비싼 전체 path 계산
+무한 CPU 사용
+
+도 피한다.
+
+
+재시도 횟수/시간은 실제 Minecraft AI 특성과 현재 사건 규모를 보고 결정한다.
+
+테스트만 통과하도록 임의의 매우 짧은 timeout을 넣지 않는다.
+
+
+======================================================================
+10. 통로를 다시 열었을 때 재개
+======================================================================
+
+플레이어가 설치했던 장애 블록을 제거한다.
+
+그 후 기존 여울이:
+
+- 환경 조건 재평가
+- path 재탐색
+- 실제 이동
+- return-light 관찰
+- 사건 완료
+
+까지 진행하는지 확인한다.
+
+
+중간에 NPC를 teleport하지 않는다.
+
+
+======================================================================
+11. Player World Modification 보호 원칙
+======================================================================
+
+환경 장애 해결을 위해 다음은 절대 금지한다.
+
+- 플레이어 블록 자동 삭제
+- 벽 강제 파괴
+- 길 자동 생성
+- residence 주변 강제 평탄화
+- 플레이어 집 덮어쓰기
+- NPC를 벽 너머로 순간이동
+
+
+향후 Structure Fallback에서도 이 원칙을 유지한다.
+
+
+======================================================================
+12. Residence Conflict 검토
+======================================================================
+
+저장된 residence 위치가 존재하지만
+현재 월드 상태와 명백하게 충돌하는 케이스를 별도로 정의한다.
+
+예:
+
+- 동일 위치가 다른 필수 구조 상태로 바뀜
+- 의미적으로 residence로 사용할 수 없는 구조가 됨
+- story registry와 실제 구조가 불일치
+
+
+현재 여울 사건에서 현실적인 재현 방법이 있다면 검사한다.
+
+억지 fixture를 만들기 위해 세계 전체 구조를 재설계하지 않는다.
+
+
+======================================================================
+13. Return-Light Dependency를 별도 검증
+======================================================================
+
+현재 여울 사건에서 귀환등은 실제 환경 의존성이다.
+
+다음 네 상태를 반드시 구분한다.
+
+LIGHT-1
+정상
+
+LIGHT-2
+누락
+
+LIGHT-3
+같은 위치지만 잘못된 블록
+
+LIGHT-4
+정상 상태로 복원
+
+
+각 상태를 실제 Minecraft에서 만든다.
+
+
+======================================================================
+14. Return-Light 누락 상태
+======================================================================
+
+귀환등이 없을 때 다음이 일어나면 안 된다.
+
+- checkpoint 3 자동 확정
+- 사건 완료
+- shared experience 확정
+- completion fact 기록
+- maintain_return_light로 전환
+- NPC 삭제/재생성
+
+
+사건은 안전하게 대기해야 한다.
+
+
+======================================================================
+15. 잘못된 블록으로 교체
+======================================================================
+
+좌표만 같다고 귀환등으로 인정하지 않는다.
+
+정확한 world condition을 확인한다.
+
+단, 최종 아트 블록 ID에 너무 강하게 묶지 않는다.
+
+향후 placeholder → final asset 교체를 고려하여
+논리적 dependency를 리소스/태그/구조 정의 등 적절한 방식으로 추상화할 수 있다.
+
+
+이번 단계에서 대규모 리소스 시스템을 새로 만들지는 않는다.
+
+
+======================================================================
+16. Return-Light 복원 후 사건 재개
+======================================================================
+
+귀환등을 원래 상태로 되돌린다.
+
+NPC가 같은 identity로:
+
+→ dependency 재확인
+→ 실제 관찰 단계
+→ completion
+
+까지 진행해야 한다.
+
+
+완료 facts는 정확히 한 번만 기록한다.
+
+
+======================================================================
+17. 환경 장애 상태에서 저장·프로세스 종료
+======================================================================
+
+중요하다.
+
+최소 다음 두 종류를 실제 새 프로세스에서 검증한다.
+
+A.
+blocked path 상태
+
+B.
+missing/wrong return-light 상태
+
+
+절차:
+
+환경 장애 생성
+→ NPC 사건 안전 중단 확인
+→ 저장
+→ 프로세스 완전 종료
+→ PID 종료 확인
+→ 새 프로세스
+→ 같은 월드 로드
+→ 같은 NPC 확인
+→ 같은 영구 facts 확인
+→ 환경 장애 상태 재판정
+
+
+단순 메모리 상태만 보지 않는다.
+
+
+======================================================================
+18. 환경 복원 + 새 프로세스
+======================================================================
+
+가능하면 다음까지 수행한다.
+
+장애 상태 재접속
+→ 환경 복원
+→ 사건 재개
+→ 완료
+→ 저장
+→ 종료
+→ 새 프로세스
+→ 완료 주민 상태 확인
+
+
+이 검증은 environment recovery의 가장 강한 증거 중 하나다.
+
+
+======================================================================
+19. 완료 주민과 환경 dependency를 혼동하지 않는다
+======================================================================
+
+checkpoint 4 이후 여울은 사건 도구가 아니라 주민이다.
+
+return-light가 나중에 일시적으로 사라졌다고:
+
+- 사건 checkpoint 3으로 후퇴
+- shared experience 제거
+- completion 취소
+- NPC 재생성
+
+하면 안 된다.
+
+
+완료 이후 환경 변화는 향후 별도 생활/스토리 시스템 문제다.
+
+현재 완료 사실은 불변이다.
+
+
+======================================================================
+20. NPC 손상 저장 Actual Client 단계
+======================================================================
+
+환경 장애 검증 이후
+NPC 손상 저장을 실제 Minecraft client에서 검증한다.
+
+기존 저장 probe 8건 PASS를
+실제 클라이언트 PASS로 확대 해석하지 않는다.
+
+
+대표적인 최소 3종을 권장한다.
+
+
+CORRUPT-1
+residence 필수 데이터 누락
+
+
+CORRUPT-2
+checkpoint 4 / COMPLETED인데 필수 permanent experience 누락
+
+
+CORRUPT-3
+checkpoint/current work/relationship 사이 의미 모순
+
+
+======================================================================
+21. Recoverable vs Unrecoverable 구분
+======================================================================
+
+실제 NPC corruption도 기존 원칙을 유지한다.
+
+SAFE_AUTO_RECOVER
+
+RECOVER_WITH_WARNING
+
+MANUAL_DIAGNOSTIC
+
+
+무조건 복구하려 하지 않는다.
+
+
+특히:
+
+완료된 여울 저장 손상
+→ 여울 삭제
+→ 사건 처음부터 재실행
+
+은 절대 금지.
+
+
+======================================================================
+22. NPC Corruption 우선순위
+======================================================================
+
+복구 우선순위:
+
+1. identity
+2. generation / instance
+3. permanent story facts
+4. shared experiences
+5. relationships
+6. residence decision
+7. checkpoint
+8. current work
+9. ephemeral runtime
+
+
+낮은 계층의 정보를 복구하기 위해
+상위 사실을 추정으로 변경하지 않는다.
+
+
+======================================================================
+23. 실제 손상 월드에서 Write Guard 확인
+======================================================================
+
+복구 불가 NPC 손상 월드에서:
+
+saveEverything 또는 동등한 실제 저장 경로 실행
+→ 종료
+→ story 파일 hash 비교
+
+
+확인:
+
+- 빈 캠페인으로 덮어쓰기 없음
+- 여울 0명 상태로 정상 저장 없음
+- 부분 복구 상태 overwrite 없음
+- 원본/격리본 보존
+
+
+======================================================================
+24. 실제 손상 월드에서 NPC 복제 방지
+======================================================================
+
+corrupt NPC 데이터를:
+
+“기존 NPC가 없음”
+
+으로 해석해 새 여울을 생성하면 FAIL이다.
+
+최소:
+
+- canonical 여울 개수
+- story actor registry
+- instance
+- generation
+
+을 검사한다.
+
+
+======================================================================
+25. NPC Integrity 최종 확대
+======================================================================
+
+이번 단계가 끝나면 최소 다음 오류를 진단할 수 있어야 한다.
+
+NPC_IDENTITY_MISSING
+
+NPC_DUPLICATE_CANONICAL
+
+NPC_GENERATION_MISMATCH
+
+NPC_RESIDENCE_MISSING
+
+NPC_RESIDENCE_BLOCKED
+
+NPC_DESTINATION_UNREACHABLE
+
+NPC_RETURN_LIGHT_MISSING
+
+NPC_RETURN_LIGHT_INVALID
+
+NPC_COMPLETED_FACT_MISSING
+
+NPC_PREMATURE_COMPLETION_FACT
+
+NPC_RELATIONSHIP_DUPLICATE
+
+NPC_WORK_CHECKPOINT_CONFLICT
+
+NPC_STORAGE_WRITE_BLOCKED
+
+
+이름은 프로젝트 코드 스타일에 맞게 변경 가능.
+
+
+======================================================================
+26. 환경 장애는 영구 Story Fact가 아님
+======================================================================
+
+다음을 구분한다.
+
+“과거에 귀환등 사건을 함께 경험했다”
+= 영구 사실
+
+
+“현재 귀환등 블록이 없음”
+= 현재 월드 환경 상태
+
+
+“현재 길이 막혀 있음”
+= 환경/runtime 상태
+
+
+환경이 바뀌었다고 과거의 경험까지 사라지면 안 된다.
+
+
+======================================================================
+27. Permanent / Current / Ephemeral 경계 최종 확인
+======================================================================
+
+PERMANENT:
+
+- identity
+- instance identity
+- story experiences
+- relationships
+- major decisions
+- event completion
+
+
+CURRENT:
+
+- residence
+- current work
+- current target
+- routine
+- environmental suspension reason
+
+
+EPHEMERAL:
+
+- path nodes
+- current look target
+- animation
+- navigation internals
+- transient retry timer
+
+
+실제 구현에서는 residence decision이 장기 상태일 수 있으므로
+현재 데이터 모델과 스토리 의미에 맞춰 분류한다.
+
+핵심은 모든 값을 한 계층으로 취급하지 않는 것이다.
+
+
+======================================================================
+28. NPC→NPC 관계 저장 회귀
+======================================================================
+
+현재 npc:doyun / shared_repair 관계 round-trip이 PASS다.
+
+최종 환경/손상 변경 후 다시 최소 자동 회귀한다.
+
+대규모 NPC 사회 시스템은 아직 구현하지 않는다.
+
+
+======================================================================
+29. 최신 A/B/C/D/E를 최종 통합 회귀
+======================================================================
+
+현재 npc-world에서 A/B/C/D/E는
+“기준본 PASS 유지, 이번 최종 통합 재검사 아님”
+으로 정확하게 PARTIAL 처리했다.
+
+환경/손상 수정이 끝난 뒤에는 반드시 최신 수정본으로 다시 수행한다.
+
+
+최소:
+
+A
+B
+C
+D
+E
+
+각 강제 종료
+
++
+
+각 새 프로세스 재접속
+
+
+을 수행한다.
+
+
+======================================================================
+30. 사망/리스폰도 최신 수정본 회귀
+======================================================================
+
+최소 다음을 최신 최종 수정본에서 다시 확인한다.
+
+- KeepInventory OFF
+- KeepInventory ON
+- distant respawn
+
+
+모든 D1~D5를 또 10회 반복할 필요는 없을 수 있다.
+
+하지만 환경 로직 변경 범위를 분석해
+고위험 경계를 다시 선택한다.
+
+선택 이유를 보고서에 기록한다.
+
+
+======================================================================
+31. World Lifecycle 핵심도 최종 샘플 회귀
+======================================================================
+
+이번 npc-world에서 이미 실제 PASS한:
+
+- chunk unload
+- Nether
+- End
+- dimension restart
+- copy-world
+
+도 환경 로직 변경 후 위험 기반 최종 회귀한다.
+
+
+최소 각 범주의 핵심 대표 케이스는 다시 실행한다.
+
+과거 PASS만으로 최종 NPC PASS를 선언하지 않는다.
+
+
+======================================================================
+32. 최종 NPC Lifecycle PASS Gate
+======================================================================
+
+다음 전부가 충족돼야 한다.
+
+
+[EVENT]
+
+A/B/C/D/E = PASS
+
+
+[PLAYER]
+
+Death OFF = PASS
+Death ON = PASS
+Distant Respawn = PASS
+
+
+[ENTITY/WORLD]
+
+NPC Chunk Unload = PASS
+NPC Chunk Reload = PASS
+Unloaded != Missing = PASS
+Nether = PASS
+End = PASS
+Dimension Restart = PASS
+Copy-World Divergence = PASS
+
+
+[ENVIRONMENT]
+
+Residence Valid = PASS
+Residence Missing = PASS
+Residence Blocked = PASS
+Residence Unreachable = PASS
+Path Blocked = PASS
+Path Reopened = PASS
+Return-Light Missing = PASS
+Return-Light Wrong Block = PASS
+Return-Light Restored = PASS
+Environment Restart = PASS
+
+
+[CORRUPTION]
+
+Representative Actual-Client Corruption = PASS
+Empty NPC Fallback Blocked = PASS
+Write Guard = PASS
+Original Preservation = PASS
+
+
+[POST-COMPLETION]
+
+Completed Resident Persistence = PASS
+Relationship Persistence = PASS
+Relationship Duplicate Prevention = PASS
+Canonical NPC = 1
+Generation Stable
+
+
+필요한 항목이 하나라도 NOT TESTED면:
+
+NPC lifecycle = PARTIAL
+
+
+======================================================================
+33. NPC PASS 이전 Complex Event 금지
+======================================================================
+
+NPC lifecycle이 PARTIAL 또는 FAIL이면:
+
+FIRST COMPLEX EVENT = NOT STARTED
+
+유지.
+
+
+복합 사건을 먼저 만들어 테스트 범위를 늘리지 않는다.
+
+
+======================================================================
+34. NPC Lifecycle이 PASS되면 다음 단계 자동 진입 가능
+======================================================================
+
+모든 게이트가 실제 증거로 PASS되면
+불필요한 중간보고를 위해 멈출 필요는 없다.
+
+사용량과 작업 상태가 허용하면 다음 원자 작업 경계에서:
+
+FIRST COMPLEX CAMPAIGN EVENT
+
+설계·구현을 시작할 수 있다.
+
+
+단:
+
+NPC PASS 판정을 먼저 기록하고
+그 이후 코드 작업을 시작한다.
+
+
+======================================================================
+35. First Complex Event 목적
+======================================================================
+
+첫 복합 사건은 “화려한 공포 장면”부터 만드는 단계가 아니다.
+
+목표:
+
+여러 이미 검증된 시스템이 하나의 실제 캠페인 사건에서 동시에 작동해도
+저장/종료/재접속/복구/Aftermath가 안전한지를 검증.
+
+
+최소 4개 이상:
+
+- 실제 NPC
+- Actor 또는 Threat
+- Structure/Location State
+- Evidence/Clue
+- Sound/Scene Trigger
+
+
+권장 5개 모두 사용.
+
+
+======================================================================
+36. 첫 복합 사건의 권장 구성
+======================================================================
+
+가능하면 기존 여울 사건 이후의 자연스러운 작은 사건을 사용한다.
+
+예시 구조:
+
+여울이 귀환등 유지 작업 중 이상을 발견
+→ 플레이어와 특정 장소 확인
+→ 실제 Structure State 검사
+→ Evidence 발견
+→ Actor/환경 위협 발생
+→ 여울의 상태/관계에 반응
+→ 사건 해결
+→ 장소와 NPC에 Aftermath 남음
+
+
+이 예시를 그대로 복사할 필요는 없다.
+
+현재 캠페인 스토리와 설계 v0.4에 가장 자연스러운 작은 사건을 선택한다.
+
+
+======================================================================
+37. First Complex Event에서 반드시 필요한 상태
+======================================================================
+
+다음 같은 단일 boolean 금지:
+
+complexEventDone = true
+
+
+최소 의미 단계:
+
+PREPARED
+NPC_READY
+LOCATION_READY
+EVIDENCE_FOUND
+THREAT_ACTIVE
+RESOLVING
+RESOLUTION_COMMITTED
+AFTERMATH
+
+
+실제 이름은 사건에 맞게 변경 가능.
+
+
+======================================================================
+38. Complex Event에도 A/B/C/D/E 철학 적용
+======================================================================
+
+첫 복합 사건 구현 후에는
+중요 commit 경계를 식별한다.
+
+단순히 5글자 이름을 맞추는 게 목적이 아니라:
+
+- 준비 직후
+- actor/scene 시작 직후
+- evidence 확정 직후
+- resolution commit 직전
+- completion commit 이후
+
+등 실제 의미 있는 중단 지점을 검사한다.
+
+
+======================================================================
+39. Complex Event Aftermath 필수
+======================================================================
+
+사건 종료 후 최소 둘 이상이 실제로 달라져야 한다.
+
+예:
+
+- NPC current work
+- shared experience
+- location state
+- Evidence interpretation
+- 다음 사건 token
+- ambient scene state
+
+
+컷신이 끝난 뒤 모든 것이 원상복귀하면 안 된다.
+
+
+======================================================================
+40. Important Item Transaction은 아직 우회 금지
+======================================================================
+
+복합 사건에 유일 중요 아이템이 반드시 필요하다면
+임시 boolean으로 소유권을 흉내내지 않는다.
+
+두 선택 중 하나:
+
+A.
+첫 복합 사건에서는 중요 Item 없이 진행
+
+B.
+Item Transaction 단계를 먼저 구현
+
+
+중요 아이템을 일반 ItemStack 지급으로 임시 처리하고
+나중에 고친다는 방식은 금지.
+
+
+======================================================================
+41. 설계 v0.4 유지
+======================================================================
+
+최신 통합 설계는 계속 상위 기준이다.
+
+핵심:
+
+- 정체성은 현재에서 달라질 수 있는 권리
+- 연속기는 사람보다 관계·역할·빈자리를 보존
+- 마지막 하루는 실제 하루가 아니라 합성된 과거
+- 기록관은 인간 비상규칙들의 집합
+- 일곱 형체는 단순 일곱 희생자가 아님
+- 히든엔딩은 기록 삭제가 아니라 현재를 명령할 권한 제거
+
+
+공포 연출 기준:
+
+- No-Spawn
+- No-Stinger
+- Free-Look
+- Causality
+- Persistence
+- Recontext
+
+
+공간 기준:
+
+- Three Lives Location
+
+
+세트피스 기준:
+
+- Persistent World-Scar
+- 실제 월드/관계에 후유증이 남는 연출
+
+
+======================================================================
+42. 현재 환경 장애를 공포 장면으로 재활용하지 않는다
+======================================================================
+
+이번 테스트의:
+
+- blocked path
+- missing residence
+- missing return-light
+
+는 QA fixture다.
+
+이를 곧바로 정식 공포 이벤트로 사용하지 않는다.
+
+정식 공포 연출은 나중에 의도적으로 설계한다.
+
+
+======================================================================
+43. Horror Activation은 아직 구현 보류
+======================================================================
+
+장기 구조:
+
+DORMANT
+→ LATENT / CONTACT
+→ AWAKENED
+→ ESCALATING
+→ FULL
+→ RESOLUTION
+
+
+초반 정상 생존 시간을 보장하는 방향 유지.
+
+
+하지만 지금은 NPC/Complex Event 기반을 먼저 닫는다.
+
+
+======================================================================
+44. 최종 아트 계속 보류
+======================================================================
+
+현재는 기능과 통합 안정성 우선.
+
+지금 하지 않을 것:
+
+- 도시 전면 리빌드
+- 최종 건축
+- 여울 최종 모델
+- 최종 애니메이션
+- 리소스팩 본 제작
+- 최종 BGM
+- Signature Setpiece 본 제작
+- 회상 연출 폴리싱
+
+
+기능 동결 이후 별도 최종 아트 단계에서 수행한다.
+
+
+======================================================================
+45. 모델 운용 — 기본 GPT-6 Astra/High
+======================================================================
+
+이번 환경 의미·손상 정책·최종 NPC 판정은
+GPT-6 Astra / High를 주력으로 유지한다.
+
+
+GPT-6 필수:
+
+- Environment State 의미
+- residence policy
+- path failure semantics
+- return-light dependency
+- NPC corruption
+- permanent/current/runtime 구분
+- Integrity
+- 복합 사건 설계
+- 최종 PASS 판정
+
+
+======================================================================
+46. Terra 시험 가능 영역
+======================================================================
+
+정책이 GPT-6에서 확정된 뒤 Terra에 제한 위임 가능:
+
+- environment fixture 반복 구현
+- 이미 확정된 GameTest 추가
+- 반복 client harness
+- NBT corruption fixture
+- serialization round-trip
+- 정형 Integrity assertion
+- manifest/hash 검증 코드
+
+
+Terra가 정책을 결정하게 하지 않는다.
+
+
+======================================================================
+47. Luna 사용 가능 영역
+======================================================================
+
+더 낮은 위험의 반복 작업만:
+
+- fixture 데이터 생성
+- 반복 상수
+- 정형 boilerplate
+- 결과 manifest
+- 이미 규격이 확정된 로그/테이블 처리
+
+
+상태 의미를 해석해야 하면 Luna 금지.
+
+
+======================================================================
+48. 모델 라우팅 확대 원칙
+======================================================================
+
+Terra/Luna를 사용한 실제 작업에서 누적적으로:
+
+- 기능 정확도 동일
+- 테스트 품질 동일
+- 누락 없음
+- 버그 증가 없음
+- 재작업 증가 없음
+- GPT-6 재검수 수정량 미미
+- 장기 연속성 문제 없음
+- 실제 총 사용량 감소
+
+가 확인되면 이후 작업 지시서에서 적용 범위를 점진적으로 넓힌다.
+
+
+반대로 품질 저하가 한 번이라도 의미 있게 관측되면
+해당 작업군 확대를 중단한다.
+
+
+======================================================================
+49. 모델 변경을 위해 작업 중단 금지
+======================================================================
+
+모델 전환은 반드시 원자적 하위 작업 경계에서만 수행한다.
+
+예:
+
+GPT-6
+→ EnvironmentPolicy 구현
+→ 빌드
+→ 핵심 테스트
+→ Terra
+→ 반복 fixture 추가
+→ GPT-6
+→ 최종 회귀
+
+
+가능.
+
+
+다음은 금지:
+
+NpcEvents.update 수정 절반
+→ 모델 변경
+→ 나머지 수정
+
+
+모델 변경 자체를 이유로 중간보고하지 않는다.
+
+
+======================================================================
+50. Caveman 계속 HOLD
+======================================================================
+
+Caveman은 사용하지 않는다.
+
+현재까지 실제 결과는:
+
+출력 절감은 있었음
+그러나 전체 토큰 증가
+
+
+따라서 재시험은 다른 독립 저위험 작업에서만 추후 고려한다.
+
+
+======================================================================
+51. 사용량 접근 시 안전 일시중단
+======================================================================
+
+사용량 제한이 가까우면:
+
+현재 원자 작업 완료
+→ 코드 일관성 확보
+→ 빌드 가능 확인
+→ 핵심 검사
+→ 증거 저장
+→ exact next starting point 기록
+
+
+후 중단.
+
+
+중간보고를 하기 위해 임의로 작업을 끊지 않는다.
+
+
+======================================================================
+52. 이번 단계 자동 테스트 기준
+======================================================================
+
+현재 기준:
+
+GameTest:
+58
+
+Core Assertions:
+176,857
+
+Load Guard:
+580 cases / 2,161 assertions
+
+NPC Storage:
+8 cases
+
+
+새 테스트를 추가하더라도 숫자 부풀리기가 목적이 아니다.
+
+새로운 실패 표면을 잡는 경우에만 추가한다.
+
+
+======================================================================
+53. 최종 통합 회귀에서는 실제 Minecraft를 반드시 포함
+======================================================================
+
+자동 검사만으로 NPC lifecycle PASS 선언 금지.
+
+최소:
+
+REAL CLIENT
+
+REAL CLIENT + PROCESS RESTART
+
+REAL CLIENT + DISK HASH
+
+REAL COPY WORLD
+
+를 포함해야 한다.
+
+
+======================================================================
+54. Natural Survival과 구분
+======================================================================
+
+현재 실제 Minecraft 자동화 검증은
+자연 생존 테스트가 아니다.
+
+최종 보고서에서 반드시 분리한다.
+
+Natural Survival은 이후 별도 단계다.
+
+
+======================================================================
+55. BASELINE / MODIFIED / ROLLBACK 유지
+======================================================================
+
+이번에도 세 구간 증거를 남긴다.
+
+BASELINE
+- 현재 npc-world
+
+MODIFIED
+- 이번 수정본
+
+ROLLBACK
+- 수정 JAR 별도 복사본을 npc-world로 복원
+
+
+롤백 대상은 배포 JAR이 아닌 별도 검사 사본.
+
+
+JAR rollback은 save downgrade가 아니다.
+
+
+======================================================================
+56. 산출물
+======================================================================
+
+최소:
+
+MODIFIED JAR
+
+SOURCE ZIP
+
+DIFF.patch
+
+VERIFICATION.txt
+
+ROLLBACK.sh
+
+
+각 파일을 실제로 다시 열어 검사한다.
+
+SHA-256 기록.
+
+소스 ZIP manifest/CRC 확인.
+
+
+======================================================================
+57. 완료 보고서 형식
+======================================================================
+
+완료 보고서만으로 다음 세션 작업을 이어갈 수 있어야 한다.
+
+별도 handoff 파일 필수 의존 금지.
+
+
+반드시 포함:
+
+
+[Current]
+
+- 버전
+- 작업본
+- 전체 상태
+- NPC lifecycle 상태
+- Complex Event 상태
+- 0.3.2 상태
+
+
+[Baseline]
+
+- JAR
+- SOURCE
+- SHA
+- save format
+- actor schema
+- art revision
+
+
+[Changes]
+
+- 실제 수정 파일
+- 클래스
+- 함수
+- 환경 상태 모델
+- residence 정책
+- path 정책
+- return-light 정책
+- corruption 정책
+- Integrity 변화
+- 저장/migration 변화
+
+
+[Validation]
+
+- GameTest
+- Core
+- Load Guard
+- NPC Probe
+- 실제 Minecraft
+- 프로세스 수
+- 새 프로세스
+- disk hash
+- copy-world
+- 실제 실행 시간
+
+
+[Failure History]
+
+각 문제:
+
+증상
+→ 재현
+→ 근본 원인
+→ 수정 위치
+→ 수정 내용
+→ 재검증
+→ 결과
+
+
+[Models]
+
+- 작업별 사용 모델
+- Terra/Luna 위임
+- 선정 이유
+- 최초 성공
+- 재작업
+- GPT-6 검수
+- 품질 영향
+- 사용량 데이터
+
+
+[Caveman]
+
+- HOLD / 사용 여부
+
+
+[Storage]
+
+- save format
+- actor schema
+- write guard
+- corruption
+- migration
+- original preservation
+- downgrade 범위
+
+
+[Evidence]
+
+- BASELINE
+- MODIFIED
+- ROLLBACK
+- 명령
+- 주요 출력
+- exit
+- hash
+
+
+[Artifacts]
+
+- JAR
+- source ZIP
+- DIFF
+- VERIFICATION
+- ROLLBACK
+- SHA
+
+
+[Remaining]
+
+- PASS
+- PARTIAL
+- FAIL
+- NOT TESTED
+
+
+[Next]
+
+- 정확한 다음 시작점
+- Complex Event 진입 여부
+- 0.3.2까지 남은 경로
+
+
+======================================================================
+58. 이번 단계 최종 판정표
+======================================================================
+
+최종 보고서에 반드시 다음을 채운다.
+
+A/B/C/D/E:
+PASS/PARTIAL/FAIL
+
+Death OFF:
+PASS/PARTIAL/FAIL
+
+Death ON:
+PASS/PARTIAL/FAIL
+
+Distant Respawn:
+PASS/PARTIAL/FAIL
+
+NPC Chunk Unload:
+PASS/PARTIAL/FAIL
+
+NPC Chunk Reload:
+PASS/PARTIAL/FAIL
+
+Unloaded != Missing:
+PASS/PARTIAL/FAIL
+
+Nether:
+PASS/PARTIAL/FAIL
+
+End:
+PASS/PARTIAL/FAIL
+
+Dimension Restart:
+PASS/PARTIAL/FAIL
+
+Copy-World Divergence:
+PASS/PARTIAL/FAIL
+
+Residence Valid:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Residence Missing:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Residence Blocked:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Residence Unreachable:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Path Blocked:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Path Restored:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Return-Light Missing:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Return-Light Wrong Block:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Return-Light Restored:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Environment Restart:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+NPC Corrupt Save Actual Client:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+NPC Empty-State Fallback Block:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+NPC Write Guard:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Original Preservation:
+PASS/PARTIAL/FAIL/NOT TESTED
+
+Completed Resident Persistence:
+PASS/PARTIAL/FAIL
+
+Relationship Persistence:
+PASS/PARTIAL/FAIL
+
+Relationship Duplicate Prevention:
+PASS/PARTIAL/FAIL
+
+Canonical Yeoul Count:
+PASS/PARTIAL/FAIL
+
+Generation Stability:
+PASS/PARTIAL/FAIL
+
+NPC Lifecycle Overall:
+PASS/PARTIAL/FAIL
+
+
+======================================================================
+59. NPC Lifecycle 최종 성공 문장
+======================================================================
+
+NPC lifecycle이 정말 PASS라면 실제 증거로 다음을 말할 수 있어야 한다.
+
+“실제 캠페인 NPC 여울은 사건 중단, 사망·원거리 리스폰,
+실제 청크 언로드·재로드, Nether/End 이동, 차원 이동 중 재접속,
+복사 월드의 서로 다른 진행, 거주지·경로·귀환등의 환경 장애,
+대표적인 NPC 저장 손상에서도 동일한 identity·instance·generation과
+영구 관계·경험을 보존하며, 중복 생성·잘못된 사건 완료·빈 NPC 초기화 없이
+안전하게 중단·복구·재개된다.”
+
+
+이 문장을 실제 검증으로 증명하지 못하면:
+
+NPC lifecycle = PARTIAL
+
+
+======================================================================
+60. NPC PASS 이후 정확한 다음 단계
+======================================================================
+
+NPC Lifecycle = PASS
+
+가 확정되면 다음은:
+
+FIRST COMPLEX CAMPAIGN EVENT
+
+
+그 사건부터는 현재까지 만든 기반이 실제 게임 콘텐츠에서 동시에 작동하게 한다.
+
+NPC
++ Actor/Threat
++ Location/Structure
++ Evidence
++ Sound/Scene
+
+중 최소 4개 이상.
+
+
+이 시점부터 프로젝트는 단순 NPC 토대 안정화를 넘어
+실제 캠페인 시스템 통합 단계로 진입한다.
+
+
+======================================================================
+61. 이후 전체 개발 순서
+======================================================================
+
+NPC Lifecycle
+→ First Complex Event
+→ Important Item Transaction
+→ Reward Transaction
+→ Required Structure Fallback
+→ Integrated Story Integrity
+→ Natural Survival
+→ Investigation / Evidence
+→ Puzzle
+→ Horror Activation
+→ Horror Director
+→ Foreshadow 본격 구현
+→ Chapter / Multi-Ending
+→ 기능 동결
+→ 최종 건축/리소스/NPC Art/BGM/Signature Setpiece
+
+
+현재 순서를 유지한다.
+
+
+======================================================================
+62. 0.3.2 계속 보류
+======================================================================
+
+NPC Lifecycle PASS만으로 0.3.2 승격 금지.
+
+최소:
+
+Complex Event
+Item Transaction
+Reward Transaction
+Structure Fallback
+Integrated Integrity
+첫 Natural Survival
+
+까지 주요 품질 게이트를 검토한 뒤 승격을 판단한다.

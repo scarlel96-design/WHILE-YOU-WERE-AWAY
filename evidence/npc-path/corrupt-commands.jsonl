@@ -1,0 +1,6 @@
+{"mode": "Control", "command": "./gradlew.bat --offline runNpcCorruptionControl", "exit": 0, "pid": 28716, "processExited": true, "seconds": 52.25766611099243, "pass": true}
+{"mode": "MissingHome", "command": "./gradlew.bat --offline runNpcCorruptionMissingHome", "exit": 0, "pid": 19524, "processExited": true, "seconds": 51.221906900405884, "pass": true}
+{"mode": "MissingExperience", "command": "./gradlew.bat --offline runNpcCorruptionMissingExperience", "exit": 0, "pid": 41128, "processExited": true, "seconds": 50.94729256629944, "pass": true}
+{"mode": "WrongWork", "command": "./gradlew.bat --offline runNpcCorruptionWrongWork", "exit": 0, "pid": 49224, "processExited": true, "seconds": 49.77022838592529, "pass": true}
+{"mode": "Recover", "command": "./gradlew.bat --offline runNpcCorruptionRecover", "exit": 0, "pid": 47532, "processExited": true, "seconds": 50.52560305595398, "pass": true}
+{"mode": "RecoverReload", "command": "./gradlew.bat --offline runNpcCorruptionRecoverReload", "exit": 0, "pid": 53236, "processExited": true, "seconds": 49.717952489852905, "pass": true}

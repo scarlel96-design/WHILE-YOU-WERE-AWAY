@@ -1,0 +1,3 @@
+PASS independent original/copy cityClues: 1 / 7; pair=1; both schema=4 and completed checkpoint=4
+PASS independent original/copy cityClues: 1 / 7; pair=2; both schema=4 and completed checkpoint=4
+PASS actual schema 2 -> 4 copy migration; key facts preserved; all 41 original save files byte-identical

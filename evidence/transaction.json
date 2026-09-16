@@ -1,0 +1,51 @@
+[
+  {
+    "phase": "BASELINE",
+    "command": "javac -encoding UTF-8 -d .\\build\\probe-baseline .\\evidence\\baseline\\ThreatPolicy.java .\\tools\\PolicyProbe.java",
+    "input": ".\\evidence\\baseline\\ThreatPolicy.java",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "phase": "BASELINE",
+    "command": "java -cp .\\build\\probe-baseline PolicyProbe 3 true false",
+    "input": "distinctClues=3; signalRestored=true; expected=false",
+    "exit": 0,
+    "output": "mayManifest=false"
+  },
+  {
+    "phase": "MODIFIED",
+    "command": "javac -encoding UTF-8 -d .\\build\\probe-modified .\\src\\main\\java\\io\\github\\whileaway\\core\\ThreatPolicy.java .\\tools\\PolicyProbe.java",
+    "input": ".\\src\\main\\java\\io\\github\\whileaway\\core\\ThreatPolicy.java",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "phase": "MODIFIED",
+    "command": "java -cp .\\build\\probe-modified PolicyProbe 3 true true",
+    "input": "distinctClues=3; signalRestored=true; expected=true",
+    "exit": 0,
+    "output": "mayManifest=true"
+  },
+  {
+    "phase": "ROLLBACK",
+    "command": "& 'C:\\Program Files\\Git\\bin\\bash.exe' -c 'chmod +x ./ROLLBACK.sh && test -x ./ROLLBACK.sh && ./ROLLBACK.sh build/rollback-copy/ThreatPolicy.java'",
+    "input": "build/rollback-copy/ThreatPolicy.java (modified copy)",
+    "exit": 0,
+    "output": "ROLLBACK PASS: original SHA256 restored"
+  },
+  {
+    "phase": "ROLLBACK",
+    "command": "javac -encoding UTF-8 -d .\\build\\probe-rollback .\\build\\rollback-copy\\ThreatPolicy.java .\\tools\\PolicyProbe.java",
+    "input": ".\\build\\rollback-copy\\ThreatPolicy.java",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "phase": "ROLLBACK",
+    "command": "java -cp .\\build\\probe-rollback PolicyProbe 3 true false",
+    "input": "distinctClues=3; signalRestored=true; expected=false",
+    "exit": 0,
+    "output": "mayManifest=false"
+  }
+]

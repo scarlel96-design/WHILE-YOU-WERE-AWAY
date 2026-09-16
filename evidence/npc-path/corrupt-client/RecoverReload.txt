@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53236
+PASS load STORY_LOAD outcome=LOADED recovery=SAFE_AUTO_RECOVER saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_OK
+PASS RecoverReload connectedClient=true liveNPC=1 identityUnchanged=true generation=0 checkpoint=4 saveDispatches=3 writeBlocked=false originalHash=3a29882eb5f0ef69e18099520a02513b252aa8ce26eec67041ded358f8e210f5 finalHash=1b75ac0799af47b87d7e2e1a4f79375039b36bc15d65b90c72446c858d78c110 emptyCampaignReturned=false heldTicks=100

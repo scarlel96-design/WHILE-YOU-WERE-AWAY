@@ -1,0 +1,22 @@
+{
+  "version": "0.3.1-dev.1",
+  "work": "npc-lifecycle",
+  "saveFormat": 4,
+  "actorSchema": 1,
+  "artRevision": 2,
+  "npc_abcde": "PASS",
+  "npc_full_stability": "PARTIAL",
+  "campaign": "PARTIAL",
+  "gameTests": 56,
+  "unchangedGameTests": 52,
+  "coreAssertions": 176857,
+  "storageCases": 580,
+  "storageAssertions": 2161,
+  "npcStorageCases": 8,
+  "npcSemanticBlockedCases": 6,
+  "realClients": 11,
+  "processRestartPairs": 5,
+  "npc_death_dimension_chunk_copy_progress": "NOT TESTED",
+  "natural_survival": "NOT TESTED",
+  "composite": "NOT STARTED"
+}

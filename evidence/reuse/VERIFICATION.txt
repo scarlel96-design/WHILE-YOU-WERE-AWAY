@@ -1,0 +1,157 @@
+Current: WhileAway 0.3.1 stability work / PARTIAL / reusable event adapters and transactions remain
+CHANGED: NarrativeData.save(File,Provider); SceneRecord.instanceId migration; EventCheckpoint.restore; investigation.pendingEvidence/evidence/checkpoint/noticeClaimed.
+Original adopted 0.3.1 JAR/source preserved; schema=4; art revision=2; no 0.3.2 promotion.
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\stability-work\whileaway-0.3.1-stability-work.jar
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\reuse\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\reuse\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\reuse\ROLLBACK.sh
+BASE_SHA256=90085cc811858d41865c5a9973acdef8e8cc69ac560a5c80120ded378da59da1
+MOD_SHA256=9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6
+RESTORED_SHA256=90085cc811858d41865c5a9973acdef8e8cc69ac560a5c80120ded378da59da1
+
+ARCHIVE TRANSACTION (cwd=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away)
+WRAPPER COMMAND ./tools/verify-reuse-transaction.ps1
+WRAPPER EXIT 0; input is build/rollback-reuse/test.jar, a copy of MODIFIED_FILE
+BASELINE
+COMMAND java -cp build/reuse-probe CheckpointProbe "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\reuse\baseline\previous.jar" baseline
+INPUT ABORTED/4; COMPLETED/2
+LITERAL OUTPUT
+ABORTED/4 -> COMPLETED/4
+COMPLETED/2 -> COMPLETED/4
+PASS archive behavior=baseline
+EXIT 0
+MODIFIED
+COMMAND java -cp build/reuse-probe CheckpointProbe "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\stability-work\whileaway-0.3.1-stability-work.jar" modified
+INPUT ABORTED/4; COMPLETED/2
+LITERAL OUTPUT
+ABORTED/4 -> ABORTED/4
+COMPLETED/2 -> FAILED_RECOVERABLE/2
+PASS archive behavior=modified
+EXIT 0
+ROLLBACK
+COMMAND bash -lc "chmod +x evidence/reuse/ROLLBACK.sh && test -x evidence/reuse/ROLLBACK.sh && evidence/reuse/ROLLBACK.sh build/rollback-reuse/test.jar"
+INPUT C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\build\rollback-reuse\test.jar
+LITERAL OUTPUT
+ROLLBACK PASS: adopted 0.3.1 JAR restored; world files untouched
+EXIT 0
+RESTORED
+COMMAND java -cp build/reuse-probe CheckpointProbe build/rollback-reuse/test.jar baseline
+INPUT ABORTED/4; COMPLETED/2
+LITERAL OUTPUT
+ABORTED/4 -> COMPLETED/4
+COMPLETED/2 -> COMPLETED/4
+PASS archive behavior=baseline
+EXIT 0
+
+BASELINE REPRODUCTION
+COMMAND ./gradlew.bat --offline runGameTestServer
+INPUT adopted 0.3.1 production source plus three added regression tests
+LITERAL OUTPUT: 3 required tests failed :(
+EXIT Gradle=1; GameTest JVM=3; tests=28 (existing 25 passed).
+PRE-BARRIER REPRODUCTION
+COMMAND ./gradlew.bat --offline runGameTestServer
+INPUT queued-IO worker held by latch; baseline inherited SavedData.save behavior
+LITERAL OUTPUT: Framework Failure: checkpoint save returned before queued disk write
+LITERAL OUTPUT: 1 required tests failed :(
+EXIT Gradle=1; GameTest JVM=1; tests=35.
+MODIFIED REGRESSION
+COMMAND ./gradlew.bat --offline build runGameTestServer
+INPUT current source; real Minecraft registry/NBT; held IO worker; deliberately invalid file target; six investigation orders; saved copies
+LITERAL OUTPUT: All 36 required tests passed :)
+LITERAL OUTPUT: PASS core assertions=176857
+EXIT 0
+COMMAND python tools/verify-assets.py dist/stability-work/whileaway-0.3.1-stability-work.jar
+LITERAL OUTPUT: PASS asset assertions=6703; station/animation/localization/OGG/JAR
+EXIT 0
+COMMAND python tools/verify-design-contract.py
+LITERAL OUTPUT: PASS design requirements=49; tracked unfinished asset groups=6; foreshadow seeds=2
+EXIT 0
+COMMAND ./tools/verify-mute.ps1 -OptionsPath ../../work/boundary-smoke/options.txt
+LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT 0
+COMMAND python tools/verify-reuse-fixtures.py
+INPUT all eleven final boundary snapshots, per-process sentinels, old-save triplicates, source hashes
+LITERAL OUTPUT
+PASS runBoundary4A disk checkpoint=0; state=PREPARING
+PASS runBoundary4B disk checkpoint=1; state=PHASE_1
+PASS runBoundary4D disk checkpoint=3; state=RESOLVING
+PASS runBoundary4E disk checkpoint=4; state=COMPLETED
+PASS runBoundary4Verify disk checkpoint=4; state=COMPLETED
+PASS runBoundary1D disk checkpoint=3; state=RESOLVING
+PASS runBoundary1E disk checkpoint=4; state=COMPLETED
+PASS runBoundary1Verify disk checkpoint=4; state=COMPLETED
+PASS runBoundary2D disk checkpoint=3; state=RESOLVING
+PASS runBoundary2E disk checkpoint=4; state=COMPLETED
+PASS runBoundary2Verify disk checkpoint=4; state=COMPLETED
+PASS actual schema 2 identical copies=3
+PASS actual schema 3 identical copies=3
+PASS original legacy story files unchanged
+PASS final boundary snapshots=11; runtime source unchanged; overall remains PARTIAL
+
+EXIT 0
+
+FINAL CLIENT COMMANDS: each runs in the isolated, pre-muted boundary-smoke profile. Synthetic preparation is not natural survival.
+COMMAND ./gradlew.bat --offline runBoundary4A
+INPUT whileaway-boundary-4-1788975086637; event kind=4; boundary=A
+LITERAL OUTPUT PASS runBoundary4A event=city_records boundary=PREPARED checkpoint=0
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary4B
+INPUT whileaway-boundary-4-1788975086637; event kind=4; boundary=B
+LITERAL OUTPUT PASS runBoundary4B event=city_records boundary=FACT_COMMITTED checkpoint=1
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary4D
+INPUT whileaway-boundary-4-1788975086637; event kind=4; boundary=D
+LITERAL OUTPUT PASS runBoundary4D event=city_records boundary=BEFORE_COMPLETE checkpoint=3
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary4E
+INPUT whileaway-boundary-4-1788975086637; event kind=4; boundary=E
+LITERAL OUTPUT PASS runBoundary4E event=city_records boundary=AFTER_COMPLETE checkpoint=4
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary4Verify
+INPUT whileaway-boundary-4-1788975086637; event kind=4; boundary=Verify
+LITERAL OUTPUT PASS runBoundary4Verify completed state stable for 300 ticks; duplicate input suppressed; no scene replay
+EXIT Gradle=0; JVM=0 (normal completed verification)
+COMMAND ./gradlew.bat --offline runBoundary1D
+INPUT whileaway-boundary-1-1788975487114; event kind=1; boundary=D
+LITERAL OUTPUT PASS runBoundary1D event=signal_wake boundary=BEFORE_COMPLETE checkpoint=3
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary1E
+INPUT whileaway-boundary-1-1788975487114; event kind=1; boundary=E
+LITERAL OUTPUT PASS D persisted identity/checkpoint; waiting for real client acknowledgement
+LITERAL OUTPUT PASS runBoundary1E event=signal_wake boundary=AFTER_COMPLETE checkpoint=4
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary1Verify
+INPUT whileaway-boundary-1-1788975487114; event kind=1; boundary=Verify
+LITERAL OUTPUT PASS runBoundary1Verify completed state stable for 300 ticks; duplicate input suppressed; no scene replay
+EXIT Gradle=0; JVM=0 (normal completed verification)
+COMMAND ./gradlew.bat --offline runBoundary2D
+INPUT whileaway-boundary-2-1788976315283; event kind=2; boundary=D
+LITERAL OUTPUT PASS runBoundary2D event=city_arrival boundary=BEFORE_COMPLETE checkpoint=3
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary2E
+INPUT whileaway-boundary-2-1788976315283; event kind=2; boundary=E
+LITERAL OUTPUT PASS D persisted identity/checkpoint; waiting for real client acknowledgement
+LITERAL OUTPUT PASS runBoundary2E event=city_arrival boundary=AFTER_COMPLETE checkpoint=4
+LITERAL OUTPUT FAULT Runtime.halt; no shutdown save after tested boundary
+EXIT Gradle=0; JVM=-1073740791 (intentional Runtime.halt fault; requires next-process proof)
+COMMAND ./gradlew.bat --offline runBoundary2Verify
+INPUT whileaway-boundary-2-1788976315283; event kind=2; boundary=Verify
+LITERAL OUTPUT PASS runBoundary2Verify completed state stable for 300 ticks; duplicate input suppressed; no scene replay
+EXIT Gradle=0; JVM=0 (normal completed verification)
+
+OBSERVED FAILURES RETAINED
+First investigation D halt log claimed checkpoint 3, but its actual disk snapshot had evidence=4, checkpoint=1. Following E startup failed: investigation lost evidence at completion boundary. Classified Framework Failure, fixed in common NarrativeData file-save path.
+An overlapping Gradle incremental compilation failed to resolve existing project classes. Classified test tooling collision; subsequent builds and clients run serially.
+One Groovy test-run configuration syntax error was corrected before final compilation.
+One post-fix city client exited normally after context suspensions without the D sentinel. No PASS awarded; new isolated D/E/Verify sequence ran successfully.
+Git Bash first failed to start in the sandbox (exit -1073741502); approved retry executed only the JAR-copy rollback and passed.
+
+RESTORED STATUS: adopted JAR SHA and prior checkpoint behavior restored on build/rollback-reuse/test.jar only. MODIFIED_FILE remains changed. No save downgrade or rollback world operations.
+OVERALL PARTIAL. NPC/structural/chase/composite adapters, persistent causal links, item/reward transactions, essential structure fallback, full integrity and natural survival remain open. See GATES.md.

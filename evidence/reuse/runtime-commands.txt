@@ -1,0 +1,25 @@
+FINAL SERIAL RUNS (post durable-write fix)
+COMMAND ./gradlew.bat --offline runBoundary4A
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary4B
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary4D
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary4E
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary4Verify
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary1D
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary1E
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary1Verify
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary2D
+EXIT 1
+COMMAND ./gradlew.bat --offline runBoundary2D
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary2E
+EXIT 0
+COMMAND ./gradlew.bat --offline runBoundary2Verify
+EXIT 0

@@ -1,0 +1,8 @@
+Natural world seed=74192361
+Station start=BlockPos{x=-320, y=0, z=-272}
+Piece bounds=BoundingBox{minX=-338, minY=67, minZ=-290, maxX=-320, maxY=76, maxZ=-272}
+Physical station anchor=BlockPos{x=-326, y=68, z=-281} and relay verified
+Client assets present
+PASS tracked custom entity present with camera line of sight
+PASS scene S2C starts, reaches caption phase and ends; master volume remains zero
+PASS client resource loading, natural station start, integrated world and scheduled captures

@@ -1,0 +1,3 @@
+RUNNING
+PASS runRecoveryCut2
+FAULT: Runtime.halt at checkpoint 2; no shutdown save after event start

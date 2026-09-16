@@ -1,0 +1,2018 @@
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -30,3 +30,8 @@
+ - Run Gradle tasks serially in this checkout. Concurrent incremental compilers were observed to collide on shared class outputs; keep the failed attempt as tooling evidence, not a gameplay defect.
+ - BoundarySmoke uses work/boundary-smoke with all audio categories zero. Investigation order is runBoundary4A, B, D, E, Verify; presentation checks use 1/2 D, E, Verify. A PASS cut marker requires matching on-disk snapshots and the next process, not only Runtime.halt.
+ - Scene lease tokens are not persistent causal dependency links. CityInvestigation is the existing three-book adapter, not the future complete Investigation/Puzzle/Item framework. Do not claim its notification receipt proves item/reward atomicity.
++
++- New adopted baseline is dist/stability-work (JAR 9062d039..., source 9f0f464e...). Never run package-reuse.py again against this baseline. Current actor-lifecycle slice uses dist/lifecycle-work and evidence/lifecycle.
++- StoryActors stores optional actorSchema=1 inside schema4 NarrativeData. Identity is logical storyId + instance + role + canonical UUID + generation. Missing entity storage must be loaded before reconstruction; old generations are fenced on join.
++- ActorSmoke is an explicitly scripted chase fixture, not natural survival or a shipped NPC/composite-event test. All six A/B/C/D/E/Verify processes must use the same runtime source and remain muted.
++- NPC villager GameTests validate generic lifecycle primitives only. They do not establish actual named NPC campaign behavior, item transaction atomicity, causal links or structure fallback.
+--- a/build.gradle
++++ b/build.gradle
+@@ -62,6 +62,15 @@
+                 systemProperty 'whileaway.boundary', boundary
+                 systemProperty 'whileaway.boundaryKind', kind.toString()
+                 systemProperty 'whileaway.evidence', file('evidence/reuse').absolutePath
++            }
++        } }
++        [1,2].each { repetition -> ['A','B','C','D','E','Verify'].each { boundary ->
++            create("actor${boundary}${repetition}") {
++                client()
++                gameDirectory = file('../../work/actor-smoke')
++                systemProperty 'whileaway.actorBoundary', boundary
++                systemProperty 'whileaway.actorRepeat', repetition.toString()
++                systemProperty 'whileaway.evidence', file('evidence/lifecycle').absolutePath
+             }
+         } }
+         recoveryLegacy {
+@@ -186,3 +195,24 @@
+         }
+     }
+ } }
++
++// Actor cuts use a new, isolated profile. No audio may be emitted even before the world opens.
++[1,2].each { repetition -> ['A','B','C','D','E','Verify'].each { boundary ->
++    tasks.named("runActor${boundary}${repetition}").configure {
++        if(boundary!='Verify')ignoreExitValue=true
++        doFirst {
++            def dir=file('../../work/actor-smoke');dir.mkdirs()
++            def muted=['master','music','record','weather','block','hostile','neutral','player','ambient','voice']
++            def lines=muted.collect { "soundCategory_${it}:0.0" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5'])
++            def options=new File(dir,'options.txt');options.setText(lines.join('\n')+'\n','UTF-8')
++            if(!muted.every { options.text.contains("soundCategory_${it}:0.0") } || !options.text.contains('narrator:0'))throw new GradleException('Actor mute failed')
++            logger.lifecycle("VERIFIED MUTED before actor client launch: ${options.absolutePath}")
++            file("evidence/lifecycle/runActor${boundary}${repetition}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            if(boundary!='Verify')logger.lifecycle("EXPECTED_FAULT_PROCESS_EXIT=${executionResult.get().exitValue}")
++            if(!file("evidence/lifecycle/runActor${boundary}${repetition}.txt").text.contains("PASS runActor${boundary}${repetition}"))throw new GradleException('Actor boundary gate did not finish')
++        }
++    }
++} }
+--- a/docs/ACTOR_LIFECYCLE_031.md
++++ b/docs/ACTOR_LIFECYCLE_031.md
+@@ -0,0 +1,49 @@
++# 0.3.1 lifecycle-work — 추격 사건 복구 일반화 작업본
++
++## 기준과 판정
++- 채택한 기준: 0.3.1 stability-work, JAR SHA256 `9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6`.
++- 작업 버전: 0.3.1-dev.1. 0.3.2로 승격하지 않는다. 전체 안정화는 PARTIAL.
++- 저장 형식4, 도시 아트 revision2, 기존 6개 임시 자산 그룹과 2개 떡밥 초안을 유지한다.
++- 이번 구현은 기존 Wayfarer 추격에 공통 actor registry를 연결한다. 완성형 NPC 사건/복합 사건/아이템·보상 트랜잭션/구조물 fallback을 구현했다고 해석하지 않는다.
++
++## 저장 계약
++NarrativeData의 Overworld `whileaway_story.dat` 안에 선택적 `actorSchema=1`, `actors` 목록을 추가한다. 별도 전역 파일이나 원본 월드 절대경로를 참조하지 않는다. 이전 형식1/2/3 및 actors가 없는 기존 형식4는 빈 레지스트리로 결정적으로 로드된다. 이전 scene ID 및 도시 데이터는 바꾸지 않는다.
++
++각 레코드는 storyId, ownerEventId, spawnRole, entityType, dimension, instanceId, owner, entityUUID, generation, position, temporary, lifecycleState, state, checkpoint, interruptions, reason, snapshot, facts, noticeClaimed를 저장한다. facts는 정렬된 집합이다. snapshot은 재구축용 엔티티 NBT이며 UUID/Passengers/Leash를 복제하지 않는다. 중요 아이템 인벤토리 원자성을 제공하는 구조가 아니다.
++
++생명주기 PREPARED / ACTIVE / SUSPENDED / RETIRED와 사건 체크포인트는 분리한다. 체크포인트0=예약,1=등장 확정,2=추격 시작,3=완료 사실·퇴역 예약,4=완료 확정이다. 죽음/다른 차원/오프라인 동안 Wayfarer의 AI 활성 시간은 진행하지 않는다. 이 조건을 일반 NPC의 모든 행동에 자동으로 적용했다고 주장하지 않는다.
++
++## 실제 변경 위치
++- StoryActorRecord: 저장/읽기, 정렬된 영구 사실, actor 고유성 필드. 필수 식별자 누락/중복 logical ID/미지원 actorSchema/잘못된 lifecycle는 진단 오류로 남긴다.
++- NarrativeData: actors를 기존 동기적 원자 교체 저장에 포함한다. 파일 저장 실패 때 dirty를 유지하는 기준본 동작을 보존한다.
++- StoryActors.prepare/beginChase: 사건 티켓과 actor 예약을 먼저 저장한다. 그 뒤에 엔티티를 생성한다.
++- StoryActors.reconcile/storageReady/find: 로드된 차원들의 UUID 조회와 해당 청크의 entity storage 로드 여부를 확인한다. 두 번의 로드 확인 전에는 누락으로 판정하지 않는다. 월드 전체 엔티티 검색이나 청크 강제 로딩을 하지 않는다.
++- StoryActors.joining/canonical: storyId + event ID + instance ID + role + UUID + generation + entity type을 확인한다. 이미 퇴역했거나 이전 세대인 엔티티의 로드를 차단한다. 알 수 없는 소유 기록을 임의로 삭제하지 않는다. join 콜백에서 청크 로딩이나 생성/저장을 하지 않는다.
++- 재생성: 최신 UUID를 저장하고 generation을 증가시킨 뒤 생성한다. 예전 청크의 엔티티가 뒤늦게 나타나도 새 canonical actor와 공존하지 않도록 fencing한다. 안전한 체크포인트 인근9개 위치만 검사하며 블록을 바꾸지 않는다. 막힌 위치는 기다린다.
++- Wayfarer.tick: 기존 적의 실제 AI를 연결했다. 엔티티 청크 저장이 뒤처져도 저널의 추격 시작 사실로 AI를 복원한다. 현재 엔티티의 체력/인벤토리/좌표를 무조건 덮어쓰지 않는다. 실제 추격이 시작될 때 phase2를 저장한다.
++- StoryActors.completeChase/confirmChase: encounterComplete, encounter 티켓 제거, RETIRED, 완료 사실을 같은 저장으로 확정한 뒤 phase4를 확정한다. 완료 통지 receipt는 at-most-once이며 소리/통지의 정확히 한 번 전달이나 아이템 지급 트랜잭션 증거가 아니다.
++- StoryEvents.manifest: spawn-then-ticket 순서를 reserve-then-spawn으로 교체한다. 관리되는 actor의 운영자 recover는 티켓을 무작정 지우지 않고 상태를 재조정한다.
++- debug integrity: 기존 scene 검사에 actor 티켓/UUID/차원/완료 사실/잔존 엔티티 검사를 추가한다. SAFE_AUTO_RECOVER, RECOVER_WITH_WARNING, MANUAL_DIAGNOSTIC을 구분한다. 개발 옵션 및 권한 제한을 유지한다.
++- ActorGameTests: 실제 Minecraft 서버의 Villager를 사용한 재사용 가능한 lifecycle 검사다. NPC 대화/관계/공동 행동이 있는 실제 캠페인 사건의 완료 증거가 아니다.
++- ActorSmoke/build.gradle: 무음 격리 클라이언트 A/B/C/D/E/Verify. 테스트용 이동/평지 생성/사건 시작 호출을 사용하므로 자연 생존 테스트가 아니다.
++
++## 이 단계의 경계와 다음 작업
++1. NPC 캠페인 사건 및 4요소 이상 복합 사건은 아직 별도 연결/검증이 필요하다. Villager fixture로 이를 PASS 처리하지 않는다.
++2. 신규 추격 adapter의 사망(keepInventory true/false), 실제 청크 이탈/귀환, Nether/End 왕복은 별도 클라이언트 회귀가 필요하다. 이전 seven-figures 결과를 자동으로 재사용하지 않는다.
++3. 레지스트리가 없는 이전 버전의 encounter UUID는 실제 엔티티가 로드되어 일치할 때만 결정적으로 채택한다. 엔티티마저 누락된 옛 티켓의 자동 복구는 미완성이다.
++4. actor integrity는 전체 Story Integrity의 일부이다. 중요 아이템/보상/구조물/상호배타 선택/causal token 전체 검사는 아직 없다. 손상된 ResourceLocation 등 모든 actor 필드의 스트레스 검증도 남아 있다.
++5. 중요 아이템의 실제 소유권 이동 및 중복 보상 방지는 구현하지 않았다. NPC snapshot을 이 용도로 사용하지 않는다.
++6. 필수 구조물 대체 경로와 자연 생존 처음부터 현재 끝까지 진행은 미검증이다. 현재 actor의 9점 안전 위치 탐색은 구조물 fallback이 아니다.
++7. scene 연결 토큰은 일시적 client acknowledgement lease이다. 영구 사건 A→B 인과 토큰은 별도 구현 대상이다.
++8. 다른 엔티티를 통과시키기 위해 플레이어 건축물을 지우거나 월드를 다시 만들도록 처리하지 않는다.
++9. JAR rollback만 검증한다. 추가 actor 데이터를 포함한 세이브를 옛 JAR로 읽으면 모르는 필드가 보존된다는 보장이 없다. 세이브 downgrade는 지원/검증하지 않는다.
++
++## 재현 순서
++작업 루트에서 Java21과 기존 work/gradle-home을 사용한다.
++1. `./gradlew.bat --offline build runGameTestServer`
++2. `./tools/run-actor-boundaries.ps1` — 같은 소스로 두 월드, 각 A B C D E Verify 순서.
++3. `python tools/verify-actor-evidence.py`
++4. `python tools/package-lifecycle.py --prepare`
++5. `./tools/verify-lifecycle-transaction.ps1` — Git Bash, JAR 복사본만 복원.
++6. evidence/lifecycle/VERIFICATION.txt와 GATES.md를 현재 실측 결과로 갱신한 후 `python tools/package-lifecycle.py`.
++이전 package-reuse.py는 보존 중인 baseline을 대상으로 하므로 실행하지 않는다.
+--- a/docs/NEXT_STABILITY_REQUEST.md
++++ b/docs/NEXT_STABILITY_REQUEST.md
+@@ -0,0 +1,912 @@
++# 《네가 없는 동안》 다음 작업 지시
++
++## 현재 기준점
++
++**Current: 《네가 없는 동안》 0.3.1 작업본 / PARTIAL / 사건 복구 일반화·트랜잭션 안정화 단계**
++
++이번 작업은 현재 검증된 `0.3.1 stability-work`를 기준으로 그대로 이어간다.
++
++현재 확인된 상태:
++
++* Minecraft Java Edition 기준
++* 저장 형식 4
++* 기존 저장 형식 1·2·3 지원
++* 체크포인트 저널 활성화
++* 사건 상태·체크포인트·연결 토큰 구현
++* `cityShockTriggered`는 사건 시작이 아니라 완료 시 확정
++* 일곱 형체 사건 강제 종료/재개 PASS
++* 조사 사건 A/B/D/E 복구 PASS
++* 신호·도시 진입 연출 D/E 복구 PASS
++* 사망·리스폰 PASS
++* 실제 청크 언로드·귀환 PASS
++* Nether·End 왕복 PASS
++* 원본/복사 월드 독립 진행 PASS
++* 실제 0.2 세이브 마이그레이션 PASS
++* Minecraft 테스트 36개 PASS
++* 저장/로드 450회 검증 PASS
++* 결정적 migration 검증 PASS
++* 기존 0.3.1 아트 상태 유지
++* 설계 기준 33–81 반영 완료
++* 임시 자산 6그룹 유지
++* 떡밥 관리 초안 2건 존재
++
++전체 안정화는 아직 **PARTIAL**이다.
++
++이번 작업에서 전체 PASS로 성급히 승격하지 않는다.
++
++# 1. 이번 작업의 최우선 목표
++
++이번 작업의 목표는 지금까지 성공한 체크포인트/복구 시스템이 일부 조사 사건에 맞춘 특수 구현이 아니라,
++
++**NPC 사건
++→ 전투/추격 사건
++→ 구조물 변화 사건
++→ 여러 시스템이 동시에 동작하는 복합 사건**
++
++에서도 재사용 가능한 공통 기반임을 검증하는 것이다.
++
++그와 동시에 다음 미완성 핵심을 실제 구현한다.
++
++1. NPC 중심 사건 A/B/C/D/E 복구
++2. 전투·추격 사건 A/B/C/D/E 복구
++3. 복합 사건 A/B/C/D/E 복구
++4. 중요 아이템 소비 트랜잭션
++5. 보상 지급 멱등성
++6. 필수 구조물 fallback 실제 구현
++7. Story Integrity 검사 확대
++8. 자연 생존 전체 진행 검증 기반 마련
++
++새로운 스토리 콘텐츠나 최종 아트 제작보다 이것들을 우선한다.
++
++# 2. 기준 작업본 보존
++
++작업 시작 전에 현재 0.3.1 작업본을 새로운 baseline으로 보존한다.
++
++반드시 다음을 남긴다.
++
++* 기준 JAR
++* 기준 소스
++* 기준 SHA-256
++* 저장 형식
++* art revision
++* checkpoint 기능 revision
++* 현재 테스트 개수
++* 현재 Git/소스 상태
++
++수정본과 baseline을 섞지 않는다.
++
++기존 정상 JAR를 직접 덮어쓰지 않는다.
++
++# 3. NPC 중심 사건 복구 검증
++
++NPC가 단순히 서 있는 사건이 아니라 실제 상태 변화가 있는 사건을 선택한다.
++
++반드시 다음 중 여러 요소를 포함해야 한다.
++
++* NPC 위치 이동
++* AI 상태 변경
++* 대화 진행
++* NPC 고유 상태 변경
++* 플레이어와의 상호작용
++* NPC ↔ NPC 상호작용
++* 사건 완료 후 생활 상태 변화
++
++각 사건에서 다음 중단 지점을 테스트한다.
++
++### A — 시작 직전
++
++트리거 충족 후 사건 실행 직전.
++
++### B — 첫 상태 변경 직후
++
++NPC 이동 또는 대화 상태가 최초로 확정된 직후.
++
++### C — 사건 중간
++
++NPC 행동·대화·월드 상태가 일부 진행된 시점.
++
++### D — 완료 직전
++
++실질적인 작업은 끝났으나 `COMPLETED` 확정 직전.
++
++### E — 완료 직후
++
++완료 확정과 저장 직후.
++
++재접속했을 때 확인한다.
++
++* NPC 중복 생성 없음
++* NPC 사라짐 없음
++* 이전 위치와 새 위치 동시 존재 없음
++* 대화 이중 실행 없음
++* 상태 롤백 없음
++* 완료 후 생활 상태 정상
++* 이벤트 연결 토큰 중복 없음
++
++# 4. NPC 고유성 검증
++
++모든 중요 NPC는 월드 내에서 고유해야 한다.
++
++월드 로드 시 다음 모순을 검사한다.
++
++* 동일 스토리 NPC가 2명 이상 존재
++* NPC UUID는 저장됐지만 엔티티 없음
++* 엔티티는 있지만 NarrativeData에 등록 없음
++* 완료 사건 NPC가 이전 사건 위치에 남아 있음
++* 사건용 복제 NPC가 영구 NPC로 남음
++
++복구 정책을 명확하게 정의한다.
++
++단순히 UUID가 없으면 새 NPC를 생성하는 방식만 사용하면 중복이 발생할 수 있으므로
++
++**스토리 ID + NPC 역할 + 저장 상태 + 월드 엔티티 존재**
++
++를 함께 확인한다.
++
++# 5. 전투 및 추격 사건 복구
++
++다음에는 실제 엔티티 AI가 포함된 사건을 대상으로 한다.
++
++최소 하나는 다음을 포함한다.
++
++* 사건용 적 생성
++* 플레이어 탐지
++* 추적
++* 경로 변경
++* 전투 또는 회피
++* 사건 종료 조건
++* 임시 엔티티 제거
++
++각 사건에서 A/B/C/D/E 종료를 검증한다.
++
++특히 다음을 집중 확인한다.
++
++* 재접속 후 적 무한 복제
++* 이미 처치한 적 재생성
++* 추격 종료 후 적 잔류
++* AI 상태가 사건과 불일치
++* 플레이어 사망 후 추격이 영구 지속
++* 차원 이동 후 사건용 적 잔류
++* 사건 완료 후 임시 엔티티 정리 실패
++
++# 6. 사건용 엔티티 ownership 강화
++
++모든 사건 전용 엔티티에는 가능한 한 명확한 소유 관계를 둔다.
++
++예:
++
++* ownerEventId
++* instanceId
++* spawnRole
++* lifecycleState
++
++실제 이름은 현재 코드 구조에 맞게 결정한다.
++
++월드 로드 시 다음을 할 수 있어야 한다.
++
++**완료 사건의 잔여 엔티티 제거
++ACTIVE 사건의 필수 엔티티 누락 시 안전 재생성
++복제 엔티티 발견 시 하나만 보존
++잘못된 event instance 소유 엔티티 정리**
++
++한다.
++
++단순 UUID 저장만으로 상태 일관성을 보장하지 않는다.
++
++# 7. 복합 사건 검증
++
++이번 단계의 가장 중요한 검증 중 하나다.
++
++최소 하나의 사건은 다음 요소 중 4개 이상을 동시에 포함해야 한다.
++
++* NPC
++* 임시 적
++* 구조물 상태 변경
++* 중요 아이템
++* 조사 기록
++* 연출
++* 사운드
++* 연결 토큰
++* 보상
++
++이 사건을 A/B/C/D/E 모든 위치에서 종료하고 재개한다.
++
++복합 사건이 통과해야 현재 체크포인트 프레임워크를 공통 기반으로 인정할 수 있다.
++
++# 8. 프레임워크 문제와 사건별 문제를 반드시 구분
++
++테스트 실패 시 즉시 해당 사건 안에 특수 조건문을 추가하지 않는다.
++
++먼저 다음으로 분류한다.
++
++### Framework Failure
++
++공통 체크포인트, journal, save/load 문제.
++
++### Event Adapter Failure
++
++특정 사건의 저장/복구 구현 오류.
++
++### Entity Lifecycle Failure
++
++NPC·적·임시 엔티티 문제.
++
++### World State Failure
++
++블록·구조물·통로 상태 문제.
++
++### Transaction Failure
++
++아이템·보상 원자성 문제.
++
++### Migration Failure
++
++저장 데이터 변환 문제.
++
++공통 문제라면 반드시 공통 시스템에서 고친다.
++
++# 9. 중요 아이템 상태 모델 구현
++
++스토리 중요 아이템은 단순히
++
++`player inventory contains item`
++
++으로만 판단하지 않는다.
++
++최소 다음 상태를 구분할 수 있도록 한다.
++
++* NOT_DISCOVERED
++* ACQUIRED
++* HELD
++* RESERVED
++* COMMITTED
++* CONSUMED
++* TRANSFERRED
++* RETURNED
++* RECOVERABLE_LOST
++
++실제 enum은 프로젝트 구조에 맞게 줄이거나 변경할 수 있다.
++
++중요한 것은
++
++**아이템의 존재 위치와 스토리에서의 논리 상태를 분리**
++
++하는 것이다.
++
++# 10. 아이템 소비 트랜잭션
++
++중요 아이템 소비는 가능한 한 트랜잭션으로 처리한다.
++
++권장 흐름:
++
++**VALIDATE
++→ RESERVE
++→ SAVE
++→ APPLY
++→ COMMIT
++→ CONFIRM**
++
++예를 들어 플레이어가 중요 장치에 아이템을 넣는 경우:
++
++1. 올바른 아이템인지 확인
++2. 해당 사건이 아이템을 사용할 권한 확보
++3. `RESERVED` 저장
++4. 실제 아이템 제거 또는 장치 이동
++5. 사건 상태 변경
++6. `COMMITTED`
++7. 최종 완료 저장
++
++각 단계에서 강제 종료 테스트를 수행한다.
++
++# 11. 아이템 복제·소실 테스트
++
++반드시 다음 상황을 만든다.
++
++* 소비 직전 종료
++* 소비 직후 종료
++* commit 직전 종료
++* commit 직후 종료
++* 플레이어 사망
++* KeepInventory ON/OFF
++* 아이템 바닥 드롭
++* 상자 이동
++* 인벤토리 가득 참
++* 사건 중 청크 언로드
++* 사건 중 차원 이동
++
++어떤 경우에도 중요 아이템이
++
++**플레이어 인벤토리에도 있고 장치에도 동시에 존재**
++
++하거나
++
++**양쪽 모두에서 사라져 캠페인이 막히는 상태**
++
++가 되지 않도록 한다.
++
++# 12. 스토리 중요 아이템 복구 정책
++
++중요 아이템이 Minecraft 기본 시스템 때문에 완전히 사라질 수 있는 경우를 고려한다.
++
++예:
++
++* 용암
++* cactus
++* despawn
++* void
++* 폭발
++* 플레이어 실수
++
++모든 중요 아이템을 무조건 불멸로 만들 필요는 없다.
++
++그러나 캠페인 필수 아이템이라면 다음 중 하나를 제공해야 한다.
++
++* 재발급
++* 대체 아이템
++* NPC 복구
++* 원형 재제작
++* 사건 복구
++* 다른 해결 경로
++
++**아이템 하나를 실수로 잃었다는 이유로 15시간 월드가 소프트락되는 상황은 금지한다.**
++
++# 13. 보상 멱등성
++
++모든 중요 보상은 고유 지급 기록을 가져야 한다.
++
++예:
++
++`RewardTransactionId`
++
++형태로 관리한다.
++
++보상 지급 조건을 단순히
++
++`if eventCompleted -> give reward`
++
++로 만들지 않는다.
++
++최소 다음을 관리한다.
++
++* 지급 준비
++* 지급 성공
++* 지급 실패
++* 재지급 필요
++* 최종 지급 완료
++
++동일 reward ID는 한 번만 확정되어야 한다.
++
++# 14. 보상 테스트
++
++다음 상황을 테스트한다.
++
++* 완료 직전 종료
++* 완료 직후 종료
++* 지급 직전 종료
++* 지급 직후 종료
++* 인벤토리 가득 참
++* 재접속 반복
++* 저장/로드 반복
++* migration
++* 월드 복사
++
++월드 복사본에서는 정상적으로 각 월드의 기록을 따라가되, 한 월드의 보상 상태가 다른 월드와 공유되지 않아야 한다.
++
++# 15. 필수 구조물 fallback 실제 구현
++
++이번 작업에서는 설계만 하지 말고 최소 하나 이상의 필수 구조물을 대상으로 실제 fallback pipeline을 만든다.
++
++권장 흐름:
++
++**등록된 위치 확인
++→ 위치 유효성 검사
++→ 실제 구조물 존재 확인
++→ 접근 가능성 확인
++→ 주변 충돌 확인
++→ 기존 대체 후보 탐색
++→ 후보 없음
++→ 새 안전 위치 선정
++→ 대체 생성
++→ registry 갱신
++→ story link 갱신**
++
++구조물 좌표만 존재한다고 정상으로 판정하지 않는다.
++
++# 16. 구조물 fallback 실패 시나리오
++
++의도적으로 다음 상태를 만든다.
++
++* 등록 데이터만 있고 구조물 없음
++* 구조물 절반만 존재
++* 진입구가 지형으로 막힘
++* 다른 스토리 구조물과 겹침
++* 플레이어 건축물과 충돌
++* 청크 생성 도중 종료
++* 생성 직후 종료
++* registry 기록 직전 종료
++* registry 기록 직후 종료
++
++복구 후 캠페인이 정상 진행 가능한지 확인한다.
++
++# 17. 플레이어 건축물 보호
++
++fallback 구조물 생성 때문에 플레이어 거점을 파괴하지 않는다.
++
++최소 다음을 고려한다.
++
++* 플레이어 침대 주변
++* 반복 방문 생활권
++* 등록된 거점
++* 기존 스토리 구조물
++* NPC 거주 공간
++* 플레이어가 배치한 고밀도 블록 영역
++
++완벽한 플레이어 건축 판별이 어렵더라도 안전거리와 충돌 검사를 둔다.
++
++**스토리 구조물 복구를 위해 플레이어 집을 덮어쓰는 것은 FAIL이다.**
++
++# 18. Story Integrity 검사 확대
++
++기존 무결성 검사를 다음까지 확장한다.
++
++* 사건 상태
++* 체크포인트
++* 연결 토큰
++* NPC 고유성
++* 중요 아이템
++* reward transaction
++* 구조물 registry
++* 완료 사건의 임시 엔티티
++* migration version
++* mutually exclusive 선택
++
++예:
++
++* `itemConsumed=true`인데 동일 고유 아이템이 두 개 존재
++* `rewardGranted=true`인데 지급 기록 없음
++* `eventCompleted=true`인데 필수 NPC가 사건 상태
++* 등록 구조물이 존재하지 않음
++* 완료 사건의 임시 적이 살아 있음
++
++등을 검출한다.
++
++# 19. 자동 복구와 진단을 구분
++
++무결성 오류를 발견했다고 모든 문제를 자동으로 조용히 수정하지 않는다.
++
++다음 세 종류로 나눈다.
++
++### SAFE_AUTO_RECOVER
++
++명확하게 정상 상태를 판단할 수 있는 경우.
++
++### RECOVER_WITH_WARNING
++
++복구 가능하지만 데이터 이상이 있었음을 기록해야 하는 경우.
++
++### MANUAL_DIAGNOSTIC
++
++자동 판단이 위험한 경우.
++
++잘못된 자동 복구가 플레이어의 정상 진행을 덮어쓰지 않게 한다.
++
++# 20. 자연 생존 전체 진행 검증 준비
++
++이번 작업 후반부터 실제 자연 생존 플레이를 시작한다.
++
++개발용 명령과 순간이동을 최소화하고
++
++**실제 플레이어가 모드를 처음 설치해 새 월드를 시작한 상황**
++
++에 가깝게 진행한다.
++
++순서 예:
++
++**새 월드
++→ 초기 생존
++→ 나무/광물 확보
++→ 거점 형성
++→ 탐험
++→ 모드 구조물 발견
++→ 이상현상
++→ 첫 조사
++→ 일반 생존 복귀
++→ 다음 사건
++→ 사망 또는 수면
++→ Nether 이용
++→ 복귀
++→ 도시 접근
++→ 현재 구현 끝 지점**
++
++까지 진행한다.
++
++# 21. 자연 생존 테스트에서 기록할 데이터
++
++단순히 클리어 여부만 보지 않는다.
++
++다음도 기록한다.
++
++* 첫 모드 콘텐츠 발견까지 걸린 실제 시간
++* 주요 구조물 거리
++* 사건 사이 평균 간격
++* 플레이어가 일반 생존을 할 여유
++* 공포 이벤트 연속 발생 횟수
++* 주요 진행 막힘
++* 필요한 자원 확보 난도
++* 잘못된 동선 유도
++* 과도한 왕복
++* 자연스럽지 않은 강제 진행
++* 스토리와 Minecraft 생존의 충돌
++
++향후 Horror Director와 월드젠 튜닝에 사용할 수 있도록 한다.
++
++# 22. 공포 디렉터 기반 데이터 수집
++
++아직 Horror Director의 완성형 이벤트 선택 로직을 구현하지 않는다.
++
++하지만 향후를 위해 다음 데이터는 기록 가능하게 한다.
++
++* lastMajorHorrorEvent
++* lastScareCategory
++* lastThreatEntity
++* timeSinceStrongEvent
++* currentRegion
++* currentNarrativeStage
++* currentCompanion
++* recentDeaths
++* currentSafetyState
++* repeatedPlayerRoute
++* homeRegionActivity
++
++실제 필드명은 프로젝트 규칙에 맞춘다.
++
++지금은 관찰·진단용 데이터만으로도 충분하다.
++
++# 23. 떡밥 시스템은 확대 구현하지 않음
++
++현재 등록된 떡밥 초안 2건과 설계 59–81은 유지한다.
++
++이번 작업에서 새 떡밥을 대량 제작하지 않는다.
++
++다만 데이터 구조가 다음 관계를 지원할 수 있는지만 확인한다.
++
++**Foreshadow
++→ Evidence
++→ Location
++→ NPC
++→ Item
++→ Puzzle
++→ Payoff
++→ Ending**
++
++현재 기능 안정화를 우선한다.
++
++# 24. 퍼즐 및 리소스팩 제작 계속 보류
++
++이번 단계에서 다음을 본격 제작하지 않는다.
++
++* 최종 퍼즐 콘텐츠
++* 최종 리소스팩
++* 고해상도 텍스처
++* 최종 건축 리빌드
++* 최종 인테리어
++* NPC 외형 고도화
++* 대규모 파티클
++* 최종 BGM
++* 최종 시네마틱
++
++현재 아트는 **기능 검증용 작업본**으로 유지한다.
++
++# 25. 현재 스크린샷의 아트 기준 보존
++
++현재 촬영된
++
++* 도시 전경
++* 도로
++* 건물
++* 일곱 형체 장면
++* 도시 진입 연출
++
++은 최종 품질 기준이 아니라 **현재 기능 검증 기준점**으로 기록한다.
++
++기능 구현이 모두 끝난 후 별도 최종 아트 단계에서 전면 고도화한다.
++
++그때의 품질 목표는:
++
++**인터넷에서 호평받는 고품질 Minecraft 도시·건축 작품과 직접 비교했을 때 지나치게 단순하거나 조악해 보이지 않고, 최소한 그에 준하는 설계 밀도와 완성도를 갖추는 것.**
++
++현재 단계에서는 이 작업을 앞당기지 않는다.
++
++# 26. 최종 아트 단계에서 향후 반드시 적용할 기준
++
++지금 구현하지는 않지만 향후 지시사항으로 보존한다.
++
++최종 아트에서는 반드시 다음을 다시 검토한다.
++
++* 도시 스카이라인
++* 건물별 실루엣
++* 파사드 깊이
++* 창호
++* 지붕선
++* 재료 팔레트
++* 색 조합
++* 외벽 디테일
++* 배관
++* 전선
++* 간판
++* 환기구
++* 옥상 시설
++* 도로
++* 보도
++* 배수
++* 골목
++* 가로등
++* 차량/시설 잔해
++* 수로
++* 식생
++* 환경 노후화
++* 플레이어 이동 시 시야 구성
++* 환경 스토리텔링
++* 내부 인테리어
++
++주요 스토리 장면은
++
++**건축 + NPC + 조명 + 카메라 + 사운드 + 애니메이션 + 이펙트**
++
++를 하나의 세트피스로 재설계한다.
++
++# 27. 현재 아트 revision은 불필요하게 올리지 않음
++
++이번 안정화 작업에서 테스트용 블록 배치나 진단용 변경만 발생한다면 최종 art revision을 올리지 않는다.
++
++아트 revision 증가는 실제 시각 자산 또는 월드 디자인 revision이 의미 있게 변경된 경우에만 한다.
++
++# 28. 저장 포맷 변경 정책
++
++현재 저장 형식은 4다.
++
++새 필드가 추가된다고 무조건 저장 형식을 5로 올리지 않는다.
++
++기존 형식 4에서 하위 호환 가능한 optional field 추가라면 기존 포맷 유지 가능성을 먼저 검토한다.
++
++반대로 의미 변경이나 필수 migration이 필요하면 명확한 이유와 migration 경로를 만들고 포맷을 올린다.
++
++저장 버전 숫자만 불필요하게 증가시키지 않는다.
++
++# 29. 0.3.2 승격 조건
++
++이번 작업이 끝났다고 무조건 0.3.2로 올리지 않는다.
++
++최소 다음이 통과해야 한다.
++
++* NPC 중심 사건 A/B/C/D/E PASS
++* 전투/추격 사건 A/B/C/D/E PASS
++* 복합 사건 A/B/C/D/E PASS
++* 중요 아이템 트랜잭션 PASS
++* 중요 아이템 복제/소실 방지 PASS
++* 보상 멱등성 PASS
++* 필수 구조물 fallback 실제 구현 PASS
++* fallback 종료/재접속 PASS
++* Story Integrity 확대 검사 PASS
++* 기존 36개 테스트 회귀 PASS
++* 새 테스트 전체 PASS
++
++자연 생존 전체 진행이 아직 완료되지 않았다면
++
++**0.3.2 기능 후보**
++
++로는 판단할 수 있어도 전체 안정화는 계속 PARTIAL로 유지할 수 있다.
++
++# 30. 회귀 테스트
++
++기존에 PASS한 항목은 이번 변경 뒤 반드시 다시 확인한다.
++
++최소:
++
++* 일곱 형체 사건 복구
++* 조사 사건 A/B/D/E
++* 신호/도시 진입 D/E
++* 사망/리스폰
++* 청크 언로드
++* Nether 왕복
++* End 왕복
++* 월드 복사 독립성
++* 0.2 migration
++
++신규 기능이 기존 체크포인트 시스템을 깨지 않았다는 것을 확인한다.
++
++# 31. 테스트 개수보다 테스트 다양성을 우선
++
++테스트 숫자를 늘리기 위한 단순 중복 테스트를 만들지 않는다.
++
++새 테스트는 반드시 기존에 없던 실패 유형을 다루도록 한다.
++
++특히:
++
++* NPC 복제
++* 임시 엔티티 잔류
++* 아이템 double-spend
++* 보상 double-grant
++* structure registry 불일치
++* commit 직전 종료
++* commit 직후 종료
++* partial world state
++
++등을 우선한다.
++
++# 32. 이번 작업 완료 보고서는 별도 문서 없이도 이어갈 수 있을 정도로 상세하게 작성
++
++이번 작업부터 최종 보고서의 상세 수준을 강화한다.
++
++`VERIFICATION.txt`, `DIFF.patch`, 별도 handoff 문서가 있더라도,
++
++**채팅에 출력하는 최종 보고서만으로 새로운 세션에서 바로 작업을 이어갈 수 있어야 한다.**
++
++최종 보고서에는 최소한 다음을 반드시 포함한다.
++
++### 현재 기준점
++
++* 프로젝트명
++* 최신 버전
++* 작업본 이름
++* 전체 판정
++* 저장 형식
++* art revision
++* 최신 기준 JAR/소스
++
++### 이번 작업 목표
++
++처음 계획과 실제 수행 범위를 각각 기록.
++
++### 변경 사항
++
++* 수정 파일
++* 수정 클래스
++* 핵심 함수
++* 새 필드
++* 상태 변화
++* 저장 구조 변화
++* migration 변화
++
++단순히 “안정화 개선”이라고 요약하지 않는다.
++
++### 기능별 결과표
++
++최소:
++
++| 항목 | 결과 | 실제 검증 방법 | 횟수 | 비고 |
++| -- | -- | -------- | -: | -- |
++
++형태로 정리한다.
++
++결과는:
++
++* PASS
++* PARTIAL
++* FAIL
++* NOT TESTED
++
++중 하나를 명확히 사용한다.
++
++### 실제 검증
++
++자동 테스트와 실제 Minecraft 클라이언트 테스트를 구분한다.
++
++### 실패했던 문제
++
++작업 중 발견 후 수정한 중요한 문제도 기록한다.
++
++**증상 → 원인 → 변경 → 재검증 결과**
++
++형태로 남긴다.
++
++### 남은 문제
++
++무엇이 아직 PARTIAL인지 정확히 기록한다.
++
++### 저장 및 migration
++
++* 최신 저장 형식
++* 지원 이전 형식
++* migration 변경
++* 기존 월드 영향
++* 다운그레이드 정책
++
++### 원본 보존
++
++기존 JAR와 월드가 수정됐는지 여부를 명시한다.
++
++### BASELINE / MODIFIED / ROLLBACK
++
++실행 명령, 입력, 주요 출력, exit code, hash 확인을 가능하면 포함한다.
++
++### 산출물
++
++정확한 파일명과 경로를 기록한다.
++
++### 다음 작업 시작점
++
++다음 작업자가 바로 실행할 수 있는 수준으로 순서를 지정한다.
++
++### 다음 단계 진입 조건
++
++무엇을 PASS해야 다음 단계로 이동할 수 있는지 명시한다.
++
++# 33. 보고서 품질 자체를 완료 조건으로 포함
++
++아래 질문에 별도 파일 없이 답할 수 있어야 한다.
++
++1. 최신 버전과 기준 작업본은 무엇인가?
++2. 이번에 정확히 무엇을 바꿨는가?
++3. 어떤 파일과 함수가 수정됐는가?
++4. 저장 형식은 어떻게 달라졌는가?
++5. 어떤 테스트를 실제로 수행했는가?
++6. 각각 몇 회 수행했는가?
++7. 무엇이 PASS인가?
++8. 무엇이 아직 PARTIAL인가?
++9. 어떤 문제가 발생했고 어떻게 고쳤는가?
++10. 기존 세이브는 안전한가?
++11. 어떤 파일이 다음 기준점인가?
++12. 다음 작업의 첫 번째 작업은 무엇인가?
++
++보고서만으로 이것을 답할 수 없다면 보고서 작성도 미완료로 본다.
++
++# 34. 이번 단계에서 하지 말아야 할 것
++
++이번 작업 중 다음 방향으로 새지 않는다.
++
++* 새로운 대형 스토리 장 추가
++* 새 몬스터 수량 확대
++* 대규모 퍼즐 제작
++* 떡밥 대량 추가
++* 최종 도시 리빌드
++* 리소스팩 제작에 장시간 투입
++* NPC 최종 모델링
++* 최종 BGM 제작
++* 셰이더 의존 연출
++* 기능 안정화와 관계없는 UI 리디자인
++
++필요한 기반 훅만 마련하고 기능 안정화를 우선한다.
++
++# 35. 이번 작업의 최종 성공 기준
++
++이번 작업의 핵심 질문은 하나다.
++
++**“조사 사건에서 성공한 체크포인트 시스템이 NPC·전투·아이템·구조물까지 포함한 실제 캠페인 시스템 전체에서도 안전하게 작동하는가?”**
++
++다음이 가능해야 한다.
++
++NPC 사건 도중 종료해도
++→ NPC가 중복되거나 사라지지 않는다.
++
++추격 도중 종료해도
++→ 적과 사건 상태가 다시 일치한다.
++
++중요 아이템 사용 도중 종료해도
++→ 아이템이 복제되거나 소실되지 않는다.
++
++보상 지급 도중 종료해도
++→ 한 번만 지급된다.
++
++필수 구조물이 잘못되어도
++→ 기존 월드를 버리지 않고 다른 진행 경로를 확보한다.
++
++이 다섯 축이 실제 게임에서 검증되면 다음 안정화 단계로 넘어간다.
++
++# 다음 단계 예고
++
++이번 작업 완료 후 다음 순서는 원칙적으로:
++
++**자연 생존 전체 진행
++→ 현재 구현 구간 처음부터 끝까지 통합 회귀
++→ 미완성 핵심 기능 구현
++→ Investigation / Evidence / Puzzle / Custom Item 기반 확장
++→ 모든 멀티엔딩을 임시 자산으로 연결
++→ 전체 기능 안정화
++→ 최종 건축·NPC·환경·인테리어·리소스팩·사운드·이펙트 폴리싱**
++
++순서로 진행한다.
++
++최종 아트는 여전히 마지막이다.
++
++지금은 먼저 **절대 쉽게 망가지지 않는 캠페인 기반**을 완성한다.
+--- a/src/main/java/io/github/whileaway/ActorGameTests.java
++++ b/src/main/java/io/github/whileaway/ActorGameTests.java
+@@ -0,0 +1,133 @@
++package io.github.whileaway;
++
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.gametest.framework.*;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.world.entity.*;
++import net.minecraft.world.level.block.Blocks;
++import net.neoforged.neoforge.gametest.*;
++
++/** Real server entity fixtures. Villagers test a reusable adapter, NOT a shipped story NPC. */
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class ActorGameTests {
++    private static StoryActorRecord record() {
++        return new StoryActorRecord("test:npc","test:meeting","resident","minecraft:villager","minecraft:overworld",
++            UUID.fromString("00000000-0000-0000-0000-000000000001"),null,UUID.fromString("00000000-0000-0000-0000-000000000002"),new BlockPos(0,80,0),false);
++    }
++    private static Entity villager(GameTestHelper h) {
++        var a=EntityType.VILLAGER.create(h.getLevel());var pos=h.absolutePos(new BlockPos(1,2,1));
++        h.setBlock(new BlockPos(1,1,1),Blocks.STONE);h.setBlock(new BlockPos(1,2,1),Blocks.AIR);h.setBlock(new BlockPos(1,3,1),Blocks.AIR);
++        a.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,0,0);((Mob)a).setNoAi(true);return a;
++    }
++    private static StoryActorRecord prepare(GameTestHelper h,Entity a) {
++        return StoryActors.prepare(a,"test:npc:"+UUID.randomUUID(),"test:meeting","resident",UUID.randomUUID(),null,false);
++    }
++    private static void clean(GameTestHelper h,StoryActorRecord r){StoryActors.abort(h.getLevel().getServer(),r);}
++    @GameTest(template="empty")
++    public static void actorJournalRoundTripsEveryBoundary(GameTestHelper h) {
++        for(int phase=0;phase<=4;phase++) {
++            var r=record();for(int n=1;n<=phase;n++)r.checkpoint.advance(n);r.facts.add("dialogue:window");r.facts.add("rescued");
++            r.lifecycle=phase==0?StoryActorRecord.Lifecycle.PREPARED:StoryActorRecord.Lifecycle.ACTIVE;
++            var input=r.save();CompoundTag normalized=null;
++            for(int n=0;n<40;n++) {
++                r=StoryActorRecord.load(input);h.assertTrue(r.checkpoint.checkpoint==phase&&r.facts.size()==2,"checkpoint and irreversible facts survive");
++                input=r.save();if(normalized==null)normalized=input;else h.assertTrue(normalized.equals(input),"deterministic normalization");
++            }
++        }h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void actorMalformedIdentityStopsLoad(GameTestHelper h) {
++        for(var key:List.of("entityUUID","instanceId","storyId","position")) {
++            var t=record().save();t.remove(key);boolean rejected=false;
++            try{StoryActorRecord.load(t);}catch(IllegalStateException expected){rejected=expected.getMessage().contains("MANUAL_DIAGNOSTIC");}
++            h.assertTrue(rejected,"ambiguous identity not silently replaced: "+key);
++        }
++        var t=record().save();t.putString("lifecycleState","UNKNOWN");boolean rejected=false;
++        try{StoryActorRecord.load(t);}catch(IllegalStateException expected){rejected=true;}h.assertTrue(rejected,"unknown lifecycle diagnosed");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void npcMissingEntityRebuiltAndOldGenerationRejected(GameTestHelper h) {
++        var a=villager(h);var r=prepare(h,a);h.assertTrue(StoryActors.spawnPrepared(h.getLevel(),r,a),"fixture actor spawned");
++        StoryActors.checkpoint(a,r,2,"dialogue:already_spoken");var oldSnapshot=r.snapshot.copy();var oldId=r.entityId;
++        a.discard();h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==null,"first loaded pass waits for entity joins");
++        var replacement=StoryActors.reconcile(h.getLevel().getServer(),r);
++        h.assertTrue(replacement!=null&&!replacement.getUUID().equals(oldId)&&r.generation==1,"missing actor recreated once with epoch fence");
++        h.assertTrue(r.facts.contains("dialogue:already_spoken")&&r.checkpoint.checkpoint==2,"dialogue and checkpoint not reset");
++        var stale=EntityType.VILLAGER.create(h.getLevel());stale.load(oldSnapshot);stale.setUUID(oldId);
++        h.assertTrue(!h.getLevel().addFreshEntity(stale),"late old chunk actor rejected");
++        h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==replacement,"repeated reconciliation returns same actor");clean(h,r);h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void unloadedActorStorageIsNotAbsence(GameTestHelper h) {
++        var r=record();r.position=new BlockPos(12000000,80,12000000);
++        var id=r.entityId;for(int i=0;i<10;i++)h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==null,"unloaded location deferred");
++        h.assertTrue(!h.getLevel().hasChunkAt(r.position)&&id.equals(r.entityId)&&r.generation==0,"no chunk force-load or blind NPC clone");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void retiredActorRejectedOnJoin(GameTestHelper h) {
++        var a=villager(h);var r=prepare(h,a);r.lifecycle=StoryActorRecord.Lifecycle.RETIRED;
++        StoryActors.persist(h.getLevel().getServer());h.assertTrue(!h.getLevel().addFreshEntity(a),"retired actor never joins world");
++        h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==null,"terminal actor not recreated");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void actorIdentityRoleAndInstanceAreRequired(GameTestHelper h) {
++        var a=villager(h);var r=prepare(h,a);
++        for(var key:List.of("spawnRole","ownerEventId","storyId")) {
++            StoryActors.tag(a,r);a.getPersistentData().getCompound(StoryActors.TAG).putString(key,"wrong");
++            h.assertTrue(!StoryActors.canonical(a,r),"UUID alone cannot authorize "+key);
++        }
++        StoryActors.tag(a,r);a.getPersistentData().getCompound(StoryActors.TAG).putUUID("instanceId",UUID.randomUUID());
++        h.assertTrue(!StoryActors.canonical(a,r),"instance fence");clean(h,r);h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void copyKeepsActorFactsIndependent(GameTestHelper h) {
++        var d=new NarrativeData();var r=record();d.actors.put(r.storyId,r);r.facts.add("promise");
++        var copy=NarrativeData.load(d.save(new CompoundTag(),h.getLevel().registryAccess()),h.getLevel().registryAccess());
++        copy.actors.get(r.storyId).facts.add("rescued");copy.actors.get(r.storyId).generation++;
++        h.assertTrue(r.facts.size()==1&&r.generation==0,"world data does not share actor objects");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void actorDuplicateRegistryIdentityRejected(GameTestHelper h) {
++        var t=new NarrativeData().save(new CompoundTag(),h.getLevel().registryAccess());var list=new net.minecraft.nbt.ListTag();list.add(record().save());list.add(record().save());t.put("actors",list);
++        boolean rejected=false;try{NarrativeData.load(t,h.getLevel().registryAccess());}catch(IllegalStateException expected){rejected=true;}
++        h.assertTrue(rejected,"duplicate logical NPC never silently overrides");h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void actorCollisionDoesNotOverwriteWorld(GameTestHelper h) {
++        var a=villager(h);var r=prepare(h,a);var pos=r.position;
++        // Fill only the fixture's own volume; production recovery must not remove any of it.
++        for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++)for(int y=0;y<3;y++)h.getLevel().setBlock(pos.offset(x,y,z),Blocks.IRON_BLOCK.defaultBlockState(),2);
++        for(int n=0;n<4;n++)h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==null,"blocked recovery waits");
++        h.assertTrue(r.generation==0&&h.getLevel().getBlockState(pos).is(Blocks.IRON_BLOCK),"player geometry preserved");clean(h,r);h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void optionalActorSchemaMigratesWithoutInventingNPCs(GameTestHelper h) {
++        for(int schema=1;schema<=4;schema++) {
++            var t=new CompoundTag();t.putInt("schema",schema);
++            var a=NarrativeData.load(t,h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
++            var b=NarrativeData.load(t.copy(),h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
++            h.assertTrue(a.equals(b)&&a.getInt("schema")==4&&a.getList("actors",10).isEmpty(),"old save deterministically gains empty optional registry");
++        }h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void staleChunkAIReconcilesCommittedHunt(GameTestHelper h) {
++        var a=WhileAway.WAYFARER.get().create(h.getLevel());var owner=UUID.randomUUID();a.bind(owner,BlockPos.ZERO);
++        var d=NarrativeData.get(h.getLevel().getServer());d.entry(owner).encounter=a.getUUID();
++        var r=StoryActors.prepare(a,StoryActors.chaseId(owner),StoryActors.CHASE,"pursuer",UUID.randomUUID(),owner,true);
++        r.checkpoint.advance(1);r.checkpoint.advance(2);r.facts.add("pursuit_started");r.snapshot.putInt("StoryAge",240);r.snapshot.putInt("HuntTicks",12);
++        // Entity has pre-hunt values, but the separate durable facts say the hunt already started.
++        a.tick();var saved=new CompoundTag();a.addAdditionalSaveData(saved);
++        h.assertTrue(saved.getBoolean("Hunting")&&saved.getInt("StoryAge")==240&&saved.getInt("HuntTicks")==12,"stale entity AI restored to committed checkpoint without aging offline");
++        clean(h,r);h.succeed();
++    }
++    @GameTest(template="empty")
++    public static void spawnBeforeCommitReconcilesOnce(GameTestHelper h) {
++        var a=villager(h);var r=prepare(h,a);h.assertTrue(h.getLevel().addFreshEntity(a),"world spawn before B write");
++        h.assertTrue(r.checkpoint.checkpoint==0,"simulated prepare/spawn/commit gap");
++        StoryActors.reconcile(h.getLevel().getServer(),r);
++        h.assertTrue(r.checkpoint.checkpoint==1&&r.lifecycle==StoryActorRecord.Lifecycle.ACTIVE,"B finalized from existing canonical actor");
++        StoryActors.reconcile(h.getLevel().getServer(),r);h.assertTrue(r.generation==0,"no replacement of an existing actor");clean(h,r);h.succeed();
++    }
++}
+--- a/src/main/java/io/github/whileaway/client/ActorSmoke.java
++++ b/src/main/java/io/github/whileaway/client/ActorSmoke.java
+@@ -0,0 +1,125 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.entity.Wayfarer;
++import java.nio.file.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.screens.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.*;
++import net.minecraft.world.item.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.levelgen.WorldOptions;
++import net.minecraft.world.level.levelgen.presets.WorldPresets;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in actual-client crash chain for the shipped pursuer. Test movement is not natural survival QA. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class ActorSmoke {
++    private static final String MODE=System.getProperty("whileaway.actorBoundary","");
++    private static final int REPEAT=Integer.getInteger("whileaway.actorRepeat",1);
++    private static final String TASK="runActor"+MODE+REPEAT;
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/lifecycle"));
++    private static boolean launched,setup;
++    private static volatile boolean queued;
++    private static volatile int phase;
++    private static int ticks,stable;
++    private static void check(boolean ok,String message){if(!ok)throw new IllegalStateException(message);}
++    private static void note(String s) {
++        try{Files.writeString(E.resolve(TASK+".txt"),s+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception ex){throw new IllegalStateException(ex);}
++        com.mojang.logging.LogUtils.getLogger().info("WHILEAWAY_ACTOR {}",s);
++    }
++    private static StoryActorRecord record(ServerPlayer p){return NarrativeData.get(p.getServer()).actors.get(StoryActors.chaseId(p.getUUID()));}
++    private static void failure(Exception ex){com.mojang.logging.LogUtils.getLogger().error("ACTOR_FAILED",ex);note("FAIL "+ex);phase=-1;Minecraft.getInstance().stop();}
++    private static void server(java.util.function.Consumer<ServerPlayer> f) {
++        var mc=Minecraft.getInstance();var id=mc.player.getUUID();queued=true;
++        mc.getSingleplayerServer().execute(()->{try{f.accept(mc.getSingleplayerServer().getPlayerList().getPlayer(id));}
++            catch(Exception ex){mc.execute(()->failure(ex));}finally{queued=false;}});
++    }
++    @SubscribeEvent public static void boundary(RecoveryBoundaryEvent event) {
++        if(MODE.isEmpty()||!event.eventId.equals(StoryActors.CHASE))return;
++        try {
++            boolean target=switch(MODE){case "A"->event.boundary.equals("PREPARED");case "B"->event.boundary.equals("FACT_COMMITTED");
++                case "C"->event.boundary.equals("CHECKPOINT_COMMITTED")&&event.checkpoint==2;case "D"->event.boundary.equals("BEFORE_COMPLETE");
++                case "E"->event.boundary.equals("AFTER_COMPLETE");default->false;};
++            if(MODE.equals("Verify")&&event.boundary.equals("AFTER_COMPLETE"))throw new IllegalStateException("completion replayed");
++            if(!target)return;
++            var p=event.player;var r=record(p);int expected=switch(MODE){case "A"->0;case "B"->1;case "C"->2;case "D"->3;default->4;};
++            check(r.checkpoint.checkpoint==expected,"wrong boundary");
++            if(MODE.equals("A"))Files.writeString(E.resolve("actor-instance-"+REPEAT+".txt"),r.instanceId.toString());
++            check(r.instanceId.toString().equals(Files.readString(E.resolve("actor-instance-"+REPEAT+".txt")).trim()),"logical event instance drift");
++            check(p.getInventory().countItem(Items.DIAMOND)==27,"fixture inventory changed");
++            if(expected>=2)check(r.facts.contains("pursuit_started"),"hunt fact missing");
++            if(expected>=3)check(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED&&NarrativeData.get(p.getServer()).entry(p.getUUID()).progress.encounterComplete(),"retirement not atomic with completion facts");
++            var disk=p.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("data/whileaway_story.dat");
++            Files.createDirectories(E.resolve("snapshots"));Files.copy(disk,E.resolve("snapshots/actor-"+REPEAT+"-"+MODE+".dat"),StandardCopyOption.REPLACE_EXISTING);
++            note("PASS "+TASK+" boundary="+event.boundary+" checkpoint="+expected+" generation="+r.generation+" instance="+r.instanceId);
++            note("FAULT Runtime.halt after durable story write; no shutdown save");Runtime.getRuntime().halt(0);
++        }catch(Exception ex){failure(ex);}
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
++        if(MODE.isEmpty()||phase<0)return;var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen) {
++                launched=true;Files.createDirectories(E);check(mc.options.getSoundSourceVolume(net.minecraft.sounds.SoundSource.MASTER)==0,"client not muted");
++                if(MODE.equals("A")) {
++                    String world="whileaway-actor-"+REPEAT+"-"+System.currentTimeMillis();Files.writeString(E.resolve("actor-world-"+REPEAT+".txt"),world);
++                    var rules=new GameRules();rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(false,null);
++                    mc.createWorldOpenFlows().createFreshLevel(world,new LevelSettings("Actor recovery fixture",GameType.SPECTATOR,false,Difficulty.NORMAL,true,rules,WorldDataConfiguration.DEFAULT),
++                        new WorldOptions(74192361L,true,false),WorldPresets::createNormalWorldDimensions,new TitleScreen());
++                }else {
++                    var world=Files.readString(E.resolve("actor-world-"+REPEAT+".txt")).trim();check(world.matches("whileaway-actor-[12]-[0-9]+"),"unexpected fixture world");
++                    mc.createWorldOpenFlows().openWorld(world,mc::stop);
++                }
++            }
++            if(mc.screen instanceof BackupConfirmScreen screen)for(var child:screen.children())
++                if(child instanceof net.minecraft.client.gui.components.Button button&&button.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())){button.onPress();break;}
++            if(++ticks>7500)throw new IllegalStateException("timeout phase="+phase+" mode="+MODE);
++            if(mc.player==null||mc.level==null||mc.getSingleplayerServer()==null||queued||ticks%10!=0)return;
++            if(!setup) {
++                setup=true;server(p->{
++                    if(MODE.equals("A")) {
++                        var pos=new BlockPos(0,81,0);var level=p.serverLevel();
++                        for(int x=-12;x<=12;x++)for(int z=-12;z<=12;z++)for(int y=-1;y<=3;y++)level.setBlock(pos.offset(x,y,z),y==-1?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState(),2);
++                        p.teleportTo(level,.5,81,.5,java.util.Set.of(),0,0);p.setGameMode(GameType.SURVIVAL);p.setHealth(20);p.fallDistance=0;
++                        var e=NarrativeData.get(p.getServer()).entry(p.getUUID());e.station=pos;
++                        p.getInventory().add(new ItemStack(Items.DIAMOND,27));StoryActors.persist(p.getServer());
++                        p.getServer().saveEverything(true,true,true); // ONLY fixture baseline, before any tested operation.
++                        var actor=WhileAway.WAYFARER.get().create(level);actor.moveTo(3.5,81,.5,0,0);actor.bind(p.getUUID(),pos);
++                        check(StoryActors.beginChase(p,actor),"start rejected");
++                    }else {
++                        var r=record(p);check(r!=null,"reservation missing after crash");
++                        check(r.instanceId.toString().equals(readInstance()),"instance lost on reload");
++                        check(p.getInventory().countItem(Items.DIAMOND)==27,"fixture inventory lost");
++                        note("PASS reload "+MODE+" checkpoint="+r.checkpoint.checkpoint+" facts="+r.facts);
++                        phase=MODE.equals("Verify")?3:2;
++                    }
++                });return;
++            }
++            if(phase==2)server(p->{
++                var r=record(p);var actor=StoryActors.find(p.getServer(),r.entityId);
++                if(actor==null)return;
++                if(MODE.equals("C")) {
++                    p.teleportTo(p.serverLevel(),actor.getX()+3,actor.getY(),actor.getZ(),java.util.Set.of(),180,0);p.setHealth(20);p.fallDistance=0;
++                }else if(MODE.equals("D")) {
++                    check(r.facts.contains("pursuit_started")&&r.checkpoint.checkpoint==2,"C fact not durable");
++                    // Escape uses the existing encounter's genuine completion condition, not a forced flag.
++                    p.teleportTo(p.serverLevel(),50.5,81,.5,java.util.Set.of(),0,0);p.fallDistance=0;
++                }
++            });
++            if(phase==3)server(p->{
++                var r=record(p);var e=NarrativeData.get(p.getServer()).entry(p.getUUID());
++                check(r.checkpoint.checkpoint==4&&r.noticeClaimed&&e.encounter==null&&e.progress.encounterComplete(),"E completion lost");
++                check(StoryActors.find(p.getServer(),r.entityId)==null,"retired pursuer remains");
++                check(StoryActors.integrity(p.getServer()).isEmpty(),"actor integrity failed");
++                stable+=10;if(stable>=300){note("PASS "+TASK+" completed state stable 300 ticks; no actor or completion replay; integrity clean");phase=-1;mc.execute(mc::stop);}
++            });
++        }catch(Exception ex){failure(ex);}
++    }
++    private static String readInstance(){try{return Files.readString(E.resolve("actor-instance-"+REPEAT+".txt")).trim();}catch(Exception ex){throw new IllegalStateException(ex);}}
++}
+--- a/src/main/java/io/github/whileaway/entity/Wayfarer.java
++++ b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+@@ -28,6 +28,7 @@
+     private UUID witness;
+     private BlockPos home;
+     private int lifetime, windup, attackCooldown, huntTicks;
++    private boolean checkpointRestored;
+     public Wayfarer(EntityType<? extends PathfinderMob> type, Level level) { super(type, level); setPersistenceRequired(); xpReward = 0; }
+     public static AttributeSupplier.Builder attributes() {
+         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 28).add(Attributes.MOVEMENT_SPEED, 0.22)
+@@ -47,12 +48,28 @@
+         if (witness == null) return;
+         var ledger=NarrativeData.get(server.getServer());var entry=ledger.entry(witness);
+         if(entry.progress.encounterComplete()||(entry.encounter!=null&&!getUUID().equals(entry.encounter))){discard();return;}
++        var actorRecord=StoryActors.attach(this);
++        if(actorRecord==null){discard();return;}
++        if(!server.dimension().location().toString().equals(actorRecord.dimension)){getNavigation().stop();return;}
++        if(!checkpointRestored) {
++            // Chunk NBT may lag behind the story-file commit. Restore ONLY encounter AI,
++            // not health, physical inventory, or a position which might now contain a player's blocks.
++            var saved=actorRecord.snapshot;
++            lifetime=Math.max(0,saved.getInt("StoryAge"));huntTicks=Math.max(0,saved.getInt("HuntTicks"));
++            entityData.set(HUNTING,actorRecord.facts.contains("pursuit_started")||saved.getBoolean("Hunting"));
++            windup=Math.max(30,saved.getInt("Windup"));attackCooldown=Math.max(20,saved.getInt("AttackCooldown"));
++            checkpointRestored=true;
++        }
+         var player = server.getServer().getPlayerList().getPlayer(witness);
+-        if (player == null) { getNavigation().stop(); return; }
++        if (player == null) { getNavigation().stop(); StoryActors.suspend(this,actorRecord,"owner_offline"); return; }
+         // Absence, death and dimension travel suspend AI and active-time budgets; they are not story failures.
+-        if (player.level() != level() || player.isDeadOrDying()) { getNavigation().stop();windup=Math.max(windup,30);return; }
++        if (player.level() != level() || player.isDeadOrDying()) { getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_dead_or_other_dimension");return; }
+         if (player.isCreative() || player.isSpectator() || server.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL
+                 || !StoryConfig.ENCOUNTERS.get()) { getNavigation().stop(); entityData.set(HUNTING, false); windup=0; return; }
++        if(actorRecord.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED) {
++            actorRecord.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,null);
++        }
++        if(tickCount%100==0)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,null);
+         lifetime++;
+         if (player.blockPosition().distSqr(home) > 42*42) { finish(true); return; }
+         if (lifetime > 2400) { finish(true); return; }
+@@ -60,6 +77,7 @@
+         boolean hunting=entityData.get(HUNTING);
+         if (!hunting && lifetime > 200 && distanceToSqr(player) < 5*5 && hasLineOfSight(player)) {
+             entityData.set(HUNTING,true); windup=30;
++            StoryActors.checkpoint(this,actorRecord,2,"pursuit_started");
+             StoryEvents.sound(player, WhileAway.ATTACK.get(), SoundSource.HOSTILE, blockPosition(), .65f);
+         }
+         if (entityData.get(HUNTING)) {
+@@ -78,21 +96,8 @@
+         }
+     }
+     private void finish(boolean complete) {
+-        if (level() instanceof ServerLevel server && witness != null) {
+-            var data=NarrativeData.get(server.getServer()); var e=data.entry(witness);
+-            if (getUUID().equals(e.encounter)) {
+-                e.encounter=null;
+-                if (complete) e.progress=e.progress.complete();
+-                else e.progress=e.progress.defer(server.getGameTime()+1200);
+-                data.setDirty();
+-                var p=server.getServer().getPlayerList().getPlayer(witness);
+-                if (complete && p!=null) {
+-                    p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"), false);
+-                    if (StoryConfig.MUSIC.get()) StoryEvents.music(p, WhileAway.RESOLVE.get(), .45f);
+-                }
+-            }
+-        }
+-        discard();
++        if(level() instanceof ServerLevel && witness!=null)StoryActors.completeChase(this);
++        else discard();
+     }
+     @Override public void die(DamageSource source) { super.die(source); finish(true); }
+     @Override public void addAdditionalSaveData(CompoundTag t) {
+@@ -103,7 +108,7 @@
+         t.putInt("Windup",windup); t.putInt("AttackCooldown",attackCooldown);
+     }
+     @Override public void readAdditionalSaveData(CompoundTag t) {
+-        super.readAdditionalSaveData(t); if(t.hasUUID("Witness"))witness=t.getUUID("Witness");
++        super.readAdditionalSaveData(t); checkpointRestored=false; if(t.hasUUID("Witness"))witness=t.getUUID("Witness");
+         if(t.contains("Home"))home=BlockPos.of(t.getLong("Home")); lifetime=Math.max(0,t.getInt("StoryAge"));
+         entityData.set(HUNTING,t.getBoolean("Hunting")); huntTicks=Math.max(0,t.getInt("HuntTicks"));
+         windup=Math.max(30,t.getInt("Windup")); attackCooldown=Math.max(20,t.getInt("AttackCooldown"));
+--- a/src/main/java/io/github/whileaway/NarrativeData.java
++++ b/src/main/java/io/github/whileaway/NarrativeData.java
+@@ -12,6 +12,7 @@
+ public final class NarrativeData extends SavedData {
+     public static final int SCHEMA = 4;
+     private final Map<UUID, Entry> players = new TreeMap<>();
++    public final Map<String,StoryActorRecord> actors=new TreeMap<>();
+     public static final class Entry {
+         public Progress progress = Progress.empty();
+         public BlockPos station;
+@@ -70,6 +71,13 @@
+             e.returnYaw=t.getFloat("returnYaw");e.returnPitch=t.getFloat("returnPitch");
+             e.transitAfter=Math.max(0,t.getLong("transitAfter"));
+         }
++        if(root.getInt("actorSchema")>1)throw new IllegalStateException("MANUAL_DIAGNOSTIC Unsupported actor schema");
++        var actors=root.getList("actors",Tag.TAG_COMPOUND);
++        if(actors.size()>256)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor registry exceeds bounded capacity");
++        for(int i=0;i<actors.size();i++) {
++            var actor=StoryActorRecord.load(actors.getCompound(i));
++            if(data.actors.putIfAbsent(actor.storyId,actor)!=null)throw new IllegalStateException("MANUAL_DIAGNOSTIC Duplicate story actor "+actor.storyId);
++        }
+         if(!data.save(new CompoundTag(),registry).equals(root))data.setDirty();
+         return data;
+     }
+@@ -107,6 +115,8 @@
+             t.putFloat("returnYaw",e.returnYaw);t.putFloat("returnPitch",e.returnPitch);t.putLong("transitAfter",e.transitAfter);
+             list.add(t);
+         });
+-        root.put("players", list); return root;
++        root.put("players", list);
++        root.putInt("actorSchema",1);var actorList=new ListTag();actors.values().forEach(a->actorList.add(a.save()));root.put("actors",actorList);
++        return root;
+     }
+ }
+--- a/src/main/java/io/github/whileaway/StoryActorRecord.java
++++ b/src/main/java/io/github/whileaway/StoryActorRecord.java
+@@ -0,0 +1,51 @@
++package io.github.whileaway;
++
++import io.github.whileaway.core.EventCheckpoint;
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.nbt.*;
++
++/** World-local identity and safe checkpoint; entity NBT is reconstructible, facts are not. */
++public final class StoryActorRecord {
++    public enum Lifecycle { PREPARED, ACTIVE, SUSPENDED, RETIRED }
++    public final String storyId, eventId, role, entityType, dimension;
++    public final UUID instanceId;
++    public final UUID owner;
++    public final boolean temporary;
++    public UUID entityId;
++    public int generation;
++    public BlockPos position;
++    public Lifecycle lifecycle=Lifecycle.PREPARED;
++    public final EventCheckpoint checkpoint=new EventCheckpoint();
++    public CompoundTag snapshot=new CompoundTag();
++    public final Set<String> facts=new TreeSet<>();
++    public boolean noticeClaimed;
++    public StoryActorRecord(String storyId,String eventId,String role,String entityType,String dimension,
++            UUID instanceId,UUID owner,UUID entityId,BlockPos position,boolean temporary) {
++        this.storyId=storyId;this.eventId=eventId;this.role=role;this.entityType=entityType;this.dimension=dimension;
++        this.instanceId=instanceId;this.owner=owner;this.entityId=entityId;this.position=position.immutable();this.temporary=temporary;
++    }
++    public CompoundTag save() {
++        var t=new CompoundTag();t.putString("storyId",storyId);t.putString("ownerEventId",eventId);t.putString("spawnRole",role);
++        t.putString("entityType",entityType);t.putString("dimension",dimension);t.putUUID("instanceId",instanceId);
++        if(owner!=null)t.putUUID("owner",owner);t.putUUID("entityUUID",entityId);t.putInt("generation",generation);
++        t.putLong("position",position.asLong());t.putBoolean("temporary",temporary);t.putString("lifecycleState",lifecycle.name());
++        t.putString("state",checkpoint.state.name());t.putInt("checkpoint",checkpoint.checkpoint);
++        t.putInt("interruptions",checkpoint.interruptions);t.putString("reason",checkpoint.reason);
++        t.put("snapshot",snapshot.copy());t.putBoolean("noticeClaimed",noticeClaimed);
++        var list=new ListTag();facts.forEach(f->list.add(StringTag.valueOf(f)));t.put("facts",list);return t;
++    }
++    public static StoryActorRecord load(CompoundTag t) {
++        for(var key:List.of("storyId","ownerEventId","spawnRole","entityType","dimension","lifecycleState"))
++            if(t.getString(key).isBlank())throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor missing "+key);
++        for(var key:List.of("instanceId","entityUUID"))if(!t.hasUUID(key))throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor missing "+key);
++        if(!t.contains("position",Tag.TAG_LONG)||t.getInt("generation")<0)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor position/generation invalid");
++        var r=new StoryActorRecord(t.getString("storyId"),t.getString("ownerEventId"),t.getString("spawnRole"),t.getString("entityType"),t.getString("dimension"),
++            t.getUUID("instanceId"),t.hasUUID("owner")?t.getUUID("owner"):null,t.getUUID("entityUUID"),BlockPos.of(t.getLong("position")),t.getBoolean("temporary"));
++        try{r.lifecycle=Lifecycle.valueOf(t.getString("lifecycleState"));}catch(IllegalArgumentException ex){throw new IllegalStateException("MANUAL_DIAGNOSTIC Unknown actor lifecycle",ex);}
++        r.generation=t.getInt("generation");r.snapshot=t.getCompound("snapshot").copy();r.noticeClaimed=t.getBoolean("noticeClaimed");
++        r.checkpoint.restore(t.getString("state"),t.getInt("checkpoint"),0,t.getInt("interruptions"));r.checkpoint.reason=t.getString("reason");
++        for(var fact:t.getList("facts",Tag.TAG_STRING))r.facts.add(fact.getAsString());
++        return r;
++    }
++}
+--- a/src/main/java/io/github/whileaway/StoryActors.java
++++ b/src/main/java/io/github/whileaway/StoryActors.java
+@@ -0,0 +1,205 @@
++package io.github.whileaway;
++
++import io.github.whileaway.core.EventCheckpoint;
++import io.github.whileaway.entity.Wayfarer;
++import java.nio.charset.StandardCharsets;
++import java.util.*;
++import net.minecraft.core.registries.*;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.resources.*;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.*;
++import net.minecraft.world.entity.*;
++import net.minecraft.world.level.ChunkPos;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
++import net.neoforged.neoforge.event.tick.ServerTickEvent;
++import net.neoforged.neoforge.event.server.ServerStoppedEvent;
++
++/** Bounded world-local actor reconciliation. Never loads a chunk or edits a block to make an actor fit. */
++public final class StoryActors {
++    public static final String TAG="whileaway_actor";
++    public static final String CHASE="wayfarer_first";
++    private static final Map<MinecraftServer,Map<String,Integer>> readyPasses=new WeakHashMap<>();
++    public static String chaseId(UUID owner){return CHASE+":"+owner;}
++    public static void persist(MinecraftServer server){var d=NarrativeData.get(server);d.setDirty();server.overworld().getDataStorage().save();}
++    public static StoryActorRecord prepare(Entity actor,String id,String event,String role,UUID instance,UUID owner,boolean temporary) {
++        var level=(ServerLevel)actor.level();var d=NarrativeData.get(level.getServer());
++        var previous=d.actors.get(id);if(previous!=null)return previous;
++        if(d.actors.size()>=256)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor capacity reached");
++        var r=new StoryActorRecord(id,event,role,BuiltInRegistries.ENTITY_TYPE.getKey(actor.getType()).toString(),
++            level.dimension().location().toString(),instance,owner,actor.getUUID(),actor.blockPosition(),temporary);
++        d.actors.put(id,r);tag(actor,r);capture(actor,r);persist(level.getServer());emit(level.getServer(),r,"PREPARED");return r;
++    }
++    public static boolean beginChase(ServerPlayer player,Wayfarer actor) {
++        var d=NarrativeData.get(player.getServer());String id=chaseId(player.getUUID());
++        if(d.actors.containsKey(id)||d.entry(player.getUUID()).progress.encounterComplete())return false;
++        // The reservation and encounter ticket share one durable record BEFORE any world entity exists.
++        d.entry(player.getUUID()).encounter=actor.getUUID();
++        var r=prepare(actor,id,CHASE,"pursuer",UUID.randomUUID(),player.getUUID(),true);
++        return spawnPrepared(player.serverLevel(),r,actor);
++    }
++    private static void emit(MinecraftServer server,StoryActorRecord r,String boundary) {
++        var p=r.owner==null?null:server.getPlayerList().getPlayer(r.owner);
++        if(p!=null)RecoveryBoundaryEvent.emit(p,r.eventId,boundary,r.checkpoint.checkpoint);
++    }
++    public static void tag(Entity actor,StoryActorRecord r) {
++        var t=new CompoundTag();t.putString("storyId",r.storyId);t.putString("ownerEventId",r.eventId);
++        t.putString("spawnRole",r.role);t.putUUID("instanceId",r.instanceId);t.putInt("generation",r.generation);
++        t.putString("lifecycleState",r.lifecycle.name());actor.getPersistentData().put(TAG,t);
++    }
++    public static boolean canonical(Entity actor,StoryActorRecord r) {
++        var t=actor.getPersistentData().getCompound(TAG);
++        return actor.getUUID().equals(r.entityId)&&t.hasUUID("instanceId")&&t.getUUID("instanceId").equals(r.instanceId)
++            &&t.getInt("generation")==r.generation&&t.getString("storyId").equals(r.storyId)
++            &&t.getString("ownerEventId").equals(r.eventId)&&t.getString("spawnRole").equals(r.role)
++            &&BuiltInRegistries.ENTITY_TYPE.getKey(actor.getType()).toString().equals(r.entityType);
++    }
++    public static void capture(Entity actor,StoryActorRecord r) {
++        r.position=actor.blockPosition();r.snapshot=actor.saveWithoutId(new CompoundTag());
++        // Runtime IDs, passengers and leash references are not a durable actor identity.
++        r.snapshot.remove("UUID");r.snapshot.remove("Passengers");r.snapshot.remove("Leash");
++    }
++    public static boolean spawnPrepared(ServerLevel level,StoryActorRecord r,Entity actor) {
++        if(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED||!canonical(actor,r))return false;
++        if(!level.addFreshEntity(actor))return false;
++        r.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;tag(actor,r);capture(actor,r);
++        if(r.checkpoint.checkpoint==0)r.checkpoint.advance(1);
++        persist(level.getServer());emit(level.getServer(),r,"FACT_COMMITTED");return true;
++    }
++    /** False means unknown/unloaded, not proof of absence. Two separate loaded passes fence join queues. */
++    public static boolean storageReady(ServerLevel level,StoryActorRecord r) {
++        return level.hasChunkAt(r.position)&&level.areEntitiesLoaded(new ChunkPos(r.position).toLong());
++    }
++    public static Entity find(MinecraftServer server,UUID id) {
++        for(var level:server.getAllLevels()){var entity=level.getEntity(id);if(entity!=null)return entity;}return null;
++    }
++    public static Entity reconcile(MinecraftServer server,StoryActorRecord r) {
++        var current=find(server,r.entityId);
++        if(r.eventId.equals(CHASE)&&r.owner!=null&&r.lifecycle!=StoryActorRecord.Lifecycle.RETIRED) {
++            var e=NarrativeData.get(server).entry(r.owner);
++            // Contradictory permanent facts require diagnosis, not an endless spawn/discard loop.
++            if(e.progress.encounterComplete()||!r.entityId.equals(e.encounter))return null;
++        }
++        if(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED) {
++            if(current!=null&&canonical(current,r))current.discard();
++            if(r.eventId.equals(CHASE)&&r.checkpoint.checkpoint==3&&server.getPlayerList().getPlayer(r.owner)!=null)confirmChase(server,r);
++            return null;
++        }
++        if(current!=null) {
++            if(!canonical(current,r)||!current.level().dimension().location().toString().equals(r.dimension))return null;
++            readyPasses.computeIfAbsent(server,s->new HashMap<>()).remove(r.storyId);
++            if(r.lifecycle==StoryActorRecord.Lifecycle.PREPARED) {
++                r.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;tag(current,r);
++                if(r.checkpoint.checkpoint==0)r.checkpoint.advance(1);
++                persist(server);emit(server,r,"FACT_COMMITTED");
++            }
++            return current;
++        }
++        var passes=readyPasses.computeIfAbsent(server,s->new HashMap<>());
++        if(r.owner!=null) {
++            var p=server.getPlayerList().getPlayer(r.owner);
++            if(p==null||!p.isAlive()||!p.level().dimension().location().toString().equals(r.dimension)){passes.remove(r.storyId);return null;}
++        }
++        var level=server.getLevel(ResourceKey.create(Registries.DIMENSION,ResourceLocation.parse(r.dimension)));
++        if(level==null||!storageReady(level,r)){passes.remove(r.storyId);return null;}
++        if(passes.merge(r.storyId,1,Integer::sum)<2)return null;
++        // Only known registry types; unsupported types remain diagnosable, never substitute a different NPC.
++        var type=BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(r.entityType)).orElse(null);
++        if(type==null)return null;
++        Entity actor=type.create(level);if(actor==null)return null;
++        actor.load(r.snapshot.copy());
++        boolean clear=false;
++        for(int[] off:new int[][]{{0,0},{1,0},{-1,0},{0,1},{0,-1},{2,0},{-2,0},{0,2},{0,-2}}) {
++            var p=r.position.offset(off[0],0,off[1]);
++            if(!level.hasChunkAt(p)||!level.getFluidState(p).isEmpty()||!level.getBlockState(p.below()).isCollisionShapeFullBlock(level,p.below()))continue;
++            actor.moveTo(p.getX()+.5,p.getY(),p.getZ()+.5,actor.getYRot(),actor.getXRot());
++            if(level.noCollision(actor)&&level.isUnobstructed(actor)){clear=true;break;}
++        }
++        if(!clear)return null;
++        if(r.generation==Integer.MAX_VALUE)throw new IllegalStateException("MANUAL_DIAGNOSTIC Actor generation exhausted");
++        var previous=r.lifecycle;r.generation++;r.entityId=UUID.randomUUID();actor.setUUID(r.entityId);
++        r.lifecycle=StoryActorRecord.Lifecycle.PREPARED;tag(actor,r);capture(actor,r);
++        if(r.eventId.equals(CHASE)&&r.owner!=null)NarrativeData.get(server).entry(r.owner).encounter=r.entityId;
++        persist(server); // Fence a late entity from an OLD, unloaded chunk before introducing the replacement.
++        if(!spawnPrepared(level,r,actor))return null;
++        passes.remove(r.storyId);
++        com.mojang.logging.LogUtils.getLogger().info("EVENT_RECOVERY eventId={} previousState={} restoredCheckpoint={} reason=missing_loaded_actor entitiesRemoved=0 entitiesRecreated=1 generation={}",r.eventId,previous,r.checkpoint.checkpoint,r.generation);
++        return actor;
++    }
++    /** Legacy actor adoption happens in its tick, not while a chunk is joining. */
++    public static StoryActorRecord attach(Wayfarer actor) {
++        var level=(ServerLevel)actor.level();var server=level.getServer();var d=NarrativeData.get(server);
++        var r=d.actors.get(chaseId(actor.witness()));
++        if(r==null) {
++            var e=d.entry(actor.witness());if(e.progress.encounterComplete()||!actor.getUUID().equals(e.encounter))return null;
++            var instance=UUID.nameUUIDFromBytes(("whileaway:legacy:"+chaseId(actor.witness())).getBytes(StandardCharsets.UTF_8));
++            r=prepare(actor,chaseId(actor.witness()),CHASE,"pursuer",instance,actor.witness(),true);
++            r.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;r.checkpoint.advance(1);capture(actor,r);persist(server);
++        }
++        return canonical(actor,r)&&r.lifecycle!=StoryActorRecord.Lifecycle.RETIRED?r:null;
++    }
++    public static void checkpoint(Entity actor,StoryActorRecord r,int phase,String fact) {
++        if(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED||!canonical(actor,r))return;
++        if(fact!=null)r.facts.add(fact);
++        if(phase==r.checkpoint.checkpoint+1)r.checkpoint.advance(phase);
++        capture(actor,r);persist(((ServerLevel)actor.level()).getServer());
++        emit(((ServerLevel)actor.level()).getServer(),r,"CHECKPOINT_COMMITTED");
++    }
++    public static void suspend(Entity actor,StoryActorRecord r,String reason) {
++        if(r.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED)return;
++        r.lifecycle=StoryActorRecord.Lifecycle.SUSPENDED;r.checkpoint.suspend(reason);capture(actor,r);persist(((ServerLevel)actor.level()).getServer());
++    }
++    public static void completeChase(Wayfarer actor) {
++        var server=((ServerLevel)actor.level()).getServer();var r=attach(actor);
++        if(r==null){actor.discard();return;}
++        if(r.checkpoint.terminal())return;
++        var e=NarrativeData.get(server).entry(r.owner);
++        // Completion facts, retirement and old ticket removal are one atomic story-file write.
++        r.facts.add("encounter_complete");r.lifecycle=StoryActorRecord.Lifecycle.RETIRED;
++        while(r.checkpoint.checkpoint<3)r.checkpoint.advance(r.checkpoint.checkpoint+1);
++        e.progress=e.progress.complete();e.encounter=null;persist(server);emit(server,r,"BEFORE_COMPLETE");
++        confirmChase(server,r);actor.discard();
++    }
++    private static void confirmChase(MinecraftServer server,StoryActorRecord r) {
++        if(r.checkpoint.checkpoint!=3||!r.facts.contains("encounter_complete"))return;
++        var e=NarrativeData.get(server).entry(r.owner);e.progress=e.progress.complete();e.encounter=null;
++        r.checkpoint.advance(4);boolean notice=!r.noticeClaimed;r.noticeClaimed=true;persist(server);emit(server,r,"AFTER_COMPLETE");
++        var p=server.getPlayerList().getPlayer(r.owner);
++        if(notice&&p!=null){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
++            if(StoryConfig.MUSIC.get())StoryEvents.music(p,WhileAway.RESOLVE.get(),.45f);}
++    }
++    public static void abort(MinecraftServer server,StoryActorRecord r) {
++        r.lifecycle=StoryActorRecord.Lifecycle.RETIRED;r.checkpoint.state=EventCheckpoint.State.ABORTED;r.checkpoint.reason="operator_recovery";
++        if(r.owner!=null)NarrativeData.get(server).entry(r.owner).encounter=null;
++        persist(server);var actor=find(server,r.entityId);if(actor!=null&&canonical(actor,r))actor.discard();
++    }
++    @SubscribeEvent public void joining(EntityJoinLevelEvent event) {
++        if(!(event.getLevel() instanceof ServerLevel level))return;
++        var actor=event.getEntity();if(!actor.getPersistentData().contains(TAG))return;
++        var r=NarrativeData.get(level.getServer()).actors.get(actor.getPersistentData().getCompound(TAG).getString("storyId"));
++        // Pure metadata admission: no chunk loading, spawning or saving from a join callback.
++        if(r!=null&&(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED||!canonical(actor,r)))event.setCanceled(true);
++    }
++    @SubscribeEvent public void tick(ServerTickEvent.Post event) {
++        var server=event.getServer();if(server.getTickCount()%20!=0)return;
++        for(var r:NarrativeData.get(server).actors.values())reconcile(server,r);
++    }
++    @SubscribeEvent public void stopped(ServerStoppedEvent event){readyPasses.remove(event.getServer());}
++    public static List<String> integrity(MinecraftServer server) {
++        var result=new ArrayList<String>();var ids=new HashSet<UUID>();var d=NarrativeData.get(server);
++        for(var r:d.actors.values()) {
++            if(!ids.add(r.entityId))result.add("MANUAL_DIAGNOSTIC duplicate canonical UUID "+r.storyId);
++            var actor=find(server,r.entityId);
++            if(actor!=null&&!canonical(actor,r))result.add("MANUAL_DIAGNOSTIC actor ownership mismatch "+r.storyId);
++            if(actor!=null&&!actor.level().dimension().location().toString().equals(r.dimension))result.add("MANUAL_DIAGNOSTIC actor dimension mismatch "+r.storyId);
++            if(r.lifecycle==StoryActorRecord.Lifecycle.RETIRED&&actor!=null)result.add("SAFE_AUTO_RECOVER retired actor present "+r.storyId);
++            if(r.eventId.equals(CHASE)&&r.owner!=null) {
++                var e=d.entry(r.owner);
++                if(r.lifecycle!=StoryActorRecord.Lifecycle.RETIRED&&!r.entityId.equals(e.encounter))result.add("MANUAL_DIAGNOSTIC chase ticket mismatch "+r.storyId);
++                if(r.checkpoint.state==EventCheckpoint.State.COMPLETED&&!e.progress.encounterComplete())result.add("MANUAL_DIAGNOSTIC completion fact missing "+r.storyId);
++            }
++            if(actor==null&&r.lifecycle!=StoryActorRecord.Lifecycle.RETIRED)result.add("RECOVER_WITH_WARNING actor absent or unloaded "+r.storyId);
++        }return result;
++    }
++}
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -84,8 +84,7 @@
+             mob.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,0,0);
+             if(!level.noCollision(mob) || !level.isUnobstructed(mob))continue;
+             mob.bind(p.getUUID(),e.station);
+-            if(!level.addFreshEntity(mob))return false;
+-            e.encounter=mob.getUUID();
++            if(!StoryActors.beginChase(p,mob))return false;
+             sound(p,WhileAway.BREATH.get(),SoundSource.HOSTILE,pos,.7f);
+             p.displayClientMessage(Component.translatable("story.whileaway.arrival"),true);
+             return true;
+@@ -100,7 +99,7 @@
+                     e.scenes.values().forEach(r->c.getSource().sendSuccess(()->Component.literal(r.eventId()+" "+r.id+" "+r.progress.state+" checkpoint="+r.progress.checkpoint+" reason="+r.progress.reason),false));return 1;
+                 }))
+                 .then(Commands.literal("integrity").executes(c->{
+-                    var p=c.getSource().getPlayerOrException();var issues=SceneRecovery.integrity(NarrativeData.get(p.getServer()).entry(p.getUUID()));
++                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(SceneRecovery.integrity(NarrativeData.get(p.getServer()).entry(p.getUUID())));issues.addAll(StoryActors.integrity(p.getServer()));
+                     c.getSource().sendSuccess(()->Component.literal(issues.isEmpty()?"PASS scene integrity":String.join("; ",issues)),false);return issues.isEmpty()?1:0;
+                 })))
+             .then(Commands.literal("return").executes(c->CityTransit.leave(c.getSource().getPlayerOrException())?1:0))
+@@ -110,7 +109,12 @@
+             }))
+             .then(Commands.literal("recover").requires(s->s.hasPermission(2)).executes(c->{
+                 var p=c.getSource().getPlayerOrException();var data=NarrativeData.get(p.getServer());var e=data.entry(p.getUUID());
+-                // Operator-only recovery; remove the loaded owned entity before releasing the ticket.
++                var actorRecord=data.actors.get(StoryActors.chaseId(p.getUUID()));
++                if(actorRecord!=null) {
++                    StoryActors.reconcile(p.getServer(),actorRecord);
++                    c.getSource().sendSuccess(()->Component.literal("Actor recovery inspected: "+actorRecord.lifecycle+" checkpoint="+actorRecord.checkpoint.checkpoint+"; unloaded storage is deferred"),false);return 1;
++                }
++                // Legacy operator path; unknown/unloaded actors are not blindly recreated.
+                 if(e.encounter!=null) {
+                     var entity=p.getServer().overworld().getEntity(e.encounter);
+                     if(entity!=null)entity.discard();
+--- a/src/main/java/io/github/whileaway/StoryGameTests.java
++++ b/src/main/java/io/github/whileaway/StoryGameTests.java
+@@ -270,7 +270,7 @@
+ 
+     @GameTest(template="empty",timeoutTicks=400)
+     public static void schemaFourDiskStress(GameTestHelper h) throws Exception {
+-        var dir=java.nio.file.Path.of(System.getProperty("whileaway.reuseEvidence","../evidence/reuse"),"nbt-stress");
++        var dir=java.nio.file.Path.of(System.getProperty("whileaway.testEvidence","../evidence/lifecycle"),"nbt-stress");
+         java.nio.file.Files.createDirectories(dir);
+         var id=UUID.fromString("34567890-1234-1234-1234-123456789012");
+         int cycles=0;
+@@ -352,9 +352,9 @@
+     }
+     @GameTest(template="empty")
+     public static void actualLegacyMigrationTriplicates(GameTestHelper h) throws Exception {
+-        var dir=java.nio.file.Path.of("../evidence/reuse");int copies=0;
++        var dir=java.nio.file.Path.of(System.getProperty("whileaway.testEvidence","../evidence/lifecycle"));int copies=0;
+         for(int schema:new int[]{2,3}) {
+-            var input=net.minecraft.nbt.NbtIo.readCompressed(dir.resolve("baseline/legacy-v"+schema+".dat"),net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("data");
++            var input=net.minecraft.nbt.NbtIo.readCompressed(java.nio.file.Path.of("../evidence/reuse/baseline/legacy-v"+schema+".dat"),net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("data");
+             h.assertTrue(input.getInt("schema")==schema,"actual legacy fixture schema");
+             CompoundTag first=null;
+             for(int copy=0;copy<3;copy++) {
+@@ -373,7 +373,7 @@
+ 
+     @GameTest(template="empty")
+     public static void checkpointSaveWaitsForDurability(GameTestHelper h) throws Exception {
+-        var dir=java.nio.file.Path.of("../evidence/reuse/io-probe");java.nio.file.Files.createDirectories(dir);
++        var dir=java.nio.file.Path.of("../evidence/lifecycle/io-probe");java.nio.file.Files.createDirectories(dir);
+         var file=java.nio.file.Files.createTempFile(dir,"durability-",".dat");java.nio.file.Files.delete(file);
+         var blocked=new java.util.concurrent.CountDownLatch(1);
+         net.neoforged.neoforge.common.IOUtilities.withIOWorker(()->{try {blocked.await();}catch(InterruptedException ex){Thread.currentThread().interrupt();}});
+@@ -387,7 +387,7 @@
+ 
+     @GameTest(template="empty")
+     public static void failedCheckpointSaveRemainsDirty(GameTestHelper h) throws Exception {
+-        var root=java.nio.file.Path.of("../evidence/reuse/io-probe");java.nio.file.Files.createDirectories(root);
++        var root=java.nio.file.Path.of("../evidence/lifecycle/io-probe");java.nio.file.Files.createDirectories(root);
+         var directory=java.nio.file.Files.createTempDirectory(root,"not-a-file-");
+         var d=new NarrativeData();d.discover(new UUID(0,92),Clue.STATION);boolean failed=false;
+         try {d.save(directory.toFile(),h.getLevel().registryAccess());}catch(java.io.UncheckedIOException expected){failed=true;}
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -84,6 +84,7 @@
+         NeoForge.EVENT_BUS.register(new CityDistrict());
+         NeoForge.EVENT_BUS.register(new CityHorror());
+         NeoForge.EVENT_BUS.register(new SceneRecovery());
++        NeoForge.EVENT_BUS.register(new StoryActors());
+     }
+     private void attributes(EntityAttributeCreationEvent event) { event.put(WAYFARER.get(), Wayfarer.attributes().build()); }
+ }
+--- a/tools/ActorArchiveProbe.java
++++ b/tools/ActorArchiveProbe.java
+@@ -0,0 +1,22 @@
++import java.net.URLClassLoader;
++import java.nio.file.Path;
++import java.util.jar.JarFile;
++/** Archive identity + unchanged pure checkpoint behavior. Not a substitute for Minecraft lifecycle QA. */
++public final class ActorArchiveProbe {
++    public static void main(String[] args) throws Exception {
++        boolean expected=args[1].equals("modified");
++        try(var jar=new JarFile(args[0]);var loader=new URLClassLoader(new java.net.URL[]{Path.of(args[0]).toUri().toURL()},ClassLoader.getPlatformClassLoader())) {
++            boolean registry=jar.getEntry("io/github/whileaway/StoryActors.class")!=null;
++            boolean adapter=new String(jar.getInputStream(jar.getEntry("io/github/whileaway/entity/Wayfarer.class")).readAllBytes(),java.nio.charset.StandardCharsets.ISO_8859_1).contains("io/github/whileaway/StoryActors");
++            if(registry!=expected||adapter!=expected)throw new AssertionError("actor registry/adapter mismatch");
++            var c=loader.loadClass("io.github.whileaway.core.EventCheckpoint");var r=c.getConstructor().newInstance();
++            var restore=c.getMethod("restore",String.class,int.class,int.class,int.class);
++            restore.invoke(r,"ABORTED",4,127,0);String a=c.getField("state").get(r)+"/"+c.getField("checkpoint").get(r);
++            restore.invoke(r,"COMPLETED",2,127,0);String b=c.getField("state").get(r)+"/"+c.getField("checkpoint").get(r);
++            if(!a.equals("ABORTED/4")||!b.equals("FAILED_RECOVERABLE/2"))throw new AssertionError("checkpoint regression");
++            System.out.println("actorRegistry="+registry+" chaseAdapter="+adapter);
++            System.out.println("ABORTED/4 -> "+a+"; COMPLETED/2 -> "+b);
++            System.out.println("PASS archive="+args[1]+"; runtime lifecycle proof is separate");
++        }
++    }
++}
+--- a/tools/package-lifecycle.py
++++ b/tools/package-lifecycle.py
+@@ -0,0 +1,69 @@
++from pathlib import Path
++import hashlib,shutil,difflib,zipfile,sys,json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/lifecycle';D=R/'dist/lifecycle-work'
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++BASE=E/'baseline/previous.jar';MOD=D/'whileaway-0.3.1-lifecycle-work.jar'
++assert sha(BASE)=='9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6'
++assert sha(E/'baseline/previous-source.zip')=='9f0f464e680ce2cfdde8751777411c1bc264645ed6f70e6d195b063b7ae4e427'
++assert sha(R/'dist/stability-work/whileaway-0.3.1-stability-work.jar')==sha(BASE)
++assert sha(R/'dist/stability-work/whileaway-0.3.1-stability-work-source.zip')==sha(E/'baseline/previous-source.zip')
++source=[p for folder in ['src','tools','docs','gradle'] for p in (R/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
++source += [R/n for n in ['README.md','AGENTS.md','build.gradle','gradle.properties','settings.gradle','gradlew','gradlew.bat','.gitignore']]
++if '--prepare' in sys.argv:
++    D.mkdir(exist_ok=True);shutil.copyfile(R/'build/libs/whileaway-0.3.1-dev.1.jar',MOD)
++    changes=[]
++    with zipfile.ZipFile(E/'baseline/previous-source.zip') as old:
++        for p in sorted(source):
++            try:after=p.read_text(encoding='utf-8')
++            except UnicodeError:continue
++            rel=p.relative_to(R).as_posix();key='while-you-were-away/'+rel
++            before=old.read(key).decode('utf-8').replace('\r\n','\n') if key in old.namelist() else ''
++            changes.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+rel,tofile='b/'+rel))
++    (E/'DIFF.patch').write_text(''.join(changes),encoding='utf-8')
++    script='''#!/usr/bin/env bash
++set -euo pipefail
++# Restores only a caller-supplied JAR copy. No world file operations.
++HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
++BASE="$HERE/baseline/previous.jar"
++TARGET="${1:?Pass the modified JAR copy to restore}"
++[[ -f "$TARGET" && ! -L "$TARGET" ]] || exit 2
++[[ "$(sha256sum "$BASE" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 3
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "MOD_HASH" ]] || { echo 'ERROR preserving unexpected target'; exit 4; }
++cp -- "$BASE" "$TARGET"
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 5
++echo 'ROLLBACK PASS: stability-work JAR restored; world files untouched'
++'''.replace('BASE_HASH',sha(BASE)).replace('MOD_HASH',sha(MOD))
++    (E/'ROLLBACK.sh').write_text(script,encoding='utf-8',newline='\n')
++    with zipfile.ZipFile(BASE) as old,zipfile.ZipFile(MOD) as new:
++        names=[n for n in old.namelist() if n.startswith(('assets/','data/')) and not n.endswith('/')]
++        assert set(names)=={n for n in new.namelist() if n.startswith(('assets/','data/')) and not n.endswith('/')}
++        assert all(old.read(n)==new.read(n) for n in names)
++        classes=list((R/'build/classes/java/main').rglob('*.class'))
++        assert all(new.read(p.relative_to(R/'build/classes/java/main').as_posix())==p.read_bytes() for p in classes)
++        assert new.testzip() is None
++    (E/'ARCHIVE_PROOF.txt').write_text(f'PASS archive reopens; compiled classes match={len(classes)}; unchanged asset/data entries={len(names)}\nBASE_SHA256={sha(BASE)}\nMOD_SHA256={sha(MOD)}\n',encoding='utf-8')
++    print((E/'ARCHIVE_PROOF.txt').read_text(encoding='utf-8'));sys.exit(0)
++# Seal only after independently verified commands, runtime snapshots and rollback proof exist.
++assert 'All 48 required tests passed' in (E/'modified-tests.log').read_text(encoding='utf-8')
++assert 'PASS actor boundary snapshots=10; final client verifications=2' in (E/'FIXTURE_PROOF.txt').read_text(encoding='utf-8')
++assert json.loads((E/'transaction.json').read_text(encoding='utf-8'))['restored_hash']==sha(BASE)
++assert sha(MOD)!=sha(BASE)
++for line in (E/'RUNTIME_SOURCE.sha256').read_text(encoding='utf-8').splitlines():
++    digest,name=line.split('  ',1);assert sha(R/name)==digest,'runtime source drift: '+name
++files=source+[BASE,E/'baseline/previous-source.zip',MOD,R/'evidence/reuse/baseline/legacy-v2.dat',R/'evidence/reuse/baseline/legacy-v3.dat']+[p for p in E.rglob('*') if p.is_file() and p.suffix not in ('.jar','.zip')]
++files=list(dict.fromkeys(files));manifest=E/'SOURCE_MANIFEST.sha256'
++files=[p for p in files if p!=manifest]
++manifest.write_text(''.join(sha(p)+'  '+p.relative_to(R).as_posix()+'\n' for p in sorted(files)),encoding='utf-8')
++files.append(manifest)
++archive=D/'whileaway-0.3.1-lifecycle-work-source.zip'
++with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
++    for p in sorted(files):
++        info=zipfile.ZipInfo('while-you-were-away/'+p.relative_to(R).as_posix(),(2026,9,10,0,0,0));info.create_system=3
++        info.external_attr=(0o100755 if p.name in ('ROLLBACK.sh','gradlew') else 0o100644)<<16
++        z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED)
++with zipfile.ZipFile(archive) as z:
++    assert z.testzip() is None
++    for p in files:assert z.read('while-you-were-away/'+p.relative_to(R).as_posix())==p.read_bytes()
++for p in [MOD,E/'DIFF.patch',E/'VERIFICATION.txt',E/'ROLLBACK.sh']:assert p.read_bytes()
++(D/'SHA256SUMS.txt').write_text(sha(MOD)+'  '+MOD.name+'\n'+sha(archive)+'  '+archive.name+'\n',encoding='utf-8')
++print(f'PASS sealed working archives; source files={len(files)}; version remains 0.3.1-dev.1; overall=PARTIAL')
+--- a/tools/report-lifecycle.py
++++ b/tools/report-lifecycle.py
+@@ -0,0 +1,74 @@
++from pathlib import Path
++import json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/lifecycle';D=R/'dist/lifecycle-work'
++assert 'PASS actor boundary snapshots=10; final client verifications=2' in (E/'FIXTURE_PROOF.txt').read_text(encoding='utf-8')
++t=json.loads((E/'transaction.json').read_text(encoding='utf-8-sig'))
++paths={'MODIFIED_FILE':D/'whileaway-0.3.1-lifecycle-work.jar','DIFF_FILE':E/'DIFF.patch','VERIFICATION':E/'VERIFICATION.txt','ROLLBACK':E/'ROLLBACK.sh','SOURCE':D/'whileaway-0.3.1-lifecycle-work-source.zip'}
++report='Current: WhileAway 0.3.1 lifecycle-work / PARTIAL / NPC-composite-item-structure stabilization remains\n'
++report+='VERSION=0.3.1-dev.1; SAVE_SCHEMA=4; optional ACTOR_SCHEMA=1; ART_REVISION=2; overall=PARTIAL; no 0.3.2 promotion\n'
++report+='BASELINE_JAR_SHA256='+t['baseline_hash']+'\nMODIFIED_JAR_SHA256='+t['modified_hash']+'\nRESTORED_JAR_SHA256='+t['restored_hash']+'\n'
++report+='BASELINE_SOURCE_SHA256=9f0f464e680ce2cfdde8751777411c1bc264645ed6f70e6d195b063b7ae4e427\n'
++report+='Git state: not a Git repository; immutable archives and source manifests identify this work.\n'
++for key,p in paths.items():report+=key+'='+str(p.resolve())+'\n'
++report+='\nCHANGES AND REMAINING SCOPE\n'+(R/'docs/ACTOR_LIFECYCLE_031.md').read_text(encoding='utf-8')
++report+='\nOBSERVED COMMANDS / INPUT / OUTPUT / EXIT\n'
++report+='BASELINE command: ./gradlew.bat --offline runGameTestServer\ninput: unchanged adopted stability-work source; existing 36 Minecraft tests\noutput: All 36 required tests passed :) | BUILD SUCCESSFUL in 57s\nexit=0\n'
++report+='MODIFIED command: ./gradlew.bat --offline build runGameTestServer\ninput: frozen lifecycle-work source; 36 retained + 12 new Minecraft tests\noutput: PASS core assertions=176857 | All 48 required tests passed :) | BUILD SUCCESSFUL in 58s\nexit=0\n'
++for c in t['commands']:
++    report+='\n'+c['label']+' command: '+c['command']+'\ninput: '+c['input']+'\noutput:\n'+c['output']+'\nexit='+str(c['exit'])+'\n'
++report+='\nCLIENT COMMANDS (scripted real Minecraft client, not natural survival)\n'+(E/'runtime-commands.txt').read_text(encoding='utf-8-sig')
++for repeat in (1,2):
++    for mode in ('A','B','C','D','E','Verify'):
++        report+='\n'+(E/f'runActor{mode}{repeat}.txt').read_text(encoding='utf-8-sig')
++report+='\nThe ten intended Runtime.halt cuts report EXPECTED_FAULT_PROCESS_EXIT=-1073740791 on this Windows host; each Gradle gate exits0 only after its PASS cut marker. Next-process reload and raw NBT verification are also required and passed.\n'
++report+='Two Verify processes each checked300 ticks after E. All twelve used ten muted audio categories and narrator0 before startup. No OS volume change.\n'
++report+='Runtime uses the development classpath; the packaged JAR was independently reopened and all58 compiled classes matched it. No normal-profile installation test is claimed.\n'
++for name in ('FIXTURE_PROOF.txt','assets.txt','design.txt','mute.txt','ARCHIVE_PROOF.txt'):
++    report+='\n'+name+'\n'+(E/name).read_text(encoding='utf-8-sig')
++report+='\nFAILURES / FIXES / LIMITS\n'
++report+='Observed tooling failure: first Git Bash rollback launch exited -1073741502 (outer PowerShell1); approved execution-context retry passed all archive probes and rollback with exit0. No game gate is credited from the failed attempt.\n'
++report+='Code-review failure windows, not claimed baseline client reproductions: spawn before ticket save; old entity AI NBT behind committed hunt; spawn succeeds before B write. Changes: durable reserve, actor generation fence, encounter-only AI reconciliation, existing-canonical B finalization. New Minecraft regression tests passed.\n'
++report+='Initial A1 preflight passed on the intermediate46-test snapshot and is preserved in attempt-1 but excluded from the final12-client evidence. The final chain used frozen48-test source.\n'
++report+='NPC Villager fixtures prove lifecycle primitives only, not named NPC campaign movement/dialogue/relationships. NPC campaign and four-component composite event recovery remain NOT TESTED.\n'
++report+='Critical-item consumption/ownership and reward atomicity, essential structure fallback, permanent causal links, natural survival completion: NOT TESTED / not implemented in this slice. Notice receipt is not an item reward transaction.\n'
++report+='Actor world-copy test is object/serialization isolation only. Copied-save client independence for this new actor extension remains NOT TESTED. Previous actual copy tests covered earlier code.\n'
++report+='New chase adapter death/respawn, actual chunk travel, Nether/End roundtrips remain NOT TESTED; old seven-figures evidence is not promoted to these gates.\n'
++report+='Full actor-field corruption stress and legacy encounter tickets whose old entity is also missing remain incomplete. Live matching legacy actors are deterministically adopted. Generic NPC inventories are not an atomic item ledger.\n'
++report+='Full Story Integrity remains PARTIAL: actor/scene checks exist, item/reward/structure/exclusive-choice/causal-link checks remain.\n'
++report+='Schema1/2/3 and actor-less4 normalize deterministically. Existing450 scene disk cycles,200 actor in-memory roundtrips, and6 actual legacy2/3 fixture migrations passed in the48-test suite. These counts do not mean full campaign completion.\n'
++report+='Old published baseline JAR/source hashes unchanged; the two original legacy story NBT files were read-only verified unchanged. Only isolated new actor worlds were launched. No old city rebuilt; asset/data69 entries unchanged.\n'
++report+='ROLLBACK restored ONLY a JAR copy to stability-work. Restored archive has actorRegistry=false/chaseAdapter=false and preserved pure checkpoint behavior. The modified JAR remains changed. Save downgrade is neither supported nor verified.\n'
++report+='Reporting tool first-write SyntaxError from nested string delimiters was corrected before execution; it did not run or alter production source.\n'
++gates='''# 0.3.1 lifecycle-work quality gates — overall PARTIAL
++
++| 항목 | 결과 | 실제 방법 | 횟수 | 경계 |
++|---|---|---|---:|---|
++| 기준본 회귀 | PASS | Minecraft GameTest | 36 / 1회 | 기존 stability-work |
++| 수정본 서버 회귀 | PASS | Minecraft 서버 GameTest | 48 / 1회 | 기존36 + 신규12 |
++| 추격 A/B/C/D/E | PASS | 무음 실제 클라이언트 강제 종료/다음 JVM 재개 | 각2회, 총10컷 | 실제 Wayfarer AI; 테스트용 이동/시작 |
++| E 이후 재접속 | PASS | 300tick 완료 안정성/등록 actor 제거/무결성 | 2회 | 같은 소스, 서로 다른 새 월드 |
++| NPC lifecycle 기초 | PASS | Villager 서버 fixture | 신규12개 검사 묶음에 포함 | 실제 캠페인 NPC 사건 아님 |
++| NPC 중심 캠페인 사건 | NOT TESTED | 실제 캠페인 미연결 | 0 | 대화/관계/독립 행동 미완성 |
++| 복합 캠페인 사건 | NOT TESTED | 4요소 이상 사건 미구현 | 0 | 별도 gate |
++| 기존 scene 저장 스트레스 | PASS | NBT 디스크 쓰기/읽기 | 450회 | 3종 x5경계 x30 |
++| actor 저장 정규화 | PASS | NBT 메모리 roundtrip | 200회 | 5경계 x40; 디스크 crash 아님 |
++| 실제 구형 NBT migration | PASS | 보존 복사본의 결정적 변환 | 6개 | 형식2/3 각3개 |
++| 신규 actor 월드 복사 | PARTIAL | object/serialization 분리 | 1개 테스트 | 실제 세이브 복사 클라이언트 미검증 |
++| 신규 actor 사망/청크/차원 예외 | NOT TESTED | 신규 adapter 실제 클라이언트 미실행 | 0 | 옛 seven 사건 증거와 분리 |
++| 중요 아이템/보상 트랜잭션 | NOT TESTED | 미구현 | 0 | 알림 중복 억제와 구분 |
++| 필수 구조물 fallback | NOT TESTED | 미구현 | 0 | actor 위치9점 탐색과 구분 |
++| 영구 인과 연결 토큰 | NOT TESTED | 미구현 | 0 | SceneAck lease와 구분 |
++| 전체 Story Integrity | PARTIAL | actor/scene 일부 검사 | 클라이언트2회 포함 | 아이템/보상/구조물/선택 전체 검사 남음 |
++| 자연 생존 전체 진행 | NOT TESTED | 이번 client는 scripted fixture | 0 | 생존 QA 남음 |
++| 아트/리소스 보존 | PASS | 기존 JAR와 byte 비교 | 69 entries | 도시 revision2 유지 |
++| 자산 계약 | PASS | archive/resource 검사 | 6704 assertions | 새 아트 없음 |
++| 설계 계약 | PASS | 요구사항/임시자산/떡밥 등록 확인 | 49 / 6 / 2 | 완성 콘텐츠 수 아님 |
++| JAR 롤백 | PASS | 복사본 hash 및 archive/순수 checkpoint 검사 | 성공1회 | 세이브 downgrade 미지원 |
++
++다음 첫 작업: 신규 adapter의 사망/청크/차원/복사 클라이언트 검증 및 손상 필드/옛 누락 티켓 진단을 보강한다. 그 뒤 실제 NPC와 4요소 이상 복합 사건 A/B/C/D/E, 아이템/보상 트랜잭션, 필수 구조물 fallback을 구현/검증한다. 이전 실제 클라이언트 시나리오를 새 코드로 회귀하고 자연 생존 진행을 확인한다. 요구된 gate 묶음 전에는0.3.2 및 전체 PASS로 승격하지 않는다.
++
++다음 작업본: dist/lifecycle-work JAR/source.zip. dist/stability-work는 계속 immutable baseline. 최종 아트는 보류한다.
++'''
++(E/'GATES.md').write_text(gates,encoding='utf-8');report+='\n'+gates
++(E/'VERIFICATION.txt').write_text(report,encoding='utf-8')
++print('PASS lifecycle report generated from verified runtime and rollback evidence; overall remains PARTIAL')
+--- a/tools/run-actor-boundaries.ps1
++++ b/tools/run-actor-boundaries.ps1
+@@ -0,0 +1,17 @@
++param([int[]]$Repetitions=@(1,2))
++$ErrorActionPreference='Stop'
++$root=Split-Path -Parent $PSScriptRoot;Set-Location $root
++$env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot'
++$env:GRADLE_USER_HOME=(Resolve-Path ../../work/gradle-home).Path
++foreach($repeat in $Repetitions){
++    if($repeat -notin @(1,2)){throw 'Unexpected fixture repetition'}
++    foreach($boundary in @('A','B','C','D','E','Verify')) {
++        $task="runActor${boundary}${repeat}"
++        & ./gradlew.bat --offline $task *> "evidence/lifecycle/$task.log"
++        $rc=$LASTEXITCODE
++        Add-Content evidence/lifecycle/runtime-commands.txt "./gradlew.bat --offline $task | input=isolated actor fixture $repeat / $boundary | exit=$rc"
++        Write-Output "$task exit=$rc"
++        if($rc -ne 0){Get-Content "evidence/lifecycle/$task.log" -Tail 50;throw "$task failed"}
++        if(!(Get-Content "evidence/lifecycle/$task.txt" -Raw).Contains("PASS $task")){throw 'Missing cut/completion marker'}
++    }
++}
+--- a/tools/verify-actor-evidence.py
++++ b/tools/verify-actor-evidence.py
+@@ -0,0 +1,40 @@
++from pathlib import Path
++import importlib.util,hashlib,json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/lifecycle'
++spec=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py');nbt=importlib.util.module_from_spec(spec);spec.loader.exec_module(nbt)
++count=0
++for repeat in (1,2):
++    identity=None;generation=-1
++    for cp,mode in enumerate(('A','B','C','D','E')):
++        task=f'runActor{mode}{repeat}'
++        assert f'PASS {task}' in (E/f'{task}.txt').read_text(encoding='utf-8')
++        log=(E/f'{task}.log').read_text(encoding='utf-8')
++        assert 'BUILD SUCCESSFUL' in log and 'VERIFIED MUTED before actor client launch' in log and 'EXPECTED_FAULT_PROCESS_EXIT=' in log
++        root=nbt.read(E/f'snapshots/actor-{repeat}-{mode}.dat')['data']
++        assert root['schema']==4 and root['actorSchema']==1
++        actors=root['actors'];assert len(actors)==1
++        actor=actors[0];assert actor['ownerEventId']=='wayfarer_first' and actor['spawnRole']=='pursuer'
++        assert actor['checkpoint']==cp
++        if identity is None:identity=actor['instanceId']
++        assert actor['instanceId']==identity and actor['generation']>=generation;generation=actor['generation']
++        p=next(p for p in root['players'] if p['id']==actor['owner'])
++        if cp<3:assert p['encounter']==actor['entityUUID'] and not p['complete']
++        else:assert 'encounter' not in p and p['complete'] and actor['lifecycleState']=='RETIRED' and 'encounter_complete' in actor['facts']
++        if cp>=2:assert 'pursuit_started' in actor['facts'] and actor['snapshot']['Hunting']
++        if cp==4:assert actor['state']=='COMPLETED' and actor['noticeClaimed']
++        count+=1
++    task=f'runActorVerify{repeat}'
++    assert f'PASS {task} completed state stable 300 ticks' in (E/f'{task}.txt').read_text(encoding='utf-8')
++    assert 'BUILD SUCCESSFUL' in (E/f'{task}.log').read_text(encoding='utf-8')
++# Frozen runtime source equality, before and after the twelve JVMs.
++for line in (E/'RUNTIME_SOURCE.sha256').read_text(encoding='utf-8').splitlines():
++    digest,name=line.split('  ',1);assert hashlib.sha256((R/name).read_bytes()).hexdigest()==digest,name
++# Read-only check of previously tested original legacy story files.
++legacy=json.loads((R/'evidence/reuse/legacy-originals.json').read_text(encoding='utf-8-sig'))
++for row in legacy:
++    assert hashlib.sha256(Path(row['source']).read_bytes()).hexdigest()==row['sha256']
++# Retained baseline archives have not been republished in place.
++for name,digest in [('whileaway-0.3.1-stability-work.jar','9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6'),('whileaway-0.3.1-stability-work-source.zip','9f0f464e680ce2cfdde8751777411c1bc264645ed6f70e6d195b063b7ae4e427')]:
++    assert hashlib.sha256((R/'dist/stability-work'/name).read_bytes()).hexdigest()==digest
++result=f'PASS actor boundary snapshots={count}; final client verifications=2\nPASS frozen runtime source; original legacy story files=2 unchanged; baseline archives=2 unchanged\n'
++(E/'FIXTURE_PROOF.txt').write_text(result,encoding='utf-8');print(result)
+--- a/tools/verify-lifecycle-transaction.ps1
++++ b/tools/verify-lifecycle-transaction.ps1
+@@ -0,0 +1,29 @@
++$ErrorActionPreference='Stop'
++$root=Split-Path -Parent $PSScriptRoot; Set-Location $root
++$java='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe'
++$javac='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\javac.exe'
++$e=Join-Path $root 'evidence/lifecycle'; $base=Join-Path $e 'baseline/previous.jar'
++$mod=Join-Path $root 'dist/lifecycle-work/whileaway-0.3.1-lifecycle-work.jar'
++New-Item -ItemType Directory -Force build/actor-probe,build/rollback-lifecycle | Out-Null
++& $javac -encoding UTF-8 -d build/actor-probe tools/ActorArchiveProbe.java
++if($LASTEXITCODE -ne 0){throw 'Probe compilation failed'}
++$commands=@()
++foreach($label in @('BASELINE','MODIFIED')){
++    $file=if($label -eq 'BASELINE'){$base}else{$mod};$mode=$label.ToLower()
++    $result=& $java -cp build/actor-probe ActorArchiveProbe $file $mode 2>&1
++    $rc=$LASTEXITCODE
++    $commands+=@{label=$label;command="java -cp build/actor-probe ActorArchiveProbe `"$file`" $mode";input='actor registry/adapter presence; ABORTED/4; COMPLETED/2';output=($result -join "`n");exit=$rc}
++    if($rc -ne 0){throw "$label probe failed"}
++}
++$target=Join-Path $root 'build/rollback-lifecycle/test.jar';Copy-Item -LiteralPath $mod -Destination $target
++& 'C:\Program Files\Git\bin\bash.exe' -lc 'chmod +x evidence/lifecycle/ROLLBACK.sh && test -x evidence/lifecycle/ROLLBACK.sh && evidence/lifecycle/ROLLBACK.sh build/rollback-lifecycle/test.jar' 2>&1 | Set-Content "$e/rollback-output.txt" -Encoding utf8
++$rc=$LASTEXITCODE
++if($rc -ne 0){throw "Rollback failed $rc"}
++$commands+=@{label='ROLLBACK';command='bash -lc "chmod +x evidence/lifecycle/ROLLBACK.sh && test -x evidence/lifecycle/ROLLBACK.sh && evidence/lifecycle/ROLLBACK.sh build/rollback-lifecycle/test.jar"';input=$target;output=(Get-Content "$e/rollback-output.txt" -Raw).Trim();exit=$rc}
++$result=& $java -cp build/actor-probe ActorArchiveProbe $target baseline 2>&1;$rc=$LASTEXITCODE
++$commands+=@{label='RESTORED';command='java -cp build/actor-probe ActorArchiveProbe build/rollback-lifecycle/test.jar baseline';input='actor registry/adapter presence; ABORTED/4; COMPLETED/2';output=($result -join "`n");exit=$rc}
++if($rc -ne 0){throw 'Restored behavior mismatch'}
++$restored=(Get-FileHash $target).Hash.ToLower();$original=(Get-FileHash $base).Hash.ToLower();$changed=(Get-FileHash $mod).Hash.ToLower()
++if($restored -ne $original -or $changed -eq $original){throw 'Rollback hash mismatch or modified file no longer changed'}
++@{commands=$commands;baseline_hash=$original;modified_hash=$changed;restored_hash=$restored;world_operations='none'} | ConvertTo-Json -Depth 5 | Set-Content "$e/transaction.json" -Encoding utf8
++$commands | ForEach-Object { Write-Output ($_.label+': '+$_.output+'; exit='+$_.exit) }

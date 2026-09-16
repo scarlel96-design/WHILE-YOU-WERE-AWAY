@@ -1,0 +1,5 @@
+{"mode": "Control", "command": "./gradlew.bat --offline runLoadGuardControl", "pid": 51684, "processExited": true, "exit": 0, "seconds": 59.52676558494568, "pass": true}
+{"mode": "Recover", "command": "./gradlew.bat --offline runLoadGuardRecover", "pid": 53832, "processExited": true, "exit": 0, "seconds": 54.99152064323425, "pass": true}
+{"mode": "RecoverReload", "command": "./gradlew.bat --offline runLoadGuardRecoverReload", "pid": 53676, "processExited": true, "exit": 0, "seconds": 64.74621176719666, "pass": true}
+{"mode": "Blocked", "command": "./gradlew.bat --offline runLoadGuardBlocked", "pid": 56192, "processExited": true, "exit": 0, "seconds": 48.827725648880005, "pass": true}
+{"mode": "Unsupported", "command": "./gradlew.bat --offline runLoadGuardUnsupported", "pid": 34932, "processExited": true, "exit": 0, "seconds": 45.51668119430542, "pass": true}

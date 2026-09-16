@@ -1,0 +1,14 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=56796
+PASS death_respawn keepInventory=false checkpoint=1 generation=0
+PASS death_respawn keepInventory=true checkpoint=2 generation=0
+CHUNKS before HOME=[64, 64] snapshot=[65, 64] live=[65, 64] player=[64, 64]
+PASS actual_chunk_unloaded HOME=[64, 64] snapshot=[65, 64] last_live=[65, 64] all hasChunk=false entitiesLoaded=false; canonical_absent=true; player=[320, 320] loaded=true; held_ticks=100 generation=0
+PASS return scenario=1 canonical_count=1 same UUID/instance/generation/checkpoint
+CHUNKS before HOME=[64, 64] snapshot=[65, 64] live=[65, 64] player=[64, 64]
+PASS dimension_absence=Nether generation=0
+PASS return scenario=2 canonical_count=1 same UUID/instance/generation/checkpoint
+CHUNKS before HOME=[64, 64] snapshot=[65, 64] live=[65, 64] player=[64, 64]
+PASS dimension_absence=End generation=0
+PASS return scenario=3 canonical_count=1 same UUID/instance/generation/checkpoint
+PASS runActorExceptionsSeed1 checkpoint=2 generation=0 instance=2e0f4d9a-f9b1-4ca0-b178-658738c5fa8a actor=7c11663a-22b2-4155-8a11-fe14c2c4f91d

@@ -1,0 +1,8 @@
+RUNNING
+PASS locked access and partial construction cursor round-trip
+PASS actual server transfer to quiet_city; cells=20988
+CAPTURE city-street.png
+PASS three book interactions and return to original overworld position
+CAPTURE city-overview.png
+PASS reentry preserves player edits
+PASS runCitySmoke

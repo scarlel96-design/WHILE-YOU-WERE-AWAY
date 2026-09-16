@@ -1,0 +1,36 @@
+{
+  "restored_hash": "90085cc811858d41865c5a9973acdef8e8cc69ac560a5c80120ded378da59da1",
+  "commands": [
+    {
+      "label": "BASELINE",
+      "output": "ABORTED/4 -> COMPLETED/4\nCOMPLETED/2 -> COMPLETED/4\nPASS archive behavior=baseline",
+      "command": "java -cp build/reuse-probe CheckpointProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\reuse\\baseline\\previous.jar\" baseline",
+      "exit": 0,
+      "input": "ABORTED/4; COMPLETED/2"
+    },
+    {
+      "label": "MODIFIED",
+      "output": "ABORTED/4 -> ABORTED/4\nCOMPLETED/2 -> FAILED_RECOVERABLE/2\nPASS archive behavior=modified",
+      "command": "java -cp build/reuse-probe CheckpointProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\stability-work\\whileaway-0.3.1-stability-work.jar\" modified",
+      "exit": 0,
+      "input": "ABORTED/4; COMPLETED/2"
+    },
+    {
+      "label": "ROLLBACK",
+      "output": "ROLLBACK PASS: adopted 0.3.1 JAR restored; world files untouched",
+      "command": "bash -lc \"chmod +x evidence/reuse/ROLLBACK.sh && test -x evidence/reuse/ROLLBACK.sh && evidence/reuse/ROLLBACK.sh build/rollback-reuse/test.jar\"",
+      "exit": 0,
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-reuse\\test.jar"
+    },
+    {
+      "label": "RESTORED",
+      "output": "ABORTED/4 -> COMPLETED/4\nCOMPLETED/2 -> COMPLETED/4\nPASS archive behavior=baseline",
+      "command": "java -cp build/reuse-probe CheckpointProbe build/rollback-reuse/test.jar baseline",
+      "exit": 0,
+      "input": "ABORTED/4; COMPLETED/2"
+    }
+  ],
+  "modified_hash": "9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6",
+  "baseline_hash": "90085cc811858d41865c5a9973acdef8e8cc69ac560a5c80120ded378da59da1",
+  "world_operations": "none"
+}

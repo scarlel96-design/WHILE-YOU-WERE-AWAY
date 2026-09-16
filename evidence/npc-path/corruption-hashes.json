@@ -1,0 +1,26 @@
+[
+  {
+    "mode": "MissingHome",
+    "original": "49a13723964f359cc733a218972f0a01bf8f8fd7d2fa9dfb48c059a74f209573",
+    "quarantine": "49a13723964f359cc733a218972f0a01bf8f8fd7d2fa9dfb48c059a74f209573",
+    "after": "49a13723964f359cc733a218972f0a01bf8f8fd7d2fa9dfb48c059a74f209573"
+  },
+  {
+    "mode": "MissingExperience",
+    "original": "b41a6dda9ab2a9710786e12407ec9b8b9d54c1f9f1679c3f3d1885d1af2104ca",
+    "quarantine": "b41a6dda9ab2a9710786e12407ec9b8b9d54c1f9f1679c3f3d1885d1af2104ca",
+    "after": "b41a6dda9ab2a9710786e12407ec9b8b9d54c1f9f1679c3f3d1885d1af2104ca"
+  },
+  {
+    "mode": "WrongWork",
+    "original": "2667a483cf38971ad9611420f9cc19cfd0a9fd9c19bae4e522530c66d8cfc92b",
+    "quarantine": "2667a483cf38971ad9611420f9cc19cfd0a9fd9c19bae4e522530c66d8cfc92b",
+    "after": "2667a483cf38971ad9611420f9cc19cfd0a9fd9c19bae4e522530c66d8cfc92b"
+  },
+  {
+    "mode": "Recover",
+    "original": "e5a60fbd0dcaf70695115fc1ed1c8fcf9eb84c7de632b9032159274aa9daf9cd",
+    "quarantine": "e5a60fbd0dcaf70695115fc1ed1c8fcf9eb84c7de632b9032159274aa9daf9cd",
+    "after": "3a29882eb5f0ef69e18099520a02513b252aa8ce26eec67041ded358f8e210f5"
+  }
+]

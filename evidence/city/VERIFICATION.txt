@@ -1,0 +1,86 @@
+WHILEAWAY 0.2.0-dev.1 / CITY SLICE / 2026-09-09
+Changed fields: mod_version 0.1.0-dev.1 -> 0.2.0-dev.1; NarrativeData.SCHEMA 1 -> 2;
+new quiet_city dimension; relay lit flag and conditional city entry; persistent city cursor/return position/records.
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\whileaway-0.2.0-dev.1.jar
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\city\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\city\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\city\ROLLBACK.sh
+BASELINE_SHA256=3a3d083731506450772d247f2a6df4bd0126db173c9b75f169b2a23e0902e49b
+MODIFIED_SHA256=70ea359aa99044c542379fbc95a1d204d884446e9891db281e9bfa22a881848e
+Working directory=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+
+BASELINE
+COMMAND: python .\tools\probe-release.py .\evidence\city\baseline\whileaway-0.1.0-dev.1.jar 0.1.0-dev.1
+INPUT: JAR=.\evidence\city\baseline\whileaway-0.1.0-dev.1.jar; expected version=0.1.0-dev.1
+LITERAL OUTPUT: version=0.1.0-dev.1; city_dimension=false
+EXIT STATUS: 0
+
+MODIFIED
+COMMAND: python .\tools\probe-release.py .\dist\whileaway-0.2.0-dev.1.jar 0.2.0-dev.1
+INPUT: JAR=.\dist\whileaway-0.2.0-dev.1.jar; expected version=0.2.0-dev.1
+LITERAL OUTPUT: version=0.2.0-dev.1; city_dimension=true
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: & 'C:\Program Files\Git\bin\bash.exe' -c 'chmod +x evidence/city/ROLLBACK.sh && test -x evidence/city/ROLLBACK.sh && evidence/city/ROLLBACK.sh build/rollback-city/whileaway.jar'
+INPUT: build/rollback-city/whileaway.jar (modified copy)
+LITERAL OUTPUT: ROLLBACK PASS: 0.1 JAR hash restored; world files untouched
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: python .\tools\probe-release.py .\build\rollback-city\whileaway.jar 0.1.0-dev.1
+INPUT: JAR=.\build\rollback-city\whileaway.jar; expected version=0.1.0-dev.1
+LITERAL OUTPUT: version=0.1.0-dev.1; city_dimension=false
+EXIT STATUS: 0
+
+Restored copy: version=0.1.0-dev.1; city_dimension=false; baseline SHA256 equal.
+Retained modified release: version=0.2.0-dev.1; city_dimension=true; modified SHA256 unchanged.
+ROLLBACK.sh was executed with Git Bash and test -x. It restores a JAR COPY only, not sources or save data.
+Do not interpret this as a schema-2 world downgrade test. Existing worlds were not downgraded.
+
+COMMAND: .\gradlew.bat build runGameTestServer runCitySmoke runCityReload --console=plain
+INPUT: Java 21 / Minecraft 1.21.1 / NeoForge 21.1.249 / GeckoLib 4.9.2; isolated seed 74192361 world.
+LITERAL OUTPUT: All 15 required tests passed :)
+LITERAL OUTPUT: PASS runCitySmoke
+LITERAL OUTPUT: PASS runCityReload
+BUILD SUCCESSFUL in 2m 20s
+EXIT STATUS: 0
+Full runtime log=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\city\runtime-final.log
+
+COMMAND: & .\tools\test-core.ps1
+INPUT: Pure Java core, 20988 cell layout and route reachability
+LITERAL OUTPUT: PASS core assertions=43604
+EXIT STATUS: 0
+
+COMMAND: python tools\verify-assets.py build\libs\whileaway-0.2.0-dev.1.jar
+INPUT: Mod resources, native localization reference and compiled JAR
+LITERAL OUTPUT: PASS asset assertions=6699; station/animation/localization/OGG/JAR
+EXIT STATUS: 0
+
+COMMAND: pwsh -NoProfile -File tools\verify-mute.ps1 -OptionsPath ..\..\work\city-smoke\options.txt
+INPUT: Isolated city client options file
+LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT STATUS: 0
+
+RUNNING
+PASS locked access and partial construction cursor round-trip
+PASS actual server transfer to quiet_city; cells=20988
+CAPTURE city-street.png
+PASS three book interactions and return to original overworld position
+CAPTURE city-overview.png
+PASS reentry preserves player edits
+PASS runCitySmoke
+
+RUNNING
+INFO isolated smoke world backup confirmed
+PASS disk reload: player dimension, return point, 3 records, construction completion and player edit preserved
+PASS return after process restart
+CAPTURE city-reloaded.png
+PASS runCityReload
+
+VISUAL REVIEW: city-street.png, city-overview.png, city-reloaded.png inspected. Prototype block architecture, not final art.
+ACTUAL CLIENT: real integrated server transfer, three book-use calls, return, reentry and second-process disk reload.
+NOT TESTED: two simultaneous clients, death/respawn playthrough, full natural survival quest, listening quality, modpack/shader compatibility, crash-atomic persistence.
+Full city campaign / additional city monsters / multiple endings: NOT IMPLEMENTED in this slice.
+First server test mistakenly expected a custom level in vanilla GameTestServer; test responsibilities corrected after source inspection.
+First reload waited on experimental-world backup confirmation and timed out; harness now confirms backup only for its named isolated test save.

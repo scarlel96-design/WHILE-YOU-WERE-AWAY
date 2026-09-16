@@ -1,0 +1,1 @@
+Usage-aware safe pause at 5h89%, weekly76%; finish current build and package only; no new client; no shutdown.

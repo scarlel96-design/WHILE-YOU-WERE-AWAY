@@ -1,0 +1,19 @@
+{
+  "changedExistingClasses": [
+    "io/github/whileaway/NpcEnvironment$Assessment.class",
+    "io/github/whileaway/NpcEnvironment$Path.class",
+    "io/github/whileaway/NpcEnvironment$Residence.class",
+    "io/github/whileaway/NpcEnvironment.class",
+    "io/github/whileaway/NpcEnvironmentGameTests.class",
+    "io/github/whileaway/NpcEvents.class",
+    "io/github/whileaway/StoryGameTests.class",
+    "io/github/whileaway/entity/StoryNpc.class"
+  ],
+  "newClasses": [
+    "io/github/whileaway/NpcNavigation.class",
+    "io/github/whileaway/client/NpcCorruptionSmoke.class",
+    "io/github/whileaway/client/NpcEnvironmentSmoke.class",
+    "io/github/whileaway/core/NpcPathBudget.class"
+  ],
+  "unchangedArtEntries": 102
+}

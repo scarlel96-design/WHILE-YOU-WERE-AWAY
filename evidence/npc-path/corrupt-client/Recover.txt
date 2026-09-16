@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=47532
+PASS load STORY_LOAD outcome=RECOVERABLE_CORRUPTION recovery=RECOVER_WITH_WARNING saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_RECOVERED storyId=npc:yeoul eventId=yeoul_return_light instanceId=1ce8a937-ad13-43c7-a5ab-aa852217fb3d generation=0 field=snapshot.Motion restored_stationary_runtime_default
+PASS Recover connectedClient=true liveNPC=1 identityUnchanged=true generation=0 checkpoint=4 saveDispatches=3 writeBlocked=false originalHash=e5a60fbd0dcaf70695115fc1ed1c8fcf9eb84c7de632b9032159274aa9daf9cd finalHash=3a29882eb5f0ef69e18099520a02513b252aa8ce26eec67041ded358f8e210f5 emptyCampaignReturned=false heldTicks=100

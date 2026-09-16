@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=42380
+DEATH boundary=NPC_D_BEFORE_COMPLETE checkpoint=3 keepInventory=false uuid=efea36e3-cba5-48b0-8cfe-b8c856eb1c51 generation=0
+PASS remote_respawn checkpoint=3 heldTicks=120 same identity/facts; keepInventory=false diamonds=0
+PASS Death4Off canonical=1 checkpoint=4 generation=0 uuid=efea36e3-cba5-48b0-8cfe-b8c856eb1c51 instance=752b88dd-57fd-4540-b770-f90bd52dd661 dimension=whileaway:quiet_city work=maintain_return_light stableTicks=100

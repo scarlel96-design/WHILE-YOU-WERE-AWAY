@@ -1,0 +1,2 @@
+9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6  whileaway-0.3.1-stability-work.jar
+9f0f464e680ce2cfdde8751777411c1bc264645ed6f70e6d195b063b7ae4e427  whileaway-0.3.1-stability-work-source.zip

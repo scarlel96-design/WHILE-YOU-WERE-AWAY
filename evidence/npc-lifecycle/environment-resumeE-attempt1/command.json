@@ -1,0 +1,9 @@
+{
+  "mode": "ResumeE",
+  "command": "./gradlew.bat --offline runNpcResumeE",
+  "exit": 1,
+  "pid": 0,
+  "processExited": false,
+  "seconds": 108.18367028236389,
+  "pass": false
+}

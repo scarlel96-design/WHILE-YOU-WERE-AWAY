@@ -1,0 +1,11 @@
+{
+  "version": "0.3.1-dev.1",
+  "work_name": "stability-work",
+  "schema": 4,
+  "art_revision": 2,
+  "checkpoint_revision": "durable-write-barrier and investigation read reservations; identified by source SHA, no prior numeric revision",
+  "minecraft_tests": 36,
+  "source_sha256": "9f0f464e680ce2cfdde8751777411c1bc264645ed6f70e6d195b063b7ae4e427",
+  "jar_sha256": "9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6",
+  "overall": "PARTIAL"
+}

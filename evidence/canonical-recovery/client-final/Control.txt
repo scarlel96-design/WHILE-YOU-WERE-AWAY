@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=43708
+PASS load STORY_LOAD outcome=LOADED recovery=SAFE_AUTO_RECOVER saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_OK
+PASS Control canonical=1 sameUUID=true generation=0 checkpoint=2 stableTicks=100 integrity=clean

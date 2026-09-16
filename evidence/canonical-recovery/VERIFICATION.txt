@@ -1,0 +1,619 @@
+# 0.3.1 canonical-recovery — implementation and verification contract
+
+Current: 《네가 없는 동안》 0.3.1-dev.1 / canonical-recovery / campaign PARTIAL
+
+This document describes implemented behavior. Final gate results are generated from the current logs in VERIFICATION.txt; no count in a historical report is reused as current execution evidence.
+
+## Immutable adopted baseline
+
+- dist/load-guard/whileaway-0.3.1-load-guard.jar
+- SHA-256 a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03
+- dist/load-guard/whileaway-0.3.1-load-guard-source.zip
+- SHA-256 c5d0161e2f436dcd8cb6c10e4654c84656e5a91cf1b96991c19907e8aa1f38b0
+- Byte-identical copies: evidence/canonical-recovery/baseline/previous.jar and previous-source.zip.
+- Minecraft 1.21.1, NeoForge 21.1.249, Java 21.0.5; save format 4, optional actorSchema 1, city art revision 2; no 0.3.2.
+
+## Canonical identity and load boundary
+
+ActorCandidates.identity checks storyId, eventId, instanceId, generation (including NBT integer presence), and role. The candidate query separately checks entity type, dimension, supported lifecycle, and Wayfarer witness. Position/Motion/health never establish identity. The query enumerates currently loaded entities, never force-loads a chunk, and requires registered-position and snapshot-position terrain and entity storage to be ready.
+
+Outcomes: NO_CANDIDATE, EXACT_SINGLE_CANDIDATE, AMBIGUOUS_MULTIPLE_CANDIDATES, STALE_GENERATION_ONLY, UNLOADED_OR_UNCONFIRMED, IDENTITY_CONFLICT. No nearest/first/UUID-sorted winner exists.
+
+CanonicalRecovery attempts missing entityUUID repair only for the currently supported Wayfarer event adapter with a surviving, consistent player encounter ticket. A malformed UUID is still blocked. A valid ticket is used only to construct a private preflight draft; the same strict StoryStorage validator must accept the full data. The draft is not installed in DimensionDataStorage or returned to gameplay. Generation never comes from snapshot tags.
+
+Each missing binding must then have exactly one live candidate with the full identity and the same UUID as the event ticket. Two distinct server-tick observations must agree and both tracked chunks must have completed entity loading. Multiple candidates or identity conflicts latch MANUAL_DIAGNOSTIC for that server session. No candidate or unconfirmed chunks remain blocked without spawning or incrementing generation.
+
+The original hash is checked again before strict final parsing and commit. Original-byte quarantine is verified before guarded atomic write; only then is the recovered data registered. A new process must load the repaired file through LOADED and retain UUID/instance/generation/checkpoint/facts.
+
+StoryStorage preserves ABSENT/LOADED/RECOVERABLE_CORRUPTION/CORRUPT/UNSUPPORTED. ABSENT is the only public new-campaign path. The internal recovery path refuses missing/replaced source files and registered/poisoned live data. Runtime conflicts poison the existing NarrativeData write guard.
+
+## Loading entities without running a broken story
+
+StoryStorage.available checks the real loader; it never supplies substitute data. Story event ticks, scene ticks, city generation/horror, station tick, relevant item/block interactions and city travel pause when blocked. Wayfarer skips AI/tick progression and completion while blocked. Tagged entities may finish deserialization as recovery evidence; they are not activated as story actors before recovery succeeds.
+
+This is a narrow story activation gate, not a promise that every third-party mod or every developer command operates normally in a corrupted world. A poisoned registered SavedData can throw during saveEverything; that failure is intentional and must preserve its previous file. Load-rejected data is never registered and unrelated vanilla save dispatch can proceed.
+
+## Generation reservation, binding, and crash boundaries
+
+The existing PREPARED + generation + entityUUID + event encounter ticket already expresses a durable spawn reservation. No second large journal was added. The defect was retrying that reservation by allocating yet another generation/UUID. PREPARED retries now reuse both, including after owner absence. A non-PREPARED replacement is allowed only after valid dimension, tracked chunk/entity-storage readiness, missing recorded UUID, no exact candidate/conflict, and the loaded reconciliation checks.
+
+Replacement sequence:
+
+1. Confirm missing within the tracked/loaded evidence scope; verify type and a collision-free placement without editing blocks.
+2. Boundary 1: before generation reservation.
+3. Increment generation once; reserve a UUID; set PREPARED; update the event ticket; persist synchronously.
+4. Boundary 2: reservation saved. Old generations are fenced on join.
+5. Spawn using that reserved UUID, not a newly assigned binding UUID.
+6. Boundary 3: entity added, live binding not yet verified.
+7. Verify canonical identity and observe/bind the preallocated UUID.
+8. Boundary 4: memory binding verified, durable active binding not committed.
+9. Flush Minecraft entity/world storage while the story is still PREPARED. This rare recovery flush is not performed every tick.
+10. Set ACTIVE, capture runtime, persist binding. Boundary 5.
+11. Restore Wayfarer runtime from checkpoint facts without resetting health/inventory/world blocks. Boundary 6.
+12. Verify a single canonical candidate and confirm recovery. Story checkpoint/facts do not advance except the existing initial checkpoint-0 spawn rule.
+
+The UUID in PREPARED is a reservation, not proof that an entity exists. At boundaries 3/4 the test deliberately flushes the real entity while leaving the story PREPARED to exercise the dangerous existing-entity/unconfirmed-binding branch. The six cut runs are paired with separate resume processes and disk checks, not inferred from the older A/B/C/D/E suite.
+
+The exact Minecraft entity-storage API was inspected locally: processPendingLoads adds deserialized entities before setting ChunkLoadStatus.LOADED; areEntitiesLoaded tests that status; saveAll flushes permanent entity storage. Evidence: entity-storage-api.txt. The loaded query is not an exhaustive disk search of every unexplored chunk. Late entities outside the tracked positions are subject to the persistent generation fence and conflict guard, not silently adopted.
+
+## Late stale entities and same-generation duplicates
+
+Joining known older-family generations is canceled before AI or event ownership. Retired actor joins are also canceled. A conflicting same-generation UUID instead blocks story writes and retains evidence rather than choosing a winner. Other noncanonical identity conflicts block rather than silently becoming a replacement.
+
+The late-load fixture is written offline to a separate copied world's entity region at chunk (600,600), using Minecraft RegionFile/NBT APIs. Its generation-0 actor is then actually deserialized when the real client visits that chunk after a generation-1 recovery. This is distinct from calling addFreshEntity on a stale object. The original generation-1 world remains unmodified by preparing this copy.
+
+## Storage compatibility
+
+No permanent field meaning changed and no new recovery schema is required: PREPARED already meant a persisted not-yet-confirmed spawn. Reusing its UUID/generation fixes retry semantics. Save format 4 and actorSchema 1 remain. Legacy 1/2/3 and actor-free 4 use the existing migration; missing/malformed generation remains blocked rather than inferred. Snapshot Motion default recovery and all prior fail-closed cases remain covered by the unchanged storage probe.
+
+JAR rollback is tested on a JAR copy only. It restores load-guard behavior (including its missing-UUID manual block and old generation retry), not a world downgrade.
+
+## Code changes and reasons
+
+- ActorCandidates.java: read-only typed candidate evidence; separates identity/context/spatial readiness.
+- CanonicalRecovery.java: private validated draft, live candidate/ticket agreement, distinct loaded observations, original-hash recheck, guarded commit; no spawn operation.
+- StoryStorage.java: private preflight/final recovery path; public load remains fail-closed; activation query and runtime conflict guard.
+- NarrativeData.java: explicit write poisoning hook; previous file/hash and atomic-save safeguards retained.
+- StoryActors.java: candidate conflict guard, two-position readiness, reservation reuse, six generation boundaries, durable entity flush before ACTIVE commit, stale admission fence, duplicate diagnostics.
+- Wayfarer.java: pause before AI during blocked load; extract idempotent checkpoint runtime restoration with canonical identity validation.
+- StoryEvents/SceneRecovery/CityHorror/CityDistrict/CityTransit/StationEntity/NoteItem/RelayBlock: pause story entry points while the vanilla entity loader gathers recovery evidence.
+- WhileAway.java: register recovery coordinator.
+- CanonicalGameTests.java: four new tests; original ActorGameTests and StoryGameTests remain byte-identical.
+- CanonicalSmoke.java, build.gradle, tools/run-canonical-*.py, LateActorFixture.java: isolated muted real clients, actual process boundaries and copied-world corruption injection.
+
+## Failure and review history
+
+- Missing UUID previously blocked startup before entity evidence could be loaded. Fixed by retaining load/write blocking while pausing story activation and allowing vanilla deserialization; no empty NarrativeData was introduced.
+- PREPARED retry previously incremented generation again. Fixed by treating the already-durable identity/UUID as a reservation and persisting actual entity storage before ACTIVE binding commit.
+- Owner absence could turn a pending PREPARED reservation into SUSPENDED, losing the reservation distinction. PREPARED is now preserved while absent.
+- Same-generation conflicts were previously rejected on join without preserving an explicit ambiguity diagnosis. They now poison writes and pause AI; genuine older generations are separately fenced.
+- Local tooling had a PowerShell brace-list parse error and a Python default cp949 decoding error. They were corrected without broad filesystem changes; source edits were checked and the full final compile/tests rerun. These are tooling failures, not a repaired-gameplay PASS claim.
+- Six early development clients are preserved in canonical/ and canonical-commands.jsonl. They are not included in the final canonical-final suite.
+
+## Unchanged scope and next stage
+
+Design v0.4 remains the higher narrative contract. No new story chapters, NPC system, transactions, structure fallback, Horror Activation, final art, resource pack, sound, or setpiece was introduced. Caveman is HOLD/off; no Terra/Luna delegation or model-switch experiment occurred. No token savings are claimed.
+
+Do not promote 0.3.2. Only after the final required Actor gates pass is the next implementation task a minimal real campaign NPC event, with the same lifecycle and A/B/C/D/E proof. Campaign stabilization remains PARTIAL even if the current Actor recovery gate passes.
+
+
+## Final observed gates
+{
+  "wayfarer_suite": "PASS",
+  "overall_stability": "PARTIAL",
+  "distinct_client_processes": 11,
+  "crash_snapshots": 5,
+  "crash_final_verifies": 1,
+  "exception_processes": 5,
+  "copied_world_pairs": [
+    {
+      "repeat": 1,
+      "original_checkpoint": 4,
+      "copy_checkpoint": 2,
+      "generation": 0,
+      "same_identity_within_each_world": true,
+      "independent_worlds": true
+    }
+  ],
+  "scope": "Shipped Wayfarer identity recovery + current generic Actor primitives. Not NPC campaign, transactions, fallback, natural survival or arbitrary corrupt-field auto-repair.",
+  "load_guard": "PASS",
+  "canonical_suite": "PASS",
+  "actor_recovery_current_adapter": "PASS",
+  "npc_stage": "NOT STARTED",
+  "generation_boundaries": [
+    {
+      "boundary": 1,
+      "cutGeneration": 0,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": false,
+      "diskVerified": true
+    },
+    {
+      "boundary": 2,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 3,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 4,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 5,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 6,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    }
+  ],
+  "canonical_clients": 19,
+  "load_clients": 5,
+  "wayfarer_clients": 11,
+  "total_current_clients": 35,
+  "load_probe_cases": 580,
+  "load_probe_assertions": 2161,
+  "game_tests": 52,
+  "original_game_tests": 48
+}
+
+Current: 0.3.1-dev.1 / canonical-recovery / current Actor adapter recovery PASS / campaign PARTIAL / NPC NOT STARTED.
+No 0.3.2 promotion. No natural survival, NPC campaign, transactions or fallback proof is implied.
+Baseline suite: 48 required GameTests. Current suite: 52 = those same 48 plus four new candidate/reservation tests.
+Final storage regression: 580 cases / 2161 assertions; 20 repetitions retained from prior probe. These are NOT 580 new failure surfaces or clients.
+Final actual clients: 19 canonical/generation + 5 load guard + 11 Wayfarer = 35 distinct fully exited processes.
+The load-suite Blocked fixture is a malformed UUID string; missing UUID blocking is independently covered by Ambiguous/Unloaded/NoCandidate.
+Six earlier development clients are separate and excluded. All clients were muted and verified inside RIGHT secondary DISPLAY1.
+Blocked load tests call actual server saveEverything 3 times; this is not a natural autosave-timer playthrough.
+The same-generation duplicate test poisons registered data; a resulting guarded save exception is an expected rejection, not a successful save.
+
+
+## Acceptance matrix (separate evidence layers)
+|Item|AUTOMATED/GAME TEST/STORAGE PROBE|REAL CLIENT|Fresh process|Disk evidence|Final|
+|---|---|---|---|---|---|
+|Load Guard|580 storage cases|5 load cases|yes|hash/quarantine|PASS|
+|Missing UUID exact|candidate tests|Exact|ExactReload|original/quarantine/repaired|PASS|
+|Missing UUID ambiguous|multiplicity test|Ambiguous|isolated process|unchanged after 3 saves|PASS|
+|Malformed UUID|storage probe|Blocked malformed-string fixture|isolated process|unchanged after 3 saves|PASS|
+|Missing UUID no candidate|absence classification|NoCandidate|isolated process|unchanged after 3 saves|PASS|
+|Unloaded vs missing|unloaded classification|Unloaded + Wayfarer actual unload|yes|story unchanged|PASS|
+|Confirmed missing / generation reservation|reservation test|Cut1-6 / Resume1-6|6 pairs|all cut/resume NBT|PASS|
+|Boundary 1|shared reservation tests|Cut1|Resume1|paired NBT / UUID / generation|PASS|
+|Boundary 2|shared reservation tests|Cut2|Resume2|paired NBT / UUID / generation|PASS|
+|Boundary 3|shared reservation tests|Cut3|Resume3|paired NBT / UUID / generation|PASS|
+|Boundary 4|shared reservation tests|Cut4|Resume4|paired NBT / UUID / generation|PASS|
+|Boundary 5|shared reservation tests|Cut5|Resume5|paired NBT / UUID / generation|PASS|
+|Boundary 6|shared reservation tests|Cut6|Resume6|paired NBT / UUID / generation|PASS|
+|Stale generation late-load|stale classification + old regression|Late actual entity chunk|separate copied world process|final canonical NBT|PASS|
+|Same-generation duplicate|multiplicity test|Duplicate|isolated process|write guard/hash|PASS|
+|Recovery fresh-process|serialization / existing tests|ExactReload + Resume1-6|yes|identity preserved|PASS|
+|Write guard / original preservation|storage probe|5 load + blocked canonical cases|yes|before/quarantine/after hash|PASS|
+|Story Integrity|existing + new checks|canonical stable / blocked diagnostics|yes|state assertions|PASS - current Actor/load scope|
+|Migration 1 to 4|20 storage fixtures|NOT TESTED separately|NOT TESTED separately|actual NBT writes/reads|PASS - storage regression|
+|Migration 2 to 4|20 storage fixtures|NOT TESTED separately|NOT TESTED separately|actual NBT writes/reads|PASS - storage regression|
+|Migration 3 to 4|20 storage fixtures|NOT TESTED separately|NOT TESTED separately|actual NBT writes/reads|PASS - storage regression|
+|Wayfarer regression|original 48 maintained|11 current processes|yes|actual copied world + snapshots|PASS|
+|Actor recovery gate|52 tests + storage|current required failure surfaces|yes|verified|PASS - current supported Actor scope|
+|NPC stage|NOT STARTED|NOT STARTED|NOT STARTED|none|NOT STARTED|
+|Campaign|incomplete|natural survival NOT TESTED|not complete|not complete|PARTIAL|
+
+## Absolute artifacts and hashes
+
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\canonical-recovery\whileaway-0.3.1-canonical-recovery.jar
+SHA-256: 82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\DIFF.patch
+SHA-256: 9a17bb8a928b10ee13e333bfbf36f357627af71fc9c8c6090b3d16dc257799d5
+VERIFICATION: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\VERIFICATION.txt
+ROLLBACK: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\ROLLBACK.sh
+SHA-256: de9dc880d2e50d94e5d9e6edf9ffc9018e6423b2c536dd89386509bdf34ad35c
+BASELINE_JAR: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\baseline\previous.jar
+SHA-256: a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03
+BASELINE_SOURCE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\baseline\previous-source.zip
+SHA-256: c5d0161e2f436dcd8cb6c10e4654c84656e5a91cf1b96991c19907e8aa1f38b0
+Source ZIP digest is in dist/canonical-recovery/SHA256SUMS.txt outside the ZIP to avoid a circular hash.
+
+## Exact commands and literal outputs
+Working directory: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot
+GRADLE_USER_HOME=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home
+
+BASELINE_GAME
+command: ./gradlew.bat --offline runGameTestServer
+input: current isolated fixtures; log C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\baseline-tests.log
+output:
+[15:10:34] [Server thread/INFO] [minecraft/GameTestServer]: All 48 required tests passed :)
+BUILD SUCCESSFUL in 35s
+exit: 0
+
+MODIFIED_GAME
+command: ./gradlew.bat --offline compileJava runGameTestServer build
+input: current isolated fixtures; log C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\final-tests.log
+output:
+[19:56:19] [Server thread/INFO] [minecraft/GameTestServer]: All 52 required tests passed :)
+PASS core assertions=176857
+BUILD SUCCESSFUL in 41s
+exit: 0
+
+MODIFIED_STORAGE
+command: pwsh -NoProfile -File tools/probe-canonical-storage.ps1
+input: current isolated fixtures; log C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\probe.log
+output:
+PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false
+exit: 0
+
+BASELINE
+command: java -cp build/canonical-archive-probe CanonicalArchiveProbe "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\baseline\previous.jar" baseline
+input: 8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; canonical recovery and generation boundaries expected only in modified
+output:
+PASS archive policy=PRESENT checks=8
+PASS archive=baseline explicitLoader=true writeGuard=true canonicalRecovery=false generationBoundaries=false
+exit: 0
+
+MODIFIED
+command: java -cp build/canonical-archive-probe CanonicalArchiveProbe "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\canonical-recovery\whileaway-0.3.1-canonical-recovery.jar" modified
+input: 8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; canonical recovery and generation boundaries expected only in modified
+output:
+PASS archive policy=PRESENT checks=8
+PASS archive=modified explicitLoader=true writeGuard=true canonicalRecovery=true generationBoundaries=true
+exit: 0
+
+ROLLBACK
+command: bash -lc "chmod +x evidence/canonical-recovery/ROLLBACK.sh && test -x evidence/canonical-recovery/ROLLBACK.sh && evidence/canonical-recovery/ROLLBACK.sh build/rollback-canonical/test.jar"
+input: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\build\rollback-canonical\test.jar
+output:
+ROLLBACK PASS: load-guard JAR restored; world files untouched
+exit: 0
+
+RESTORED
+command: java -cp build/canonical-archive-probe CanonicalArchiveProbe build/rollback-canonical/test.jar baseline
+input: same 8 policy cases and baseline fixture revision
+output:
+PASS archive policy=PRESENT checks=8
+PASS archive=baseline explicitLoader=true writeGuard=true canonicalRecovery=false generationBoundaries=false
+exit: 0
+Restored JAR hash=a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03; MODIFIED_FILE remains changed=82b0201c0067bc50fe931e0daf24b54c2bef31cd07e2cc63845ae4677beca542; no world operations or save downgrade.
+
+## Actual client executions: launcher exit, child PID exit and markers are separate gates
+
+{"mode": "Cut1", "command": "./gradlew.bat --offline runCanonicalCut1", "exit": 0, "pid": 42184, "processExited": true, "seconds": 53.462013244628906, "pass": true}
+{"mode": "Resume1", "command": "./gradlew.bat --offline runCanonicalResume1", "exit": 0, "pid": 38284, "processExited": true, "seconds": 56.74375820159912, "pass": true}
+{"mode": "Cut2", "command": "./gradlew.bat --offline runCanonicalCut2", "exit": 0, "pid": 55072, "processExited": true, "seconds": 53.163466930389404, "pass": true}
+{"mode": "Resume2", "command": "./gradlew.bat --offline runCanonicalResume2", "exit": 0, "pid": 28684, "processExited": true, "seconds": 65.94997930526733, "pass": true}
+{"mode": "Cut3", "command": "./gradlew.bat --offline runCanonicalCut3", "exit": 0, "pid": 45852, "processExited": true, "seconds": 58.23933148384094, "pass": true}
+{"mode": "Resume3", "command": "./gradlew.bat --offline runCanonicalResume3", "exit": 0, "pid": 47468, "processExited": true, "seconds": 68.2494306564331, "pass": true}
+{"mode": "Cut4", "command": "./gradlew.bat --offline runCanonicalCut4", "exit": 0, "pid": 55024, "processExited": true, "seconds": 58.404712200164795, "pass": true}
+{"mode": "Resume4", "command": "./gradlew.bat --offline runCanonicalResume4", "exit": 0, "pid": 37256, "processExited": true, "seconds": 63.51002383232117, "pass": true}
+{"mode": "Cut5", "command": "./gradlew.bat --offline runCanonicalCut5", "exit": 0, "pid": 53292, "processExited": true, "seconds": 60.28229355812073, "pass": true}
+{"mode": "Resume5", "command": "./gradlew.bat --offline runCanonicalResume5", "exit": 0, "pid": 27940, "processExited": true, "seconds": 59.98269033432007, "pass": true}
+{"mode": "Cut6", "command": "./gradlew.bat --offline runCanonicalCut6", "exit": 0, "pid": 55588, "processExited": true, "seconds": 59.85957169532776, "pass": true}
+{"mode": "Resume6", "command": "./gradlew.bat --offline runCanonicalResume6", "exit": 0, "pid": 13924, "processExited": true, "seconds": 59.32274794578552, "pass": true}
+{"mode": "Exact", "command": "./gradlew.bat --offline runCanonicalExact", "exit": 0, "pid": 41604, "processExited": true, "seconds": 60.7960729598999, "pass": true}
+{"mode": "ExactReload", "command": "./gradlew.bat --offline runCanonicalExactReload", "exit": 0, "pid": 19232, "processExited": true, "seconds": 55.289889335632324, "pass": true}
+{"mode": "Ambiguous", "command": "./gradlew.bat --offline runCanonicalAmbiguous", "exit": 0, "pid": 48944, "processExited": true, "seconds": 58.770479917526245, "pass": true}
+{"mode": "Unloaded", "command": "./gradlew.bat --offline runCanonicalUnloaded", "exit": 0, "pid": 56960, "processExited": true, "seconds": 64.65808844566345, "pass": true}
+{"mode": "NoCandidate", "command": "./gradlew.bat --offline runCanonicalNoCandidate", "exit": 0, "pid": 51664, "processExited": true, "seconds": 56.08547854423523, "pass": true}
+{"mode": "Duplicate", "command": "./gradlew.bat --offline runCanonicalDuplicate", "exit": 0, "pid": 28888, "processExited": true, "seconds": 51.54388689994812, "pass": true}
+{"mode": "Late", "command": "./gradlew.bat --offline runCanonicalLate", "exit": 0, "pid": 59060, "processExited": true, "seconds": 62.7039749622345, "pass": true}
+{"mode": "Control", "command": "./gradlew.bat --offline runLoadGuardControl", "pid": 43708, "processExited": true, "exit": 0, "seconds": 58.119054079055786, "pass": true}
+{"mode": "Recover", "command": "./gradlew.bat --offline runLoadGuardRecover", "pid": 52180, "processExited": true, "exit": 0, "seconds": 58.67851805686951, "pass": true}
+{"mode": "RecoverReload", "command": "./gradlew.bat --offline runLoadGuardRecoverReload", "pid": 41992, "processExited": true, "exit": 0, "seconds": 55.33681917190552, "pass": true}
+{"mode": "Blocked", "command": "./gradlew.bat --offline runLoadGuardBlocked", "pid": 3344, "processExited": true, "exit": 0, "seconds": 42.12158703804016, "pass": true}
+{"mode": "Unsupported", "command": "./gradlew.bat --offline runLoadGuardUnsupported", "pid": 34148, "processExited": true, "exit": 0, "seconds": 40.48447799682617, "pass": true}
+{"task": "runActorA1", "command": "./gradlew.bat --offline runActorA1", "exit": 0, "seconds": 59.506542682647705, "pid": 24264, "process_exited": true, "timestamp": "2026-09-11T11:21:13.105719+00:00", "pass": true}
+{"task": "runActorB1", "command": "./gradlew.bat --offline runActorB1", "exit": 0, "seconds": 64.03730773925781, "pid": 54320, "process_exited": true, "timestamp": "2026-09-11T11:22:17.144374+00:00", "pass": true}
+{"task": "runActorC1", "command": "./gradlew.bat --offline runActorC1", "exit": 0, "seconds": 54.24702048301697, "pid": 14896, "process_exited": true, "timestamp": "2026-09-11T11:23:11.392593+00:00", "pass": true}
+{"task": "runActorD1", "command": "./gradlew.bat --offline runActorD1", "exit": 0, "seconds": 44.46095395088196, "pid": 43564, "process_exited": true, "timestamp": "2026-09-11T11:23:55.854661+00:00", "pass": true}
+{"task": "runActorE1", "command": "./gradlew.bat --offline runActorE1", "exit": 0, "seconds": 45.260435342788696, "pid": 51632, "process_exited": true, "timestamp": "2026-09-11T11:24:41.117070+00:00", "pass": true}
+{"task": "runActorVerify1", "command": "./gradlew.bat --offline runActorVerify1", "exit": 0, "seconds": 61.314451456069946, "pid": 29796, "process_exited": true, "timestamp": "2026-09-11T11:25:42.432542+00:00", "pass": true}
+{"task": "runActorExceptionsSeed1", "command": "./gradlew.bat --offline runActorExceptionsSeed1", "exit": 0, "seconds": 118.18887877464294, "pid": 39392, "process_exited": true, "timestamp": "2026-09-11T11:27:40.841014+00:00", "pass": true}
+{"task": "runActorExceptionsOriginal1", "command": "./gradlew.bat --offline runActorExceptionsOriginal1", "exit": 0, "seconds": 47.735390424728394, "pid": 56864, "process_exited": true, "timestamp": "2026-09-11T11:28:28.995696+00:00", "pass": true}
+{"task": "runActorExceptionsCopy1", "command": "./gradlew.bat --offline runActorExceptionsCopy1", "exit": 0, "seconds": 48.835275650024414, "pid": 28884, "process_exited": true, "timestamp": "2026-09-11T11:29:17.983757+00:00", "pass": true}
+{"task": "runActorExceptionsReload1", "command": "./gradlew.bat --offline runActorExceptionsReload1", "exit": 0, "seconds": 55.109198808670044, "pid": 45708, "process_exited": true, "timestamp": "2026-09-11T11:30:13.249888+00:00", "pass": true}
+{"task": "runActorExceptionsCopyReload1", "command": "./gradlew.bat --offline runActorExceptionsCopyReload1", "exit": 0, "seconds": 49.33410692214966, "pid": 45124, "process_exited": true, "timestamp": "2026-09-11T11:31:02.750511+00:00", "pass": true}
+Final client launcher wall time sum=2029.788 seconds; not total development time or natural gameplay duration.
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Ambiguous.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=48944
+INPUT hash=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT same_generation_duplicate
+PASS Ambiguous MANUAL_DIAGNOSTIC AMBIGUOUS_MULTIPLE_CANDIDATES storyId=wayfarer_first:380df991-f603-344c-a090-369bad2a924a eventId=wayfarer_first instanceId=bdce090e-72c9-4922-a8bc-d0a6d3adf4da generation=0 candidates=2 stale=0 writeBlocked=true writeBlocked=true realSaveDispatches=3 originalPreserved=true noGenerationCreated=true
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Cut1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=42184
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut1 boundary=GENERATION_1_BEFORE_RESERVATION generation=0 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 checkpoint=2 diskHash=0c7c5cfaaaf29ce064342938cbf77a9ecae769a2f584a5311144d546f330c049
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Cut2.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=55072
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut2 boundary=GENERATION_2_RESERVATION_SAVED generation=1 uuid=af6599f6-aedd-4b51-bfdc-ff0ebc6f20ee checkpoint=2 diskHash=a718840d17a86619c85d1812be5fdb2cc84027e7c1bc673897971522b9b4f497
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Cut3.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=45852
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut3 boundary=GENERATION_3_SPAWNED_UNBOUND generation=1 uuid=8ae30137-85d3-4cd1-b4da-e52bc368eff2 checkpoint=2 diskHash=be63521fb7cf069544af84ab224cab2975f31a64a52fe1d80db7ba81f6bea080
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Cut4.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=55024
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut4 boundary=GENERATION_4_BOUND_UNSAVED generation=1 uuid=cae7ce72-f883-4245-8ded-22099afae068 checkpoint=2 diskHash=17fe2b1d821398ee689281b1ebb7d4f3188c9109624354a5887bb824474bfb93
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Cut5.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53292
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut5 boundary=GENERATION_5_BINDING_SAVED generation=1 uuid=15b646cd-df0b-453b-9db7-72593f20c305 checkpoint=2 diskHash=e5fb912b8147dbd757580d502cdc80ba4cad74ad5ddefef8b7f53389cd5053e4
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Cut6.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=55588
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut6 boundary=GENERATION_6_RUNTIME_RESTORED generation=1 uuid=c381f0e6-50bc-4f69-ad2d-9d8e4f04d8e6 checkpoint=2 diskHash=c33f5793af234bc106f3124ac113be775ebbe5477f930b5fdbd1702a488282d6
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Duplicate.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=28888
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+EXPECTED guarded save rejected IllegalStateException
+PASS Duplicate writeBlocked=true originalPreserved=true AI_paused=true
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Exact.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=41604
+INPUT hash=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+PASS Exact staleLateJoin=false canonical=1 generation=0 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 checkpoint=2 factsPreserved=true integrity=clean stableTicks=164
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\ExactReload.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=19232
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+PASS ExactReload staleLateJoin=false canonical=1 generation=0 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Late.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=59060
+INPUT hash=bbac31f3b49a9c6856c4ac1de973f077f236bac5d2bc35128d8924d87581b06b uuid=c381f0e6-50bc-4f69-ad2d-9d8e4f04d8e6 generation=1 checkpoint=2
+OBSERVED real_entity_chunk_join stale_generation=0 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30
+PASS Late staleLateJoin=true canonical=1 generation=1 uuid=c381f0e6-50bc-4f69-ad2d-9d8e4f04d8e6 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\NoCandidate.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=51664
+INPUT hash=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+PASS NoCandidate NO_CANDIDATE storyId=wayfarer_first:380df991-f603-344c-a090-369bad2a924a eventId=wayfarer_first instanceId=bdce090e-72c9-4922-a8bc-d0a6d3adf4da generation=0 candidates=0 stale=0 writeBlocked=true realSaveDispatches=3 originalPreserved=true noGenerationCreated=true
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Resume1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=38284
+INPUT hash=0c7c5cfaaaf29ce064342938cbf77a9ecae769a2f584a5311144d546f330c049 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+PASS Resume1 staleLateJoin=false canonical=1 generation=1 uuid=dc567fd1-1f23-4e84-8361-9c4706833227 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Resume2.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=28684
+INPUT hash=a718840d17a86619c85d1812be5fdb2cc84027e7c1bc673897971522b9b4f497 uuid=af6599f6-aedd-4b51-bfdc-ff0ebc6f20ee generation=1 checkpoint=2
+PASS Resume2 staleLateJoin=false canonical=1 generation=1 uuid=af6599f6-aedd-4b51-bfdc-ff0ebc6f20ee checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Resume3.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=47468
+INPUT hash=be63521fb7cf069544af84ab224cab2975f31a64a52fe1d80db7ba81f6bea080 uuid=8ae30137-85d3-4cd1-b4da-e52bc368eff2 generation=1 checkpoint=2
+PASS Resume3 staleLateJoin=false canonical=1 generation=1 uuid=8ae30137-85d3-4cd1-b4da-e52bc368eff2 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Resume4.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=37256
+INPUT hash=17fe2b1d821398ee689281b1ebb7d4f3188c9109624354a5887bb824474bfb93 uuid=cae7ce72-f883-4245-8ded-22099afae068 generation=1 checkpoint=2
+PASS Resume4 staleLateJoin=false canonical=1 generation=1 uuid=cae7ce72-f883-4245-8ded-22099afae068 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Resume5.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=27940
+INPUT hash=e5fb912b8147dbd757580d502cdc80ba4cad74ad5ddefef8b7f53389cd5053e4 uuid=15b646cd-df0b-453b-9db7-72593f20c305 generation=1 checkpoint=2
+PASS Resume5 staleLateJoin=false canonical=1 generation=1 uuid=15b646cd-df0b-453b-9db7-72593f20c305 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Resume6.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=13924
+INPUT hash=c33f5793af234bc106f3124ac113be775ebbe5477f930b5fdbd1702a488282d6 uuid=c381f0e6-50bc-4f69-ad2d-9d8e4f04d8e6 generation=1 checkpoint=2
+PASS Resume6 staleLateJoin=false canonical=1 generation=1 uuid=c381f0e6-50bc-4f69-ad2d-9d8e4f04d8e6 checkpoint=2 factsPreserved=true integrity=clean stableTicks=160
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\canonical-final\Unloaded.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=56960
+INPUT hash=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058 uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+PASS Unloaded UNLOADED_OR_UNCONFIRMED storyId=wayfarer_first:380df991-f603-344c-a090-369bad2a924a eventId=wayfarer_first instanceId=bdce090e-72c9-4922-a8bc-d0a6d3adf4da generation=0 candidates=0 stale=0 writeBlocked=true realSaveDispatches=3 originalPreserved=true noGenerationCreated=true
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\client-final\Blocked.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=3344
+PASS Blocked actual_server_save_dispatches=3 originalHash=ae54de1dd003480b853e78d13da3b38de62346bc3b8f3006d4903c42943f6d72 writeBlocked=true emptyCampaignReturned=false
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\client-final\Control.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=43708
+PASS load STORY_LOAD outcome=LOADED recovery=SAFE_AUTO_RECOVER saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_OK
+PASS Control canonical=1 sameUUID=true generation=0 checkpoint=2 stableTicks=100 integrity=clean
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\client-final\Recover.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=52180
+PASS load STORY_LOAD outcome=RECOVERABLE_CORRUPTION recovery=RECOVER_WITH_WARNING saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_RECOVERED storyId=wayfarer_first:380df991-f603-344c-a090-369bad2a924a eventId=wayfarer_first instanceId=bdce090e-72c9-4922-a8bc-d0a6d3adf4da generation=0 field=snapshot.Motion restored_stationary_runtime_default
+PASS Recover canonical=1 sameUUID=true generation=0 checkpoint=2 stableTicks=100 integrity=clean
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\client-final\RecoverReload.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=41992
+PASS load STORY_LOAD outcome=LOADED recovery=SAFE_AUTO_RECOVER saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_OK
+PASS RecoverReload canonical=1 sameUUID=true generation=0 checkpoint=2 stableTicks=100 integrity=clean
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\client-final\Unsupported.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=34148
+PASS Unsupported actual_server_save_dispatches=3 originalHash=a257354b77e275426efd2e3118e0038cf6e2443f41cdc638862df700988c3b19 writeBlocked=true emptyCampaignReturned=false
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\crash\runActorA1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=24264
+PASS runActorA1 boundary=PREPARED checkpoint=0 generation=0 instance=af4e48f3-ef91-4fd6-8865-bef38c4b50b4
+FAULT Runtime.halt after durable story write; no shutdown save
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\crash\runActorB1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=54320
+PASS reload B checkpoint=0 facts=[]
+PASS runActorB1 boundary=FACT_COMMITTED checkpoint=1 generation=0 instance=af4e48f3-ef91-4fd6-8865-bef38c4b50b4
+FAULT Runtime.halt after durable story write; no shutdown save
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\crash\runActorC1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=14896
+PASS reload C checkpoint=1 facts=[]
+PASS runActorC1 boundary=CHECKPOINT_COMMITTED checkpoint=2 generation=0 instance=af4e48f3-ef91-4fd6-8865-bef38c4b50b4
+FAULT Runtime.halt after durable story write; no shutdown save
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\crash\runActorD1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=43564
+PASS reload D checkpoint=2 facts=[pursuit_started]
+PASS runActorD1 boundary=BEFORE_COMPLETE checkpoint=3 generation=0 instance=af4e48f3-ef91-4fd6-8865-bef38c4b50b4
+FAULT Runtime.halt after durable story write; no shutdown save
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\crash\runActorE1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=51632
+PASS reload E checkpoint=3 facts=[encounter_complete, pursuit_started]
+PASS runActorE1 boundary=AFTER_COMPLETE checkpoint=4 generation=0 instance=af4e48f3-ef91-4fd6-8865-bef38c4b50b4
+FAULT Runtime.halt after durable story write; no shutdown save
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\crash\runActorVerify1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=29796
+PASS reload Verify checkpoint=4 facts=[encounter_complete, pursuit_started]
+PASS runActorVerify1 completed state stable 300 ticks; no actor or completion replay; integrity clean
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\exceptions\runActorExceptionsCopy1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=28884
+PASS fresh_process_reconnected same UUID/instance/generation/checkpoint; ACTIVE; canonical_count=1
+PASS runActorExceptionsCopy1 checkpoint=2 generation=0 instance=754019f2-d156-44b6-8b37-e2df1cf833c6 actor=3a68f9cf-df79-46a4-ae9e-15861f97e4c8
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\exceptions\runActorExceptionsCopyReload1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=45124
+PASS fresh_process_reconnected same UUID/instance/generation/checkpoint; ACTIVE; canonical_count=1
+PASS runActorExceptionsCopyReload1 checkpoint=2 generation=0 instance=754019f2-d156-44b6-8b37-e2df1cf833c6 actor=3a68f9cf-df79-46a4-ae9e-15861f97e4c8
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\exceptions\runActorExceptionsOriginal1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=56864
+PASS fresh_process_reconnected same UUID/instance/generation/checkpoint; ACTIVE; canonical_count=1
+PASS runActorExceptionsOriginal1 checkpoint=4 generation=0 instance=754019f2-d156-44b6-8b37-e2df1cf833c6 actor=3a68f9cf-df79-46a4-ae9e-15861f97e4c8
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\exceptions\runActorExceptionsReload1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=45708
+PASS runActorExceptionsReload1 checkpoint=4 generation=0 instance=754019f2-d156-44b6-8b37-e2df1cf833c6 actor=3a68f9cf-df79-46a4-ae9e-15861f97e4c8
+
+
+Literal marker: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\canonical-recovery\exceptions\runActorExceptionsSeed1.txt
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=39392
+PASS death_respawn keepInventory=false checkpoint=1 generation=0
+PASS death_respawn keepInventory=true checkpoint=2 generation=0
+CHUNKS before HOME=[64, 64] snapshot=[65, 64] live=[65, 64] player=[64, 64]
+PASS actual_chunk_unloaded HOME=[64, 64] snapshot=[65, 64] last_live=[65, 64] all hasChunk=false entitiesLoaded=false; canonical_absent=true; player=[320, 320] loaded=true; held_ticks=100 generation=0
+PASS return scenario=1 canonical_count=1 same UUID/instance/generation/checkpoint
+CHUNKS before HOME=[64, 64] snapshot=[65, 64] live=[65, 64] player=[64, 64]
+PASS dimension_absence=Nether generation=0
+PASS return scenario=2 canonical_count=1 same UUID/instance/generation/checkpoint
+CHUNKS before HOME=[64, 64] snapshot=[65, 64] live=[65, 64] player=[64, 64]
+PASS dimension_absence=End generation=0
+PASS return scenario=3 canonical_count=1 same UUID/instance/generation/checkpoint
+PASS runActorExceptionsSeed1 checkpoint=2 generation=0 instance=754019f2-d156-44b6-8b37-e2df1cf833c6 actor=3a68f9cf-df79-46a4-ae9e-15861f97e4c8
+
+
+## Corrupt original / quarantine / final hashes
+
+canonical-final/Exact: original=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; quarantine=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; final=ea3db96aab4c362a24ccdb92008b21fe21b4cc83b1c91f942f01a83346d5900c
+canonical-final/Ambiguous: original=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; quarantine=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; final=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058
+canonical-final/Unloaded: original=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; quarantine=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; final=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058
+canonical-final/NoCandidate: original=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; quarantine=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058; final=31f8a56d1831537d813f836e921b5b4166dc20effa87f0071dd8d09863858058
+client-final/Recover: original=b736673c68e1483deb08ea1f7a77cbde7bb27dfe71277a95f8e2c82bf46f9491; quarantine=b736673c68e1483deb08ea1f7a77cbde7bb27dfe71277a95f8e2c82bf46f9491; final=1c341c60726af8772f451e9a48b48baa5b5c40ae8022e80fc94912b9ea8d18d1
+client-final/Blocked: original=ae54de1dd003480b853e78d13da3b38de62346bc3b8f3006d4903c42943f6d72; quarantine=ae54de1dd003480b853e78d13da3b38de62346bc3b8f3006d4903c42943f6d72; final=ae54de1dd003480b853e78d13da3b38de62346bc3b8f3006d4903c42943f6d72
+client-final/Unsupported: original=a257354b77e275426efd2e3118e0038cf6e2443f41cdc638862df700988c3b19; quarantine=a257354b77e275426efd2e3118e0038cf6e2443f41cdc638862df700988c3b19; final=a257354b77e275426efd2e3118e0038cf6e2443f41cdc638862df700988c3b19
+
+## Additional execution issue
+Git Bash initialization under the sandbox returned -1073741502 during rollback. The failed log was preserved in rollback-sandbox-failure.log. The identical JAR-copy-only rollback ran successfully in the ordinary execution context, exit 0. No world files were part of either command.
+## Model / usage
+No Terra/Luna delegation, model-switch experiment or Caveman execution occurred. Primary-session implementation and review only. No per-model input/output/reasoning-token measurement or usage-reduction percentage is claimed.
+## Next exact starting point
+Preserve these canonical-recovery JAR/source hashes as the next immutable baseline. Keep load guard, private recovery preflight, reservation UUID reuse, two-position readiness and generation fence.
+Next functional task is a minimal REAL campaign NPC event using this lifecycle: appearance -> movement -> player interaction -> reaction to another NPC/object -> durable fact -> completion -> new residence/life state, with A/B/C/D/E and fresh-process proof. Do not start final art or promote 0.3.2.

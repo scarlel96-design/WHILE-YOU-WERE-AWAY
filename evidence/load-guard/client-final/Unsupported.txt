@@ -1,0 +1,3 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=34932
+PASS Unsupported actual_server_save_dispatches=3 originalHash=a257354b77e275426efd2e3118e0038cf6e2443f41cdc638862df700988c3b19 writeBlocked=true emptyCampaignReturned=false

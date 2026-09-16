@@ -1,0 +1,30 @@
+[
+  {
+    "input": "JAR=.\\evidence\\art\\baseline\\previous.jar; expected version=0.2.0-dev.1, art_revision=1",
+    "command": "python .\\tools\\probe-art.py .\\evidence\\art\\baseline\\previous.jar 0.2.0-dev.1 1",
+    "phase": "BASELINE",
+    "output": "version=0.2.0-dev.1; art_revision=1; city_dimension=true",
+    "exit": 0
+  },
+  {
+    "input": "JAR=.\\dist\\whileaway-0.3.0-dev.1.jar; expected version=0.3.0-dev.1, art_revision=2",
+    "command": "python .\\tools\\probe-art.py .\\dist\\whileaway-0.3.0-dev.1.jar 0.3.0-dev.1 2",
+    "phase": "MODIFIED",
+    "output": "version=0.3.0-dev.1; art_revision=2; city_dimension=true",
+    "exit": 0
+  },
+  {
+    "input": "build/rollback-art/whileaway.jar (modified copy)",
+    "command": "& 'C:\\Program Files\\Git\\bin\\bash.exe' -c 'chmod +x evidence/art/ROLLBACK.sh && test -x evidence/art/ROLLBACK.sh && evidence/art/ROLLBACK.sh build/rollback-art/whileaway.jar'",
+    "phase": "ROLLBACK",
+    "output": "ROLLBACK PASS: 0.2 JAR hash restored; world files untouched",
+    "exit": 0
+  },
+  {
+    "input": "JAR=.\\build\\rollback-art\\whileaway.jar; expected version=0.2.0-dev.1, art_revision=1",
+    "command": "python .\\tools\\probe-art.py .\\build\\rollback-art\\whileaway.jar 0.2.0-dev.1 1",
+    "phase": "ROLLBACK",
+    "output": "version=0.2.0-dev.1; art_revision=1; city_dimension=true",
+    "exit": 0
+  }
+]

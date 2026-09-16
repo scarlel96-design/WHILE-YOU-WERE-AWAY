@@ -1,0 +1,1 @@
+PASS actual legacy schemas=2,3; identical migrations=6; original files read only via copies

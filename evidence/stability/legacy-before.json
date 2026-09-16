@@ -1,0 +1,28 @@
+{
+  "data": {
+    "schema": 2,
+    "players": [
+      {
+        "next": 1613,
+        "readingUntil": 1613,
+        "returnPitch": 0.0,
+        "cityClues": 7,
+        "cityVisited": 1,
+        "transitAfter": 681,
+        "station": -549756641197,
+        "returnPosition": -1099512455085,
+        "id": [
+          940439953,
+          -167562164,
+          -1601161573,
+          -1389718966
+        ],
+        "complete": 1,
+        "returnYaw": 0.0,
+        "events": 0,
+        "clues": 31
+      }
+    ]
+  },
+  "DataVersion": 3955
+}

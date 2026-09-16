@@ -1,0 +1,30 @@
+[
+  {
+    "exit": 0,
+    "phase": "BASELINE",
+    "command": "python .\\tools\\probe-release.py .\\evidence\\city\\baseline\\whileaway-0.1.0-dev.1.jar 0.1.0-dev.1",
+    "output": "version=0.1.0-dev.1; city_dimension=false",
+    "input": "JAR=.\\evidence\\city\\baseline\\whileaway-0.1.0-dev.1.jar; expected version=0.1.0-dev.1"
+  },
+  {
+    "exit": 0,
+    "phase": "MODIFIED",
+    "command": "python .\\tools\\probe-release.py .\\dist\\whileaway-0.2.0-dev.1.jar 0.2.0-dev.1",
+    "output": "version=0.2.0-dev.1; city_dimension=true",
+    "input": "JAR=.\\dist\\whileaway-0.2.0-dev.1.jar; expected version=0.2.0-dev.1"
+  },
+  {
+    "exit": 0,
+    "phase": "ROLLBACK",
+    "command": "& 'C:\\Program Files\\Git\\bin\\bash.exe' -c 'chmod +x evidence/city/ROLLBACK.sh && test -x evidence/city/ROLLBACK.sh && evidence/city/ROLLBACK.sh build/rollback-city/whileaway.jar'",
+    "output": "ROLLBACK PASS: 0.1 JAR hash restored; world files untouched",
+    "input": "build/rollback-city/whileaway.jar (modified copy)"
+  },
+  {
+    "exit": 0,
+    "phase": "ROLLBACK",
+    "command": "python .\\tools\\probe-release.py .\\build\\rollback-city\\whileaway.jar 0.1.0-dev.1",
+    "output": "version=0.1.0-dev.1; city_dimension=false",
+    "input": "JAR=.\\build\\rollback-city\\whileaway.jar; expected version=0.1.0-dev.1"
+  }
+]

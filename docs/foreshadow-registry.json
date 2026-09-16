@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "stage": "design_only_registry",
+  "entries": [
+    {
+      "related_npcs": [],
+      "related_items": [],
+      "related_puzzles": [],
+      "related_endings": [],
+      "intentionally_unresolved": false,
+      "quality_gates": {
+        "fairness": "NOT TESTED",
+        "memorability": "NOT TESTED",
+        "reinterpretation": "NOT TESTED",
+        "causality": "NOT TESTED",
+        "impact": "NOT TESTED",
+        "novelty": "NOT TESTED",
+        "emotion": "NOT TESTED",
+        "ending_link": "NOT TESTED"
+      },
+      "id": "C_SEVEN_NAMES",
+      "tier": "C",
+      "first_chapter": "city_intro",
+      "first_exposure": "city_intake record; northern hanging chairs",
+      "likely_initial_interpretation": "A disturbing discrepancy between seats and names",
+      "actual_meaning": "The closed departure lane left seven people waiting",
+      "reinforcement": "city_siren record and seven_departures presentation",
+      "related_places": [
+        "quiet_city:station_district"
+      ],
+      "payoff_timing": "planned",
+      "payoff_method": "Current scene implies the immediate event; complete historical revelation remains planned",
+      "post_payoff_change": "planned",
+      "implementation_status": "PARTIAL",
+      "lifecycle": [
+        "exposure",
+        "variation",
+        "contradiction",
+        "partial_explanation",
+        "new_question",
+        "revelation",
+        "reinterpretation",
+        "aftermath"
+      ]
+    },
+    {
+      "related_npcs": [],
+      "related_items": [],
+      "related_puzzles": [],
+      "related_endings": [],
+      "intentionally_unresolved": false,
+      "quality_gates": {
+        "fairness": "NOT TESTED",
+        "memorability": "NOT TESTED",
+        "reinterpretation": "NOT TESTED",
+        "causality": "NOT TESTED",
+        "impact": "NOT TESTED",
+        "novelty": "NOT TESTED",
+        "emotion": "NOT TESTED",
+        "ending_link": "NOT TESTED"
+      },
+      "id": "B_LOW_RETURN_LIGHT",
+      "tier": "B",
+      "first_chapter": "city_intro",
+      "first_exposure": "city_home record; low return light",
+      "likely_initial_interpretation": "A strange light in an empty place",
+      "actual_meaning": "Someone maintained a visible route home",
+      "reinforcement": "Returning to the same light after exploring the city",
+      "related_places": [
+        "quiet_city:station_district"
+      ],
+      "payoff_timing": "planned",
+      "payoff_method": "Future relationship and ending reinterpretation is not implemented",
+      "post_payoff_change": "planned",
+      "implementation_status": "PARTIAL",
+      "lifecycle": [
+        "exposure",
+        "variation",
+        "contradiction",
+        "partial_explanation",
+        "new_question",
+        "revelation",
+        "reinterpretation",
+        "aftermath"
+      ]
+    }
+  ]
+}

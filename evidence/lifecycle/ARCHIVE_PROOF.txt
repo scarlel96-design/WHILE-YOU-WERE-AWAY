@@ -1,0 +1,3 @@
+PASS archive reopens; compiled classes match=58; unchanged asset/data entries=69
+BASE_SHA256=9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6
+MOD_SHA256=07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255

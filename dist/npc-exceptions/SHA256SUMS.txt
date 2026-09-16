@@ -1,0 +1,2 @@
+19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19  whileaway-0.3.1-npc-exceptions.jar
+d34f61add10bcfd2ff44fe6cfc4034f74abab503d0f074eb0940b55646afeb4d  whileaway-0.3.1-npc-exceptions-source.zip

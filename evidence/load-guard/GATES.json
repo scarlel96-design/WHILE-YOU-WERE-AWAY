@@ -1,0 +1,33 @@
+{
+  "wayfarer_suite": "PASS",
+  "overall_stability": "PARTIAL",
+  "distinct_client_processes": 11,
+  "crash_snapshots": 5,
+  "crash_final_verifies": 1,
+  "exception_processes": 5,
+  "copied_world_pairs": [
+    {
+      "repeat": 1,
+      "original_checkpoint": 4,
+      "copy_checkpoint": 2,
+      "generation": 0,
+      "same_identity_within_each_world": true,
+      "independent_worlds": true
+    }
+  ],
+  "scope": "Load fail-closed boundary and bounded Motion recovery. Not a full Actor recovery seal; no NPC expansion.",
+  "load_guard": "PASS",
+  "normal_create": "PASS",
+  "blocked_empty_campaign": "PASS",
+  "blocked_save_dispatch": "PASS",
+  "safe_snapshot_motion_recovery": "PASS",
+  "missing_uuid_auto_relink": "NOT IMPLEMENTED; blocked with preserved original",
+  "generation_auto_recovery": "NOT IMPLEMENTED; missing/negative blocked",
+  "actor_recovery_seal": "PARTIAL",
+  "complete_missing_ticket_crash_boundaries": "NOT TESTED",
+  "load_clients": 5,
+  "wayfarer_clients": 11,
+  "total_current_clients": 16,
+  "load_probe_cases": 580,
+  "load_probe_assertions": 2161
+}

@@ -1,0 +1,16 @@
+{
+  "changedExistingClasses": [],
+  "newClasses": [
+    "io/github/whileaway/ReturnNetworkGameTests.class",
+    "io/github/whileaway/ReturnNetworkState$Fact.class",
+    "io/github/whileaway/ReturnNetworkState$Location.class",
+    "io/github/whileaway/ReturnNetworkState$Participant.class",
+    "io/github/whileaway/ReturnNetworkState$Prerequisite.class",
+    "io/github/whileaway/ReturnNetworkState$Presentation.class",
+    "io/github/whileaway/ReturnNetworkState$Stage.class",
+    "io/github/whileaway/ReturnNetworkState$Structure.class",
+    "io/github/whileaway/ReturnNetworkState$Wait.class",
+    "io/github/whileaway/ReturnNetworkState.class"
+  ],
+  "unchangedArtEntries": 102
+}

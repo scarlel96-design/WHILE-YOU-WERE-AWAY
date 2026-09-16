@@ -1,0 +1,30 @@
+[
+  {
+    "exit": 0,
+    "input": "JAR=.\\evidence\\stability\\baseline\\previous.jar; expected version=0.3.0-dev.1, checkpoint_journal=0",
+    "phase": "BASELINE",
+    "output": "version=0.3.0-dev.1; checkpoint_journal=false; art_revision=2",
+    "command": "python .\\tools\\probe-stability.py .\\evidence\\stability\\baseline\\previous.jar 0.3.0-dev.1 0"
+  },
+  {
+    "exit": 0,
+    "input": "JAR=.\\dist\\whileaway-0.3.1-dev.1.jar; expected version=0.3.1-dev.1, checkpoint_journal=1",
+    "phase": "MODIFIED",
+    "output": "version=0.3.1-dev.1; checkpoint_journal=true; art_revision=2",
+    "command": "python .\\tools\\probe-stability.py .\\dist\\whileaway-0.3.1-dev.1.jar 0.3.1-dev.1 1"
+  },
+  {
+    "exit": 0,
+    "input": "build/rollback-stability/whileaway.jar (modified copy)",
+    "phase": "ROLLBACK",
+    "output": "ROLLBACK PASS: 0.3 JAR hash restored; world files untouched",
+    "command": "& 'C:\\Program Files\\Git\\bin\\bash.exe' -c 'chmod +x evidence/stability/ROLLBACK.sh && test -x evidence/stability/ROLLBACK.sh && evidence/stability/ROLLBACK.sh build/rollback-stability/whileaway.jar'"
+  },
+  {
+    "exit": 0,
+    "input": "JAR=.\\build\\rollback-stability\\whileaway.jar; expected version=0.3.0-dev.1, checkpoint_journal=0",
+    "phase": "ROLLBACK",
+    "output": "version=0.3.0-dev.1; checkpoint_journal=false; art_revision=2",
+    "command": "python .\\tools\\probe-stability.py .\\build\\rollback-stability\\whileaway.jar 0.3.0-dev.1 0"
+  }
+]

@@ -1,0 +1,1 @@
+PASS design requirements=49; tracked unfinished asset groups=6; foreshadow seeds=2

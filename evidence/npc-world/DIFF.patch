@@ -1,0 +1,866 @@
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -66,3 +66,7 @@
+ - User requested usage-aware SAFE PAUSE (not shutdown): check current five-hour and weekly limits at major work boundaries. Near exhaustion, do not start another large coding/test batch. Finish the in-flight save/recovery pair, preserve logs/artifacts and exact next step, mark unfinished gates PARTIAL/NOT TESTED, then pause. Never deliberately consume usage to reach a threshold. No automatic computer shutdown without a new explicit request.
+ 
+ - Immutable input for npc-exceptions is dist/npc-lifecycle (80a80cf1... JAR, eba768de... source). New output/evidence use npc-exceptions only. Use package-npc-exceptions.py; never republish npc-lifecycle. Player-independent NPC ownership does not imply an unfinished event has a living witness. Preserve PREPARED and generation while no eligible player is present; completed residents remain independent.
++
++- npc-world uses immutable npc-exceptions baseline (19636c1b... JAR / d34f61ad... source). Only new opt-in NpcWorldSmoke plus isolated tool/config changes; every existing 83 compiled class is byte-identical. Safe pause marker at evidence/npc-world/PAUSE_REQUESTED stops new launches. Check GATES.json and current client command ledger before resuming; next expected Chunk4, not full NPC closure.
++
++- npc-world continuation completed travel9 + divergent-copy5 actual clients (12 new this continuation). Copy harness is opt-in; baseline83 classes unchanged, current85. Rerun verify-npc-world.py THEN verify-npc-copy.py, as the first writes travel-only gates. Current build evidence tests-4.log; tests-2/3 are preserved build-tool failures. The old two-case pause verifier is historical only. Next NpcEvents.update residence/path/return-light environment classification; NPC corruption clients and combined regression remain, so no composite/0.3.2/art expansion. Preserve dist/npc-world before the next production change.
+--- a/build.gradle
++++ b/build.gradle
+@@ -114,6 +114,20 @@
+                 client(); gameDirectory=file('../../work/npc-exceptions-regression')
+                 systemProperty 'whileaway.npcSmoke',mode
+                 systemProperty 'whileaway.evidence',file('evidence/npc-exceptions/regression').absolutePath
++            }
++        }
++        ['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2'].each { mode ->
++            create("npcWorld${mode}") {
++                client(); gameDirectory=file('../../work/npc-world')
++                systemProperty 'whileaway.npcWorld',mode
++                systemProperty 'whileaway.evidence',file('evidence/npc-world/client').absolutePath
++            }
++        }
++        ['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB'].each { mode ->
++            create("npcCopy${mode}") {
++                client(); gameDirectory=file('../../work/npc-copy')
++                systemProperty 'whileaway.npcCopy',mode
++                systemProperty 'whileaway.evidence',file('evidence/npc-world/copy-client').absolutePath
+             }
+         }
+         recoveryLegacy {
+@@ -397,3 +411,47 @@
+     }
+ }
+ 
++
++['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2'].each { mode ->
++    tasks.named("runNpcWorld${mode}").configure {
++        ignoreExitValue=true
++        doFirst {
++            if(file('evidence/npc-world/PAUSE_REQUESTED').exists() && !mode.startsWith('Resume'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-world/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
++            def dir=file('../../work/npc-world');dir.mkdirs()
++            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
++            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
++            file('evidence/npc-world/client').mkdirs();file("evidence/npc-world/client/${mode}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            def text=file("evidence/npc-world/client/${mode}.txt").text
++            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
++        }
++    }
++}
++
++
++['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB'].each { mode ->
++    tasks.named("runNpcCopy${mode}").configure {
++        ignoreExitValue=true
++        doFirst {
++            if(file('evidence/npc-world/PAUSE_REQUESTED').exists() && !mode.startsWith('Reload'))throw new GradleException('PAUSED_AT_SAFE_BOUNDARY: no new NPC client launched')
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/npc-world/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
++            def dir=file('../../work/npc-copy');dir.mkdirs()
++            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false'])
++            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
++            file('evidence/npc-world/copy-client').mkdirs();file("evidence/npc-world/copy-client/${mode}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            def text=file("evidence/npc-world/copy-client/${mode}.txt").text
++            if(!text.contains("PASS ${mode}")||text.contains('FAIL '))throw new GradleException('NPC smoke failed')
++        }
++    }
++}
++
+--- a/docs/NPC_WORLD_031.md
++++ b/docs/NPC_WORLD_031.md
+@@ -0,0 +1,55 @@
++Current: While You Were Away / 0.3.1-dev.1 / npc-world / PARTIAL
++NPC world travel and copied-world divergence verified; NPC environment/corruption closure remains PARTIAL.
++Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21.0.5 / save format 4 / optional actorSchema 1 / art revision 2 unchanged.
++No 0.3.2 promotion, composite event, final art, resource pack, new monster, or Caveman use.
++
++BASELINE input JAR: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\baseline\previous.jar
++SHA256 19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19
++BASELINE source: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\baseline\previous-source.zip
++SHA256 d34f61add10bcfd2ff44fe6cfc4034f74abab503d0f074eb0940b55646afeb4d
++Immediate continuation snapshot (previous npc-world JAR/source) preserved at C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\npc-world\history\pause-20260914:
++JAR f5b159a950233a7c2413d2dc0d8e7b4f65287d44f728a1cd79c4323f7c02d438
++SOURCE 924bd5ca92bce9221751d684ae257113521703a6b866cab4234cf2eb716efa6a
++Neither adopted npc-exceptions distribution nor original seed worlds were overwritten.
++
++ACTUAL CHANGES
++Previously prepared NpcWorldSmoke.tick was executed for remaining Chunk4, Nether1/2, End1/2, CutNether2/ResumeNether2. Existing Java runtime unchanged for these nine cases; RUNTIME_SOURCE.sha256 checks that source.
++Added client/NpcCopySmoke.java: property whileaway.npcCopy is opt-in. Seed creates a real campaign NPC via existing adapter, saves checkpoint 1; AdvanceA uses real interaction/navigation to finish at 4; AdvanceB uses real interaction then removes the eligible witness to remain at 2; ReloadA/B use separate fresh processes. Identity, residence, work, facts, candidate uniqueness, and repeated interaction are asserted. No NPC teleport, fact edits, block rewrite or generation override.
++build.gradle: isolated runNpcCopySeed/AdvanceA/AdvanceB/ReloadA/ReloadB tasks, muted profile work/npc-copy, mandatory right secondary DISPLAY1 bounds. Test-only spectator/creative changes apply only to fixture player.
++tools/run-npc-copy.py: copies a closed seed directory twice, records full save-tree manifests before/after each process for the inactive world and seed; verifies child PID exit and named PASS marker. It refuses to overwrite old attempts.
++tools/verify-npc-copy.py: compares saved NBT identity, different progress/work/facts and fresh reload preservation; not just in-memory assertions. COPY_RUNTIME_SOURCE.sha256 covers the current source with the new harness.
++tools/NpcWorldFactProbe.java and probe-npc-world-facts.ps1: existing six semantic corruption cases plus two valid round trips, now explicitly retaining npc:doyun/shared_repair relationship through StoryStorage and disk reload. This is a storage probe, not a live NPC-to-NPC scene or actual corrupted-world client.
++Package/verification tools validate both opt-in harnesses, baseline class equality, current build result, source manifests, artifact reopening, and JAR-copy-only rollback.
++All 83 baseline classes remain byte-identical; 85 current classes = 83 baseline + NpcWorldSmoke + NpcCopySmoke. All 69 asset/data entries unchanged. Existing five GameTest source files unchanged.
++No production NpcEvents/NpcState/StoryActors/StoryStorage semantics changed. No new schema, migration, environmental classifier, path policy or corruption recovery was introduced. No NPC relationship semantics were replaced with a single affinity score.
++
++REAL MINECRAFT EVIDENCE
++Travel: 9 processes total, of which Chunk1/2 were verified before this continuation; 7 newly executed. Checkpoints 1/2/4 actually unloaded their entity/record/snapshot/home/light chunks and entity storage for 100 observed ticks. Snapshot/registered/residence anchors in these fixtures share chunk [2,4]; this does not prove mutually distant anchor chunks. currentTarget denotes adapter residence goal, not serialized path nodes.
++Nether and End each tested before conversation and during actual movement. Identity/generation/checkpoint/facts/work preserved while absent; other dimension has no StoryNpc. Return yields exactly one loaded canonical NPC and natural completion.
++CutNether2 PID20904 terminated after durable absent-state save. ResumeNether2 PID34532 loaded in Nether at checkpoint2 with UUID0811d8cc-6eae-40cf-acbe-418425268962, generation0, then returned and completed at4 with the same UUID and instance. This is a real process-restart pair.
++Copy: 5 new processes. One saved real NPC copied into A/B with the same UUID/instance. A completes at4 with maintain_return_light, B remains2 SUSPENDED with check_return_light. Both reopen in fresh processes and retain divergent state. Full inactive A/B and seed save trees remain byte-identical during the other world's run.
++All clients muted before startup and asserted on DISPLAY1 right secondary. No natural survival test claim. 12 new processes this continuation, 14 total in npc-world.
++Travel process durations total=830.555s; copy total=297.797s. These are launch-to-exit durations, not human playtime.
++
++VALIDATION
++Baseline runGameTestServer: 58 required tests; exit0 (earlier preserved baseline-tests.log).
++Current ./gradlew.bat --offline compileJava runGameTestServer build: All 58 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 49s; exit0; tests-4.log. Existing tests retained, not replaced with weaker cases.
++pwsh -NoProfile -File tools/probe-npc-world-storage.ps1: PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false; exit0. Fresh execution, including migration 1/2/3 to4, existing format4 and actor extension.
++pwsh -NoProfile -File tools/probe-npc-world-facts.ps1: PASS NPC storage cases=8 semanticBlocked=6 normalRoundTrips=2 npcCounterpartRoundTrips=2 originalsPreserved=true actualClient=false; exit0. Six corrupt fixtures stay blocked with original/quarantine byte equality after attempted saves; do not promote this into actual Minecraft corruption PASS.
++python tools/verify-npc-world.py: PASS NPC world travel: actual unload/reload 3 checkpoints; Nether/End each 2; Nether cut/fresh process; identity/facts/disk/seed preservation; NPC overall PARTIAL; exit0.
++python tools/verify-npc-copy.py: PASS REAL COPY WORLD: one saved NPC split into A/B; same identity; A completed/B suspended; separate fresh processes preserve different facts/work/checkpoint; inactive trees byte-identical; exit0.
++
++FAILURES AND REWORK
++1. build.gradle parse failure at line460, tests-2.log, exit1. Cause: tool insertion selected the run-definition block instead of the final task-configuration block and duplicated an invalid outer section. Preserved failed file under failures/. Rebuilt exactly the two bounded blocks from preserved source ZIP, with last matching top-level configuration. No client ran from this configuration.
++2. NpcCopySmoke compilation failed with missing GameType symbol, tests-3.log, exit1. Cause: GameType belongs to net.minecraft.world.level, not the imported net.minecraft.world package. Added explicit import, refreshed copy source manifest. tests-4.log then built and passed58/Core176857; all5 copy clients then passed. Two development corrections, no production policy correction.
++3. Rollback helper failed to launch in the initial execution context (child exit -1073741502; wrapper exit1). Preserved failures/rollback-launch-context.log, confirmed the target was still the modified JAR copy, and reran the same verified copy-only script with the approved execution context. Final rollback and restored policy check exit0. This is an execution-environment failure, not a story/save regression.
++Expected CORRUPT/MANUAL_DIAGNOSTIC probe log errors represent successful fail-closed fixtures, not silent resets. No failures in the final actual client suites.
++
++STORAGE AND MODEL
++Format4 / optional actorSchema1 unchanged; migration semantics unchanged. Identity remains independent of runtime path. Fail-closed/write guard unchanged. Original corrupted probe data and same-hash quarantine preserved. Existing death/A-E client PASS is baseline evidence, not rerun this slice. Full final NPC regression awaits environment/corruption work.
++Only primary agent performed implementation and review; no Terra/Luna/subagents, Caveman HOLD/off. No model-token attribution or savings experiment. Usage observed at resume: five-hour12%, weekly48%; at copy batch checkpoint: five-hour58%, weekly56%; after copy verification: five-hour66%, weekly57%. Account percentages are not per-model token measurements and no exhaustion claim is made.
++JAR rollback is not save downgrade; no world files touched by rollback. No automatic shutdown.
++
++NEXT EXACT START
++After usage check, preserve this packaged npc-world baseline. Begin NpcEvents.update environment classification (residence valid/temporarily blocked/unreachable/missing/conflict; path chunk-unavailable vs blocked/invalid/missing), without deleting blocks, moving NPC identity or auto-completing. Add return-light missing/wrong-block/restored and environment save/restart tests. Then actual NPC corruption clients and combined final NPC regression. NPC must remain PARTIAL; composite NOT STARTED until all requested gates pass.
++
+--- a/src/main/java/io/github/whileaway/client/NpcCopySmoke.java
++++ b/src/main/java/io/github/whileaway/client/NpcCopySmoke.java
+@@ -0,0 +1,81 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.entity.StoryNpc;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.screens.*;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.world.*;
++import net.minecraft.world.level.GameType;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in divergent copies, with real interaction/navigation and no actor/fact edits. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class NpcCopySmoke {
++    private static final String MODE=System.getProperty("whileaway.npcCopy","");
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/npc-world/copy-client"));
++    private static boolean launched,setup,stopped;private static volatile boolean queued;
++    private static int ticks,stable;private static UUID uuid,instance;private static int generation,initial;
++    private static Set<String> facts;private static net.minecraft.core.BlockPos home;
++    private static void check(boolean v,String s){if(!v)throw new IllegalStateException(s);}
++    private static void note(String s){try{Files.createDirectories(E);Files.writeString(E.resolve(MODE+".txt"),s+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception e){throw new IllegalStateException(e);}}
++    private static void fail(Exception e){note("FAIL "+e);Runtime.getRuntime().halt(8);}
++    private static void snapshot(MinecraftServer s,String suffix)throws Exception {
++        s.saveEverything(true,true,true);
++        Files.copy(s.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat"),E.resolve(MODE+suffix+".dat"));
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post event){
++        if(MODE.isEmpty()||stopped)return;var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen){launched=true;Files.createDirectories(E);note(ClientTestEnvironment.verify(E,MODE));
++                mc.createWorldOpenFlows().openWorld("copy-"+(MODE.equals("Seed")?"Seed":MODE.substring(MODE.length()-1)),mc::stop);}
++            if(mc.screen instanceof BackupConfirmScreen screen)for(var c:screen.children())if(c instanceof net.minecraft.client.gui.components.Button b&&b.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())){b.onPress();break;}
++            if(++ticks>12000)throw new IllegalStateException("NPC_COPY_TIMEOUT "+MODE);
++            if(mc.player==null||mc.getSingleplayerServer()==null||queued||ticks%5!=0)return;queued=true;var playerId=mc.player.getUUID();
++            mc.getSingleplayerServer().execute(()->{try {
++                var s=mc.getSingleplayerServer();var p=s.getPlayerList().getPlayer(playerId);if(p==null)return;
++                var city=s.getLevel(CityDistrict.KEY);check(city!=null&&CityDistrict.get(city).ready(),"fixture city missing");
++                if(!setup){setup=true;var before=NarrativeData.get(s).actors.get(NpcEvents.STORY);
++                    if(MODE.equals("Seed"))check(before==null,"not a pristine seed");
++                    else {
++                        check(before!=null,"existing copied NPC lost");uuid=before.entityId;instance=before.instanceId;generation=before.generation;facts=Set.copyOf(before.facts);home=NpcState.home(before);initial=before.checkpoint.checkpoint;
++                        check(initial==(MODE.startsWith("Advance")?1:MODE.endsWith("A")?4:2),"unexpected persisted checkpoint");
++                        note("PASS input checkpoint="+initial+" uuid="+uuid+" instance="+instance+" generation="+generation+" work="+NpcState.work(before));snapshot(s,"-input");
++                    }
++                    if(!MODE.startsWith("Reload")){
++                        p.setGameMode(GameType.CREATIVE);p.teleportTo(city,CityDistrict.ARRIVAL.getX()+2.5,CityDistrict.ARRIVAL.getY(),CityDistrict.ARRIVAL.getZ()+.5,Set.of(),0,0);
++                    }
++                }
++                var r=NarrativeData.get(s).actors.get(NpcEvents.STORY);if(r==null)return;
++                if(!MODE.equals("Seed"))check(r.entityId.equals(uuid)&&r.instanceId.equals(instance)&&r.generation==generation&&NpcState.home(r).equals(home)&&r.dimension.equals("whileaway:quiet_city"),"copied identity/residence drift");
++                var entity=StoryActors.find(s,r.entityId);if(!(entity instanceof StoryNpc npc))return;
++                check(ActorCandidates.inspect(s,r).outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"canonical not unique");
++                long count=0;for(var en:city.getAllEntities())if(en instanceof StoryNpc)count++;check(count==1,"duplicate NPC");
++                if(MODE.startsWith("Advance")&&r.checkpoint.checkpoint==1){
++                    check(npc.mobInteract(p,InteractionHand.MAIN_HAND).consumesAction(),"real interaction rejected");
++                    if(MODE.endsWith("B"))p.setGameMode(GameType.SPECTATOR); // no living witness; retain unfinished story naturally
++                }
++                int wanted=MODE.equals("Seed")?1:MODE.endsWith("A")?4:2;
++                if(r.checkpoint.checkpoint<wanted)return;
++                check(r.checkpoint.checkpoint==wanted,"unwanted progress");
++                if(MODE.equals("Seed"))p.setGameMode(GameType.SPECTATOR);
++                check(NpcState.integrity(r).isEmpty()&&StoryActors.integrity(s).isEmpty(),"integrity");
++                if(MODE.startsWith("Reload"))check(r.facts.equals(facts),"reload changed stored facts/work");
++                if(wanted==4){
++                    check(NpcState.work(r).equals("maintain_return_light")&&r.lifecycle==StoryActorRecord.Lifecycle.ACTIVE,"resident state");
++                    var f=Set.copyOf(r.facts);check(!NpcEvents.interact(npc,p)&&r.facts.equals(f),"duplicate dialogue/relation");
++                }else if(wanted==2)check(NpcState.work(r).equals("check_return_light")&&!r.facts.contains(NpcState.LINK),"B inherited A completion");
++                if((stable+=5)<120)return;
++                if(wanted<4)check(r.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED,"unfinished absent witness not suspended");
++                snapshot(s,"");note("PASS "+MODE+" checkpoint="+r.checkpoint.checkpoint+" uuid="+r.entityId+" instance="+r.instanceId+" generation="+r.generation+" canonical=1 work="+NpcState.work(r)+" facts="+r.facts+" stableTicks="+stable);
++                stopped=true;s.halt(false);mc.execute(mc::stop);
++            }catch(Exception e){fail(e);}finally{queued=false;}});
++        }catch(Exception e){fail(e);}
++    }
++}
+--- a/src/main/java/io/github/whileaway/client/NpcWorldSmoke.java
++++ b/src/main/java/io/github/whileaway/client/NpcWorldSmoke.java
+@@ -0,0 +1,109 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.entity.StoryNpc;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.screens.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.nbt.Tag;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.*;
++import net.minecraft.world.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in copied-world tests. No NPC teleport, story edits, forced chunk tickets or world rebuild. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class NpcWorldSmoke {
++    private static final String MODE=System.getProperty("whileaway.npcWorld","");
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/npc-world/client"));
++    private static boolean launched,setup,stopped;private static volatile boolean queued;
++    private static int ticks,phase,wait,unloadedTicks,stable,checkpoint,generation;
++    private static UUID uuid,instance;private static Set<String> facts;private static String work,dimension;
++    private static BlockPos residence,lastLive,registered,snapshot;private static net.minecraft.world.phys.Vec3 movementStart;
++    private static void check(boolean b,String s){if(!b)throw new IllegalStateException(s);}
++    private static void note(String s){try{Files.createDirectories(E);Files.writeString(E.resolve(MODE+".txt"),s+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception e){throw new IllegalStateException(e);}}
++    private static void fail(Exception e){note("FAIL "+e);Runtime.getRuntime().halt(8);}
++    private static StoryActorRecord record(MinecraftServer s){var r=NarrativeData.get(s).actors.get(NpcEvents.STORY);check(r!=null,"NPC record missing");return r;}
++    private static BlockPos snapshot(StoryActorRecord r){var p=r.snapshot.getList("Pos",Tag.TAG_DOUBLE);check(p.size()==3,"snapshot position missing");return BlockPos.containing(p.getDouble(0),p.getDouble(1),p.getDouble(2));}
++    private static void remember(StoryActorRecord r){uuid=r.entityId;instance=r.instanceId;generation=r.generation;facts=Set.copyOf(r.facts);work=NpcState.work(r);residence=NpcState.home(r);dimension=r.dimension;checkpoint=r.checkpoint.checkpoint;registered=r.position;snapshot=snapshot(r);}
++    private static void identity(StoryActorRecord r){check(r.storyId.equals(NpcEvents.STORY)&&r.entityId.equals(uuid)&&r.instanceId.equals(instance)&&r.generation==generation&&r.dimension.equals(dimension)&&NpcState.home(r).equals(residence),"NPC identity/binding/residence changed");}
++    private static void unchanged(StoryActorRecord r){identity(r);check(r.checkpoint.checkpoint==checkpoint&&r.facts.equals(facts)&&NpcState.work(r).equals(work),"absence progressed checkpoint/facts/work");}
++    private static void save(MinecraftServer s,String suffix)throws Exception {s.saveEverything(true,true,true);Files.copy(s.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat"),E.resolve(MODE+suffix+".dat"),StandardCopyOption.REPLACE_EXISTING);}
++    private static void back(ServerPlayer p,BlockPos pos){p.setGameMode(GameType.CREATIVE);p.teleportTo(p.getServer().getLevel(CityDistrict.KEY),pos.getX()+2.5,pos.getY(),pos.getZ()+.5,Set.of(),0,0);}
++    private static String positions(StoryActorRecord r,ServerPlayer p){return "live="+lastLive+"/"+new ChunkPos(lastLive)+" registered="+r.position+"/"+new ChunkPos(r.position)+" snapshot="+snapshot(r)+"/"+new ChunkPos(snapshot(r))+" residence="+residence+"/"+new ChunkPos(residence)+" currentTarget="+residence+"/"+new ChunkPos(residence)+" returnLight="+residence.offset(2,0,0)+"/"+new ChunkPos(residence.offset(2,0,0))+" player="+p.blockPosition()+"/"+p.chunkPosition()+" playerDimension="+p.level().dimension().location();}
++    private static boolean unloaded(ServerLevel l,BlockPos p){return !l.hasChunkAt(p)&&!l.areEntitiesLoaded(new ChunkPos(p).toLong());}
++    private static int target(){return Character.digit(MODE.charAt(MODE.length()-1),10);}
++    @SubscribeEvent public static void tick(ClientTickEvent.Post e){
++        if(MODE.isEmpty()||stopped)return;var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen){launched=true;Files.createDirectories(E);note(ClientTestEnvironment.verify(E,MODE));mc.createWorldOpenFlows().openWorld("world-"+(MODE.startsWith("Resume")?"CutNether2":MODE),mc::stop);}
++            if(mc.screen instanceof BackupConfirmScreen screen)for(var c:screen.children())if(c instanceof net.minecraft.client.gui.components.Button b&&b.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())){b.onPress();break;}
++            if(++ticks>18000)throw new IllegalStateException("NPC_WORLD_TIMEOUT phase="+phase+" wait="+wait);
++            if(mc.player==null||mc.getSingleplayerServer()==null||queued||ticks%5!=0)return;queued=true;var id=mc.player.getUUID();
++            mc.getSingleplayerServer().execute(()->{try {
++                var s=mc.getSingleplayerServer();var p=s.getPlayerList().getPlayer(id);if(p==null)return;var city=s.getLevel(CityDistrict.KEY);
++                if(!setup){setup=true;check(CityDistrict.get(city).ready(),"missing fixture city");
++                    if(MODE.startsWith("Resume")){var r=record(s);remember(r);lastLive=r.position;check(p.level().dimension().equals(Level.NETHER)&&checkpoint==2,"fresh process did not resume absent in Nether");note("PASS fresh_start dimension=Nether checkpoint=2 uuid="+uuid);phase=1;}
++                    else{check(!NarrativeData.get(s).actors.containsKey(NpcEvents.STORY),"not a pristine copy");back(p,CityDistrict.ARRIVAL);}
++                }
++                var r=NarrativeData.get(s).actors.get(NpcEvents.STORY);if(r==null)return;
++                var found=StoryActors.find(s,r.entityId);var npc=found instanceof StoryNpc n?n:null;
++                if(phase==0){
++                    if(npc==null)return;
++                    if(target()>=2&&r.checkpoint.checkpoint==1){movementStart=npc.position();check(npc.mobInteract(p,InteractionHand.MAIN_HAND).consumesAction(),"actual interaction rejected");}
++                    if(r.checkpoint.checkpoint!=target())return;
++                    if(target()==2&&(movementStart==null||npc.position().distanceToSqr(movementStart)<=.25))return;
++                    remember(r);lastLive=npc.blockPosition();save(s,"-before");note("BEFORE "+positions(r,p)+" checkpoint="+checkpoint+" generation="+generation+" actualMovement="+(target()==2));
++                    var away=MODE.contains("Nether")?s.getLevel(Level.NETHER):MODE.startsWith("End")?s.getLevel(Level.END):city;
++                    p.setGameMode(GameType.SPECTATOR);p.teleportTo(away,4096.5,160,4096.5,Set.of(),0,0);phase=1;wait=0;return;
++                }
++                if(phase==1){
++                    unchanged(r);wait+=5;if(npc!=null)lastLive=npc.blockPosition();
++                    if(wait<40)return;
++                    check(r.lifecycle==(checkpoint==4?StoryActorRecord.Lifecycle.ACTIVE:StoryActorRecord.Lifecycle.SUSPENDED),"wrong absence lifecycle "+r.lifecycle);
++                    if(MODE.startsWith("Chunk")){
++                        boolean all=npc==null&&unloaded(city,lastLive)&&unloaded(city,r.position)&&unloaded(city,snapshot(r))&&unloaded(city,residence)&&unloaded(city,residence.offset(2,0,0));
++                        if(!all){unloadedTicks=0;check(wait<3000,"actual NPC chunks did not unload "+positions(r,p));return;}
++                        check(p.serverLevel().hasChunkAt(p.blockPosition()),"player chunk not loaded");
++                        if((unloadedTicks+=5)<100)return;
++                        note("PASS actual_unload heldTicks="+unloadedTicks+" entityAbsent=true hasChunk=false entitiesLoaded=false allTrackedPositions=true "+positions(r,p));
++                    }else{
++                        if(wait<120)return;
++                        check(p.serverLevel()!=city&&p.serverLevel().getEntity(uuid)==null,"NPC crossed dimension");
++                        long wrong=0;for(var en:p.serverLevel().getAllEntities())if(en instanceof StoryNpc)wrong++;
++                        check(wrong==0,"duplicate NPC in other dimension");note("PASS dimension_absence="+p.level().dimension().location()+" checkpoint="+checkpoint+" unchanged=true wrongDimensionNPC=0 heldTicks="+wait);
++                    }
++                    save(s,"-away");
++                    if(MODE.startsWith("Cut")){note("PASS "+MODE+" checkpoint="+checkpoint+" generation="+generation+" uuid="+uuid+" playerDimension=Nether durable=true");Runtime.getRuntime().halt(0);}
++                    back(p,lastLive);phase=2;wait=0;return;
++                }
++                if(phase==2){
++                    identity(r);if(npc==null){check((wait+=5)<800,"NPC failed to reconnect");return;}
++                    check(ActorCandidates.inspect(s,r).outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"canonical candidate not unique");
++                    long count=0;for(var en:city.getAllEntities())if(en instanceof StoryNpc)count++;check(count==1,"duplicate StoryNpc in loaded city");
++                    check(r.facts.containsAll(facts),"return lost facts before resuming");
++                    note("PASS reconnected checkpoint="+r.checkpoint.checkpoint+" generation="+generation+" sameUUID="+uuid+" canonical=1 duplicates=0");save(s,"-return");phase=3;
++                }
++                if(phase==3){
++                    if(npc==null)return;
++                    if(r.checkpoint.checkpoint==1)check(npc.mobInteract(p,InteractionHand.MAIN_HAND).consumesAction(),"return interaction rejected");
++                    if(r.checkpoint.checkpoint<4)return;
++                    identity(r);check(facts.stream().filter(f->!f.startsWith("npc.work=")).allMatch(r.facts::contains),"permanent facts lost");
++                    check(StoryActors.integrity(s).isEmpty()&&NpcState.work(r).equals("maintain_return_light")&&r.lifecycle==StoryActorRecord.Lifecycle.ACTIVE,"completed resident/integrity");
++                    var before=Set.copyOf(r.facts);check(!NpcEvents.interact(npc,p)&&before.equals(r.facts),"repeat relationship/completion");
++                    check(npc.distanceToSqr(residence.getX()+.5,residence.getY(),residence.getZ()+.5)<=1.4,"NPC did not reach residence naturally");
++                    if((stable+=5)<100)return;
++                    save(s,"");note("PASS "+MODE+" canonical=1 generation="+generation+" uuid="+uuid+" instance="+instance+" checkpoint=4 work="+NpcState.work(r)+" dimension="+dimension+" stableTicks="+stable);
++                    stopped=true;s.halt(false);mc.execute(mc::stop);
++                }
++            }catch(Exception x){fail(x);}finally{queued=false;}});
++        }catch(Exception x){fail(x);}
++    }
++}
+--- a/tools/NpcWorldArchiveProbe.java
++++ b/tools/NpcWorldArchiveProbe.java
+@@ -0,0 +1,15 @@
++import java.util.jar.JarFile;
++import java.nio.charset.StandardCharsets;
++public final class NpcWorldArchiveProbe {
++ public static void main(String[] args)throws Exception {
++  PresenceArchiveProbe.main(new String[]{args[0],"present"});
++  boolean expected=args[1].equals("modified");
++  try(var jar=new JarFile(args[0])) {
++   String npc=new String(jar.getInputStream(jar.getEntry("io/github/whileaway/NpcEvents.class")).readAllBytes(),StandardCharsets.ISO_8859_1);
++   String data=new String(jar.getInputStream(jar.getEntry("io/github/whileaway/NarrativeData.class")).readAllBytes(),StandardCharsets.ISO_8859_1);
++   if(!npc.contains("hasWitness")||(jar.getEntry("io/github/whileaway/client/NpcWorldSmoke.class")!=null)!=expected||!data.contains("STORY_WRITE_BLOCKED")||jar.getEntry("io/github/whileaway/CanonicalRecovery.class")==null)throw new AssertionError("artifact contract");
++   if((jar.getEntry("io/github/whileaway/client/NpcCopySmoke.class")!=null)!=expected)throw new AssertionError("copy harness contract");
++   System.out.println("PASS archive="+args[1]+" canonicalRecovery=true writeGuard=true campaignNpc=true witnessGate=true worldHarness="+expected+" copyHarness="+expected);
++  }
++ }
++}
+--- a/tools/NpcWorldFactProbe.java
++++ b/tools/NpcWorldFactProbe.java
+@@ -0,0 +1,51 @@
++package io.github.whileaway;
++import java.nio.file.*;
++import java.util.*;
++import java.util.function.Consumer;
++import net.minecraft.SharedConstants;
++import net.minecraft.nbt.*;
++import net.minecraft.world.level.storage.DimensionDataStorage;
++
++/** Real StoryStorage calls on isolated NBT fixtures, not a real-client claim. */
++public final class NpcWorldFactProbe {
++    private static final Set<String> DIMS=Set.of("minecraft:overworld","minecraft:the_nether","minecraft:the_end","whileaway:quiet_city");
++    private static CompoundTag actor(CompoundTag root){return root.getCompound("data").getList("actors",10).getCompound(0);}
++    private static void remove(CompoundTag t,String prefix){t.getList("facts",8).removeIf(x->x.getAsString().startsWith(prefix));}
++    private static void add(CompoundTag t,String fact){t.getList("facts",8).add(StringTag.valueOf(fact));}
++    private static void check(boolean v,String s){if(!v)throw new AssertionError(s);}
++    public static void main(String[] args)throws Exception {
++        SharedConstants.tryDetectVersion();Path source=Path.of(args[0]),base=Path.of(args[1]);byte[] original=Files.readAllBytes(source);
++        var preparing=NbtIo.readCompressed(source,NbtAccounter.unlimitedHeap());
++        var complete=preparing.copy();var t=actor(complete);
++        t.putInt("checkpoint",4);t.putString("state","COMPLETED");t.putString("lifecycleState","ACTIVE");remove(t,"npc.work=");
++        for(String f:List.of("npc.met="+UUID.randomUUID(),NpcState.DIALOGUE,NpcState.ARRIVED,NpcState.OBSERVED,NpcState.SETTLED,NpcState.LINK,"npc.work=maintain_return_light"))add(t,f);
++        Map<String,Consumer<CompoundTag>> invalid=new LinkedHashMap<>();
++        invalid.put("missing_home",a->remove(a,"npc.home="));
++        invalid.put("multiple_home",a->add(a,"npc.home=123"));
++        invalid.put("malformed_home",a->{remove(a,"npc.home=");add(a,"npc.home=not-a-position");});
++        invalid.put("missing_dialogue",a->remove(a,"npc.dialogue="));
++        invalid.put("missing_work",a->remove(a,"npc.work="));
++        invalid.put("premature_link",a->{a.putInt("checkpoint",1);a.putString("state","PHASE_1");});
++        int cases=0;
++        for(var entry:invalid.entrySet()) {
++            var root=complete.copy();entry.getValue().accept(actor(root));Path dir=base.resolve(entry.getKey());Files.createDirectories(dir);
++            Path f=dir.resolve("whileaway_story.dat");NbtIo.writeCompressed(root,f);byte[] before=Files.readAllBytes(f);
++            var store=new DimensionDataStorage(dir.toFile(),null,null);boolean blocked=false;
++            try{StoryStorage.open(store,dir,null,DIMS);}catch(StoryStorage.Blocked ex){blocked=!ex.status.writable()&&ex.status.outcome()==StoryStorage.Outcome.CORRUPT;}
++            check(blocked,"NPC semantic corruption must fail closed: "+entry.getKey());store.save();
++            check(Arrays.equals(before,Files.readAllBytes(f)),"write protection "+entry.getKey());
++            check(Arrays.equals(before,Files.readAllBytes(dir.resolve("whileaway-quarantine/"+StoryStorage.digest(before)+".dat"))),"quarantine "+entry.getKey());cases++;
++        }
++        for(var root:List.of(preparing,complete)) {
++            add(actor(root),NpcState.relationship("npc:doyun","shared_repair"));
++            Path dir=base.resolve("normal-"+cases);Files.createDirectories(dir);Path f=dir.resolve("whileaway_story.dat");NbtIo.writeCompressed(root,f);
++            var loaded=StoryStorage.open(new DimensionDataStorage(dir.toFile(),null,null),dir,null,DIMS);var r=loaded.actors.get(NpcEvents.STORY);
++            check(r!=null&&NpcState.integrity(r).isEmpty(),"valid NPC rejected");loaded.setDirty();loaded.save(f.toFile(),null);
++            var again=StoryStorage.open(new DimensionDataStorage(dir.toFile(),null,null),dir,null,DIMS).actors.get(NpcEvents.STORY);
++            check(again.facts.contains(NpcState.relationship("npc:doyun","shared_repair")),"NPC to NPC relationship lost");
++            check(again.facts.equals(r.facts)&&again.entityId.equals(r.entityId)&&again.generation==r.generation,"NPC reload drift");cases++;
++        }
++        check(Arrays.equals(original,Files.readAllBytes(source)),"fixture source altered");
++        System.out.println("PASS NPC storage cases="+cases+" semanticBlocked=6 normalRoundTrips=2 npcCounterpartRoundTrips=2 originalsPreserved=true actualClient=false");System.exit(0);
++    }
++}
+--- a/tools/package-npc-world.py
++++ b/tools/package-npc-world.py
+@@ -0,0 +1,97 @@
++"""Package a PARTIAL development slice; never republish the adopted lifecycle baseline."""
++from pathlib import Path
++import difflib
++import hashlib
++import shutil
++import sys
++import zipfile
++
++R = Path(__file__).resolve().parents[1]
++E = R/'evidence/npc-world'
++D = R/'dist/npc-world'
++BASE = E/'baseline/previous.jar'
++MOD = D/'whileaway-0.3.1-npc-world.jar'
++sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
++baseline_hash = '19636c1b8d8c8b9faf7693f5c05e69b199bb896c4f131c7f72c34331ca099c19'
++source_hash = 'd34f61add10bcfd2ff44fe6cfc4034f74abab503d0f074eb0940b55646afeb4d'
++assert sha(BASE) == baseline_hash
++assert sha(E/'baseline/previous-source.zip') == source_hash
++assert sha(R/'dist/npc-exceptions/whileaway-0.3.1-npc-exceptions.jar') == baseline_hash
++assert sha(R/'dist/npc-exceptions/whileaway-0.3.1-npc-exceptions-source.zip') == source_hash
++source = [p for folder in ('src','tools','docs','gradle') for p in (R/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
++source += [R/n for n in ('README.md','AGENTS.md','build.gradle','gradle.properties','settings.gradle','gradlew','gradlew.bat','.gitignore')]
++if '--prepare' in sys.argv:
++    D.mkdir(parents=True,exist_ok=True)
++    shutil.copyfile(R/'build/libs/whileaway-0.3.1-dev.1.jar',MOD)
++    differences = []
++    with zipfile.ZipFile(E/'baseline/previous-source.zip') as old:
++        for p in sorted(source):
++            try: after = p.read_text(encoding='utf-8')
++            except UnicodeError: continue
++            name = p.relative_to(R).as_posix()
++            key = 'while-you-were-away/'+name
++            before = old.read(key).decode('utf-8').replace('\r\n','\n') if key in old.namelist() else ''
++            differences.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+name,tofile='b/'+name))
++        for name in ('ActorGameTests.java','StoryGameTests.java','CanonicalGameTests.java','NpcGameTests.java','NpcExceptionGameTests.java'):
++            key = 'while-you-were-away/src/main/java/io/github/whileaway/'+name
++            assert old.read(key) == (R/'src/main/java/io/github/whileaway'/name).read_bytes()
++    (E/'DIFF.patch').write_text(''.join(differences),encoding='utf-8')
++    rollback = '''#!/usr/bin/env bash
++set -euo pipefail
++# Restore only a caller-supplied JAR copy. No world/save operations.
++HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
++BASE="$HERE/baseline/previous.jar"
++TARGET="${1:?Pass a modified JAR copy to restore}"
++[[ -f "$TARGET" && ! -L "$TARGET" ]] || exit 2
++[[ "$(sha256sum "$BASE" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 3
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "MOD_HASH" ]] || { echo 'ERROR preserving unexpected target'; exit 4; }
++cp -- "$BASE" "$TARGET"
++[[ "$(sha256sum "$TARGET" | cut -d' ' -f1)" == "BASE_HASH" ]] || exit 5
++echo 'ROLLBACK PASS: npc-exceptions JAR restored; world files untouched'
++'''.replace('BASE_HASH',baseline_hash).replace('MOD_HASH',sha(MOD))
++    (E/'ROLLBACK.sh').write_text(rollback,encoding='utf-8',newline='\n')
++    with zipfile.ZipFile(BASE) as old, zipfile.ZipFile(MOD) as new:
++        assets = [n for n in old.namelist() if n.startswith(('assets/','data/')) and not n.endswith('/')]
++        assert set(assets) == {n for n in new.namelist() if n.startswith(('assets/','data/')) and not n.endswith('/')}
++        assert all(old.read(n) == new.read(n) for n in assets)
++        classes = list((R/'build/classes/java/main').rglob('*.class'))
++        assert all(new.read(p.relative_to(R/'build/classes/java/main').as_posix()) == p.read_bytes() for p in classes)
++        assert new.testzip() is None
++        previous_classes = [n for n in old.namelist() if n.endswith('.class')]
++        assert all(old.read(n) == new.read(n) for n in previous_classes), 'Baseline class changed'
++    text = f'PASS archive reopened; runtime classes match={len(classes)}; asset/data entries={len(assets)} (all baseline assets/data unchanged); baseline GameTest sources unchanged=5\nBASE_SHA256={sha(BASE)}\nMOD_SHA256={sha(MOD)}\n'
++    (E/'ARCHIVE_PROOF.txt').write_text(text,encoding='utf-8')
++    print(text)
++else:
++    import json
++    gates=json.loads((E/'GATES.json').read_text())
++    assert gates.get('world_travel')=='PASS' or (gates.get('safePause') and gates.get('buildableCheckpoint')=='PASS')
++    assert 'All 58 required tests passed' in (E/'tests-4.log').read_text(encoding='utf-8-sig')
++    assert (E/'VERIFICATION.txt').is_file()
++    assert 'ROLLBACK PASS' in (E/'rollback.log').read_text(encoding='utf-8-sig')
++    for line in (E/'RUNTIME_SOURCE.sha256').read_text().splitlines():
++        digest,name=line.split('  ',1)
++        assert sha(R/name)==digest, name
++    for line in (E/'COPY_RUNTIME_SOURCE.sha256').read_text().splitlines():
++        digest,name=line.split('  ',1)
++        assert sha(R/name)==digest, name
++    files = source+[BASE,E/'baseline/previous-source.zip',MOD]
++    files += [p for folder in ('npc-world',) for p in (R/'evidence'/folder).rglob('*') if p.is_file() and p.suffix not in ('.jar','.zip')]
++    manifest = E/'SOURCE_MANIFEST.sha256'
++    files = sorted(set(p for p in files if p != manifest))
++    manifest.write_text(''.join(sha(p)+'  '+p.relative_to(R).as_posix()+'\n' for p in files),encoding='utf-8')
++    files.append(manifest)
++    archive = D/'whileaway-0.3.1-npc-world-source.zip'
++    with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
++        for p in files:
++            info=zipfile.ZipInfo('while-you-were-away/'+p.relative_to(R).as_posix(),(2026,9,14,0,0,0))
++            info.create_system=3
++            info.external_attr=(0o100755 if p.name in ('ROLLBACK.sh','gradlew') else 0o100644)<<16
++            z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED)
++    with zipfile.ZipFile(archive) as z:
++        assert z.testzip() is None
++        for p in files: assert z.read('while-you-were-away/'+p.relative_to(R).as_posix()) == p.read_bytes()
++    for p in (MOD,E/'DIFF.patch',E/'VERIFICATION.txt',E/'ROLLBACK.sh'): assert p.read_bytes()
++    (D/'SHA256SUMS.txt').write_text(sha(MOD)+'  '+MOD.name+'\n'+sha(archive)+'  '+archive.name+'\n',encoding='utf-8')
++    print(f'PASS development archive reopened and verified; files={len(files)}; version=0.3.1-dev.1; overall=PARTIAL')
++
+--- a/tools/probe-npc-world-facts.ps1
++++ b/tools/probe-npc-world-facts.ps1
+@@ -0,0 +1,18 @@
++$ErrorActionPreference='Stop'
++Set-Location (Split-Path -Parent $PSScriptRoot)
++$jdk='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin'
++$folder='build/npc-world-fact-probe'
++New-Item -ItemType Directory -Force $folder | Out-Null
++$cp=@((Resolve-Path build/classes/java/main).Path,(Resolve-Path build/moddev/artifacts/neoforge-21.1.249-merged.jar).Path)
++$cp+=Get-Content build/moddev/actorExceptionsCopy1LegacyClasspath.txt
++$cp=$cp -join ';'
++# Argument files avoid Windows command-line length limits; use slash paths for Java parsing.
++@('-encoding','UTF-8','-cp',('"'+$cp.Replace('\','/')+'"'),'-d',$folder,'tools/NpcWorldFactProbe.java') | Set-Content "$folder/compile.args" -Encoding utf8NoBOM
++& "$jdk/javac.exe" "@$folder/compile.args"
++if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
++@('-cp',('"'+($folder+';'+$cp).Replace('\','/')+'"'),'io.github.whileaway.NpcWorldFactProbe','evidence/npc-lifecycle/client/CutA.dat',("$folder/data-"+[DateTime]::UtcNow.Ticks)) | Set-Content "$folder/run.args" -Encoding utf8NoBOM
++& "$jdk/java.exe" "@$folder/run.args" *> evidence/npc-world/npc-facts-probe.log
++$rc=$LASTEXITCODE
++Get-Content evidence/npc-world/npc-facts-probe.log -Tail 20
++exit $rc
++
+--- a/tools/probe-npc-world-storage.ps1
++++ b/tools/probe-npc-world-storage.ps1
+@@ -0,0 +1,18 @@
++$ErrorActionPreference='Stop'
++Set-Location (Split-Path -Parent $PSScriptRoot)
++$jdk='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin'
++$folder='build/load-guard-probe'
++New-Item -ItemType Directory -Force $folder | Out-Null
++$cp=@((Resolve-Path build/classes/java/main).Path,(Resolve-Path build/moddev/artifacts/neoforge-21.1.249-merged.jar).Path)
++$cp+=Get-Content build/moddev/actorExceptionsCopy1LegacyClasspath.txt
++$cp=$cp -join ';'
++# Argument files avoid Windows command-line length limits; use slash paths for Java parsing.
++@('-encoding','UTF-8','-cp',('"'+$cp.Replace('\','/')+'"'),'-d',$folder,'tools/LoadGuardProbe.java') | Set-Content "$folder/compile.args" -Encoding utf8NoBOM
++& "$jdk/javac.exe" "@$folder/compile.args"
++if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
++@('-cp',('"'+($folder+';'+$cp).Replace('\','/')+'"'),'io.github.whileaway.LoadGuardProbe','evidence/wayfarer-stability/exceptions/runActorExceptionsSeed1.dat',("$folder/data-"+[DateTime]::UtcNow.Ticks)) | Set-Content "$folder/run.args" -Encoding utf8NoBOM
++& "$jdk/java.exe" "@$folder/run.args" *> evidence/npc-world/probe.log
++$rc=$LASTEXITCODE
++Get-Content evidence/npc-world/probe.log -Tail 20
++exit $rc
++
+--- a/tools/run-npc-copy.py
++++ b/tools/run-npc-copy.py
+@@ -0,0 +1,38 @@
++from pathlib import Path
++import ctypes,hashlib,json,shutil,subprocess,sys,time
++R=Path(__file__).resolve().parents[1];E=R/'evidence/npc-world';W=(R/'../../work/npc-copy/saves').resolve()
++h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++def manifest(p):return {f.relative_to(p).as_posix():h(f) for f in p.rglob('*') if f.is_file()}
++W.mkdir(parents=True,exist_ok=True);F=E/'copy-client';F.mkdir(exist_ok=True)
++modes=sys.argv[1:] or ['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB']
++for mode in modes:
++    assert mode in ['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB']
++    if (E/'PAUSE_REQUESTED').exists() and not mode.startswith('Reload'):
++        print('PAUSED_AT_SAFE_BOUNDARY before '+mode,flush=True);sys.exit(0)
++    source=(R/'../../work/npc-lifecycle/saves/npc-Seed').resolve()
++    if mode=='Seed':
++        target=W/'copy-Seed';assert not target.exists();before=manifest(source);shutil.copytree(source,target);assert before==manifest(target)
++        (E/'copy-source.json').write_text(json.dumps({'source':str(source),'manifest':before},indent=2))
++    if mode=='AdvanceA':
++        seed=W/'copy-Seed';before=manifest(seed)
++        for name in ['copy-A','copy-B']:
++            assert not (W/name).exists();shutil.copytree(seed,W/name);assert before==manifest(W/name)
++        (E/'copy-split.json').write_text(json.dumps({'seed':str(seed),'A':str(W/'copy-A'),'B':str(W/'copy-B'),'manifest':before},indent=2))
++    protected=[source]+([W/'copy-Seed',W/('copy-B' if mode.endswith('A') else 'copy-A')] if mode!='Seed' else [])
++    before={str(p):manifest(p) for p in protected}
++    log=F/(mode+'.log');assert not log.exists(),'preserve existing attempts'
++    script="$ErrorActionPreference='Stop'; ./tools/select-test-monitor.ps1 -OutputPath evidence/npc-world/monitor.json; $env:JAVA_HOME='C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot'; $env:GRADLE_USER_HOME=(Resolve-Path ../../work/gradle-home).Path; ./gradlew.bat --offline runNpcCopy"+mode+"; exit $LASTEXITCODE"
++    start=time.time()
++    with log.open('w',encoding='utf-8') as out:result=subprocess.run(['pwsh.exe','-NoProfile','-Command',script],cwd=R,stdout=out,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
++    marker=(F/(mode+'.txt')).read_text(encoding='utf-8') if (F/(mode+'.txt')).exists() else ''
++    pid=int((F/(mode+'.pid')).read_text()) if (F/(mode+'.pid')).exists() else 0
++    k=ctypes.WinDLL('kernel32',use_last_error=True);k.OpenProcess.restype=ctypes.c_void_p;k.WaitForSingleObject.argtypes=[ctypes.c_void_p,ctypes.c_uint32];k.CloseHandle.argtypes=[ctypes.c_void_p]
++    handle=k.OpenProcess(0x100000,False,pid);stopped=bool(pid) and ((not handle and ctypes.get_last_error()==87) or (bool(handle) and k.WaitForSingleObject(handle,0)==0))
++    if handle:k.CloseHandle(handle)
++    after={str(p):manifest(p) for p in protected};preserved=before==after
++    (F/(mode+'-isolation.json')).write_text(json.dumps({'before':before,'after':after,'equal':preserved},indent=2))
++    good=result.returncode==0 and 'PASS '+mode in marker and 'FAIL ' not in marker and stopped and preserved
++    row={'mode':mode,'command':'./gradlew.bat --offline runNpcCopy'+mode,'exit':result.returncode,'pid':pid,'processExited':bool(stopped),'seconds':time.time()-start,'protectedTreesUnchanged':preserved,'pass':good}
++    with (E/'copy-commands.jsonl').open('a') as out:out.write(json.dumps(row)+'\n')
++    print(json.dumps(row),flush=True);assert good,mode+' failed'
++print('PASS requested copy clients; inactive world trees unchanged',flush=True)
+--- a/tools/run-npc-world.py
++++ b/tools/run-npc-world.py
+@@ -0,0 +1,34 @@
++from pathlib import Path
++import ctypes, hashlib, json, shutil, subprocess, sys, time
++R=Path(__file__).resolve().parents[1];E=R/'evidence/npc-world';W=(R/'../../work/npc-world/saves').resolve()
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++def manifest(p):return {f.relative_to(p).as_posix():sha(f) for f in p.rglob('*') if f.is_file()}
++W.mkdir(parents=True,exist_ok=True)
++modes=sys.argv[1:] or ['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2']
++for mode in modes:
++    if (E/'PAUSE_REQUESTED').exists() and not mode.startswith('Resume'):
++        print('PAUSED_AT_SAFE_BOUNDARY before '+mode+'; no new client launched',flush=True)
++        sys.exit(0)
++    source=(R/'../../work/npc-lifecycle/saves/npc-Seed').resolve();before=None
++    if not mode.startswith('Resume'):
++        before=manifest(source);target=W/('world-'+mode)
++        if target.exists():raise RuntimeError('Preserve existing fixture before retry: '+str(target))
++        shutil.copytree(source,target);assert manifest(target)==before
++        (E/(mode+'-copy.json')).write_text(json.dumps({'source':str(source),'target':str(target),'manifest':before},indent=2))
++    folder=E/'client';folder.mkdir(exist_ok=True);log=folder/(mode+'.log')
++    if log.exists():raise RuntimeError('Preserve previous attempt before retry: '+mode)
++    script="$ErrorActionPreference='Stop'; ./tools/select-test-monitor.ps1 -OutputPath evidence/npc-world/monitor.json; $env:JAVA_HOME='C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.5.11-hotspot'; $env:GRADLE_USER_HOME=(Resolve-Path ../../work/gradle-home).Path; ./gradlew.bat --offline runNpcWorld"+mode+"; exit $LASTEXITCODE"
++    start=time.time()
++    with log.open('w',encoding='utf-8') as out: result=subprocess.run(['pwsh.exe','-NoProfile','-Command',script],cwd=R,stdout=out,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
++    marker=(folder/(mode+'.txt')).read_text(encoding='utf-8') if (folder/(mode+'.txt')).exists() else ''
++    pid=int((folder/(mode+'.pid')).read_text()) if (folder/(mode+'.pid')).exists() else 0
++    k=ctypes.WinDLL('kernel32',use_last_error=True);k.OpenProcess.restype=ctypes.c_void_p;k.WaitForSingleObject.argtypes=[ctypes.c_void_p,ctypes.c_uint32];k.CloseHandle.argtypes=[ctypes.c_void_p]
++    handle=k.OpenProcess(0x100000,False,pid);stopped=bool(pid) and ((not handle and ctypes.get_last_error()==87) or (bool(handle) and k.WaitForSingleObject(handle,0)==0))
++    if handle:k.CloseHandle(handle)
++    good=result.returncode==0 and 'PASS '+mode in marker and 'FAIL ' not in marker and stopped
++    row={'mode':mode,'command':'./gradlew.bat --offline runNpcWorld'+mode,'exit':result.returncode,'pid':pid,'processExited':bool(stopped),'seconds':time.time()-start,'pass':good}
++    with (E/'client-commands.jsonl').open('a') as out:out.write(json.dumps(row)+'\n')
++    print(json.dumps(row),flush=True)
++    if before is not None:assert manifest(source)==before,'Seed world changed'
++    assert good,mode+' failed'
++print('PASS requested NPC clients; copied worlds isolated',flush=True)
+--- a/tools/verify-npc-copy.py
++++ b/tools/verify-npc-copy.py
+@@ -0,0 +1,35 @@
++from pathlib import Path
++import hashlib,importlib.util,json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/npc-world';F=E/'copy-client'
++h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++spec=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py');nbt=importlib.util.module_from_spec(spec);spec.loader.exec_module(nbt)
++def actor(path):
++    d=nbt.read(path)['data'];assert d['schema']==4 and d['actorSchema']==1
++    a=[r for r in d['actors'] if r['storyId']=='npc:yeoul'];assert len(a)==1;return a[0]
++rows=[json.loads(x) for x in (E/'copy-commands.jsonl').read_text().splitlines()]
++assert [r['mode'] for r in rows]==['Seed','AdvanceA','AdvanceB','ReloadA','ReloadB']
++assert len({r['pid'] for r in rows})==5
++seed=actor(F/'Seed.dat')
++assert seed['checkpoint']==1 and seed['generation']==0
++for row in rows:
++    mode=row['mode'];assert row['pass'] and row['exit']==0 and row['processExited'] and row['protectedTreesUnchanged']
++    text=(F/(mode+'.txt')).read_text();assert 'PASS monitor DISPLAY1' in text and 'all sound categories=0' in text
++    proof=json.loads((F/(mode+'-isolation.json')).read_text());assert proof['equal'] and proof['before']==proof['after']
++    a=actor(F/(mode+'.dat'))
++    for key in ['storyId','ownerEventId','instanceId','spawnRole','entityUUID','generation','dimension']:assert a[key]==seed[key],(mode,key)
++    assert {f for f in a['facts'] if f.startswith('npc.home=')}=={f for f in seed['facts'] if f.startswith('npc.home=')}
++    if mode=='Seed':continue
++    expected=4 if mode.endswith('A') else 2;assert a['checkpoint']==expected
++    if expected==4:assert a['state']=='COMPLETED' and a['lifecycleState']=='ACTIVE' and 'npc.work=maintain_return_light' in a['facts'] and a['facts'].count('npc.link=return_light_shared')==1
++    else:assert a['state']!='COMPLETED' and a['lifecycleState']=='SUSPENDED' and 'npc.work=check_return_light' in a['facts'] and 'npc.link=return_light_shared' not in a['facts']
++    if mode.startswith('Reload'):
++        prev=actor(F/('Advance'+mode[-1]+'.dat'))
++        for key in ['facts','checkpoint','state','entityUUID','instanceId','generation','dimension']:assert prev[key]==a[key],(mode,key)
++for line in (E/'COPY_RUNTIME_SOURCE.sha256').read_text().splitlines():
++    digest,name=line.split('  ',1);assert h(R/name)==digest
++g=json.loads((E/'GATES.json').read_text());g.update(copyDivergence='PASS A=4/B=2; fresh process each; complete inactive save trees unchanged',copyClients=5,realClients=14,NPC_overall='PARTIAL',campaign='PARTIAL',composite='NOT STARTED')
++g.update(currentContinuationClients=12,npcStorageProbe='PASS 8 cases; 6 blocked, 2 normal/NPC-counterpart round trips',loadGuardProbe='PASS 580 cases/2161 assertions; 19 blocked categories repeated20',latestGameTestLog='tests-4.log',next='NpcEvents.update environment classification; residence/path/return-light recovery and fresh-process tests')
++for gate in ['residenceMissing','residenceBlocked','residenceUnreachable','pathBlocked','pathRestored','returnLightMissing','returnLightWrongBlock','returnLightRestored','environmentFreshProcess','NPC_corruptionClient','finalCombinedNpcRegression']:
++    g[gate]='NOT TESTED'
++(E/'GATES.json').write_text(json.dumps(g,indent=2)+'\n')
++print('PASS REAL COPY WORLD: one saved NPC split into A/B; same identity; A completed/B suspended; separate fresh processes preserve different facts/work/checkpoint; inactive trees byte-identical')
+--- a/tools/verify-npc-world-pause.py
++++ b/tools/verify-npc-world-pause.py
+@@ -0,0 +1,34 @@
++from pathlib import Path
++import hashlib,importlib.util,json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/npc-world';h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++spec=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py');nbt=importlib.util.module_from_spec(spec);spec.loader.exec_module(nbt)
++def actor(p):
++ d=nbt.read(p)['data'];assert d['schema']==4 and d['actorSchema']==1
++ return next(a for a in d['actors'] if a['storyId']=='npc:yeoul')
++rows=[json.loads(x) for x in (E/'client-commands.jsonl').read_text().splitlines()]
++expected=['Chunk1','Chunk2']
++assert [r['mode'] for r in rows]==expected and len({r['pid'] for r in rows})==2
++for row in rows:
++ m=row['mode'];assert row['pass'] and row['exit']==0 and row['processExited'],row
++ text=(E/'client'/(m+'.txt')).read_text(encoding='utf-8');assert 'all sound categories=0' in text and 'PASS monitor DISPLAY1' in text
++ a=actor(E/'client'/((m if not m.startswith('Resume') else 'CutNether2')+'-before.dat'));b=actor(E/'client'/(m+'-away.dat'))
++ assert a['checkpoint']==b['checkpoint']==int(m[-1]);assert a['facts']==b['facts']
++ for key in ('entityUUID','instanceId','generation','storyId','ownerEventId','spawnRole','dimension'):assert a[key]==b[key],(m,key)
++ assert b['generation']==0 and b['dimension']=='whileaway:quiet_city'
++ assert b['lifecycleState']==('ACTIVE' if int(m[-1])==4 else 'SUSPENDED')
++ if m.startswith('Chunk'):assert 'PASS actual_unload heldTicks=100' in text and 'entitiesLoaded=false allTrackedPositions=true' in text
++ else:assert 'wrongDimensionNPC=0' in text
++ if not m.startswith('Cut'):
++  c=actor(E/'client'/(m+'.dat'));assert c['checkpoint']==4 and c['state']=='COMPLETED' and c['lifecycleState']=='ACTIVE'
++  for key in ('entityUUID','instanceId','generation','dimension'):assert a[key]==c[key]
++  assert set(a['facts'])-set(c['facts'])<= {'npc.work=check_return_light'}
++  assert c['facts'].count('npc.link=return_light_shared')==1
++ if m.startswith('Resume'):assert 'PASS fresh_start dimension=Nether checkpoint=2' in text
++ else:
++  copy=json.loads((E/(m+'-copy.json')).read_text());source=Path(copy['source']);assert {p.relative_to(source).as_posix():h(p) for p in source.rglob('*') if p.is_file()}==copy['manifest']
++for line in (E/'RUNTIME_SOURCE.sha256').read_text().splitlines():
++ digest,name=line.split('  ',1);assert h(R/name)==digest
++assert 'All 58 required tests passed' in (E/'tests-1.log').read_text(encoding='utf-8-sig')
++assert 'PASS core assertions=176857' in (E/'tests-1.log').read_text(encoding='utf-8-sig')
++g={'version':'0.3.1-dev.1','work':'npc-world','safePause':True,'buildableCheckpoint':'PASS','saveFormat':4,'actorSchema':1,'artRevision':2,'world_travel':'PARTIAL','actualChunk1':'PASS','actualChunk2':'PASS','completedChunk4':'NOT TESTED','Nether':'NOT TESTED','End':'NOT TESTED','dimensionFreshProcess':'NOT TESTED','gameTests':58,'coreAssertions':176857,'realClients':2,'NPC_overall':'PARTIAL','campaign':'PARTIAL','copyDivergence':'NOT TESTED','residencePathLight':'NOT TESTED','NPC_corruptionClient':'NOT TESTED','composite':'NOT STARTED','next':'Chunk4 after usage check; then Nether1/2, End1/2, CutNether2+ResumeNether2'}
++(E/'GATES.json').write_text(json.dumps(g,indent=2)+'\n');print('PASS safe-pause snapshot: two actual NPC unload/reload cases verified on disk; world travel and NPC overall PARTIAL')
+--- a/tools/verify-npc-world-transaction.ps1
++++ b/tools/verify-npc-world-transaction.ps1
+@@ -0,0 +1,33 @@
++﻿$ErrorActionPreference='Stop'
++$root=Split-Path -Parent $PSScriptRoot; Set-Location $root
++$java='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe'
++$javac='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\javac.exe'
++$e=Join-Path $root 'evidence/npc-world'
++$base=Join-Path $e 'baseline/previous.jar'
++$mod=Join-Path $root 'dist/npc-world/whileaway-0.3.1-npc-world.jar'
++New-Item -ItemType Directory -Force build/npc-world-archive-probe,build/rollback-npc-world | Out-Null
++& $javac -encoding UTF-8 -d build/npc-world-archive-probe tools/PresenceArchiveProbe.java tools/NpcWorldArchiveProbe.java
++if($LASTEXITCODE -ne 0){throw 'Probe compilation failed'}
++$commands=@()
++foreach($label in @('BASELINE','MODIFIED')){
++    $file=if($label -eq 'BASELINE'){$base}else{$mod};$mode=$label.ToLower()
++    $result=& $java -cp build/npc-world-archive-probe NpcWorldArchiveProbe $file $mode 2>&1
++    $rc=$LASTEXITCODE
++    $commands+=@{label=$label;command="java -cp build/npc-world-archive-probe NpcWorldArchiveProbe `"$file`" $mode";input='8 ActorPresencePolicy cases; explicitLoader/writeGuard true for both; campaign NPC in both; NPC witness guard in both; world/copy smoke harnesses expected only in modified; canonical recovery retained in both';output=($result -join "`n");exit=$rc}
++    if($rc -ne 0){throw "$label probe failed"}
++}
++$target=Join-Path $root 'build/rollback-npc-world/test.jar'
++Copy-Item -LiteralPath $mod -Destination $target
++$result=& 'C:\Program Files\Git\bin\bash.exe' -lc 'chmod +x evidence/npc-world/ROLLBACK.sh && test -x evidence/npc-world/ROLLBACK.sh && evidence/npc-world/ROLLBACK.sh build/rollback-npc-world/test.jar' 2>&1
++$rc=$LASTEXITCODE
++$result | Set-Content "$e/rollback.log" -Encoding utf8
++if($rc -ne 0){throw "Rollback failed $rc; preserve rollback.log before retry"}
++$commands+=@{label='ROLLBACK';command='bash -lc "chmod +x evidence/npc-world/ROLLBACK.sh && test -x evidence/npc-world/ROLLBACK.sh && evidence/npc-world/ROLLBACK.sh build/rollback-npc-world/test.jar"';input=$target;output=($result -join "`n");exit=$rc}
++$result=& $java -cp build/npc-world-archive-probe NpcWorldArchiveProbe $target baseline 2>&1;$rc=$LASTEXITCODE
++$commands+=@{label='RESTORED';command='java -cp build/npc-world-archive-probe NpcWorldArchiveProbe build/rollback-npc-world/test.jar baseline';input='same 8 policy cases and baseline fixture revision';output=($result -join "`n");exit=$rc}
++if($rc -ne 0){throw 'Restored behavior mismatch'}
++$restored=(Get-FileHash $target).Hash.ToLower();$original=(Get-FileHash $base).Hash.ToLower();$changed=(Get-FileHash $mod).Hash.ToLower()
++if($restored -ne $original -or $changed -eq $original){throw 'Rollback hash mismatch or modified file no longer changed'}
++@{commands=$commands;baseline_hash=$original;modified_hash=$changed;restored_hash=$restored;world_operations='none';scope='Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.'} | ConvertTo-Json -Depth 5 | Set-Content "$e/transaction.json" -Encoding utf8
++$commands | ForEach-Object { Write-Output ($_.label+': '+$_.output+'; exit='+$_.exit) }
++
+--- a/tools/verify-npc-world.py
++++ b/tools/verify-npc-world.py
+@@ -0,0 +1,34 @@
++from pathlib import Path
++import hashlib,importlib.util,json
++R=Path(__file__).resolve().parents[1];E=R/'evidence/npc-world';h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++spec=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py');nbt=importlib.util.module_from_spec(spec);spec.loader.exec_module(nbt)
++def actor(p):
++ d=nbt.read(p)['data'];assert d['schema']==4 and d['actorSchema']==1
++ return next(a for a in d['actors'] if a['storyId']=='npc:yeoul')
++rows=[json.loads(x) for x in (E/'client-commands.jsonl').read_text().splitlines()]
++expected=['Chunk1','Chunk2','Chunk4','Nether1','Nether2','End1','End2','CutNether2','ResumeNether2']
++assert [r['mode'] for r in rows]==expected and len({r['pid'] for r in rows})==9
++for row in rows:
++ m=row['mode'];assert row['pass'] and row['exit']==0 and row['processExited'],row
++ text=(E/'client'/(m+'.txt')).read_text(encoding='utf-8');assert 'all sound categories=0' in text and 'PASS monitor DISPLAY1' in text
++ a=actor(E/'client'/((m if not m.startswith('Resume') else 'CutNether2')+'-before.dat'));b=actor(E/'client'/(m+'-away.dat'))
++ assert a['checkpoint']==b['checkpoint']==int(m[-1]);assert a['facts']==b['facts']
++ for key in ('entityUUID','instanceId','generation','storyId','ownerEventId','spawnRole','dimension'):assert a[key]==b[key],(m,key)
++ assert b['generation']==0 and b['dimension']=='whileaway:quiet_city'
++ assert b['lifecycleState']==('ACTIVE' if int(m[-1])==4 else 'SUSPENDED')
++ if m.startswith('Chunk'):assert 'PASS actual_unload heldTicks=100' in text and 'entitiesLoaded=false allTrackedPositions=true' in text
++ else:assert 'wrongDimensionNPC=0' in text
++ if not m.startswith('Cut'):
++  c=actor(E/'client'/(m+'.dat'));assert c['checkpoint']==4 and c['state']=='COMPLETED' and c['lifecycleState']=='ACTIVE'
++  for key in ('entityUUID','instanceId','generation','dimension'):assert a[key]==c[key]
++  assert set(a['facts'])-set(c['facts'])<= {'npc.work=check_return_light'}
++  assert c['facts'].count('npc.link=return_light_shared')==1
++ if m.startswith('Resume'):assert 'PASS fresh_start dimension=Nether checkpoint=2' in text
++ else:
++  copy=json.loads((E/(m+'-copy.json')).read_text());source=Path(copy['source']);assert {p.relative_to(source).as_posix():h(p) for p in source.rglob('*') if p.is_file()}==copy['manifest']
++for line in (E/'RUNTIME_SOURCE.sha256').read_text().splitlines():
++ digest,name=line.split('  ',1);assert h(R/name)==digest
++assert 'All 58 required tests passed' in (E/'tests-4.log').read_text(encoding='utf-8-sig')
++assert 'PASS core assertions=176857' in (E/'tests-4.log').read_text(encoding='utf-8-sig')
++g={'version':'0.3.1-dev.1','work':'npc-world','saveFormat':4,'actorSchema':1,'artRevision':2,'world_travel':'PASS','actualChunkUnloadReload':'PASS checkpoints 1,2,4','unloadedNotMissing':'PASS','Nether':'PASS checkpoints 1,2','End':'PASS checkpoints 1,2','dimensionFreshProcess':'PASS Nether checkpoint 2','gameTests':58,'coreAssertions':176857,'realClients':9,'unchangedBaselineClasses':83,'NPC_overall':'PARTIAL','campaign':'PARTIAL','copyDivergence':'NOT TESTED','residencePathLight':'NOT TESTED','NPC_corruptionClient':'NOT TESTED','deathABCDE':'BASELINE PASS; not rerun in this slice','composite':'NOT STARTED'}
++(E/'GATES.json').write_text(json.dumps(g,indent=2)+'\n');print('PASS NPC world travel: actual unload/reload 3 checkpoints; Nether/End each 2; Nether cut/fresh process; identity/facts/disk/seed preservation; NPC overall PARTIAL')
+--- a/tools/write-npc-world-verification.py
++++ b/tools/write-npc-world-verification.py
+@@ -0,0 +1,88 @@
++from pathlib import Path
++import hashlib,json,zipfile
++R=Path(__file__).resolve().parents[1];E=R/'evidence/npc-world';D=R/'dist/npc-world'
++h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++g=json.loads((E/'GATES.json').read_text());assert g['world_travel']=='PASS' and g['copyDivergence'].startswith('PASS')
++travel=[json.loads(x) for x in (E/'client-commands.jsonl').read_text().splitlines()]
++copies=[json.loads(x) for x in (E/'copy-commands.jsonl').read_text().splitlines()]
++assert len(travel)==9 and len(copies)==5 and all(r['pass'] for r in travel+copies)
++assert 'All 58 required tests passed' in (E/'tests-4.log').read_text(encoding='utf-8-sig')
++base=E/'baseline/previous.jar';mod=D/'whileaway-0.3.1-npc-world.jar'
++with zipfile.ZipFile(base) as a,zipfile.ZipFile(mod) as b:
++    classes=[n for n in a.namelist() if n.endswith('.class')]
++    assert len(classes)==83 and all(a.read(n)==b.read(n) for n in classes)
++    assert len([n for n in b.namelist() if n.endswith('.class')])==85
++text=f'''Current: While You Were Away / 0.3.1-dev.1 / npc-world / PARTIAL
++NPC world travel and copied-world divergence verified; NPC environment/corruption closure remains PARTIAL.
++Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21.0.5 / save format 4 / optional actorSchema 1 / art revision 2 unchanged.
++No 0.3.2 promotion, composite event, final art, resource pack, new monster, or Caveman use.
++
++BASELINE input JAR: {base}
++SHA256 {h(base)}
++BASELINE source: {E/'baseline/previous-source.zip'}
++SHA256 {h(E/'baseline/previous-source.zip')}
++Immediate continuation snapshot (previous npc-world JAR/source) preserved at {E/'history/pause-20260914'}:
++JAR f5b159a950233a7c2413d2dc0d8e7b4f65287d44f728a1cd79c4323f7c02d438
++SOURCE 924bd5ca92bce9221751d684ae257113521703a6b866cab4234cf2eb716efa6a
++Neither adopted npc-exceptions distribution nor original seed worlds were overwritten.
++
++ACTUAL CHANGES
++Previously prepared NpcWorldSmoke.tick was executed for remaining Chunk4, Nether1/2, End1/2, CutNether2/ResumeNether2. Existing Java runtime unchanged for these nine cases; RUNTIME_SOURCE.sha256 checks that source.
++Added client/NpcCopySmoke.java: property whileaway.npcCopy is opt-in. Seed creates a real campaign NPC via existing adapter, saves checkpoint 1; AdvanceA uses real interaction/navigation to finish at 4; AdvanceB uses real interaction then removes the eligible witness to remain at 2; ReloadA/B use separate fresh processes. Identity, residence, work, facts, candidate uniqueness, and repeated interaction are asserted. No NPC teleport, fact edits, block rewrite or generation override.
++build.gradle: isolated runNpcCopySeed/AdvanceA/AdvanceB/ReloadA/ReloadB tasks, muted profile work/npc-copy, mandatory right secondary DISPLAY1 bounds. Test-only spectator/creative changes apply only to fixture player.
++tools/run-npc-copy.py: copies a closed seed directory twice, records full save-tree manifests before/after each process for the inactive world and seed; verifies child PID exit and named PASS marker. It refuses to overwrite old attempts.
++tools/verify-npc-copy.py: compares saved NBT identity, different progress/work/facts and fresh reload preservation; not just in-memory assertions. COPY_RUNTIME_SOURCE.sha256 covers the current source with the new harness.
++tools/NpcWorldFactProbe.java and probe-npc-world-facts.ps1: existing six semantic corruption cases plus two valid round trips, now explicitly retaining npc:doyun/shared_repair relationship through StoryStorage and disk reload. This is a storage probe, not a live NPC-to-NPC scene or actual corrupted-world client.
++Package/verification tools validate both opt-in harnesses, baseline class equality, current build result, source manifests, artifact reopening, and JAR-copy-only rollback.
++All 83 baseline classes remain byte-identical; 85 current classes = 83 baseline + NpcWorldSmoke + NpcCopySmoke. All 69 asset/data entries unchanged. Existing five GameTest source files unchanged.
++No production NpcEvents/NpcState/StoryActors/StoryStorage semantics changed. No new schema, migration, environmental classifier, path policy or corruption recovery was introduced. No NPC relationship semantics were replaced with a single affinity score.
++
++REAL MINECRAFT EVIDENCE
++Travel: 9 processes total, of which Chunk1/2 were verified before this continuation; 7 newly executed. Checkpoints 1/2/4 actually unloaded their entity/record/snapshot/home/light chunks and entity storage for 100 observed ticks. Snapshot/registered/residence anchors in these fixtures share chunk [2,4]; this does not prove mutually distant anchor chunks. currentTarget denotes adapter residence goal, not serialized path nodes.
++Nether and End each tested before conversation and during actual movement. Identity/generation/checkpoint/facts/work preserved while absent; other dimension has no StoryNpc. Return yields exactly one loaded canonical NPC and natural completion.
++CutNether2 PID20904 terminated after durable absent-state save. ResumeNether2 PID34532 loaded in Nether at checkpoint2 with UUID0811d8cc-6eae-40cf-acbe-418425268962, generation0, then returned and completed at4 with the same UUID and instance. This is a real process-restart pair.
++Copy: 5 new processes. One saved real NPC copied into A/B with the same UUID/instance. A completes at4 with maintain_return_light, B remains2 SUSPENDED with check_return_light. Both reopen in fresh processes and retain divergent state. Full inactive A/B and seed save trees remain byte-identical during the other world's run.
++All clients muted before startup and asserted on DISPLAY1 right secondary. No natural survival test claim. 12 new processes this continuation, 14 total in npc-world.
++Travel process durations total={sum(r['seconds'] for r in travel):.3f}s; copy total={sum(r['seconds'] for r in copies):.3f}s. These are launch-to-exit durations, not human playtime.
++
++VALIDATION
++Baseline runGameTestServer: 58 required tests; exit0 (earlier preserved baseline-tests.log).
++Current ./gradlew.bat --offline compileJava runGameTestServer build: All 58 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 49s; exit0; tests-4.log. Existing tests retained, not replaced with weaker cases.
++pwsh -NoProfile -File tools/probe-npc-world-storage.ps1: PASS load guard cases=580 assertions=2161 repeats=20; blocked matrix=19; sourcePreserved=true; actualClient=false; exit0. Fresh execution, including migration 1/2/3 to4, existing format4 and actor extension.
++pwsh -NoProfile -File tools/probe-npc-world-facts.ps1: PASS NPC storage cases=8 semanticBlocked=6 normalRoundTrips=2 npcCounterpartRoundTrips=2 originalsPreserved=true actualClient=false; exit0. Six corrupt fixtures stay blocked with original/quarantine byte equality after attempted saves; do not promote this into actual Minecraft corruption PASS.
++python tools/verify-npc-world.py: PASS NPC world travel: actual unload/reload 3 checkpoints; Nether/End each 2; Nether cut/fresh process; identity/facts/disk/seed preservation; NPC overall PARTIAL; exit0.
++python tools/verify-npc-copy.py: PASS REAL COPY WORLD: one saved NPC split into A/B; same identity; A completed/B suspended; separate fresh processes preserve different facts/work/checkpoint; inactive trees byte-identical; exit0.
++
++FAILURES AND REWORK
++1. build.gradle parse failure at line460, tests-2.log, exit1. Cause: tool insertion selected the run-definition block instead of the final task-configuration block and duplicated an invalid outer section. Preserved failed file under failures/. Rebuilt exactly the two bounded blocks from preserved source ZIP, with last matching top-level configuration. No client ran from this configuration.
++2. NpcCopySmoke compilation failed with missing GameType symbol, tests-3.log, exit1. Cause: GameType belongs to net.minecraft.world.level, not the imported net.minecraft.world package. Added explicit import, refreshed copy source manifest. tests-4.log then built and passed58/Core176857; all5 copy clients then passed. Two development corrections, no production policy correction.
++3. Rollback helper failed to launch in the initial execution context (child exit -1073741502; wrapper exit1). Preserved failures/rollback-launch-context.log, confirmed the target was still the modified JAR copy, and reran the same verified copy-only script with the approved execution context. Final rollback and restored policy check exit0. This is an execution-environment failure, not a story/save regression.
++Expected CORRUPT/MANUAL_DIAGNOSTIC probe log errors represent successful fail-closed fixtures, not silent resets. No failures in the final actual client suites.
++
++STORAGE AND MODEL
++Format4 / optional actorSchema1 unchanged; migration semantics unchanged. Identity remains independent of runtime path. Fail-closed/write guard unchanged. Original corrupted probe data and same-hash quarantine preserved. Existing death/A-E client PASS is baseline evidence, not rerun this slice. Full final NPC regression awaits environment/corruption work.
++Only primary agent performed implementation and review; no Terra/Luna/subagents, Caveman HOLD/off. No model-token attribution or savings experiment. Usage observed at resume: five-hour12%, weekly48%; at copy batch checkpoint: five-hour58%, weekly56%; after copy verification: five-hour66%, weekly57%. Account percentages are not per-model token measurements and no exhaustion claim is made.
++JAR rollback is not save downgrade; no world files touched by rollback. No automatic shutdown.
++
++NEXT EXACT START
++After usage check, preserve this packaged npc-world baseline. Begin NpcEvents.update environment classification (residence valid/temporarily blocked/unreachable/missing/conflict; path chunk-unavailable vs blocked/invalid/missing), without deleting blocks, moving NPC identity or auto-completing. Add return-light missing/wrong-block/restored and environment save/restart tests. Then actual NPC corruption clients and combined final NPC regression. NPC must remain PARTIAL; composite NOT STARTED until all requested gates pass.
++
++GATES
++{json.dumps(g,indent=2)}
++
++MODIFIED_FILE={mod}
++MODIFIED_SHA256={h(mod)}
++DIFF_FILE={E/'DIFF.patch'}
++VERIFICATION={E/'VERIFICATION.txt'}
++ROLLBACK={E/'ROLLBACK.sh'}
++SOURCE_ZIP={D/'whileaway-0.3.1-npc-world-source.zip'}
++
++BASELINE / MODIFIED / ROLLBACK exact command/input/output/exit/hash:
++{(E/'transaction.json').read_text(encoding='utf-8-sig')}
++
++REAL CLIENT command ledger (exit codes / PIDs / durations):
++{json.dumps(travel+copies,indent=2)}
++'''
++(E/'VERIFICATION.txt').write_text(text,encoding='utf-8')
++(R/'docs/NPC_WORLD_031.md').write_text(text.split('GATES\n')[0],encoding='utf-8')
++print('PASS detailed current verification written; no full NPC/campaign promotion')

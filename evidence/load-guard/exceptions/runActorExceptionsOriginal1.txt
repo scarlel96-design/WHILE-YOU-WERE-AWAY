@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53044
+PASS fresh_process_reconnected same UUID/instance/generation/checkpoint; ACTIVE; canonical_count=1
+PASS runActorExceptionsOriginal1 checkpoint=4 generation=0 instance=2e0f4d9a-f9b1-4ca0-b178-658738c5fa8a actor=7c11663a-22b2-4155-8a11-fe14c2c4f91d

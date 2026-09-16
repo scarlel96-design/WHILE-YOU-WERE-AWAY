@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=49480
+INPUT checkpoint=0 generation=0 uuid=ad5d779c-635e-46b5-af40-c4593062b43e
+FAIL java.lang.IllegalStateException: permanent facts lost

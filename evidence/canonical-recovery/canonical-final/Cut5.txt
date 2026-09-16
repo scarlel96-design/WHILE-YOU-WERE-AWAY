@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53292
+INPUT hash=35f6c6ba4d2c4b8d9441d47589caa3060671b02d6d78cfde9639a7de0fb2767f uuid=a56dc6eb-5ba9-4e1d-b194-dd4990f87c30 generation=0 checkpoint=2
+INJECT confirmed-loss fixture entity removed and disk flushed; story ticket retained
+PASS Cut5 boundary=GENERATION_5_BINDING_SAVED generation=1 uuid=15b646cd-df0b-453b-9db7-72593f20c305 checkpoint=2 diskHash=e5fb912b8147dbd757580d502cdc80ba4cad74ad5ddefef8b7f53389cd5053e4

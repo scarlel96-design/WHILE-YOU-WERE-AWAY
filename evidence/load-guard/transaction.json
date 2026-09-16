@@ -1,0 +1,37 @@
+{
+  "commands": [
+    {
+      "label": "BASELINE",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline explicitLoader=false writeGuard=false",
+      "exit": 0,
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard expected false for baseline, true for modified",
+      "command": "java -cp build/load-archive-probe LoadArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\load-guard\\baseline\\previous.jar\" baseline"
+    },
+    {
+      "label": "MODIFIED",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=modified explicitLoader=true writeGuard=true",
+      "exit": 0,
+      "input": "8 ActorPresencePolicy cases; explicitLoader/writeGuard expected false for baseline, true for modified",
+      "command": "java -cp build/load-archive-probe LoadArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\load-guard\\whileaway-0.3.1-load-guard.jar\" modified"
+    },
+    {
+      "label": "ROLLBACK",
+      "output": "ROLLBACK PASS: wayfarer-stability JAR restored; world files untouched",
+      "exit": 0,
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-load-guard\\test.jar",
+      "command": "bash -lc \"chmod +x evidence/load-guard/ROLLBACK.sh && test -x evidence/load-guard/ROLLBACK.sh && evidence/load-guard/ROLLBACK.sh build/rollback-load-guard/test.jar\""
+    },
+    {
+      "label": "RESTORED",
+      "output": "PASS archive policy=PRESENT checks=8\nPASS archive=baseline explicitLoader=false writeGuard=false",
+      "exit": 0,
+      "input": "same 8 policy cases and baseline fixture revision",
+      "command": "java -cp build/load-archive-probe LoadArchiveProbe build/rollback-load-guard/test.jar baseline"
+    }
+  ],
+  "scope": "Packaged policy and fixture revision only. Actual gameplay evidence is the separate current client suites.",
+  "modified_hash": "a66cf05706329faab022af12d9ab016dc61b8e719724858f70c3449f5ae8ad03",
+  "baseline_hash": "3d3b08beddd7e9fae87c41188c31251e941ee9da9b6697b50bcf96a2fd960766",
+  "restored_hash": "3d3b08beddd7e9fae87c41188c31251e941ee9da9b6697b50bcf96a2fd960766",
+  "world_operations": "none"
+}

@@ -1,0 +1,12 @@
+./gradlew.bat --offline runActorA1 | input=isolated actor fixture 1 / A | exit=0
+./gradlew.bat --offline runActorB1 | input=isolated actor fixture 1 / B | exit=0
+./gradlew.bat --offline runActorC1 | input=isolated actor fixture 1 / C | exit=0
+./gradlew.bat --offline runActorD1 | input=isolated actor fixture 1 / D | exit=0
+./gradlew.bat --offline runActorE1 | input=isolated actor fixture 1 / E | exit=0
+./gradlew.bat --offline runActorVerify1 | input=isolated actor fixture 1 / Verify | exit=0
+./gradlew.bat --offline runActorA2 | input=isolated actor fixture 2 / A | exit=0
+./gradlew.bat --offline runActorB2 | input=isolated actor fixture 2 / B | exit=0
+./gradlew.bat --offline runActorC2 | input=isolated actor fixture 2 / C | exit=0
+./gradlew.bat --offline runActorD2 | input=isolated actor fixture 2 / D | exit=0
+./gradlew.bat --offline runActorE2 | input=isolated actor fixture 2 / E | exit=0
+./gradlew.bat --offline runActorVerify2 | input=isolated actor fixture 2 / Verify | exit=0

@@ -1,0 +1,3 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=14104
+PASS CutD boundary=NPC_D_BEFORE_COMPLETE checkpoint=3 generation=0 uuid=a449e460-68a4-4ce4-b506-8dd58df2488e facts=[npc.arrived, npc.dialogue=introduction, npc.goal=choose_evening_routine, npc.home=10445360758849, npc.met=380df991-f603-344c-a090-369bad2a924a, npc.observed=return_light, npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation, npc.schema=1, npc.work=check_return_light]

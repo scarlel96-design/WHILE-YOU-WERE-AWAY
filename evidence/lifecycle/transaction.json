@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "output": "actorRegistry=false chaseAdapter=false\nABORTED/4 -> ABORTED/4; COMPLETED/2 -> FAILED_RECOVERABLE/2\nPASS archive=baseline; runtime lifecycle proof is separate",
+      "command": "java -cp build/actor-probe ActorArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\lifecycle\\baseline\\previous.jar\" baseline",
+      "label": "BASELINE",
+      "exit": 0,
+      "input": "actor registry/adapter presence; ABORTED/4; COMPLETED/2"
+    },
+    {
+      "output": "actorRegistry=true chaseAdapter=true\nABORTED/4 -> ABORTED/4; COMPLETED/2 -> FAILED_RECOVERABLE/2\nPASS archive=modified; runtime lifecycle proof is separate",
+      "command": "java -cp build/actor-probe ActorArchiveProbe \"C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\lifecycle-work\\whileaway-0.3.1-lifecycle-work.jar\" modified",
+      "label": "MODIFIED",
+      "exit": 0,
+      "input": "actor registry/adapter presence; ABORTED/4; COMPLETED/2"
+    },
+    {
+      "output": "ROLLBACK PASS: stability-work JAR restored; world files untouched",
+      "command": "bash -lc \"chmod +x evidence/lifecycle/ROLLBACK.sh && test -x evidence/lifecycle/ROLLBACK.sh && evidence/lifecycle/ROLLBACK.sh build/rollback-lifecycle/test.jar\"",
+      "label": "ROLLBACK",
+      "exit": 0,
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\build\\rollback-lifecycle\\test.jar"
+    },
+    {
+      "output": "actorRegistry=false chaseAdapter=false\nABORTED/4 -> ABORTED/4; COMPLETED/2 -> FAILED_RECOVERABLE/2\nPASS archive=baseline; runtime lifecycle proof is separate",
+      "command": "java -cp build/actor-probe ActorArchiveProbe build/rollback-lifecycle/test.jar baseline",
+      "label": "RESTORED",
+      "exit": 0,
+      "input": "actor registry/adapter presence; ABORTED/4; COMPLETED/2"
+    }
+  ],
+  "modified_hash": "07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255",
+  "world_operations": "none",
+  "baseline_hash": "9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6",
+  "restored_hash": "9062d03914ff6dc8211e77342d785734c6263bd3af5bfb2fa5ce344a50c580d6"
+}

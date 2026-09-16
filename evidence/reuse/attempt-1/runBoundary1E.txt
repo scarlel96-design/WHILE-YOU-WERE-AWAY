@@ -1,0 +1,4 @@
+RUNNING
+PASS D persisted identity/checkpoint; waiting for real client acknowledgement
+PASS runBoundary1E event=signal_wake boundary=AFTER_COMPLETE checkpoint=4
+FAULT Runtime.halt; no shutdown save after tested boundary

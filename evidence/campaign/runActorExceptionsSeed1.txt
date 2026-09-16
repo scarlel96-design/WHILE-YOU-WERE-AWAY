@@ -1,0 +1,11 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; master=0
+PASS death_respawn keepInventory=false checkpoint=1 generation=0
+PASS death_respawn keepInventory=true checkpoint=2 generation=0
+PASS actual_chunk_unloaded hasChunk=false entitiesLoaded=false generation=0
+PASS return scenario=1 canonical_count=1 same UUID/instance/generation/checkpoint
+PASS dimension_absence=Nether generation=0
+PASS return scenario=2 canonical_count=1 same UUID/instance/generation/checkpoint
+PASS dimension_absence=End generation=0
+PASS return scenario=3 canonical_count=1 same UUID/instance/generation/checkpoint
+PASS runActorExceptionsSeed1 checkpoint=2 generation=0 instance=a7398828-cefb-4a28-8f36-8093b3473242 actor=a6fc2711-4f84-4415-8bcf-3a0a28b164f8

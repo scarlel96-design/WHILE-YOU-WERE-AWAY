@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=34644
+DEATH boundary=NPC_A_PREPARED checkpoint=0 keepInventory=false uuid=7d4561aa-e1e8-42e4-beb8-09ecdade7bd4 generation=0
+FAIL java.lang.IllegalStateException: death advanced checkpoint 0 -> 1

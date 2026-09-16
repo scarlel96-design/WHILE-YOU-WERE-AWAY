@@ -1,0 +1,1 @@
+ROLLBACK PASS: adopted 0.3.1 JAR restored; world files untouched

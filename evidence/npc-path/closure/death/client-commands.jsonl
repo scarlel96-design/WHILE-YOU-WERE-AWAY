@@ -1,0 +1,8 @@
+{"mode": "Death3Off", "command": "./gradlew.bat --offline runNpcPathDeathDeath3Off", "exit": 0, "pid": 47572, "processExited": true, "seconds": 76.36979103088379, "pass": true}
+{"mode": "Death4Off", "command": "./gradlew.bat --offline runNpcPathDeathDeath4Off", "exit": 0, "pid": 42380, "processExited": true, "seconds": 75.48542356491089, "pass": true}
+{"mode": "Death5Off", "command": "./gradlew.bat --offline runNpcPathDeathDeath5Off", "exit": 0, "pid": 40808, "processExited": true, "seconds": 76.22515439987183, "pass": true}
+{"mode": "Death3On", "command": "./gradlew.bat --offline runNpcPathDeathDeath3On", "exit": 0, "pid": 37708, "processExited": true, "seconds": 76.33389496803284, "pass": true}
+{"mode": "Death4On", "command": "./gradlew.bat --offline runNpcPathDeathDeath4On", "exit": 0, "pid": 47924, "processExited": true, "seconds": 77.11584186553955, "pass": true}
+{"mode": "Death5On", "command": "./gradlew.bat --offline runNpcPathDeathDeath5On", "exit": 0, "pid": 30508, "processExited": true, "seconds": 76.71269536018372, "pass": true}
+{"mode": "ReloadOff", "command": "./gradlew.bat --offline runNpcPathDeathReloadOff", "exit": 0, "pid": 4404, "processExited": true, "seconds": 48.39632868766785, "pass": true}
+{"mode": "ReloadOn", "command": "./gradlew.bat --offline runNpcPathDeathReloadOn", "exit": 0, "pid": 24912, "processExited": true, "seconds": 51.29321551322937, "pass": true}

@@ -1,0 +1,467 @@
+[
+  {
+    "group": "client-commands.jsonl",
+    "mode": "MissingHome",
+    "command": "./gradlew.bat --offline runNpcEnvironmentMissingHome",
+    "exit": 0,
+    "pid": 49492,
+    "processExited": true,
+    "seconds": 94.20736360549927,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "BlockedHome",
+    "command": "./gradlew.bat --offline runNpcEnvironmentBlockedHome",
+    "exit": 0,
+    "pid": 50312,
+    "processExited": true,
+    "seconds": 76.4661648273468,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "ConflictHome",
+    "command": "./gradlew.bat --offline runNpcEnvironmentConflictHome",
+    "exit": 0,
+    "pid": 51212,
+    "processExited": true,
+    "seconds": 88.7350583076477,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "WrongLight",
+    "command": "./gradlew.bat --offline runNpcEnvironmentWrongLight",
+    "exit": 0,
+    "pid": 46436,
+    "processExited": true,
+    "seconds": 85.55291604995728,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "CompletedLight",
+    "command": "./gradlew.bat --offline runNpcEnvironmentCompletedLight",
+    "exit": 0,
+    "pid": 41512,
+    "processExited": true,
+    "seconds": 70.35546469688416,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "CutPath",
+    "command": "./gradlew.bat --offline runNpcEnvironmentCutPath",
+    "exit": 0,
+    "pid": 50604,
+    "processExited": true,
+    "seconds": 68.83957815170288,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "ResumePath",
+    "command": "./gradlew.bat --offline runNpcEnvironmentResumePath",
+    "exit": 0,
+    "pid": 49204,
+    "processExited": true,
+    "seconds": 93.86060571670532,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "ReloadPath",
+    "command": "./gradlew.bat --offline runNpcEnvironmentReloadPath",
+    "exit": 0,
+    "pid": 52484,
+    "processExited": true,
+    "seconds": 90.86564064025879,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "CutLight",
+    "command": "./gradlew.bat --offline runNpcEnvironmentCutLight",
+    "exit": 0,
+    "pid": 36612,
+    "processExited": true,
+    "seconds": 72.46379375457764,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "ResumeLight",
+    "command": "./gradlew.bat --offline runNpcEnvironmentResumeLight",
+    "exit": 0,
+    "pid": 42152,
+    "processExited": true,
+    "seconds": 101.21360063552856,
+    "pass": true
+  },
+  {
+    "group": "client-commands.jsonl",
+    "mode": "ReloadLight",
+    "command": "./gradlew.bat --offline runNpcEnvironmentReloadLight",
+    "exit": 0,
+    "pid": 33812,
+    "processExited": true,
+    "seconds": 86.84188175201416,
+    "pass": true
+  },
+  {
+    "group": "corrupt-commands.jsonl",
+    "mode": "Control",
+    "command": "./gradlew.bat --offline runNpcCorruptionControl",
+    "exit": 0,
+    "pid": 28716,
+    "processExited": true,
+    "seconds": 52.25766611099243,
+    "pass": true
+  },
+  {
+    "group": "corrupt-commands.jsonl",
+    "mode": "MissingHome",
+    "command": "./gradlew.bat --offline runNpcCorruptionMissingHome",
+    "exit": 0,
+    "pid": 19524,
+    "processExited": true,
+    "seconds": 51.221906900405884,
+    "pass": true
+  },
+  {
+    "group": "corrupt-commands.jsonl",
+    "mode": "MissingExperience",
+    "command": "./gradlew.bat --offline runNpcCorruptionMissingExperience",
+    "exit": 0,
+    "pid": 41128,
+    "processExited": true,
+    "seconds": 50.94729256629944,
+    "pass": true
+  },
+  {
+    "group": "corrupt-commands.jsonl",
+    "mode": "WrongWork",
+    "command": "./gradlew.bat --offline runNpcCorruptionWrongWork",
+    "exit": 0,
+    "pid": 49224,
+    "processExited": true,
+    "seconds": 49.77022838592529,
+    "pass": true
+  },
+  {
+    "group": "corrupt-commands.jsonl",
+    "mode": "Recover",
+    "command": "./gradlew.bat --offline runNpcCorruptionRecover",
+    "exit": 0,
+    "pid": 47532,
+    "processExited": true,
+    "seconds": 50.52560305595398,
+    "pass": true
+  },
+  {
+    "group": "corrupt-commands.jsonl",
+    "mode": "RecoverReload",
+    "command": "./gradlew.bat --offline runNpcCorruptionRecoverReload",
+    "exit": 0,
+    "pid": 53236,
+    "processExited": true,
+    "seconds": 49.717952489852905,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "CutA",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleCutA",
+    "exit": 0,
+    "pid": 17044,
+    "processExited": true,
+    "seconds": 57.53291845321655,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "ResumeA",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleResumeA",
+    "exit": 0,
+    "pid": 10648,
+    "processExited": true,
+    "seconds": 61.31323266029358,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "CutB",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleCutB",
+    "exit": 0,
+    "pid": 36360,
+    "processExited": true,
+    "seconds": 49.90211534500122,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "ResumeB",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleResumeB",
+    "exit": 0,
+    "pid": 52792,
+    "processExited": true,
+    "seconds": 57.17720985412598,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "CutC",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleCutC",
+    "exit": 0,
+    "pid": 54068,
+    "processExited": true,
+    "seconds": 48.71440243721008,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "ResumeC",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleResumeC",
+    "exit": 0,
+    "pid": 33432,
+    "processExited": true,
+    "seconds": 55.945080041885376,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "CutD",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleCutD",
+    "exit": 0,
+    "pid": 52556,
+    "processExited": true,
+    "seconds": 50.46728873252869,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "ResumeD",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleResumeD",
+    "exit": 0,
+    "pid": 14200,
+    "processExited": true,
+    "seconds": 52.65241765975952,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "CutE",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleCutE",
+    "exit": 0,
+    "pid": 53124,
+    "processExited": true,
+    "seconds": 51.81565475463867,
+    "pass": true
+  },
+  {
+    "group": "closure/lifecycle",
+    "mode": "ResumeE",
+    "command": "./gradlew.bat --offline runNpcPathLifecycleResumeE",
+    "exit": 0,
+    "pid": 37644,
+    "processExited": true,
+    "seconds": 52.375319957733154,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "Death3Off",
+    "command": "./gradlew.bat --offline runNpcPathDeathDeath3Off",
+    "exit": 0,
+    "pid": 47572,
+    "processExited": true,
+    "seconds": 76.36979103088379,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "Death4Off",
+    "command": "./gradlew.bat --offline runNpcPathDeathDeath4Off",
+    "exit": 0,
+    "pid": 42380,
+    "processExited": true,
+    "seconds": 75.48542356491089,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "Death5Off",
+    "command": "./gradlew.bat --offline runNpcPathDeathDeath5Off",
+    "exit": 0,
+    "pid": 40808,
+    "processExited": true,
+    "seconds": 76.22515439987183,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "Death3On",
+    "command": "./gradlew.bat --offline runNpcPathDeathDeath3On",
+    "exit": 0,
+    "pid": 37708,
+    "processExited": true,
+    "seconds": 76.33389496803284,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "Death4On",
+    "command": "./gradlew.bat --offline runNpcPathDeathDeath4On",
+    "exit": 0,
+    "pid": 47924,
+    "processExited": true,
+    "seconds": 77.11584186553955,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "Death5On",
+    "command": "./gradlew.bat --offline runNpcPathDeathDeath5On",
+    "exit": 0,
+    "pid": 30508,
+    "processExited": true,
+    "seconds": 76.71269536018372,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "ReloadOff",
+    "command": "./gradlew.bat --offline runNpcPathDeathReloadOff",
+    "exit": 0,
+    "pid": 4404,
+    "processExited": true,
+    "seconds": 48.39632868766785,
+    "pass": true
+  },
+  {
+    "group": "closure/death",
+    "mode": "ReloadOn",
+    "command": "./gradlew.bat --offline runNpcPathDeathReloadOn",
+    "exit": 0,
+    "pid": 24912,
+    "processExited": true,
+    "seconds": 51.29321551322937,
+    "pass": true
+  },
+  {
+    "group": "closure/travel",
+    "mode": "Chunk2",
+    "command": "./gradlew.bat --offline runNpcPathTravelChunk2",
+    "exit": 0,
+    "pid": 46000,
+    "processExited": true,
+    "seconds": 67.67337942123413,
+    "pass": true
+  },
+  {
+    "group": "closure/travel",
+    "mode": "Chunk4",
+    "command": "./gradlew.bat --offline runNpcPathTravelChunk4",
+    "exit": 0,
+    "pid": 51380,
+    "processExited": true,
+    "seconds": 66.53854060173035,
+    "pass": true
+  },
+  {
+    "group": "closure/travel",
+    "mode": "Nether2",
+    "command": "./gradlew.bat --offline runNpcPathTravelNether2",
+    "exit": 0,
+    "pid": 44384,
+    "processExited": true,
+    "seconds": 69.58935284614563,
+    "pass": true
+  },
+  {
+    "group": "closure/travel",
+    "mode": "End2",
+    "command": "./gradlew.bat --offline runNpcPathTravelEnd2",
+    "exit": 0,
+    "pid": 49220,
+    "processExited": true,
+    "seconds": 66.0588583946228,
+    "pass": true
+  },
+  {
+    "group": "closure/travel",
+    "mode": "CutNether2",
+    "command": "./gradlew.bat --offline runNpcPathTravelCutNether2",
+    "exit": 0,
+    "pid": 51940,
+    "processExited": true,
+    "seconds": 60.890647888183594,
+    "pass": true
+  },
+  {
+    "group": "closure/travel",
+    "mode": "ResumeNether2",
+    "command": "./gradlew.bat --offline runNpcPathTravelResumeNether2",
+    "exit": 0,
+    "pid": 41460,
+    "processExited": true,
+    "seconds": 62.9958610534668,
+    "pass": true
+  },
+  {
+    "group": "closure/copy",
+    "mode": "Seed",
+    "command": "./gradlew.bat --offline runNpcPathCopySeed",
+    "exit": 0,
+    "pid": 2060,
+    "processExited": true,
+    "seconds": 59.2656569480896,
+    "protectedTreesUnchanged": true,
+    "pass": true
+  },
+  {
+    "group": "closure/copy",
+    "mode": "AdvanceA",
+    "command": "./gradlew.bat --offline runNpcPathCopyAdvanceA",
+    "exit": 0,
+    "pid": 46224,
+    "processExited": true,
+    "seconds": 54.8956401348114,
+    "protectedTreesUnchanged": true,
+    "pass": true
+  },
+  {
+    "group": "closure/copy",
+    "mode": "AdvanceB",
+    "command": "./gradlew.bat --offline runNpcPathCopyAdvanceB",
+    "exit": 0,
+    "pid": 54220,
+    "processExited": true,
+    "seconds": 54.11983299255371,
+    "protectedTreesUnchanged": true,
+    "pass": true
+  },
+  {
+    "group": "closure/copy",
+    "mode": "ReloadA",
+    "command": "./gradlew.bat --offline runNpcPathCopyReloadA",
+    "exit": 0,
+    "pid": 46256,
+    "processExited": true,
+    "seconds": 53.031099796295166,
+    "protectedTreesUnchanged": true,
+    "pass": true
+  },
+  {
+    "group": "closure/copy",
+    "mode": "ReloadB",
+    "command": "./gradlew.bat --offline runNpcPathCopyReloadB",
+    "exit": 0,
+    "pid": 41324,
+    "processExited": true,
+    "seconds": 52.3680534362793,
+    "protectedTreesUnchanged": true,
+    "pass": true
+  }
+]

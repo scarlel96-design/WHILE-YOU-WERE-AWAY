@@ -1,0 +1,2 @@
+07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255  whileaway-0.3.1-lifecycle-work.jar
+cc1a1899f1b16c317b8cf4022b406fd4c4e20db51f8fafa662d39647bd3597a0  whileaway-0.3.1-lifecycle-work-source.zip

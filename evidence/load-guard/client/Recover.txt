@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=50212
+PASS load STORY_LOAD outcome=RECOVERABLE_CORRUPTION recovery=RECOVER_WITH_WARNING saveFormat=4 actorSchema=1 actors=1 writeBlocked=false LOAD_RECOVERED storyId=wayfarer_first:380df991-f603-344c-a090-369bad2a924a eventId=wayfarer_first instanceId=bdce090e-72c9-4922-a8bc-d0a6d3adf4da generation=0 field=generation restored_from_matching_snapshot
+PASS Recover canonical=1 sameUUID=true generation=0 checkpoint=2 stableTicks=100 integrity=clean

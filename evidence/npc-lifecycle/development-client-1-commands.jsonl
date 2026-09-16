@@ -1,0 +1,3 @@
+{"mode": "Seed", "command": "./gradlew.bat --offline runNpcSeed", "exit": 0, "pid": 51476, "processExited": true, "seconds": 96.77172708511353, "pass": true}
+{"mode": "CutA", "command": "./gradlew.bat --offline runNpcCutA", "exit": 0, "pid": 19684, "processExited": true, "seconds": 82.7016932964325, "pass": true}
+{"mode": "ResumeA", "command": "./gradlew.bat --offline runNpcResumeA", "exit": 1, "pid": 49480, "processExited": true, "seconds": 78.23378372192383, "pass": false}

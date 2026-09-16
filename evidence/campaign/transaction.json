@@ -1,0 +1,42 @@
+{
+  "commands": [
+    {
+      "label": "BASELINE",
+      "command": "java -cp build/presence-probe PresenceArchiveProbe evidence/campaign/baseline/previous.jar absent",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\campaign\\baseline\\previous.jar",
+      "output": "PASS archive policy=ABSENT (baseline/rollback)",
+      "exit": 0,
+      "sha256": "07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255"
+    },
+    {
+      "label": "MODIFIED",
+      "command": "java -cp build/presence-probe PresenceArchiveProbe dist/campaign-pilot/whileaway-0.3.1-campaign-pilot.jar present",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\dist\\campaign-pilot\\whileaway-0.3.1-campaign-pilot.jar",
+      "output": "PASS archive policy=PRESENT checks=8",
+      "exit": 0,
+      "sha256": "9c5f78105b92a1afae46b4d488fc67aff2e0288ca78fd90f84aacb9b32efedf8"
+    },
+    {
+      "label": "ROLLBACK",
+      "command": "\"C:/Program Files/Git/bin/bash.exe\" evidence/campaign/ROLLBACK.sh evidence/campaign/rollback-target.jar",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\campaign\\rollback-target.jar",
+      "input_before_sha256": "9c5f78105b92a1afae46b4d488fc67aff2e0288ca78fd90f84aacb9b32efedf8",
+      "output": "ROLLBACK PASS: lifecycle-work JAR restored; world files untouched",
+      "exit": 0,
+      "sha256": "07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255"
+    },
+    {
+      "label": "ROLLBACK_VERIFY",
+      "command": "java -cp build/presence-probe PresenceArchiveProbe evidence/campaign/rollback-target.jar absent",
+      "input": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\outputs\\while-you-were-away\\evidence\\campaign\\rollback-target.jar",
+      "output": "PASS archive policy=ABSENT (baseline/rollback)",
+      "exit": 0,
+      "sha256": "07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255"
+    }
+  ],
+  "restored_hash": "07e888a09229b5830e2e1cf866c34d89dac7d7b0c246608b6e6dcf31ee75c255",
+  "modified_still_changed": true,
+  "save_files_touched_by_rollback": false,
+  "initial_rollback_exit": -1073741502,
+  "initial_rollback_result": "fatal error - couldn't create signal pipe, Win32 error 5"
+}

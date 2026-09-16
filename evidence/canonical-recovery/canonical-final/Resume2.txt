@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=28684
+INPUT hash=a718840d17a86619c85d1812be5fdb2cc84027e7c1bc673897971522b9b4f497 uuid=af6599f6-aedd-4b51-bfdc-ff0ebc6f20ee generation=1 checkpoint=2
+PASS Resume2 staleLateJoin=false canonical=1 generation=1 uuid=af6599f6-aedd-4b51-bfdc-ff0ebc6f20ee checkpoint=2 factsPreserved=true integrity=clean stableTicks=160

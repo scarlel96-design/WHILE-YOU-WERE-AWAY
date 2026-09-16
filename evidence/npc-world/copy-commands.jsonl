@@ -1,0 +1,5 @@
+{"mode": "Seed", "command": "./gradlew.bat --offline runNpcCopySeed", "exit": 0, "pid": 10156, "processExited": true, "seconds": 65.58854031562805, "protectedTreesUnchanged": true, "pass": true}
+{"mode": "AdvanceA", "command": "./gradlew.bat --offline runNpcCopyAdvanceA", "exit": 0, "pid": 18968, "processExited": true, "seconds": 59.49130868911743, "protectedTreesUnchanged": true, "pass": true}
+{"mode": "AdvanceB", "command": "./gradlew.bat --offline runNpcCopyAdvanceB", "exit": 0, "pid": 8828, "processExited": true, "seconds": 58.13155484199524, "protectedTreesUnchanged": true, "pass": true}
+{"mode": "ReloadA", "command": "./gradlew.bat --offline runNpcCopyReloadA", "exit": 0, "pid": 46260, "processExited": true, "seconds": 58.042017698287964, "protectedTreesUnchanged": true, "pass": true}
+{"mode": "ReloadB", "command": "./gradlew.bat --offline runNpcCopyReloadB", "exit": 0, "pid": 51208, "processExited": true, "seconds": 56.54331922531128, "protectedTreesUnchanged": true, "pass": true}

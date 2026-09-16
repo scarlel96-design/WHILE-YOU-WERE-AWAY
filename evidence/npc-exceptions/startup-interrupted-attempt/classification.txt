@@ -1,0 +1,1 @@
+Client started but exited before environment/title gate and world open; no PID marker. Cause unconfirmed. Not counted as actual death test. No remaining java processes observed on resume.

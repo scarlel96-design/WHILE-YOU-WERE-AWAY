@@ -1,0 +1,6 @@
+{"mode": "Chunk2", "command": "./gradlew.bat --offline runNpcPathTravelChunk2", "exit": 0, "pid": 46000, "processExited": true, "seconds": 67.67337942123413, "pass": true}
+{"mode": "Chunk4", "command": "./gradlew.bat --offline runNpcPathTravelChunk4", "exit": 0, "pid": 51380, "processExited": true, "seconds": 66.53854060173035, "pass": true}
+{"mode": "Nether2", "command": "./gradlew.bat --offline runNpcPathTravelNether2", "exit": 0, "pid": 44384, "processExited": true, "seconds": 69.58935284614563, "pass": true}
+{"mode": "End2", "command": "./gradlew.bat --offline runNpcPathTravelEnd2", "exit": 0, "pid": 49220, "processExited": true, "seconds": 66.0588583946228, "pass": true}
+{"mode": "CutNether2", "command": "./gradlew.bat --offline runNpcPathTravelCutNether2", "exit": 0, "pid": 51940, "processExited": true, "seconds": 60.890647888183594, "pass": true}
+{"mode": "ResumeNether2", "command": "./gradlew.bat --offline runNpcPathTravelResumeNether2", "exit": 0, "pid": 41460, "processExited": true, "seconds": 62.9958610534668, "pass": true}

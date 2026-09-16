@@ -1,0 +1,81 @@
+{
+  "wayfarer_suite": "PASS",
+  "overall_stability": "PARTIAL",
+  "distinct_client_processes": 11,
+  "crash_snapshots": 5,
+  "crash_final_verifies": 1,
+  "exception_processes": 5,
+  "copied_world_pairs": [
+    {
+      "repeat": 1,
+      "original_checkpoint": 4,
+      "copy_checkpoint": 2,
+      "generation": 0,
+      "same_identity_within_each_world": true,
+      "independent_worlds": true
+    }
+  ],
+  "scope": "Shipped Wayfarer identity recovery + current generic Actor primitives. Not NPC campaign, transactions, fallback, natural survival or arbitrary corrupt-field auto-repair.",
+  "load_guard": "PASS",
+  "canonical_suite": "PASS",
+  "actor_recovery_current_adapter": "PASS",
+  "npc_stage": "NOT STARTED",
+  "generation_boundaries": [
+    {
+      "boundary": 1,
+      "cutGeneration": 0,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": false,
+      "diskVerified": true
+    },
+    {
+      "boundary": 2,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 3,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 4,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 5,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    },
+    {
+      "boundary": 6,
+      "cutGeneration": 1,
+      "resumeGeneration": 1,
+      "checkpoint": 2,
+      "reservationUUIDPreserved": true,
+      "diskVerified": true
+    }
+  ],
+  "canonical_clients": 19,
+  "load_clients": 5,
+  "wayfarer_clients": 11,
+  "total_current_clients": 35,
+  "load_probe_cases": 580,
+  "load_probe_assertions": 2161,
+  "game_tests": 52,
+  "original_game_tests": 48
+}

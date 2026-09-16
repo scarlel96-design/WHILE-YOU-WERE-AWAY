@@ -1,0 +1,7 @@
+{
+  "reason": "window outside requested right monitor; before openWorld; actual bounds not recorded; root cause unconfirmed",
+  "storyHash": "5810ecef0dafdbbcffe346fbb5a2d512a938ef408534c594cbed65153daaa6e0",
+  "cutHash": "5810ecef0dafdbbcffe346fbb5a2d512a938ef408534c594cbed65153daaa6e0",
+  "saveUnchanged": true,
+  "runningJavaObserved": false
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "whileaway:block/personal_note"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+RUNNING
+PASS runBoundary4D event=city_records boundary=BEFORE_COMPLETE checkpoint=3
+FAULT Runtime.halt; no shutdown save after tested boundary

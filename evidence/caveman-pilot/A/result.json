@@ -1,0 +1,9 @@
+{
+  "compile_exit": 0,
+  "unit_exit": 0,
+  "unit_checks": 334,
+  "gametest_exit": 0,
+  "gametests_passed": 48,
+  "client_tests": 0,
+  "overall": "PARTIAL"
+}

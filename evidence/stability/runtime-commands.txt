@@ -1,0 +1,44 @@
+RUNTIME COMMANDS (working directory is project root)
+BASELINE RELEASE: preserved 0.3 JAR and source, SHA256 verified separately by archive probe.
+
+COMMAND: .\gradlew.bat build runGameTestServer runRecoveryCut1 --console=plain
+INPUT: new isolated world, seed 74192361, prepared inventory 27 diamonds, keepInventory=true; halt after committed scene checkpoint 2.
+LITERAL OUTPUT: All 25 required tests passed :)
+LITERAL OUTPUT: PASS runRecoveryCut1
+LITERAL OUTPUT: FAULT: Runtime.halt at checkpoint 2; no shutdown save after event start
+JVM EXIT STATUS: -1073740791 (deliberate non-graceful termination)
+GRADLE EXIT STATUS: 1 (initial driver did not yet distinguish expected fault injection)
+LOG: cut1.log
+
+COMMAND: .\gradlew.bat runRecoveryCopy1 runRecoveryResume1 --console=plain
+INPUT: entire stopped save copied; copy completes and changes cityClues to 7; original starts with cityClues=1, resumes, then runs death/chunk/dimension interruption cycles twice.
+LITERAL OUTPUT: PASS runRecoveryCopy1
+LITERAL OUTPUT: PASS runRecoveryResume1
+LITERAL OUTPUT: BUILD SUCCESSFUL in 4m 8s
+EXIT STATUS: 0
+LOG: resume1.log
+
+COMMAND: .\gradlew.bat build runGameTestServer runRecoveryCut2 runRecoveryLegacy runCitySmoke runCityReload --console=plain
+INPUT: second fresh recovery world; copied actual 0.2 save; separate city regression profile. All clients muted before startup.
+LITERAL OUTPUT: All 25 required tests passed :)
+LITERAL OUTPUT: EXPECTED_FAULT_PROCESS_EXIT=-1073740791
+LITERAL OUTPUT: PASS runRecoveryCut2
+LITERAL OUTPUT: PASS actual schema 2 save copy: migration to 4, missing flag false, revision 1 and player edit preserved
+LITERAL OUTPUT: PASS runRecoveryLegacy
+LITERAL OUTPUT: PASS runCitySmoke
+LITERAL OUTPUT: PASS runCityReload
+LITERAL OUTPUT: BUILD SUCCESSFUL in 4m 40s
+GRADLE EXIT STATUS: 0 (Cut2 requires explicit fault marker; other clients must finish their gates)
+LOG: regression-final.log
+Earlier failed attempt: client checkpoint not durable on server; GRADLE EXIT STATUS: 1. Harness awaited render state before server ack; fixed to wait for durable server boundary. LOG: cut2-first-attempt.log
+
+COMMAND: .\gradlew.bat runRecoveryCopy2 runRecoveryResume2 --console=plain
+INPUT: second entire save copy and independent original; death/chunk/Nether/End recovery cycles.
+LITERAL OUTPUT: PASS runRecoveryCopy2
+LITERAL OUTPUT: PASS runRecoveryResume2
+LITERAL OUTPUT: BUILD SUCCESSFUL in 4m 2s
+EXIT STATUS: 0
+LOG: resume2.log
+
+SIGNAL/ARRIVAL/SEVEN NBT boundaries: kinds 1-3 x checkpoints 0-4 x 2 iterations. Not equivalent to actual A/B/D/E process exits for every event.
+Actual visual cue inspection: recovery-copy-2.png shows seven actors reconstructed; recovery-resume-2.png is a transition frame without visible actors. Runtime actor-count gates carry the latter proof.

@@ -1,0 +1,1 @@
+PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile

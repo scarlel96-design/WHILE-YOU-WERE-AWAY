@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-09-10T10:31:44.489319+00:00",
+  "last_usage": {
+    "timestamp": "2026-09-10T10:31:43.074Z",
+    "ordinal": 2908,
+    "response_id": "resp_09cf95a89c299313016aa287066fac87d094a6a99962ed3064",
+    "usage": {
+      "input_tokens": 116079,
+      "cached_input_tokens": 115712,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 253,
+      "reasoning_output_tokens": 0,
+      "total_tokens": 116332
+    }
+  }
+}

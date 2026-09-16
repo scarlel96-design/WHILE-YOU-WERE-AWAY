@@ -1,0 +1,161 @@
+{
+  "A": {
+    "seconds": 110.68272,
+    "response_count": 4,
+    "tokens": {
+      "input_tokens": 439478,
+      "cached_input_tokens": 435328,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2245,
+      "reasoning_output_tokens": 181,
+      "total_tokens": 441723,
+      "non_reasoning_output_tokens": 2064,
+      "uncached_input_tokens": 4150
+    },
+    "records": [
+      {
+        "timestamp": "2026-09-10T10:28:36.304Z",
+        "ordinal": 2840,
+        "response_id": "resp_09cf95a89c299313016aa2863415dc87d0a264b3735e603749",
+        "usage": {
+          "input_tokens": 108240,
+          "cached_input_tokens": 107648,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1036,
+          "reasoning_output_tokens": 111,
+          "total_tokens": 109276
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:29:10.584Z",
+        "ordinal": 2847,
+        "response_id": "resp_09cf95a89c299313016aa28662db6887d0a6d8878feb2f6dda",
+        "usage": {
+          "input_tokens": 109343,
+          "cached_input_tokens": 108032,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 608,
+          "reasoning_output_tokens": 23,
+          "total_tokens": 109951
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:29:25.364Z",
+        "ordinal": 2854,
+        "response_id": "resp_09cf95a89c299313016aa2867f554887d0b0d47bcc16615750",
+        "usage": {
+          "input_tokens": 110627,
+          "cached_input_tokens": 109184,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 159,
+          "reasoning_output_tokens": 36,
+          "total_tokens": 110786
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:29:51.116Z",
+        "ordinal": 2864,
+        "response_id": "resp_09cf95a89c299313016aa2868f48cc87d089db271332173983",
+        "usage": {
+          "input_tokens": 111268,
+          "cached_input_tokens": 110464,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 442,
+          "reasoning_output_tokens": 11,
+          "total_tokens": 111710
+        }
+      }
+    ]
+  },
+  "B": {
+    "seconds": 103.965522,
+    "response_count": 5,
+    "tokens": {
+      "input_tokens": 576391,
+      "cached_input_tokens": 573440,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 1931,
+      "reasoning_output_tokens": 93,
+      "total_tokens": 578322,
+      "non_reasoning_output_tokens": 1838,
+      "uncached_input_tokens": 2951
+    },
+    "records": [
+      {
+        "timestamp": "2026-09-10T10:30:31.670Z",
+        "ordinal": 2880,
+        "response_id": "resp_09cf95a89c299313016aa286aa882087d0aad83e82b6abc70c",
+        "usage": {
+          "input_tokens": 113942,
+          "cached_input_tokens": 113664,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 924,
+          "reasoning_output_tokens": 23,
+          "total_tokens": 114866
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:31:03.771Z",
+        "ordinal": 2887,
+        "response_id": "resp_09cf95a89c299313016aa286d5edd487d0ba266cbcf5cb60bf",
+        "usage": {
+          "input_tokens": 114935,
+          "cached_input_tokens": 113792,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 550,
+          "reasoning_output_tokens": 32,
+          "total_tokens": 115485
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:31:19.313Z",
+        "ordinal": 2894,
+        "response_id": "resp_09cf95a89c299313016aa286f1ddf087d08ac073300dc2ea2b",
+        "usage": {
+          "input_tokens": 115588,
+          "cached_input_tokens": 114816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 142,
+          "reasoning_output_tokens": 16,
+          "total_tokens": 115730
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:31:31.737Z",
+        "ordinal": 2902,
+        "response_id": "resp_09cf95a89c299313016aa28700b68487d0a5c4cc6c4f49e1b2",
+        "usage": {
+          "input_tokens": 115847,
+          "cached_input_tokens": 115456,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 62,
+          "reasoning_output_tokens": 22,
+          "total_tokens": 115909
+        }
+      },
+      {
+        "timestamp": "2026-09-10T10:31:43.074Z",
+        "ordinal": 2908,
+        "response_id": "resp_09cf95a89c299313016aa287066fac87d094a6a99962ed3064",
+        "usage": {
+          "input_tokens": 116079,
+          "cached_input_tokens": 115712,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 253,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 116332
+        }
+      }
+    ]
+  },
+  "observed_reduction_percent": {
+    "input_tokens": -31.153550348367837,
+    "cached_input_tokens": -31.72596295207292,
+    "output_tokens": 13.98663697104677,
+    "reasoning_output_tokens": 48.61878453038674,
+    "total_tokens": -30.924131186286427,
+    "non_reasoning_output_tokens": 10.949612403100776,
+    "uncached_input_tokens": 28.89156626506024
+  },
+  "interpretation": "Observed sequential intervals, not causal Caveman savings, billing, quota or proof of quality equivalence."
+}

@@ -1,0 +1,220 @@
+WHILEAWAY 0.3.1-dev.1 / CHECKPOINT RECOVERY SUBSTAGE / WHOLE STABILITY PHASE NOT SEALED
+Changed fields: mod_version 0.3.0-dev.1 -> 0.3.1-dev.1; NarrativeData.SCHEMA 3 -> 4 (reads 1/2/3);
+SceneRecord checkpoint/state/instanceId/shown/interruption reason; ScenePayload lease/checkpoint; SceneAck;
+cityShockTriggered now committed at COMPLETED, not start. Legacy true is preserved as completed.
+Wayfarer offline/death/dimension active-time suspension and noncanonical duplicate cleanup.
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\dist\whileaway-0.3.1-dev.1.jar
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\stability\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\stability\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away\evidence\stability\ROLLBACK.sh
+BASELINE_SHA256=86b70224347ee8b527e0bd21041dba6009f263caa45d6395aaff3a3380283e49
+MODIFIED_SHA256=90085cc811858d41865c5a9973acdef8e8cc69ac560a5c80120ded378da59da1
+Working directory=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\outputs\while-you-were-away
+
+BASELINE
+COMMAND: python .\tools\probe-stability.py .\evidence\stability\baseline\previous.jar 0.3.0-dev.1 0
+INPUT: JAR=.\evidence\stability\baseline\previous.jar; expected version=0.3.0-dev.1, checkpoint_journal=0
+LITERAL OUTPUT: version=0.3.0-dev.1; checkpoint_journal=false; art_revision=2
+EXIT STATUS: 0
+
+MODIFIED
+COMMAND: python .\tools\probe-stability.py .\dist\whileaway-0.3.1-dev.1.jar 0.3.1-dev.1 1
+INPUT: JAR=.\dist\whileaway-0.3.1-dev.1.jar; expected version=0.3.1-dev.1, checkpoint_journal=1
+LITERAL OUTPUT: version=0.3.1-dev.1; checkpoint_journal=true; art_revision=2
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: & 'C:\Program Files\Git\bin\bash.exe' -c 'chmod +x evidence/stability/ROLLBACK.sh && test -x evidence/stability/ROLLBACK.sh && evidence/stability/ROLLBACK.sh build/rollback-stability/whileaway.jar'
+INPUT: build/rollback-stability/whileaway.jar (modified copy)
+LITERAL OUTPUT: ROLLBACK PASS: 0.3 JAR hash restored; world files untouched
+EXIT STATUS: 0
+
+ROLLBACK
+COMMAND: python .\tools\probe-stability.py .\build\rollback-stability\whileaway.jar 0.3.0-dev.1 0
+INPUT: JAR=.\build\rollback-stability\whileaway.jar; expected version=0.3.0-dev.1, checkpoint_journal=0
+LITERAL OUTPUT: version=0.3.0-dev.1; checkpoint_journal=false; art_revision=2
+EXIT STATUS: 0
+
+Restored copy: version=0.3.0-dev.1; checkpoint_journal=false; original hash restored.
+Retained modified release: version=0.3.1-dev.1; checkpoint_journal=true; modified hash unchanged.
+Executable rollback was run against another JAR copy only. World schema downgrade NOT TESTED.
+PASS unchanged art/data resource bytes: 102 archive entries.
+RUNTIME COMMANDS (working directory is project root)
+BASELINE RELEASE: preserved 0.3 JAR and source, SHA256 verified separately by archive probe.
+
+COMMAND: .\gradlew.bat build runGameTestServer runRecoveryCut1 --console=plain
+INPUT: new isolated world, seed 74192361, prepared inventory 27 diamonds, keepInventory=true; halt after committed scene checkpoint 2.
+LITERAL OUTPUT: All 25 required tests passed :)
+LITERAL OUTPUT: PASS runRecoveryCut1
+LITERAL OUTPUT: FAULT: Runtime.halt at checkpoint 2; no shutdown save after event start
+JVM EXIT STATUS: -1073740791 (deliberate non-graceful termination)
+GRADLE EXIT STATUS: 1 (initial driver did not yet distinguish expected fault injection)
+LOG: cut1.log
+
+COMMAND: .\gradlew.bat runRecoveryCopy1 runRecoveryResume1 --console=plain
+INPUT: entire stopped save copied; copy completes and changes cityClues to 7; original starts with cityClues=1, resumes, then runs death/chunk/dimension interruption cycles twice.
+LITERAL OUTPUT: PASS runRecoveryCopy1
+LITERAL OUTPUT: PASS runRecoveryResume1
+LITERAL OUTPUT: BUILD SUCCESSFUL in 4m 8s
+EXIT STATUS: 0
+LOG: resume1.log
+
+COMMAND: .\gradlew.bat build runGameTestServer runRecoveryCut2 runRecoveryLegacy runCitySmoke runCityReload --console=plain
+INPUT: second fresh recovery world; copied actual 0.2 save; separate city regression profile. All clients muted before startup.
+LITERAL OUTPUT: All 25 required tests passed :)
+LITERAL OUTPUT: EXPECTED_FAULT_PROCESS_EXIT=-1073740791
+LITERAL OUTPUT: PASS runRecoveryCut2
+LITERAL OUTPUT: PASS actual schema 2 save copy: migration to 4, missing flag false, revision 1 and player edit preserved
+LITERAL OUTPUT: PASS runRecoveryLegacy
+LITERAL OUTPUT: PASS runCitySmoke
+LITERAL OUTPUT: PASS runCityReload
+LITERAL OUTPUT: BUILD SUCCESSFUL in 4m 40s
+GRADLE EXIT STATUS: 0 (Cut2 requires explicit fault marker; other clients must finish their gates)
+LOG: regression-final.log
+Earlier failed attempt: client checkpoint not durable on server; GRADLE EXIT STATUS: 1. Harness awaited render state before server ack; fixed to wait for durable server boundary. LOG: cut2-first-attempt.log
+
+COMMAND: .\gradlew.bat runRecoveryCopy2 runRecoveryResume2 --console=plain
+INPUT: second entire save copy and independent original; death/chunk/Nether/End recovery cycles.
+LITERAL OUTPUT: PASS runRecoveryCopy2
+LITERAL OUTPUT: PASS runRecoveryResume2
+LITERAL OUTPUT: BUILD SUCCESSFUL in 4m 2s
+EXIT STATUS: 0
+LOG: resume2.log
+
+SIGNAL/ARRIVAL/SEVEN NBT boundaries: kinds 1-3 x checkpoints 0-4 x 2 iterations. Not equivalent to actual A/B/D/E process exits for every event.
+Actual visual cue inspection: recovery-copy-2.png shows seven actors reconstructed; recovery-resume-2.png is a transition frame without visible actors. Runtime actor-count gates carry the latter proof.
+
+COMMAND: .\tools\test-core.ps1
+INPUT: current pure Java core and CoreTests
+LITERAL OUTPUT: PASS core assertions=176857
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-assets.py .\build\libs\whileaway-0.3.1-dev.1.jar
+INPUT: built JAR and source assets
+LITERAL OUTPUT: PASS asset assertions=6702; station/animation/localization/OGG/JAR
+EXIT STATUS: 0
+COMMAND: .\tools\verify-mute.ps1 -OptionsPath ..\..\work\recovery-smoke\options.txt
+INPUT: isolated recovery profile after tests
+LITERAL OUTPUT: PASS muted options: 10 sound categories=0.0; narrator=0; isolated profile
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-design-contract.py
+INPUT: requirements 33-81 and current placeholder inventory
+LITERAL OUTPUT: PASS design requirements=49; tracked unfinished asset groups=6; foreshadow seeds=2
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-recovery-fixtures.py
+INPUT: two completed original/copy pairs and legacy save copy
+LITERAL OUTPUT: PASS independent original/copy cityClues: 1 / 7; pair=1; both schema=4 and completed checkpoint=4
+PASS independent original/copy cityClues: 1 / 7; pair=2; both schema=4 and completed checkpoint=4
+PASS actual schema 2 -> 4 copy migration; key facts preserved; all 41 original save files byte-identical
+EXIT STATUS: 0
+COMMAND: python .\tools\verify-design-contract.py --final-release
+INPUT: current placeholder/prototype inventory
+EXPECTED EXIT STATUS: 2 (final art not ready)
+LITERAL OUTPUT: NOT READY final art: tracked placeholders/prototypes remain
+
+# 0.3.1 기능 안정화 게이트
+
+**전체 단계: PARTIAL / NOT SEALED. 최종 아트 진입 금지.**
+
+## 실제 게임에서 통과한 제한된 범위
+
+대상은 주로 `seven_departures`(일곱 형체) 사건이다. 새 테스트 월드 2개에서 각각 중간 체크포인트 2의 비정상 JVM 종료를 재현했다. 각 원본과 전체 세이브 복사본을 별도 프로세스로 열었다. 원본에서는 사망→귀환, 청크 언로드→귀환, Nether/End→귀환을 2주기씩 반복했다. 테스트는 진행 준비와 keepInventory=true를 사용했다. 자연 생존 캠페인 전체 플레이와 다르다.
+
+| 요구 게이트 | 판정 | 근거와 남은 범위 |
+|---|---|---|
+| 사건 중간 종료 후 재개 | PASS: 일곱 형체 경계 2 / 전체 주요 사건 PARTIAL | Cut1/2의 사건 시작 후 정상 종료 저장 없는 JVM halt → Copy1/2·Resume1/2에서 동일 ID/경계 확인 → 완료. A/B/D/E의 실제 강제 종료 및 신호/도시 진입/귀로꾼 전 단계 중단 QA는 남음. |
+| 사망 복구 | PASS: 일곱 형체 / 전체 PARTIAL | 두 월드 × 2회, 실제 kill·죽음 화면·리스폰·동일 경계 재개·완료. keepInventory=true 조건. 기본 사망 드롭과 유일 아이템 소실, 귀로꾼 추격 중 사망은 별도. |
+| 청크 언로드/재로드 | PASS: 일곱 형체 / 전체 PARTIAL | 두 월드 × 2회, 2048블록 이탈, 실제 `hasChunkAt(origin)==false` 확인, 상태 정지, 복귀 후 완료. 구조 변화·일반 NPC AI가 결합된 사건은 아직 없음/미검증. |
+| 차원 이동 | PASS: 일곱 형체 / 전체 PARTIAL | Nether 왕복 2회, End 왕복 2회, 상태 정지와 재개. 모든 사건/각 단계의 네 차원 조합 전수 검사는 아님. |
+| 월드 복사 독립성 | PASS: 현재 장면/기록 | 전체 세이브 복사 2쌍. 복사본 기록값 7과 원본 1을 각자 유지하며 모두 완료. pair 1은 복사본 진행 중 원본 이야기 파일 바이트 불변까지 확인. pair 2는 원본 재개가 먼저 시작되어 해당 시점 해시 비교 대신 양쪽 최종 저장과 원본 시작 시 사실 검사를 사용. |
+| 필수 구조물 누락 복구 | NOT STARTED | StoryStructureRegistry, 기존 대체 탐색, 미탐험 청크 배치, 보조 진입, 분실한 필수 구조물 복구 경로가 아직 없음. |
+| 사건 엔티티 중복 방지 | PASS: 7개 클라이언트 배우 / 전체 PARTIAL | 재개 후 7개, 이탈 후 0개, 완료 후 0개. 귀로꾼 비정규 UUID 제거는 GameTest. 일반 NPC 누락 탐색/재생성은 미구현. |
+| 중복 보상 방지 | N/A: 해당 세 연출은 보상을 지급하지 않음 / 시스템 PARTIAL | 장면·죽음 검사 중 다이아몬드 27개 불변. 이를 보상 트랜잭션 완성으로 해석하지 않음. 신호 복구 레드스톤 소비 직전/직후 강제 종료 원자성은 미검증. |
+| 저장 형식 3 정상 로드 | PASS: Minecraft NBT 검사 | 3의 true/false·알 수 없는 추가 필드와 4로의 저장 검사. 실사용 0.3 세이브의 모든 변형 전수 검사는 아님. |
+| 지원 이전 형식 migration | PASS: 1/2/3 NBT; 실제 0.2 복사본 | 실제 형식 2 저장 → 4, 기존 위치/기록/완료 사실·도시 revision 1·금 블록 보존. 원본 세이브 41파일 해시 불변. |
+| 스토리 무결성 검사 | PASS: 장면 레코드 / 전체 PARTIAL | 키/ID/경계/완료 사실 모순 진단. NPC·통로·엔딩·상호 배타적 선택 등 미구현 영역까지 검사하는 전체 검사기는 아님. |
+| 처음부터 현재 끝 지점까지 진행 | PARTIAL | 기존 도시 생성·접근 차단·책·왕복·재접속 회귀 PASS. 폐역 자연 발견부터 생존 전 과정을 실제 플레이로 이어 간 전수 검사는 남음. |
+
+## A–E 종료 지점 구분
+
+세 연출 종류 × 체크포인트 0–4 × 두 번의 NBT 저장/로드 검사를 수행했다. 순서 건너뛰기·중복 단계·영구 사실 보존도 함께 검사했다. 이는 **A/B/D/E에서 실제 프로세스를 종료했다는 증거가 아니다.** 실제 비정상 종료는 현재 일곱 형체의 C(중간 경계 2)에 집중했다.
+
+## 오류·수정 기록
+
+- 첫 Cut1은 의도한 halt 직후 네이티브 종료 코드 -1073740791을 반환했고, 초기 Gradle 드라이버가 이를 일반 실패로 판정했다. 이후 Cut 태스크만 예상 비정상 종료를 허용하되, 사건 경계 표식과 다음 프로세스 복구 성공을 필수로 확인하도록 분리했다.
+- 첫 Cut2에서 렌더러 경계가 서버 확인 패킷 처리보다 먼저 도착하는 테스트 경쟁 조건을 검출했다. 서버가 경계 2를 실제로 확정할 때까지 기다린 뒤 종료하도록 수정했다. 실패 로그는 cut2-first-attempt.log에 보존했다.
+- 장면 확인은 네트워크와 디스크의 여러 파일 전체를 원자적으로 확정하는 시스템이 아니다. OS 전원 차단, 저장 도중 파일 손상, 중요한 아이템 소비/보상 처리의 정확히 한 번 보장은 별도 과제다.
+
+## 화면·자산 확인
+
+recovery-copy-2.png에는 경계 2에서 재구성된 7개 형체가 보인다. recovery-resume-2.png는 로딩 직후 렌더 전환 프레임으로 형체가 보이지 않는다. 후자의 이미지 한 장을 배우 복구 증거로 사용하지 않는다. 실제 반복 검사에서 배우 수와 정리, 서버 완료를 별도로 확인했다. 두 이미지에는 Minecraft의 백업 알림과 테스트 인벤토리가 보인다.
+
+0.3 대비 assets/data 리소스는 바이트 단위로 동일하다. 33–81 기준, 자산 교체 계약 6그룹, 떡밥 초안 2건은 문서만 추가했다. 최종 팩·퍼즐·장비·NPC 아트가 새로 구현된 것은 아니다.
+
+## 다음 작업
+
+1. 나머지 주요 사건 및 A/B/D/E 중단 지점의 실제 클라이언트 QA와 체크포인트 결손 수정.
+2. 필수 구조물 등록·검증·대체 진입 경로.
+3. 일반 사건 엔티티 누락 복구와 중요 소비/보상 멱등 처리.
+4. 기본 생존 조건의 현재 전체 진행 회귀.
+5. 이후에 조사·증거·퍼즐·장비·미스터리·엔딩 지식·떡밥 회수 기반을 확장한다. 최종 아트는 계속 보류한다.
+
+PASS independent original/copy cityClues: 1 / 7; pair=1; both schema=4 and completed checkpoint=4
+PASS independent original/copy cityClues: 1 / 7; pair=2; both schema=4 and completed checkpoint=4
+PASS actual schema 2 -> 4 copy migration; key facts preserved; all 41 original save files byte-identical
+
+FAILURE HISTORY: first Cut1 produced expected non-graceful native process exit -1073740791 after fault marker; initial Gradle wrapper marked it failed.
+Cut2 first attempt caught a harness race: renderer checkpoint arrived before queued server acknowledgement. Test now waits for server commit, then halts. The failed run is retained as cut2-first-attempt.log.
+Visual checkpoint screenshots inspected; no new visual assets. Actual audio remained muted. Listening quality NOT TESTED.
+
+RUNNING
+PASS runRecoveryCut1
+FAULT: Runtime.halt at checkpoint 2; no shutdown save after event start
+
+
+RUNNING
+PASS persisted midpoint identity and facts after non-graceful JVM halt
+PASS resumed midpoint to completion without inventory change
+PASS runRecoveryCopy1
+
+
+RUNNING
+PASS persisted midpoint identity and facts after non-graceful JVM halt
+PASS resumed midpoint to completion without inventory change
+PASS interruption=death_respawn cycle=1
+PASS interruption=chunk_unload_reload cycle=1
+PASS interruption=nether_return cycle=1
+PASS interruption=death_respawn cycle=2
+PASS interruption=chunk_unload_reload cycle=2
+PASS interruption=end_return cycle=2
+PASS runRecoveryResume1
+
+
+RUNNING
+PASS runRecoveryCut2
+FAULT: Runtime.halt at checkpoint 2; no shutdown save after event start
+
+
+RUNNING
+PASS persisted midpoint identity and facts after non-graceful JVM halt
+CAPTURE resumed checkpoint 2
+PASS resumed midpoint to completion without inventory change
+PASS runRecoveryCopy2
+
+
+RUNNING
+PASS persisted midpoint identity and facts after non-graceful JVM halt
+CAPTURE resumed checkpoint 2
+PASS resumed midpoint to completion without inventory change
+PASS interruption=death_respawn cycle=1
+PASS interruption=chunk_unload_reload cycle=1
+PASS interruption=nether_return cycle=1
+PASS interruption=death_respawn cycle=2
+PASS interruption=chunk_unload_reload cycle=2
+PASS interruption=end_return cycle=2
+PASS runRecoveryResume2
+
+
+RUNNING
+PASS actual schema 2 save copy: migration to 4, missing flag false, revision 1 and player edit preserved
+PASS runRecoveryLegacy
+
