@@ -1,13 +1,24 @@
-name: Minecraft GameTest CI
+name: Minecraft Horror Mod CI
 
 on:
   push:
     branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: minecraft-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
       - name: 저장소 체크아웃
         uses: actions/checkout@v4
@@ -18,8 +29,75 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Gradle 래퍼 실행 권한 부여
+      - name: Gradle 설정
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Gradle 실행 권한
         run: chmod +x gradlew
 
-      - name: Gradle 빌드 및 GameTest 실행
-        run: ./gradlew build runGameTestServer --no-daemon
+      - name: JSON 검사
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            python3 -m json.tool "$file" > /dev/null
+          done < <(find src/main/resources -type f -name '*.json' -print0)
+
+      - name: 설계 계약 검사
+        run: python3 tools/verify-design-contract.py
+
+      - name: Gradle Build + CoreTest + GameTest
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p evidence/ci
+          ./gradlew build runGameTestServer \
+            --no-daemon --console=plain \
+            2>&1 | tee evidence/ci/gradle-gametest.log
+
+      - name: 빌드 JAR 찾기
+        shell: bash
+        run: |
+          JAR=$(find build/libs -maxdepth 1 -name '*.jar' | head -n 1)
+          test -n "$JAR"
+          echo "CI_JAR=$JAR" >> "$GITHUB_ENV"
+
+      - name: Asset/JAR 정합성 검사
+        run: python3 tools/verify-assets.py "$CI_JAR"
+
+      - name: 오디오 검증 의존성
+        run: pip install numpy soundfile
+
+      - name: 오디오 무재생 검사
+        run: python3 tools/verify-audio.py
+
+      - name: JAR SHA-256
+        shell: bash
+        run: |
+          sha256sum "$CI_JAR" | tee evidence/ci/JAR_SHA256.txt
+
+      - name: CI 메타데이터 기록
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence/ci
+          cat > evidence/ci/run.txt <<EOF
+          commit=${GITHUB_SHA}
+          ref=${GITHUB_REF}
+          run_id=${GITHUB_RUN_ID}
+          run_number=${GITHUB_RUN_NUMBER}
+          java=21
+          runner=${RUNNER_OS}
+          EOF
+
+      - name: CI 증거 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhileAway-CI-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            build/libs/*.jar
+            build/reports/**
+            evidence/ci/**
+            evidence/return-network-contract/gametest/**
