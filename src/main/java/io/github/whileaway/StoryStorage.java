@@ -8,7 +8,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-
 /** Explicit world-local load boundary. A rejected file is never registered as empty SavedData. */
 public final class StoryStorage {
     public static final String KEY="whileaway_story";
@@ -50,7 +49,6 @@ public final class StoryStorage {
             s.status.saveFormat,s.status.actorSchema,s.status.actorCount,false,s.status.originalHash,"LOAD_CORRUPT_BLOCKED write_guard_poisoned "+s.status.detail);
         return s.status;
     }
-
     public static synchronized NarrativeData open(DimensionDataStorage storage,Path directory,HolderLookup.Provider registry,Set<String> dimensions) {
         return openInternal(storage,directory,registry,dimensions,Map.of(),false);
     }
@@ -65,7 +63,7 @@ public final class StoryStorage {
             if(Files.notExists(file)) {
                 if(!bindings.isEmpty())throw new IOException("recovery_source_disappeared");
                 var data=new NarrativeData();data.bindStorage(file,null);
-                var status=new Status(Outcome.ABSENT,Recovery.SAFE_AUTO_RECOVER,4,1,0,true,"absent","LOAD_OK new_world");
+                var status=new Status(Outcome.ABSENT,Recovery.SAFE_AUTO_RECOVER,5,1,0,true,"absent","LOAD_OK new_world");
                 states.put(storage,new Slot(data,status));storage.set(KEY,data);return data;
             }
             // exists=false also covers access failures; only notExists=true permits creation.
@@ -84,8 +82,9 @@ public final class StoryStorage {
             var root=envelope.getCompound("data");
             if(!root.contains("schema",Tag.TAG_INT))throw new IllegalStateException("field=schema missing_or_wrong_type");
             format=root.getInt("schema");schema=root.contains("actorSchema")?root.getInt("actorSchema"):0;
-            if(format<1||format>4||schema<0||schema>1){failure=Outcome.UNSUPPORTED;throw new IllegalStateException("field=schema unsupported_version");}
+            if(format<1||format>5||schema<0||schema>1){failure=Outcome.UNSUPPORTED;throw new IllegalStateException("field=schema unsupported_version");}
             if(root.contains("actorSchema")&&!root.contains("actorSchema",Tag.TAG_INT))throw new IllegalStateException("field=actorSchema wrong_type");
+            if(format==5&&!root.contains("returnNetwork",Tag.TAG_COMPOUND))throw new IllegalStateException("field=returnNetwork missing_or_wrong_type");
             listType(root,"players",Tag.TAG_COMPOUND);listType(root,"actors",Tag.TAG_COMPOUND);
             var playerIds=new HashSet<UUID>();
             for(var raw:root.getList("players",Tag.TAG_COMPOUND)) {
