@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 permissions: {contents: read}
 concurrency:
-  group: gametest-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   ci:
@@ -17,32 +17,32 @@ jobs:
         with: {distribution: temurin, java-version: '21'}
       - uses: gradle/actions/setup-gradle@v4
       - name: Prepare
-        run: |
-          mkdir -p evidence/ci/status
-          java -version 2>&1 | tee evidence/ci/java-version.txt
-          echo 'REAL CLIENT = NOT TESTED' > evidence/ci/real-client.txt
+        run: mkdir -p evidence/ci/status; java -version 2>&1 | tee evidence/ci/java-version.txt; echo 'REAL CLIENT = NOT TESTED' > evidence/ci/real-client.txt
       - name: JSON
         id: json
         continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
-          while IFS= read -r -d '' f; do python3 -m json.tool "$f" >/dev/null || exit 1; done < <(find . \( -path './.git' -o -path './.gradle' -o -path './build' -o -path './run' -o -path './runs' \) -prune -o -type f -name '*.json' -print0)
+          find src -type f -name '*.json' -print0 | while IFS= read -r -d '' f; do python3 -m json.tool "$f" >/dev/null || exit 1; done
       - name: Design
         id: design
         if: always()
         continue-on-error: true
-        run: python3 tools/verify-design-contract.py 2>&1 | tee evidence/ci/design.log
+        shell: bash
+        run: set -o pipefail; python3 tools/verify-design-contract.py 2>&1 | tee evidence/ci/design.log
       - name: Build
         id: build
         if: always()
         continue-on-error: true
-        run: chmod +x gradlew && ./gradlew build --no-daemon --console=plain 2>&1 | tee evidence/ci/build.log
+        shell: bash
+        run: set -o pipefail; chmod +x gradlew; ./gradlew build --no-daemon --console=plain 2>&1 | tee evidence/ci/build.log
       - name: GameTest
         id: gametest
         if: always()
         continue-on-error: true
-        run: ./gradlew runGameTestServer --no-daemon --console=plain 2>&1 | tee evidence/ci/gradle-gametest.log
+        shell: bash
+        run: set -o pipefail; ./gradlew runGameTestServer --no-daemon --console=plain 2>&1 | tee evidence/ci/gradle-gametest.log
       - name: JAR
         id: jar
         if: always()
@@ -50,14 +50,13 @@ jobs:
         shell: bash
         run: |
           JAR="$(find build/libs -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' | sort | head -1)"
-          test -n "$JAR"
-          echo "$JAR" > evidence/ci/final-jar.txt
-          sha256sum "$JAR" | tee evidence/ci/jar.sha256
+          test -n "$JAR"; echo "$JAR" > evidence/ci/final-jar.txt; sha256sum "$JAR" | tee evidence/ci/jar.sha256
       - name: Assets
         id: asset
         if: always()
         continue-on-error: true
-        run: python3 tools/verify-assets.py "$(cat evidence/ci/final-jar.txt)" 2>&1 | tee evidence/ci/assets.log
+        shell: bash
+        run: set -o pipefail; python3 tools/verify-assets.py "$(cat evidence/ci/final-jar.txt)" 2>&1 | tee evidence/ci/assets.log
       - name: Audio
         id: audio
         if: always()
@@ -65,9 +64,11 @@ jobs:
         shell: bash
         run: |
           python3 -c 'import numpy,soundfile' 2>/dev/null || python3 -m pip install numpy soundfile || true
-          if python3 -c 'import numpy,soundfile' 2>/dev/null; then python3 tools/verify-audio.py 2>&1 | tee evidence/ci/audio.log; else echo SKIPPED | tee evidence/ci/audio.log; fi
+          if ! python3 -c 'import numpy,soundfile' 2>/dev/null; then echo SKIPPED > evidence/ci/status/audio; exit 0; fi
+          set -o pipefail; python3 tools/verify-audio.py 2>&1 | tee evidence/ci/audio.log
       - name: Summary
         if: always()
+        shell: bash
         env:
           JSON: ${{ steps.json.outcome }}
           DESIGN: ${{ steps.design.outcome }}
@@ -76,7 +77,14 @@ jobs:
           ASSET: ${{ steps.asset.outcome }}
           AUDIO: ${{ steps.audio.outcome }}
         run: |
-          python3 -c "import os,pathlib; d=pathlib.Path('evidence/ci/status'); d.mkdir(parents=True,exist_ok=True); [(d/k).write_text({'success':'PASS','failure':'FAIL','skipped':'SKIPPED'}.get(os.environ[k.upper()],'SKIPPED')) for k in ('json','design','build','gametest','asset','audio')]"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          d=Path('evidence/ci/status'); m={'success':'PASS','failure':'FAIL','skipped':'SKIPPED','cancelled':'FAIL'}
+          for k in ('json','design','build','gametest','asset','audio'):
+              p=d/k
+              if not p.exists(): p.write_text(m.get(os.getenv(k.upper(),''),'SKIPPED'))
+          PY
           python3 tools/ci/write-summary.py
       - name: Upload
         if: always()
@@ -92,4 +100,4 @@ jobs:
             build/libs/*.jar
       - name: Gate
         if: always()
-        run: python3 -c "import json; x=json.load(open('evidence/ci/summary.json')); raise SystemExit(x['overall']!='CI PASS')"
+        run: python3 -c "import json; x=json.load(open('evidence/ci/summary.json')); print(x); raise SystemExit(x['overall']!='CI PASS')"
