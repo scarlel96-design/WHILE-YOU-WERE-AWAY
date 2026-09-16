@@ -3,11 +3,22 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [master, dev]
-    paths: ['build.gradle','settings.gradle','gradle.properties','gradle/**','gradlew','gradlew.bat','src/main/**']
-permissions: {contents: read}
+    paths:
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle.properties'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'src/main/**'
+
+permissions:
+  contents: read
+
 concurrency:
   group: windows-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: windows-latest
@@ -15,19 +26,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
-        with: {distribution: temurin, java-version: '21'}
+        with:
+          distribution: temurin
+          java-version: '21'
       - uses: gradle/actions/setup-gradle@v4
+
       - name: Build
         id: build
         continue-on-error: true
         shell: pwsh
-        run: .\gradlew.bat build --no-daemon --console=plain 2>&1 | Tee-Object evidence-windows-build.log
+        run: |
+          & .\gradlew.bat build --no-daemon --console=plain 2>&1 | Tee-Object evidence-windows-build.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) { exit $code }
+
       - name: GameTest
         id: gametest
         if: always()
         continue-on-error: true
         shell: pwsh
-        run: .\gradlew.bat runGameTestServer --no-daemon --console=plain 2>&1 | Tee-Object evidence-windows-gametest.log
+        run: |
+          & .\gradlew.bat runGameTestServer --no-daemon --console=plain 2>&1 | Tee-Object evidence-windows-gametest.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) { exit $code }
+
       - name: JAR SHA-256
         if: always()
         shell: pwsh
@@ -36,12 +58,14 @@ jobs:
           "REAL CLIENT = NOT TESTED" | Set-Content evidence/windows/real-client.txt
           $j=Get-ChildItem build/libs/*.jar -ErrorAction SilentlyContinue | Where-Object {$_.Name -notmatch '-sources|-javadoc'} | Sort-Object Name | Select-Object -First 1
           if($j){$h=Get-FileHash -Algorithm SHA256 $j.FullName; "$($h.Hash.ToLower())  $($j.Name)" | Set-Content evidence/windows/jar.sha256}
+
       - name: Upload
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: windows-validation-${{ github.run_id }}
+          name: windows-validation-${{ github.run_id }}-${{ github.run_attempt }}
           if-no-files-found: warn
+          retention-days: 14
           path: |
             evidence/windows/**
             evidence-windows-*.log
@@ -49,9 +73,10 @@ jobs:
             build/reports/**
             build/test-results/**
             build/libs/*.jar
+
       - name: Gate
         if: always()
         shell: pwsh
         run: |
           Write-Host "REAL CLIENT = NOT TESTED"
-          if('${{ steps.build.outcome }}' -ne 'success' -or '${{ steps.gametest.outcome }}' -ne 'success'){exit 1}
+          if ('${{ steps.build.outcome }}' -ne 'success' -or '${{ steps.gametest.outcome }}' -ne 'success') { exit 1 }
