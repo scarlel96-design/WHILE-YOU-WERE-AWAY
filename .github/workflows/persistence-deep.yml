@@ -1,0 +1,169 @@
+name: Persistence Deep Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "실행 이유"
+        required: false
+        default: "manual persistence validation"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: persistence-deep-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  persistence-deep:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 45
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: JDK 21 설정
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Gradle 설정
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Gradle 실행 권한
+        run: chmod +x gradlew
+
+      - name: Evidence 폴더 생성
+        run: |
+          mkdir -p evidence/ci-persistence
+
+      - name: Persistence run metadata
+        run: |
+          cat > evidence/ci-persistence/run.txt <<EOF
+          commit=${GITHUB_SHA}
+          ref=${GITHUB_REF}
+          event=${GITHUB_EVENT_NAME}
+          run_id=${GITHUB_RUN_ID}
+          reason=${{ inputs.reason }}
+          runner=${RUNNER_OS}
+          java=21
+          real_client=NOT_TESTED
+          EOF
+
+      - name: Baseline Build
+        id: build
+        shell: bash
+        run: |
+          set -o pipefail
+
+          ./gradlew build \
+            --no-daemon \
+            --console=plain \
+            2>&1 |
+            tee evidence/ci-persistence/build.log
+
+      - name: Fresh GameTest pass 1
+        id: gametest1
+        shell: bash
+        run: |
+          set -o pipefail
+
+          ./gradlew runGameTestServer \
+            --no-daemon \
+            --console=plain \
+            2>&1 |
+            tee evidence/ci-persistence/gametest-pass-1.log
+
+      - name: Fresh GameTest pass 2
+        id: gametest2
+        shell: bash
+        run: |
+          set -o pipefail
+
+          ./gradlew runGameTestServer \
+            --no-daemon \
+            --console=plain \
+            2>&1 |
+            tee evidence/ci-persistence/gametest-pass-2.log
+
+      - name: Persistence 전용 runner 존재 확인
+        id: runner
+        shell: bash
+        run: |
+          if [ -f tools/ci/run-persistence-deep.py ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Persistence deep runner: AVAILABLE"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Persistence deep runner: NOT IMPLEMENTED"
+          fi
+
+      - name: Persistence 전용 검증 실행
+        id: persistence
+        if: steps.runner.outputs.available == 'true'
+        shell: bash
+        run: |
+          set -o pipefail
+
+          python3 tools/ci/run-persistence-deep.py \
+            2>&1 |
+            tee evidence/ci-persistence/persistence-deep.log
+
+      - name: Persistence runner 미구현 기록
+        if: steps.runner.outputs.available != 'true'
+        shell: bash
+        run: |
+          cat > evidence/ci-persistence/PERSISTENCE_STATUS.txt <<EOF
+          PARTIAL
+
+          Generic Build/GameTest regression executed.
+
+          Dedicated fresh-process persistence runner:
+          NOT IMPLEMENTED
+
+          Historical tools/verify-load-guard.py was intentionally NOT
+          treated as current-runtime proof.
+
+          REAL CLIENT:
+          NOT TESTED
+          EOF
+
+      - name: JAR SHA-256
+        if: always()
+        shell: bash
+        run: |
+          JAR=$(
+            find build/libs \
+              -maxdepth 1 \
+              -type f \
+              -name '*.jar' \
+              ! -name '*-sources.jar' \
+              ! -name '*-javadoc.jar' |
+            sort |
+            head -n 1
+          )
+
+          if [ -n "$JAR" ]; then
+            sha256sum "$JAR" \
+              > evidence/ci-persistence/JAR_SHA256.txt
+          else
+            echo "JAR NOT AVAILABLE" \
+              > evidence/ci-persistence/JAR_SHA256.txt
+          fi
+
+      - name: Deep persistence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhileAway-Persistence-${{ github.sha }}
+          retention-days: 21
+          if-no-files-found: warn
+          path: |
+            evidence/ci-persistence/**
+            evidence/return-network-contract/gametest/**
+            build/reports/**
+            build/libs/*.jar
