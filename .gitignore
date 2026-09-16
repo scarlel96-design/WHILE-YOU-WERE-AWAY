@@ -5,3 +5,15 @@ runs/
 *.log
 .idea/
 *.iml
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local Python environments
+.venv/
+venv/
