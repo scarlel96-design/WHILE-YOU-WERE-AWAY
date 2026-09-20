@@ -1,0 +1,10 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=42100
+INPUT cp=1 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fb2bc8722932802c96698d3bfee80ce9fd04f397daa80dba0d95b0e5c61c41e1, detail=LOAD_OK]
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=3 followRange=24.0
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=4 followRange=24.0
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=5 followRange=24.0
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=6 followRange=24.0
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=7 followRange=24.0
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=8 followRange=24.0
+PROGRESS cp=1 npc=(38.966282226009476, 65.0, 72.03372746958745) player=(44.5, 65.0, 48.5) wait=WAITING_ENVIRONMENT path=UNREACHABLE attempts=9 followRange=24.0

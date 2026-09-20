@@ -1,0 +1,8 @@
+{
+  "restoredHash": "BF8E234052C8A33EA49CB02C3CABCD941515E29FC126280FDCFA62D4BA0DB9C0",
+  "candidateHash": "C3820A1CE4551C9260B90B00676CD904314F48AF14AE04363515F66B08FE3162",
+  "command": "\"C:\\Program Files\\Git\\bin\\bash.exe\" evidence/return-network-integration/ROLLBACK.sh build/rollback-return-network-integration/test.jar",
+  "output": "ROLLBACK PASS: return-network-contract JAR restored; world files untouched; save downgrade not performed",
+  "exit": 0,
+  "input": "build/rollback-return-network-integration/test.jar"
+}

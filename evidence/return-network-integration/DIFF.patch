@@ -1,0 +1,898 @@
+diff --git a/build.gradle b/build.gradle
+index ca071db..624dc80 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -172,6 +172,14 @@ neoForge {
+                 systemProperty 'whileaway.evidence',file('evidence/npc-path/closure/copy/copy-client').absolutePath
+             }
+         }
++        ['Seed','CutA','CutB','CutC','CutD','CutE','CutF','CutGPre','CutG','Reopen','Normal','Environment','Nether','End','Chunk','Death2Off','Death4On','Death5Off','CopyHold','CopyReopen','CorruptBinding','CorruptShared'].each { mode ->
++            create("network${mode}") {
++                client(); gameDirectory=file('../../work/return-network-client')
++                systemProperty 'whileaway.networkSmoke',mode
++                systemProperty 'whileaway.networkWorld',project.findProperty('networkWorld') ?: (mode.startsWith('Cut')||mode=='Reopen' ? 'network-verified' : 'world-'+mode)
++                systemProperty 'whileaway.evidence',file('evidence/return-network-integration/client').absolutePath
++            }
++        }
+         recoveryLegacy {
+             client()
+             gameDirectory = file('../../work/recovery-smoke')
+@@ -186,7 +194,7 @@ neoForge {
+             // otherwise old test reservations accumulate into the production capacity guard.
+             def invocation=java.util.UUID.randomUUID().toString()
+             gameDirectory=file('../../work/gametest-isolated/'+invocation)
+-            systemProperty 'whileaway.testEvidence',file('evidence/return-network-contract/gametest/'+invocation).absolutePath
++            systemProperty 'whileaway.testEvidence',file('evidence/return-network-integration/gametest/'+invocation).absolutePath
+             systemProperty 'whileaway.testFixtures',file('evidence/reuse/baseline').absolutePath
+             systemProperty 'neoforge.enabledGameTestNamespaces', 'whileaway'
+         }
+@@ -639,3 +647,25 @@ tasks.named('runRecoveryLegacy').configure {
+     }
+ }
+ 
++
++// Dedicated compound-event profiles: silence and right-monitor bounds are asserted in-client.
++['Seed','CutA','CutB','CutC','CutD','CutE','CutF','CutGPre','CutG','Reopen','Normal','Environment','Nether','End','Chunk','Death2Off','Death4On','Death5Off','CopyHold','CopyReopen','CorruptBinding','CorruptShared'].each { mode ->
++    tasks.named("runNetwork${mode}").configure {
++        if(mode.startsWith('Cut')) ignoreExitValue=true
++        doFirst {
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/return-network-integration/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
++            def dir=file('../../work/return-network-client');dir.mkdirs()
++            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
++            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
++            file('evidence/return-network-integration/client').mkdirs()
++            file("evidence/return-network-integration/client/${mode}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            if(!file("evidence/return-network-integration/client/${mode}.txt").text.contains("PASS ${mode}"))throw new GradleException('Network client gate incomplete')
++            logger.lifecycle("NETWORK_CHILD_EXIT=${executionResult.get().exitValue}")
++        }
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/ActorGameTests.java b/src/main/java/io/github/whileaway/ActorGameTests.java
+index 012eeb5..9b00e06 100644
+--- a/src/main/java/io/github/whileaway/ActorGameTests.java
++++ b/src/main/java/io/github/whileaway/ActorGameTests.java
+@@ -108,7 +108,7 @@ public final class ActorGameTests {
+             var t=new CompoundTag();t.putInt("schema",schema);
+             var a=NarrativeData.load(t,h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
+             var b=NarrativeData.load(t.copy(),h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
+-            h.assertTrue(a.equals(b)&&a.getInt("schema")==4&&a.getList("actors",10).isEmpty(),"old save deterministically gains empty optional registry");
++            h.assertTrue(a.equals(b)&&a.getInt("schema")==5&&a.getList("actors",10).isEmpty(),"old save deterministically gains empty optional registry");
+         }h.succeed();
+     }
+     @GameTest(template="empty")
+diff --git a/src/main/java/io/github/whileaway/NarrativeData.java b/src/main/java/io/github/whileaway/NarrativeData.java
+index 7fbee9d..4fed800 100644
+--- a/src/main/java/io/github/whileaway/NarrativeData.java
++++ b/src/main/java/io/github/whileaway/NarrativeData.java
+@@ -131,6 +131,7 @@ for(int i=0;i<actors.size();i++) {
+ var actor=StoryActorRecord.load(actors.getCompound(i));
+ if(data.actors.putIfAbsent(actor.storyId,actor)!=null)throw new IllegalStateException("MANUAL_DIAGNOSTIC Duplicate story actor "+actor.storyId);
+ }
++ReturnNetworkIntegrity.requireValid(data.returnNetwork,data.actors);
+ if(!data.save(new CompoundTag(),registry).equals(root))data.setDirty();
+ return data;
+ }
+@@ -212,19 +213,39 @@ throw new java.io.UncheckedIOException("STORY_WRITE_BLOCKED original preserved",
+ if(boundary==ReturnNetworkBoundary.NO_CHANGE)
+ return new ReturnNetworkCommit(boundary,returnNetwork,expectedHash,false);
+ 
++// NPC receipts and event facts belong to the SAME durable envelope. Do not mutate the live actor first.
++var proposedActors=new TreeMap<String,StoryActorRecord>(actors);
++var resident=actors.get(NpcEvents.STORY);
++if(resident!=null) {
++    var copy=StoryActorRecord.load(resident.save());
++    // Loading normalizes nonterminal checkpoint runtime. This resident is already completed.
++    if(validated.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE))copy.facts.add(ReturnNetworkIntegrity.SHARED);
++    if(validated.facts.contains(ReturnNetworkState.Fact.AFTERMATH))copy.facts.add(ReturnNetworkIntegrity.AFTERMATH);
++    proposedActors.put(copy.storyId,copy);
++}
++ReturnNetworkIntegrity.requireValid(returnNetwork,actors);
++ReturnNetworkIntegrity.requireValid(validated,proposedActors);
+ var envelope=new CompoundTag();
+-envelope.put("data",savePayload(new CompoundTag(),registry,validated));
++var payload=savePayload(new CompoundTag(),registry,validated);
++var proposedList=new ListTag();proposedActors.values().forEach(a->proposedList.add(a.save()));payload.put("actors",proposedList);
++envelope.put("data",payload);
+ NbtUtils.addCurrentDataVersion(envelope);
+ try {
+ storyWriter.write(envelope,storageFile);
++var persisted=NbtIo.readCompressed(storageFile,NbtAccounter.create(64*1024*1024));
++if(!persisted.equals(envelope))throw new java.io.IOException("return_network_readback_mismatch");
+ String durableHash=StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile));
+ expectedHash=durableHash;
+ returnNetwork=validated;
++if(resident!=null) { resident.facts.clear();resident.facts.addAll(proposedActors.get(resident.storyId).facts); }
+ setDirty(false);
+ return new ReturnNetworkCommit(boundary,validated,durableHash,true);
+ } catch(java.io.IOException ex) {
+ storySaveWritable=false;
+ throw new java.io.UncheckedIOException("RETURN_NETWORK_COMMIT_FAILED original_or_atomic_target_preserved",ex);
++} catch(RuntimeException ex) {
++storySaveWritable=false;
++throw ex;
+ }
+ }
+ 
+diff --git a/src/main/java/io/github/whileaway/NpcEvents.java b/src/main/java/io/github/whileaway/NpcEvents.java
+index f84c08d..d33e0d0 100644
+--- a/src/main/java/io/github/whileaway/NpcEvents.java
++++ b/src/main/java/io/github/whileaway/NpcEvents.java
+@@ -59,6 +59,7 @@ public final class NpcEvents {
+         var level=(ServerLevel)npc.level();var server=level.getServer();
+         var problems=NpcState.integrity(r);
+         if(!problems.isEmpty()){StoryStorage.block(server,String.join(";",problems));npc.getNavigation().stop();return;}
++        if(r.checkpoint.checkpoint==4 && ReturnNetworkEvents.update(npc,r))return;
+         var home=NpcState.home(r);
+         var nearby=witness(level,npc.blockPosition());
+         // No off-screen auto-failure. NPC's life may continue when loaded; event movement needs a living witness.
+diff --git a/src/main/java/io/github/whileaway/NpcNavigation.java b/src/main/java/io/github/whileaway/NpcNavigation.java
+index 0594576..7af09c2 100644
+--- a/src/main/java/io/github/whileaway/NpcNavigation.java
++++ b/src/main/java/io/github/whileaway/NpcNavigation.java
+@@ -44,7 +44,10 @@ public final class NpcNavigation {
+         }
+         if(!budget.ready(now))return state=budget.unreachable()?NpcEnvironment.Path.UNREACHABLE:NpcEnvironment.Path.TEMPORARY_FAILURE;
+         budget.attempted(now);
+-        var path=nav.createPath(destination,0);
++        // The adapter admits targets up to 48 blocks away. The two-argument API instead
++        // silently uses FOLLOW_RANGE (24 for Yeoul), producing false UNREACHABLE results.
++        // 1.21.1 PathNavigationRegion uses getChunkNow: this does not load missing chunks.
++        var path=nav.createPath(destination,0,48);
+         if(path==null||!path.canReach()||!nav.moveTo(path,.65)){
+             nav.stop();budget.failed(now);
+             return state=budget.unreachable()?NpcEnvironment.Path.UNREACHABLE:NpcEnvironment.Path.TEMPORARY_FAILURE;
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkPreservationGameTests.java b/src/main/java/io/github/whileaway/ReturnNetworkPreservationGameTests.java
+index f3b70f4..bf8bc4c 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkPreservationGameTests.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkPreservationGameTests.java
+@@ -27,7 +27,7 @@ public final class ReturnNetworkPreservationGameTests {
+     public static void schema5PreservesExistingPlayersAndActors(GameTestHelper h) throws Exception {
+         Path root=Path.of(System.getProperty("whileaway.testEvidence","../evidence/lifecycle"),"return-network-schema5");
+         Files.createDirectories(root); Path p=Files.createTempDirectory(root,"preserve-").resolve("whileaway_story.dat").toAbsolutePath().normalize();
+-        NarrativeData d=new NarrativeData();
++        NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d);
+         UUID player=UUID.fromString("20000000-0000-0000-0000-000000000002");
+         d.discover(player,io.github.whileaway.core.Clue.STATION); d.entry(player).cityVisited=true;
+         StoryActorRecord a=new StoryActorRecord("npc:test","event:test","witness","minecraft:pig","minecraft:overworld",
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkSchema5GameTests.java b/src/main/java/io/github/whileaway/ReturnNetworkSchema5GameTests.java
+index ec540fd..a8bb543 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkSchema5GameTests.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkSchema5GameTests.java
+@@ -50,7 +50,8 @@ public final class ReturnNetworkSchema5GameTests {
+     }
+     @GameTest(template="empty")
+     public static void schema5RoundTripsReturnNetwork(GameTestHelper h) {
+-        CompoundTag root=new NarrativeData().save(new CompoundTag(),h.getLevel().registryAccess());
++        NarrativeData base=new NarrativeData(); ReturnNetworkFixtures.resident(base);
++        CompoundTag root=base.save(new CompoundTag(),h.getLevel().registryAccess());
+         root.put("returnNetwork",discovered().save());
+         NarrativeData d=NarrativeData.load(root,h.getLevel().registryAccess());
+         h.assertTrue(d.returnNetwork().save().equals(discovered().save()),"schema5 Return Network round-trip");
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkState.java b/src/main/java/io/github/whileaway/ReturnNetworkState.java
+index 5168ffc..0a82ee3 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkState.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkState.java
+@@ -3,8 +3,8 @@ package io.github.whileaway;
+ import java.util.*;
+ import net.minecraft.nbt.*;
+ 
+-/** Immutable event contract, not a live adapter. Never infer permanent facts on load.
+- * The future adapter must persist each returned draft BEFORE presenting its effects. */
++/** Immutable event contract. Never infer permanent facts on load.
++ * The live adapter must persist each returned draft BEFORE presenting its effects. */
+ public final class ReturnNetworkState {
+     public static final String ID="return_network_first_response";
+     public enum Stage { NOT_STARTED, DISCOVERED, NPC_JOINED, SIGNAL_OBSERVED, INTERVENTION_COMMITTED, RESPONSE_OBSERVED, COMPLETED }
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkTransactionGameTests.java b/src/main/java/io/github/whileaway/ReturnNetworkTransactionGameTests.java
+index 1be2e04..3eb5173 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkTransactionGameTests.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkTransactionGameTests.java
+@@ -34,7 +34,7 @@ public final class ReturnNetworkTransactionGameTests {
+     }
+     @GameTest(template="empty")
+     public static void staleReturnNetworkDraftRejected(GameTestHelper h) throws Exception {
+-        Path p=file("stale-"); NarrativeData d=new NarrativeData(); canonical(d,p,h);
++        Path p=file("stale-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h);
+         ReturnNetworkState old=d.returnNetwork(); d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());
+         CompoundTag durable=disk(p).getCompound("returnNetwork").copy();
+         boolean rejected=false; try{d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());}catch(IllegalStateException e){rejected=e.getMessage().contains("STALE_DRAFT");}
+@@ -42,14 +42,14 @@ public final class ReturnNetworkTransactionGameTests {
+     }
+     @GameTest(template="empty")
+     public static void returnNetworkCommitSurvivesFreshStoryReload(GameTestHelper h) throws Exception {
+-        Path p=file("reload-"); NarrativeData d=new NarrativeData(); canonical(d,p,h);
++        Path p=file("reload-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h);
+         ReturnNetworkState c=d.commitReturnNetwork(d.returnNetwork(),discovered(),h.getLevel().registryAccess()).state();
+         NarrativeData fresh=NarrativeData.load(disk(p),h.getLevel().registryAccess());
+         h.assertTrue(fresh.returnNetwork().save().equals(c.save()),"fresh disk load sees committed state"); h.succeed();
+     }
+     @GameTest(template="empty")
+     public static void externalStoryFileChangeBlocksReturnNetworkCommit(GameTestHelper h) throws Exception {
+-        Path p=file("external-"); NarrativeData d=new NarrativeData(); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork();
++        Path p=file("external-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork();
+         Files.write(p,new byte[]{1,2,3,4}); boolean rejected=false;
+         try{d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());}catch(UncheckedIOException e){rejected=true;}
+         h.assertTrue(rejected&&!d.storySaveWritable(),"source mismatch blocks writer");
+@@ -57,7 +57,7 @@ public final class ReturnNetworkTransactionGameTests {
+     }
+     @GameTest(template="empty")
+     public static void failedCommitDoesNotPublishDraft(GameTestHelper h) throws Exception {
+-        Path p=file("iofail-"); NarrativeData d=new NarrativeData(); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork(); byte[] before=bytes(p);
++        Path p=file("iofail-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork(); byte[] before=bytes(p);
+         d.setStoryWriterForTest((root,target)->{throw new IOException("injected");}); boolean failed=false;
+         try{d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());}catch(UncheckedIOException e){failed=true;}
+         h.assertTrue(failed,"injected write failure visible");
+diff --git a/src/main/java/io/github/whileaway/StoryEvents.java b/src/main/java/io/github/whileaway/StoryEvents.java
+index 8f41bbc..9d293ef 100644
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -105,7 +105,7 @@ public final class StoryEvents {
+                     e.scenes.values().forEach(r->c.getSource().sendSuccess(()->Component.literal(r.eventId()+" "+r.id+" "+r.progress.state+" checkpoint="+r.progress.checkpoint+" reason="+r.progress.reason),false));return 1;
+                 }))
+                 .then(Commands.literal("integrity").executes(c->{
+-                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(StoryActors.integrity(p.getServer()));
++                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(StoryActors.integrity(p.getServer()));issues.addAll(ReturnNetworkEvents.integrity(p.getServer()));
+                     if(StoryStorage.available(p.getServer()))issues.addAll(SceneRecovery.integrity(NarrativeData.get(p.getServer()).entry(p.getUUID())));
+                     c.getSource().sendSuccess(()->Component.literal(issues.isEmpty()?"PASS scene integrity":String.join("; ",issues)),false);return issues.isEmpty()?1:0;
+                 })))
+diff --git a/src/main/java/io/github/whileaway/StoryGameTests.java b/src/main/java/io/github/whileaway/StoryGameTests.java
+index 959884a..6bad6d2 100644
+--- a/src/main/java/io/github/whileaway/StoryGameTests.java
++++ b/src/main/java/io/github/whileaway/StoryGameTests.java
+@@ -201,7 +201,7 @@ public final class StoryGameTests {
+             var loaded=NarrativeData.load(t,h.getLevel().registryAccess());var a=loaded.entry(id);
+             h.assertTrue(a.cityShockTriggered==(version==3&&oldFlag),"legacy flag preserved/defaulted");
+             h.assertTrue(a.cityClues==5&&a.station.equals(e.station),"old story facts retained");
+-            h.assertTrue(loaded.save(new CompoundTag(),h.getLevel().registryAccess()).getInt("schema")==4,"explicit schema 4 save");
++            h.assertTrue(loaded.save(new CompoundTag(),h.getLevel().registryAccess()).getInt("schema")==5,"explicit schema 5 save");
+         }
+         h.succeed();
+     }
+@@ -381,7 +381,7 @@ public final class StoryGameTests {
+         boolean durable=false;
+         try {
+             var d=new NarrativeData();d.discover(new UUID(0,91),Clue.STATION);d.save(file.toFile(),h.getLevel().registryAccess());
+-            durable=java.nio.file.Files.exists(file)&&net.minecraft.nbt.NbtIo.readCompressed(file,net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("data").getInt("schema")==4;
++            durable=java.nio.file.Files.exists(file)&&net.minecraft.nbt.NbtIo.readCompressed(file,net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("data").getInt("schema")==5;
+         } finally {blocked.countDown();net.neoforged.neoforge.common.IOUtilities.waitUntilIOWorkerComplete();}
+         h.assertTrue(durable,"Framework Failure: checkpoint save returned before queued disk write");h.succeed();
+     }
+diff --git a/src/main/java/io/github/whileaway/WhileAway.java b/src/main/java/io/github/whileaway/WhileAway.java
+index ed7669a..11ff30b 100644
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -89,6 +89,7 @@ public final class WhileAway {
+         NeoForge.EVENT_BUS.register(new StoryActors());
+         NeoForge.EVENT_BUS.register(new CanonicalRecovery());
+         NeoForge.EVENT_BUS.register(new NpcEvents());
++        NeoForge.EVENT_BUS.register(new ReturnNetworkEvents());
+     }
+     private void attributes(EntityAttributeCreationEvent event) { event.put(WAYFARER.get(), Wayfarer.attributes().build()); event.put(STORY_NPC.get(),StoryNpc.attributes().build()); }
+ }
+diff --git a/src/main/java/io/github/whileaway/entity/StoryNpc.java b/src/main/java/io/github/whileaway/entity/StoryNpc.java
+index 5d1c2a2..931eb5b 100644
+--- a/src/main/java/io/github/whileaway/entity/StoryNpc.java
++++ b/src/main/java/io/github/whileaway/entity/StoryNpc.java
+@@ -35,7 +35,7 @@ public final class StoryNpc extends PathfinderMob {
+     }
+     @Override public InteractionResult mobInteract(Player player,InteractionHand hand) {
+         if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
+-        if(player instanceof ServerPlayer p)return NpcEvents.interact(this,p)?InteractionResult.CONSUME:InteractionResult.PASS;
++        if(player instanceof ServerPlayer p)return (ReturnNetworkEvents.interactNpc(this,p)||NpcEvents.interact(this,p))?InteractionResult.CONSUME:InteractionResult.PASS;
+         return InteractionResult.SUCCESS;
+     }
+ }
+diff --git a/src/main/resources/assets/whileaway/lang/en_us.json b/src/main/resources/assets/whileaway/lang/en_us.json
+index 7ebff28..0b7b54c 100644
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -62,5 +62,16 @@
+   "scene.whileaway.seven.2": "The departure chime never ended.",
+   "entity.whileaway.story_npc": "Yeoul",
+   "story.whileaway.yeoul.introduction": "Yeoul: I will look after this light. So the way back stays familiar.",
+-  "story.whileaway.yeoul.settled": "Yeoul has begun a new routine beside the return light."
++  "story.whileaway.yeoul.settled": "Yeoul has begun a new routine beside the return light.",
++  "story.whileaway.network.discovered": "A quiet signal repeats inside the old tram relay. Look closer with Yeoul.",
++  "story.whileaway.network.joined": "Yeoul: That interval feels like our return light. Could you inspect the relay?",
++  "story.whileaway.network.pattern": "Evidence — Two short pulses, one long. The old relay repeats the pattern. [Sneak-use relay: restore connection]",
++  "story.whileaway.network.interact_hint": "Sneak-use the relay to restore its connection.",
++  "story.whileaway.network.response": "Signal response — Two short pulses, one long. The return-light pattern. The relay stays lit.",
++  "story.whileaway.network.shared": "Yeoul: It was the light I turned on… but something answered here too.",
++  "story.whileaway.network.complete": "Evidence — The old relay answered after the return light was lit. The reason is still unknown.",
++  "story.whileaway.network.aftermath": "Yeoul: I check that light sometimes. It is still on.",
++  "story.whileaway.network.evidence": "Retained evidence — The old repeating signal / A response matching the current return light.",
++  "story.whileaway.network.waiting_npc": "Check that Yeoul can reach the equipment.",
++  "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection."
+ }
+diff --git a/src/main/resources/assets/whileaway/lang/ko_kr.json b/src/main/resources/assets/whileaway/lang/ko_kr.json
+index 7a27b59..e8841bc 100644
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -62,5 +62,16 @@
+   "scene.whileaway.seven.2": "출발음은 아직 끝나지 않았다.",
+   "entity.whileaway.story_npc": "여울",
+   "story.whileaway.yeoul.introduction": "여울: 이 불은 내가 살펴볼게요. 돌아오는 길이 헷갈리지 않도록.",
+-  "story.whileaway.yeoul.settled": "여울이 귀환등 곁에서 새 일과를 시작했습니다."
++  "story.whileaway.yeoul.settled": "여울이 귀환등 곁에서 새 일과를 시작했습니다.",
++  "story.whileaway.network.discovered": "폐전차의 낡은 중계함에서 낮은 신호가 반복된다. 여울과 함께 살펴보자.",
++  "story.whileaway.network.joined": "여울: 저 간격… 귀환등을 켤 때와 닮았어. 중계함을 직접 확인해 볼래?",
++  "story.whileaway.network.pattern": "조사 기록 — 짧게 두 번, 길게 한 번. 옛 설비가 같은 간격을 반복한다. [웅크린 채 중계함 사용: 연결 복구]",
++  "story.whileaway.network.interact_hint": "웅크린 채 중계함을 사용하면 연결을 복구한다.",
++  "story.whileaway.network.response": "신호 응답 — 짧게 두 번, 길게 한 번. 귀환등과 같은 간격이다. 중계함의 불이 남아 있다.",
++  "story.whileaway.network.shared": "여울: 내가 켠 등인데… 여기서도 답이 왔네.",
++  "story.whileaway.network.complete": "조사 기록 — 귀환등을 켠 뒤 옛 중계점이 응답했다. 이유는 아직 알 수 없다.",
++  "story.whileaway.network.aftermath": "여울: 가끔 저쪽 불도 확인해. 아직 켜져 있더라.",
++  "story.whileaway.network.evidence": "남은 기록 — 옛 신호의 반복 / 현재 귀환등과 일치한 응답.",
++  "story.whileaway.network.waiting_npc": "여울이 설비에 닿을 수 있는 길을 확인하자.",
++  "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다."
+ }
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+@@ -0,0 +1,158 @@
++package io.github.whileaway;
++
++import java.util.*;
++import io.github.whileaway.content.RelayBlock;
++import io.github.whileaway.entity.StoryNpc;
++import net.minecraft.core.BlockPos;
++import net.minecraft.network.chat.Component;
++import net.minecraft.server.level.*;
++import net.minecraft.sounds.*;
++import net.minecraft.world.*;
++import net.minecraft.world.level.block.Blocks;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
++import net.neoforged.neoforge.event.tick.ServerTickEvent;
++
++/** First compound campaign adapter. Reuses the revision-2 tram, never rebuilds it.
++ * World writes require an explicit player interaction. Missing/changed equipment waits,
++ * including the crash gap between the durable intervention and its physical application. */
++public final class ReturnNetworkEvents {
++    public static final BlockPos RELAY=new BlockPos(42,68,46), STAND=new BlockPos(44,65,47);
++    public static final String LOCATION="quiet_city:tram_relay";
++    private static final Map<ServerLevel,Runtime> RUNTIME=new WeakHashMap<>();
++    private static final class Runtime { int responseTicks; ReturnNetworkState.Wait wait=ReturnNetworkState.Wait.NONE; }
++    private static Runtime runtime(ServerLevel l){return RUNTIME.computeIfAbsent(l,k->new Runtime());}
++    private static void say(ServerPlayer p,String key){p.displayClientMessage(Component.translatable("story.whileaway.network."+key),false);}
++    public static boolean originalEquipment(ServerLevel l){return l.getBlockState(RELAY).is(Blocks.OXIDIZED_CUT_COPPER);}
++    public static boolean activatedEquipment(ServerLevel l){var b=l.getBlockState(RELAY);return b.is(WhileAway.RELAY.get())&&b.getValue(RelayBlock.LIT);}
++    public static boolean environmentReady(ServerLevel l,ReturnNetworkState s) {
++        if(!l.hasChunkAt(RELAY)||!l.hasChunkAt(STAND))return false;
++        if(!l.getBlockState(STAND).isAir()||!l.getBlockState(STAND.above()).isAir()
++            ||!l.getFluidState(STAND).isEmpty()||!l.getBlockState(STAND.below()).isCollisionShapeFullBlock(l,STAND.below()))return false;
++        return s.stage.ordinal()<4?originalEquipment(l):activatedEquipment(l);
++    }
++    public static ReturnNetworkState.Wait waitState(ServerLevel l){return runtime(l).wait;}
++    private static boolean campaignLocation(ServerLevel l) {
++        return l.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(l).ready()&&CityDistrict.get(l).layoutVersion()==2;
++    }
++    private static boolean exactLocation(ReturnNetworkState s,ServerLevel l) {
++        return s.location!=null&&LOCATION.equals(s.location.id())&&s.location.position()==RELAY.asLong()
++            &&s.location.dimension().equals(l.dimension().location().toString());
++    }
++    private static boolean commit(ServerPlayer p,ReturnNetworkState next,String boundary) {
++        var server=p.getServer();if(!StoryStorage.available(server))return false;
++        try {
++            var d=NarrativeData.get(server);var result=d.commitReturnNetwork(d.returnNetwork(),next,server.registryAccess());
++            if(result.wrote())RecoveryBoundaryEvent.emit(p,ReturnNetworkState.ID,boundary,next.stage.ordinal());
++            return true;
++        }catch(RuntimeException e){
++            StoryStorage.block(server,"RN_COMMIT_FAILED "+e.getMessage());
++            com.mojang.logging.LogUtils.getLogger().error("RN_COMMIT_FAILED event={} boundary={}",ReturnNetworkState.ID,boundary,e);
++            return false;
++        }
++    }
++    @SubscribeEvent public void tick(ServerTickEvent.Post e) {
++        var server=e.getServer();if(server.getTickCount()%20!=0||!StoryStorage.available(server))return;
++        var l=server.getLevel(CityDistrict.KEY);if(l==null||!campaignLocation(l))return;
++        var d=NarrativeData.get(server);var s=d.returnNetwork();
++        if(s.stage!=ReturnNetworkState.Stage.NOT_STARTED||!ReturnNetworkIntegrity.prerequisite(d.actors.get(NpcEvents.STORY)))return;
++        if(!environmentReady(l,s))return;
++        var p=l.players().stream().filter(v->v.isAlive()&&!v.isSpectator()&&v.blockPosition().distSqr(RELAY)<=36).findFirst().orElse(null);
++        if(p==null)return;
++        var next=s.discover(new ReturnNetworkState.Prerequisite(4,true,true,true),UUID.randomUUID(),
++            new ReturnNetworkState.Location(LOCATION,l.dimension().location().toString(),RELAY.asLong()));
++        if(commit(p,next,"RN_A_DISCOVERED"))say(p,"discovered");
++    }
++    /** Returns true only when this adapter owns navigation. Existing resident identity is untouched. */
++    public static boolean update(StoryNpc npc,StoryActorRecord r) {
++        var l=(ServerLevel)npc.level();var d=NarrativeData.get(l.getServer());var s=d.returnNetwork();
++        if(s.stage==ReturnNetworkState.Stage.NOT_STARTED)return false;
++        if(!exactLocation(s,l)){StoryStorage.block(l.getServer(),"RN_LOCATION_IDENTITY_MISMATCH");npc.getNavigation().stop();return true;}
++        var issues=ReturnNetworkIntegrity.issues(s,d.actors);
++        if(!issues.isEmpty()){StoryStorage.block(l.getServer(),String.join(";",issues));npc.getNavigation().stop();return true;}
++        if(s.stage==ReturnNetworkState.Stage.COMPLETED) {
++            // A small new resident habit, not a replay of the event or a new work identity.
++            if(l.getGameTime()%200<30){npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);return true;}
++            return false;
++        }
++        var rt=runtime(l);var p=NpcEvents.witness(l,RELAY);
++        if(p==null){rt.wait=ReturnNetworkState.Wait.PLAYER_ABSENT;rt.responseTicks=0;npc.storyNavigation().externalPause(npc);return true;}
++        if(!environmentReady(l,s)){rt.wait=ReturnNetworkState.Wait.WAITING_ENVIRONMENT;rt.responseTicks=0;npc.storyNavigation().externalPause(npc);return true;}
++        var path=npc.storyNavigation().step(npc,STAND);
++        if(path!=NpcEnvironment.Path.ARRIVED){rt.wait=path==NpcEnvironment.Path.AVAILABLE?ReturnNetworkState.Wait.WAITING_NPC:ReturnNetworkState.Wait.WAITING_ENVIRONMENT;rt.responseTicks=0;return true;}
++        rt.wait=ReturnNetworkState.Wait.NONE;
++        npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);
++        if(s.stage==ReturnNetworkState.Stage.DISCOVERED) {
++            if(commit(p,s.join(new ReturnNetworkState.Participant(r.storyId,r.instanceId,r.entityId,r.generation)),"RN_B_NPC_JOINED"))say(p,"joined");
++        }else if(s.stage==ReturnNetworkState.Stage.INTERVENTION_COMMITTED) {
++            if(s.presentation==ReturnNetworkState.Presentation.NONE){commit(p,s.beginPresentation(),"RN_PRESENTING");rt.responseTicks=0;return true;}
++            rt.responseTicks+=10;
++            if(rt.responseTicks>=40&&commit(p,s.observeResponse(),"RN_E_RESPONSE")) {
++                // Facts precede ephemeral sound. Reopening exposes the retained relay/evidence instead of replaying the sound.
++                l.playSound(null,RELAY,SoundEvents.NOTE_BLOCK_BELL.value(),SoundSource.BLOCKS,.3f,.65f);
++                say(p,"response");rt.responseTicks=0;
++            }
++        }else if(s.stage==ReturnNetworkState.Stage.RESPONSE_OBSERVED&&s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)) {
++            RecoveryBoundaryEvent.emit(p,ReturnNetworkState.ID,"RN_G_BEFORE_COMPLETE",5);
++            if(commit(p,s.complete(),"RN_G_COMPLETED"))say(p,"complete");
++        }
++        return true;
++    }
++    public static boolean interactNpc(StoryNpc npc,ServerPlayer p) {
++        if(!p.isAlive()||p.isSpectator()||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!StoryStorage.available(p.getServer()))return false;
++        var d=NarrativeData.get(p.getServer());var s=d.returnNetwork();var r=d.actors.get(NpcEvents.STORY);
++        if(r==null||!StoryActors.canonical(npc,r)||!exactLocation(s,p.serverLevel()))return false;
++        if(s.stage==ReturnNetworkState.Stage.COMPLETED){say(p,"aftermath");return true;}
++        if(s.stage!=ReturnNetworkState.Stage.RESPONSE_OBSERVED||!environmentReady(p.serverLevel(),s)
++            ||npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)>1.4)return false;
++        if(!s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)&&commit(p,s.shareExperience(),"RN_F_SHARED"))say(p,"shared");
++        return true;
++    }
++    /** Public interaction seam used by the block event and scripted clients, never by timers. */
++    public static boolean interactEquipment(ServerPlayer p,BlockPos pos) {
++        var l=p.serverLevel();if(!pos.equals(RELAY)||!campaignLocation(l)||!p.isAlive()||p.isSpectator()
++            ||p.distanceToSqr(pos.getX()+.5,pos.getY()+.5,pos.getZ()+.5)>25||!StoryStorage.available(p.getServer()))return false;
++        var d=NarrativeData.get(p.getServer());var s=d.returnNetwork();
++        if(!exactLocation(s,l))return false;
++        if(s.stage.ordinal()>=4 && originalEquipment(l) && p.isShiftKeyDown()) {
++            // A committed operation can be explicitly reapplied even while the NPC route is blocked.
++            l.setBlock(RELAY,WhileAway.RELAY.get().defaultBlockState().setValue(RelayBlock.LIT,true),3);
++            return true;
++        }
++        if(s.stage.ordinal()>=5) {
++            say(p,activatedEquipment(l)?"evidence":"waiting_environment");return true;
++        }
++        var r=d.actors.get(NpcEvents.STORY);var e=r==null?null:l.getEntity(r.entityId);
++        if(!(e instanceof StoryNpc npc)||!StoryActors.canonical(npc,r)||npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)>1.4){say(p,"waiting_npc");return true;}
++        if(s.stage==ReturnNetworkState.Stage.NPC_JOINED&&environmentReady(l,s)) {
++            if(commit(p,s.observePattern(),"RN_C_PATTERN"))say(p,"pattern");return true;
++        }
++        if(s.stage==ReturnNetworkState.Stage.SIGNAL_OBSERVED) {
++            if(!environmentReady(l,s)){say(p,"waiting_environment");return true;}
++            if(!p.isShiftKeyDown()){say(p,"interact_hint");return true;}
++            if(!commit(p,s.intervene(),"RN_D_INTERVENTION"))return true;
++            s=d.returnNetwork();
++        }
++        if(s.stage.ordinal()>=4&&originalEquipment(l)&&p.isShiftKeyDown()) {
++            // Explicit, repeatable physical application after durable intent. Never replace an unknown block.
++            l.setBlock(RELAY,WhileAway.RELAY.get().defaultBlockState().setValue(RelayBlock.LIT,true),3);
++        }
++        if(s.stage.ordinal()>=4&&!activatedEquipment(l)){say(p,"waiting_environment");return true;}
++        if(s.stage.ordinal()>=5)say(p,"evidence");
++        return true;
++    }
++    @SubscribeEvent public void blockUse(PlayerInteractEvent.RightClickBlock e) {
++        if(e.getHand()!=InteractionHand.MAIN_HAND||!e.getPos().equals(RELAY)||!e.getLevel().dimension().equals(CityDistrict.KEY))return;
++        if(e.getEntity() instanceof ServerPlayer p&&interactEquipment(p,e.getPos())){e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);}
++    }
++    public static List<String> integrity(net.minecraft.server.MinecraftServer server) {
++        if(!StoryStorage.available(server))return List.of("RN_WRITE_GUARD_ACTIVE");
++        var d=NarrativeData.get(server);var s=d.returnNetwork();var out=new ArrayList<>(ReturnNetworkIntegrity.issues(s,d.actors));
++        if(s.stage==ReturnNetworkState.Stage.NOT_STARTED)return out;
++        var l=server.getLevel(CityDistrict.KEY);
++        if(l==null||!exactLocation(s,l))out.add("RN_LOCATION_IDENTITY_MISMATCH");
++        else if(!l.hasChunkAt(RELAY)||!l.hasChunkAt(STAND))out.add("RN_ENVIRONMENT_UNLOADED");
++        else if(!environmentReady(l,s))out.add("RN_STRUCTURE_CONTRADICTION checkpoint="+s.stage.ordinal());
++        return out;
++    }
++}
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnNetworkFixtures.java
+@@ -0,0 +1,22 @@
++package io.github.whileaway;
++
++import java.util.UUID;
++import net.minecraft.core.BlockPos;
++import net.minecraft.nbt.*;
++
++final class ReturnNetworkFixtures {
++    static StoryActorRecord resident(NarrativeData d) {
++        var r=new StoryActorRecord(NpcEvents.STORY,NpcEvents.ID,"resident","whileaway:story_npc","minecraft:overworld",
++            UUID.fromString("70000000-0000-0000-0000-000000000001"),null,
++            UUID.fromString("70000000-0000-0000-0000-000000000002"),new BlockPos(12,64,-8),false);
++        NpcState.initialize(r,new BlockPos(12,64,-8));
++        r.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;
++        for(int i=1;i<=4;i++)r.checkpoint.advance(i);
++        r.facts.add(NpcState.MET+"70000000-0000-0000-0000-000000000003");r.facts.add(NpcState.DIALOGUE);
++        r.facts.add(NpcState.ARRIVED);r.facts.add(NpcState.OBSERVED);NpcState.settle(r);r.facts.add(NpcState.LINK);
++        r.facts.add(NpcState.relationship("player:70000000-0000-0000-0000-000000000003","shared_return_light"));
++        var pos=new ListTag();pos.add(DoubleTag.valueOf(12.5));pos.add(DoubleTag.valueOf(64));pos.add(DoubleTag.valueOf(-7.5));r.snapshot.put("Pos",pos);
++        var motion=new ListTag();for(int i=0;i<3;i++)motion.add(DoubleTag.valueOf(0));r.snapshot.put("Motion",motion);
++        d.actors.put(r.storyId,r);return r;
++    }
++}
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnNetworkIntegrationGameTests.java
+@@ -0,0 +1,133 @@
++package io.github.whileaway;
++
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.gametest.framework.*;
++import net.minecraft.nbt.*;
++import net.minecraft.world.level.storage.DimensionDataStorage;
++import net.neoforged.neoforge.gametest.*;
++
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class ReturnNetworkIntegrationGameTests {
++    static Path file() throws Exception {
++        var root=Path.of(System.getProperty("whileaway.testEvidence"),"integration");Files.createDirectories(root);
++        return Files.createTempDirectory(root,"story-").resolve("whileaway_story.dat").toAbsolutePath();
++    }
++    static NarrativeData bound(GameTestHelper h,Path p) {
++        var d=new NarrativeData();ReturnNetworkFixtures.resident(d);d.bindStorage(p,null);d.setDirty();d.save(p.toFile(),h.getLevel().registryAccess());return d;
++    }
++    static ReturnNetworkState discovery(NarrativeData d) {
++        return d.returnNetwork().discover(new ReturnNetworkState.Prerequisite(4,true,true,true),UUID.randomUUID(),new ReturnNetworkState.Location("rail_relay","minecraft:overworld",new BlockPos(12,64,-8).asLong()));
++    }
++    static CompoundTag disk(Path p)throws Exception{return NbtIo.readCompressed(p,NbtAccounter.unlimitedHeap()).getCompound("data");}
++    static void commit(GameTestHelper h,NarrativeData d,ReturnNetworkState next){d.commitReturnNetwork(d.returnNetwork(),next,h.getLevel().registryAccess());}
++    @GameTest(template="empty") public static void networkAllDurableBoundariesWithNpcReceipts(GameTestHelper h)throws Exception {
++        var p=file();var d=bound(h,p);var r=d.actors.get(NpcEvents.STORY);var identity=r.entityId;var instance=r.instanceId;int gen=r.generation;
++        var s=discovery(d);var binding=new ReturnNetworkState.Participant(r.storyId,r.instanceId,r.entityId,r.generation);
++        var steps=List.of(s,s.join(binding),s.join(binding).observePattern(),s.join(binding).observePattern().intervene(),
++            s.join(binding).observePattern().intervene().beginPresentation(),
++            s.join(binding).observePattern().intervene().beginPresentation().observeResponse(),
++            s.join(binding).observePattern().intervene().beginPresentation().observeResponse().shareExperience(),
++            s.join(binding).observePattern().intervene().beginPresentation().observeResponse().shareExperience().complete());
++        for(var next:steps) {
++            commit(h,d,next);var fresh=NarrativeData.load(disk(p),h.getLevel().registryAccess());
++            h.assertTrue(fresh.returnNetwork().save().equals(next.save()),"disk reload exact at every semantic boundary");
++            h.assertTrue(ReturnNetworkIntegrity.issues(fresh.returnNetwork(),fresh.actors).isEmpty(),"event and NPC ledger consistent");
++            var actor=fresh.actors.get(NpcEvents.STORY);h.assertTrue(actor.entityId.equals(identity)&&actor.instanceId.equals(instance)&&actor.generation==gen,"same resident");
++            fresh.bindStorage(p,StoryStorage.digest(Files.readAllBytes(p)));d=fresh;
++        }
++        byte[] before=Files.readAllBytes(p);var duplicate=d.commitReturnNetwork(d.returnNetwork(),d.returnNetwork().complete(),h.getLevel().registryAccess());
++        h.assertTrue(!duplicate.wrote()&&Arrays.equals(before,Files.readAllBytes(p)),"repeat completion neither saves nor replays");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkFabricatedPrerequisiteRejected(GameTestHelper h)throws Exception {
++        var p=file();var d=new NarrativeData();d.bindStorage(p,null);d.setDirty();d.save(p.toFile(),h.getLevel().registryAccess());
++        byte[] before=Files.readAllBytes(p);boolean rejected=false;
++        try{commit(h,d,discovery(d));}catch(IllegalStateException e){rejected=e.getMessage().contains("RN_PREREQUISITE");}
++        h.assertTrue(rejected&&d.returnNetwork().stage==ReturnNetworkState.Stage.NOT_STARTED&&Arrays.equals(before,Files.readAllBytes(p)),"booleans cannot manufacture actual completed NPC");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkSilentWriterNeverPublishes(GameTestHelper h)throws Exception {
++        var p=file();var d=bound(h,p);byte[] before=Files.readAllBytes(p);d.setStoryWriterForTest((root,target)->{});boolean rejected=false;
++        try{commit(h,d,discovery(d));}catch(java.io.UncheckedIOException e){rejected=e.getCause().getMessage().contains("readback_mismatch");}
++        h.assertTrue(rejected&&!d.storySaveWritable()&&d.returnNetwork().stage==ReturnNetworkState.Stage.NOT_STARTED&&Arrays.equals(before,Files.readAllBytes(p)),"silent writer poisons guard without publishing");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkUncheckedWriterNeverPublishes(GameTestHelper h)throws Exception {
++        var p=file();var d=bound(h,p);d.setStoryWriterForTest((root,target)->{throw new IllegalStateException("injected unchecked writer");});boolean rejected=false;
++        try{commit(h,d,discovery(d));}catch(IllegalStateException e){rejected=true;}
++        h.assertTrue(rejected&&!d.storySaveWritable()&&d.returnNetwork().stage==ReturnNetworkState.Stage.NOT_STARTED,"unchecked failure poisons guard");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkCorruptBindingQuarantinedAndAutosaveBlocked(GameTestHelper h)throws Exception {
++        var p=file();var d=bound(h,p);commit(h,d,discovery(d));var a=d.actors.get(NpcEvents.STORY);
++        commit(h,d,d.returnNetwork().join(new ReturnNetworkState.Participant(a.storyId,a.instanceId,a.entityId,a.generation)));
++        var root=disk(p);root.getCompound("returnNetwork").getCompound("participant").putUUID("entity",UUID.randomUUID());
++        var envelope=new CompoundTag();envelope.put("data",root);NbtIo.writeCompressed(envelope,p);byte[] before=Files.readAllBytes(p);
++        var storage=new DimensionDataStorage(p.getParent().toFile(),h.getLevel().getServer().getFixerUpper(),h.getLevel().registryAccess());boolean blocked=false;
++        try{StoryStorage.open(storage,p.getParent(),h.getLevel().registryAccess(),Set.of("minecraft:overworld"));}catch(StoryStorage.Blocked e){blocked=e.status.detail().contains("RN_PARTICIPANT_IDENTITY_MISMATCH");}
++        storage.save();net.neoforged.neoforge.common.IOUtilities.waitUntilIOWorkerComplete();
++        h.assertTrue(blocked&&Arrays.equals(before,Files.readAllBytes(p)),"no empty campaign or overwrite");
++        var backup=p.getParent().resolve("whileaway-quarantine").resolve(StoryStorage.digest(before)+".dat");
++        h.assertTrue(Files.exists(backup)&&Arrays.equals(before,Files.readAllBytes(backup)),"original preserved");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkSharedCommitFailurePreservesNpcAndStory(GameTestHelper h)throws Exception {
++        var p=file();var d=bound(h,p);var a=d.actors.get(NpcEvents.STORY);
++        commit(h,d,discovery(d));commit(h,d,d.returnNetwork().join(new ReturnNetworkState.Participant(a.storyId,a.instanceId,a.entityId,a.generation)));
++        commit(h,d,d.returnNetwork().observePattern());commit(h,d,d.returnNetwork().intervene());commit(h,d,d.returnNetwork().beginPresentation());commit(h,d,d.returnNetwork().observeResponse());
++        byte[] before=Files.readAllBytes(p);var facts=Set.copyOf(a.facts);d.setStoryWriterForTest((root,target)->{throw new java.io.IOException("shared commit failure");});
++        try{commit(h,d,d.returnNetwork().shareExperience());}catch(java.io.UncheckedIOException expected){}
++        h.assertTrue(a.facts.equals(facts)&&!d.returnNetwork().facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)&&Arrays.equals(before,Files.readAllBytes(p)),"both halves unchanged on failed F");h.succeed();
++    }
++    @GameTest(template="empty") public static void networkCorruptionMatrixRejectsPermanentInference(GameTestHelper h)throws Exception {
++        var p=file();var d=bound(h,p);var a=d.actors.get(NpcEvents.STORY);
++        commit(h,d,discovery(d));commit(h,d,d.returnNetwork().join(new ReturnNetworkState.Participant(a.storyId,a.instanceId,a.entityId,a.generation)));
++        commit(h,d,d.returnNetwork().observePattern());commit(h,d,d.returnNetwork().intervene());commit(h,d,d.returnNetwork().beginPresentation());
++        commit(h,d,d.returnNetwork().observeResponse());commit(h,d,d.returnNetwork().shareExperience());commit(h,d,d.returnNetwork().complete());
++        var pristine=disk(p);
++        for(int variant=0;variant<8;variant++) {
++            var bad=pristine.copy();var event=bad.getCompound("returnNetwork");
++            switch(variant) {
++                case 0 -> event.remove("participant");
++                case 1 -> event.getList("facts",8).removeIf(t->t.getAsString().equals("OLD_PATTERN_EVIDENCE"));
++                case 2 -> event.getList("facts",8).removeIf(t->t.getAsString().equals("RESPONSE"));
++                case 3 -> event.putString("structure","INTACT");
++                case 4 -> bad.getList("actors",10).getCompound(0).getList("facts",8).removeIf(t->t.getAsString().equals(ReturnNetworkIntegrity.SHARED));
++                case 5 -> event.putInt("checkpoint",99);
++                case 6 -> event.getCompound("participant").putInt("generation",a.generation+1);
++                case 7 -> event.putString("dimension","minecraft:the_nether");
++            }
++            boolean rejected=false;try{NarrativeData.load(bad,h.getLevel().registryAccess());}catch(RuntimeException expected){rejected=true;}
++            h.assertTrue(rejected,"permanent contradiction rejected variant="+variant);
++            h.assertTrue(pristine.equals(disk(p)),"load probe never changes original variant="+variant);
++        }
++        h.succeed();
++    }
++    @GameTest(template="empty") public static void networkWorldEquipmentNeverInfersStory(GameTestHelper h)throws Exception {
++        var l=h.getLevel();var relay=ReturnNetworkEvents.RELAY;var stand=ReturnNetworkEvents.STAND;
++        var positions=List.of(relay,stand,stand.above(),stand.below());var old=positions.stream().map(l::getBlockState).toList();
++        try {
++            l.setBlock(stand,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),3);
++            l.setBlock(stand.above(),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),3);
++            l.setBlock(stand.below(),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
++            l.setBlock(relay,net.minecraft.world.level.block.Blocks.OXIDIZED_CUT_COPPER.defaultBlockState(),3);
++            var s=ReturnNetworkState.notStarted();h.assertTrue(ReturnNetworkEvents.environmentReady(l,s),"authored equipment readable");
++            l.setBlock(stand,net.minecraft.world.level.block.Blocks.DIAMOND_BLOCK.defaultBlockState(),3);
++            h.assertTrue(!ReturnNetworkEvents.environmentReady(l,s)&&l.getBlockState(stand).is(net.minecraft.world.level.block.Blocks.DIAMOND_BLOCK),"obstruction not removed");
++            l.setBlock(stand,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),3);
++            l.setBlock(relay,WhileAway.RELAY.get().defaultBlockState().setValue(io.github.whileaway.content.RelayBlock.LIT,true),3);
++            h.assertTrue(!ReturnNetworkEvents.environmentReady(l,s)&&s.stage==ReturnNetworkState.Stage.NOT_STARTED,"player-built lookalike does not manufacture intervention");
++        }finally {for(int i=0;i<positions.size();i++)l.setBlock(positions.get(i),old.get(i),3);}
++        h.succeed();
++    }
++    @GameTest(template="empty") public static void npcNavigationHonorsItsOwn48BlockLimit(GameTestHelper h) {
++        var l=h.getLevel();var start=new BlockPos(10000,80,10000);var end=start.offset(30,0,0);
++        for(int x=(start.getX()-8)>>4;x<=(end.getX()+8)>>4;x++)for(int z=(start.getZ()-8)>>4;z<=(start.getZ()+8)>>4;z++)l.getChunk(x,z);
++        for(int x=-1;x<=32;x++)for(int z=-1;z<=1;z++)for(int y=-1;y<=2;y++)l.setBlock(start.offset(x,y,z),(y==-1?net.minecraft.world.level.block.Blocks.STONE:net.minecraft.world.level.block.Blocks.AIR).defaultBlockState(),2);
++        var npc=WhileAway.STORY_NPC.get().create(l);npc.moveTo(start.getX()+.5,start.getY(),start.getZ()+.5,0,0);npc.setOnGround(true);
++        h.assertTrue(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE)==24,"fixture keeps actual resident attribute");
++        var shortPath=npc.getNavigation().createPath(end,0);
++        h.assertTrue(shortPath==null||!shortPath.canReach(),"reproduce vanilla 24-block bound");
++        h.assertTrue(npc.storyNavigation().step(npc,end)==NpcEnvironment.Path.AVAILABLE,"30-block target within story range must be reachable");
++        h.assertTrue(npc.storyNavigation().step(npc,start.offset(49,0,0))==NpcEnvironment.Path.OUT_OF_RANGE,"48-block story guard retained");h.succeed();
++    }
++
++}
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnNetworkIntegrity.java
+@@ -0,0 +1,38 @@
++package io.github.whileaway;
++
++import java.util.*;
++import io.github.whileaway.core.EventCheckpoint;
++
++/** Persistent cross-system proof. Never uses position or a snapshot as identity. */
++public final class ReturnNetworkIntegrity {
++    public static final String SHARED="npc.shared=return_network_first_response";
++    public static final String AFTERMATH="npc.routine=check_old_signal";
++    private ReturnNetworkIntegrity() {}
++    public static boolean prerequisite(StoryActorRecord r) {
++        return r!=null && NpcEvents.STORY.equals(r.storyId) && NpcEvents.ID.equals(r.eventId)
++            && r.entityType.equals("whileaway:story_npc") && r.role.equals("resident")
++            && r.lifecycle!=StoryActorRecord.Lifecycle.RETIRED && r.checkpoint.checkpoint==4
++            && r.checkpoint.state==EventCheckpoint.State.COMPLETED && NpcState.integrity(r).isEmpty()
++            && r.facts.stream().anyMatch(f->f.startsWith("npc.relationship=") && f.endsWith("/shared_return_light"));
++    }
++    public static List<String> issues(ReturnNetworkState s,Map<String,StoryActorRecord> actors) {
++        var issues=new ArrayList<String>();var r=actors.get(NpcEvents.STORY);
++        if(s.stage==ReturnNetworkState.Stage.NOT_STARTED) {
++            if(r!=null&&(r.facts.contains(SHARED)||r.facts.contains(AFTERMATH)))issues.add("RN_PREMATURE_NPC_FACT");
++            return issues;
++        }
++        if(!prerequisite(r)){issues.add("RN_PREREQUISITE_MISSING");return issues;}
++        if(!r.dimension.equals(s.location.dimension()))issues.add("RN_PARTICIPANT_DIMENSION");
++        if(s.participant!=null) {
++            var p=s.participant;
++            if(!p.storyId().equals(r.storyId)||!p.instance().equals(r.instanceId)||!p.entity().equals(r.entityId)||p.generation()!=r.generation)
++                issues.add("RN_PARTICIPANT_IDENTITY_MISMATCH");
++        }
++        if(r.facts.contains(SHARED)!=s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE))issues.add("RN_SHARED_EXPERIENCE_MISMATCH");
++        if(r.facts.contains(AFTERMATH)!=s.facts.contains(ReturnNetworkState.Fact.AFTERMATH))issues.add("RN_AFTERMATH_MISMATCH");
++        return issues;
++    }
++    public static void requireValid(ReturnNetworkState s,Map<String,StoryActorRecord> actors) {
++        var issues=issues(s,actors);if(!issues.isEmpty())throw new IllegalStateException(String.join(";",issues));
++    }
++}
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
+@@ -0,0 +1,199 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.entity.StoryNpc;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.screens.*;
++import net.minecraft.core.Direction;
++import net.minecraft.nbt.*;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.world.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.levelgen.WorldOptions;
++import net.minecraft.world.level.levelgen.presets.WorldPresets;
++import net.minecraft.world.level.storage.LevelResource;
++import net.minecraft.world.phys.*;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in integrated-client harness. Uses real NPC pathing and real block-use dispatch.
++ * Teleport/setup are fixtures, not natural-survival evidence. Cuts do NOT flush world storage. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class ReturnNetworkSmoke {
++    private static final String MODE=System.getProperty("whileaway.networkSmoke","");
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/return-network-integration/client"));
++    private static boolean launched,setup,stopped;private static volatile boolean queued;
++    private static int ticks,stable,entryCheckpoint;private static UUID entity,instance;private static int generation;
++    private static Set<String> initialFacts;
++    private static int exceptionPhase,held;private static CompoundTag frozen;private static net.minecraft.core.BlockPos oldNpcPos;
++    private static net.minecraft.world.level.block.state.BlockState obstacleBefore;private static byte[] corruptOriginal;
++    private static String world(){return System.getProperty("whileaway.networkWorld","network");}
++    private static void check(boolean ok,String message){if(!ok)throw new IllegalStateException(message);}
++    private static void note(String s){try{Files.createDirectories(E);Files.writeString(E.resolve(MODE+".txt"),s+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception e){throw new RuntimeException(e);}}
++    private static Path file(MinecraftServer s){return s.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat");}
++    private static void fail(Exception e){note("FAIL "+e);e.printStackTrace();Runtime.getRuntime().halt(8);}
++    private static void snapshot(MinecraftServer server)throws Exception {
++        Files.copy(file(server),E.resolve(MODE+".dat"),StandardCopyOption.REPLACE_EXISTING);
++        note("DISK sha256="+StoryStorage.digest(Files.readAllBytes(file(server))));
++    }
++    private static void finish(MinecraftServer s)throws Exception {stopped=true;s.saveEverything(true,true,true);snapshot(s);s.halt(false);Minecraft.getInstance().execute(()->Minecraft.getInstance().stop());}
++    @SubscribeEvent public static void boundary(RecoveryBoundaryEvent e) {
++        if(!MODE.startsWith("Cut")||!e.eventId.equals(ReturnNetworkState.ID))return;
++        String target=switch(MODE){case "CutA"->"RN_A_DISCOVERED";case "CutB"->"RN_B_NPC_JOINED";case "CutC"->"RN_C_PATTERN";case "CutD"->"RN_D_INTERVENTION";case "CutE"->"RN_E_RESPONSE";case "CutF"->"RN_F_SHARED";case "CutGPre"->"RN_G_BEFORE_COMPLETE";case "CutG"->"RN_G_COMPLETED";default->"";};
++        if(!target.equals(e.boundary))return;
++        try {
++            var s=e.player.getServer();var d=NarrativeData.get(s);var r=d.actors.get(NpcEvents.STORY);var state=d.returnNetwork();
++            check(ReturnNetworkIntegrity.issues(state,d.actors).isEmpty(),"cross-system integrity at cut");
++            var disk=NbtIo.readCompressed(file(s),NbtAccounter.unlimitedHeap()).getCompound("data");
++            check(disk.getCompound("returnNetwork").equals(state.save()),"commit not on disk");
++            snapshot(s);note("PASS "+MODE+" boundary="+e.boundary+" cp="+state.stage.ordinal()+" uuid="+r.entityId+" instance="+r.instanceId+" generation="+r.generation+" facts="+state.facts+" worldFlushBeforeCut=false");
++            Runtime.getRuntime().halt(0);
++        }catch(Exception x){fail(x);}
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post e) {
++        if(MODE.isEmpty()||stopped)return;var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen) {
++                launched=true;Files.createDirectories(E);note(ClientTestEnvironment.verify(E,MODE));
++                if(MODE.startsWith("Corrupt")) {
++                    var f=mc.gameDirectory.toPath().resolve("saves").resolve(world()).resolve("data/whileaway_story.dat");
++                    check(world().equals("world-"+MODE),"corruption restricted to named copied fixture");
++                    var root=NbtIo.readCompressed(f,NbtAccounter.unlimitedHeap());var event=root.getCompound("data").getCompound("returnNetwork");
++                    check(event.getInt("checkpoint")==6,"corruption requires completed copy");
++                    if(MODE.equals("CorruptBinding"))event.getCompound("participant").remove("entity");
++                    else root.getCompound("data").getList("actors",10).getCompound(0).getList("facts",8).removeIf(t->t.getAsString().equals(ReturnNetworkIntegrity.SHARED));
++                    NbtIo.writeCompressed(root,f);corruptOriginal=Files.readAllBytes(f);Files.write(E.resolve(MODE+"-input.dat"),corruptOriginal);
++                }
++                if(MODE.equals("Seed")) {
++                    var rules=new GameRules();rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(false,null);
++                    mc.createWorldOpenFlows().createFreshLevel("network",new LevelSettings("Return network fixture",GameType.SPECTATOR,false,Difficulty.NORMAL,true,rules,WorldDataConfiguration.DEFAULT),new WorldOptions(74192361L,true,false),WorldPresets::createNormalWorldDimensions,new TitleScreen());
++                }else mc.createWorldOpenFlows().openWorld(System.getProperty("whileaway.networkWorld","network"),mc::stop);
++            }
++            if(mc.screen instanceof BackupConfirmScreen screen)for(var child:screen.children())if(child instanceof net.minecraft.client.gui.components.Button b&&b.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())){b.onPress();break;}
++            if(mc.screen instanceof DeathScreen&&mc.player!=null){mc.player.respawn();return;}
++            if(++ticks>18000)throw new IllegalStateException("network timeout "+MODE);
++            if(mc.player==null||mc.getSingleplayerServer()==null||queued||ticks%10!=0)return;queued=true;
++            mc.getSingleplayerServer().execute(()->{try {
++                var server=mc.getSingleplayerServer();var p=server.getPlayerList().getPlayer(mc.player.getUUID());if(p==null)return;
++                var city=server.getLevel(CityDistrict.KEY);check(city!=null,"city absent");
++                if(MODE.startsWith("Corrupt")) {
++                    check(!StoryStorage.available(server),"corruption was accepted");
++                    var status=StoryStorage.status(server.overworld().getDataStorage());
++                    check(status.outcome()==StoryStorage.Outcome.CORRUPT&&!status.writable(),"wrong corruption classification");
++                    if((held+=10)<100)return;
++                    for(int n=0;n<3;n++)server.saveEverything(true,true,true);
++                    check(Arrays.equals(corruptOriginal,Files.readAllBytes(file(server))),"corrupt autosave overwrite");
++                    var quarantine=file(server).getParent().resolve("whileaway-quarantine/"+StoryStorage.digest(corruptOriginal)+".dat");
++                    check(Arrays.equals(corruptOriginal,Files.readAllBytes(quarantine)),"corrupt original not preserved");
++                    note("PASS "+MODE+" saveDispatches=3 writeBlocked=true emptyCampaign=false originalHash="+StoryStorage.digest(corruptOriginal)+" diagnostic="+status.diagnostic());finish(server);return;
++                }
++                if(!setup){setup=true;if(MODE.equals("Seed"))CityDistrict.get(city).start();else check(CityDistrict.get(city).ready(),"seed not ready");}
++                if(!CityDistrict.get(city).ready())return;
++                var d=NarrativeData.get(server);var r=d.actors.get(NpcEvents.STORY);
++                if(MODE.equals("Seed")) {
++                    if(p.serverLevel()!=city){p.setGameMode(GameType.CREATIVE);p.teleportTo(city,40.5,65,68.5,Set.of(),0,0);}
++                    if(r==null)return;
++                    var actor=StoryActors.find(server,r.entityId);if(!(actor instanceof StoryNpc npc))return;
++                    if(r.checkpoint.checkpoint==1)npc.mobInteract(p,InteractionHand.MAIN_HAND);
++                    if(r.checkpoint.checkpoint!=4)return;
++                    check(ReturnNetworkIntegrity.prerequisite(r),"actual prerequisite absent");
++                    check(ReturnNetworkEvents.originalEquipment(city),"revision2 equipment mismatch");
++                    check(ReturnNetworkEvents.environmentReady(city,d.returnNetwork()),"revision2 access mismatch");
++                    note("PASS Seed actual Yeoul event completed via interaction and path; uuid="+r.entityId+" instance="+r.instanceId+" generation="+r.generation);finish(server);return;
++                }
++                check(r!=null,"resident lost");
++                if(entity==null) {
++                    entity=r.entityId;instance=r.instanceId;generation=r.generation;initialFacts=Set.copyOf(r.facts);entryCheckpoint=d.returnNetwork().stage.ordinal();
++                    note("INPUT cp="+entryCheckpoint+" uuid="+entity+" instance="+instance+" generation="+generation+" load="+StoryStorage.status(server.overworld().getDataStorage()));
++                    p.setGameMode(GameType.CREATIVE);p.teleportTo(city,45.5,65,47.5,Set.of(),90,0);
++                }
++                var s=d.returnNetwork();
++                check(s.stage.ordinal()>=entryCheckpoint,"checkpoint rollback");
++                check(entity.equals(r.entityId)&&instance.equals(r.instanceId)&&generation==r.generation,"resident identity changed");
++                check(r.facts.containsAll(initialFacts),"resident facts lost");
++                check(ReturnNetworkIntegrity.issues(s,d.actors).isEmpty(),"persistent integrity");
++                if(MODE.equals("CopyHold")||MODE.equals("CopyReopen")) {
++                    check(entryCheckpoint==3&&s.stage.ordinal()==3,"independent copy progressed");
++                    if((held+=10)<100)return;
++                    note("PASS "+MODE+" cp=3 unchanged while original completed; generation="+generation+" uuid="+entity+" instance="+instance);finish(server);return;
++                }
++                if(exception(server,p,city,s,r))return;
++                var actual=StoryActors.find(server,r.entityId);if(!(actual instanceof StoryNpc npc))return;
++                if(ticks%200==0)note("PROGRESS cp="+s.stage.ordinal()+" npc="+npc.position()+" player="+p.position()+" wait="+ReturnNetworkEvents.waitState(city)+" path="+npc.storyNavigation().state()+" attempts="+npc.storyNavigation().attempts()+" followRange="+npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE));
++                check(StoryActors.canonical(npc,r),"live participant not canonical");
++                if(s.stage.ordinal()>=2&&s.stage.ordinal()<=5) {
++                    p.setShiftKeyDown(s.stage.ordinal()>=3);
++                    p.gameMode.useItemOn(p,city,p.getMainHandItem(),InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(ReturnNetworkEvents.RELAY),Direction.EAST,ReturnNetworkEvents.RELAY,false));
++                    p.setShiftKeyDown(false);
++                }
++                if(s.stage==ReturnNetworkState.Stage.RESPONSE_OBSERVED)npc.mobInteract(p,InteractionHand.MAIN_HAND);
++                if(s.stage!=ReturnNetworkState.Stage.COMPLETED)return;
++                check(!MODE.startsWith("Cut"),"expected cut was not reached");
++                if(!ReturnNetworkEvents.activatedEquipment(city)) {
++                    p.setShiftKeyDown(true);p.gameMode.useItemOn(p,city,p.getMainHandItem(),InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(ReturnNetworkEvents.RELAY),Direction.EAST,ReturnNetworkEvents.RELAY,false));p.setShiftKeyDown(false);return;
++                }
++                check(ActorCandidates.inspect(server,r).outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"canonical count not one");
++                check(ReturnNetworkEvents.integrity(server).isEmpty(),"world integrity");
++                check(r.facts.contains(ReturnNetworkIntegrity.SHARED)&&r.facts.contains(ReturnNetworkIntegrity.AFTERMATH),"NPC aftermath lost");
++                stable+=10;if(stable<160)return;
++                note("PASS "+MODE+" cp=6 canonical=1 generation="+generation+" uuid="+entity+" instance="+instance+" stableTicks="+stable+" aftermath=true facts="+s.facts);finish(server);
++            }catch(Exception x){fail(x);}finally{queued=false;}});
++        }catch(Exception x){fail(x);}
++    }
++    private static boolean exception(MinecraftServer server,net.minecraft.server.level.ServerPlayer p,net.minecraft.server.level.ServerLevel city,ReturnNetworkState s,StoryActorRecord r)throws Exception {
++        boolean travel=Set.of("Nether","End","Chunk").contains(MODE),death=MODE.startsWith("Death"),env=MODE.equals("Environment");
++        if(!travel&&!death&&!env)return false;
++        int target=death?Character.digit(MODE.charAt(5),10):env?3:4;
++        if(exceptionPhase==0&&s.stage.ordinal()==target) {
++            frozen=s.save();oldNpcPos=r.position;held=0;exceptionPhase=1;
++            if(env) {
++                obstacleBefore=city.getBlockState(ReturnNetworkEvents.STAND);
++                city.setBlock(ReturnNetworkEvents.STAND,net.minecraft.world.level.block.Blocks.BARRIER.defaultBlockState(),3);
++            }else if(death) {
++                p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.getInventory().add(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND,7));
++                server.getGameRules().getRule(GameRules.RULE_KEEPINVENTORY).set(MODE.endsWith("On"),server);
++                p.setRespawnPosition(Level.OVERWORLD,server.overworld().getSharedSpawnPos(),0,true,false);
++                p.kill();check(!p.isAlive(),"death did not occur");note("DEATH cp="+target+" keep="+MODE.endsWith("On"));
++            }else {
++                var away=MODE.equals("Nether")?server.getLevel(Level.NETHER):MODE.equals("End")?server.getLevel(Level.END):city;
++                p.setGameMode(GameType.SPECTATOR);p.teleportTo(away,4096.5,160,4096.5,Set.of(),0,0);
++            }
++            return true;
++        }
++        if(exceptionPhase==1) {
++            check(frozen.equals(s.save()),"exception changed durable event");
++            if(death&&!p.isAlive())return true;
++            if(MODE.equals("Chunk")) {
++                boolean unloaded=!city.hasChunkAt(oldNpcPos)&&!city.areEntitiesLoaded(new ChunkPos(oldNpcPos).toLong())
++                    &&!city.hasChunkAt(ReturnNetworkEvents.RELAY)&&!city.areEntitiesLoaded(new ChunkPos(ReturnNetworkEvents.RELAY).toLong())
++                    &&!city.hasChunkAt(r.position)&&!city.areEntitiesLoaded(new ChunkPos(r.position).toLong())&&StoryActors.find(server,r.entityId)==null;
++                if(!unloaded){held=0;return true;}
++            }
++            if((held+=10)<120)return true;
++            if(death)check(p.serverLevel()==server.overworld()&&p.getInventory().countItem(net.minecraft.world.item.Items.DIAMOND)==(MODE.endsWith("On")?7:0),"respawn/keepInventory result");
++            if(env) {
++                check(city.getBlockState(ReturnNetworkEvents.STAND).is(net.minecraft.world.level.block.Blocks.BARRIER),"production deleted player obstruction");
++                check(ReturnNetworkEvents.waitState(city)==ReturnNetworkState.Wait.WAITING_ENVIRONMENT,"environment not suspended");
++                city.setBlock(ReturnNetworkEvents.STAND,obstacleBefore,3);
++                obstacleBefore=city.getBlockState(ReturnNetworkEvents.RELAY);city.setBlock(ReturnNetworkEvents.RELAY,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),3);
++                exceptionPhase=2;held=0;return true;
++            }
++            note("PASS exception "+MODE+" heldTicks="+held+" cp="+s.stage.ordinal()+" unchanged=true actualUnloaded="+MODE.equals("Chunk"));
++            p.setGameMode(GameType.CREATIVE);p.teleportTo(city,45.5,65,47.5,Set.of(),90,0);exceptionPhase=3;return true;
++        }
++        if(env&&exceptionPhase==2) {
++            check(frozen.equals(s.save())&&city.getBlockState(ReturnNetworkEvents.RELAY).isAir(),"missing equipment advanced or was overwritten");
++            if((held+=10)<120)return true;
++            city.setBlock(ReturnNetworkEvents.RELAY,obstacleBefore,3);
++            // The obstruction can push the scripted player out of interaction reach. Reposition only the test player.
++            p.teleportTo(city,45.5,65,47.5,Set.of(),90,0);exceptionPhase=3;
++            note("PASS exception Environment obstruction and missing equipment each held120 ticks; fixture restored; identity unchanged");return true;
++        }
++        return false;
++    }
++}
++

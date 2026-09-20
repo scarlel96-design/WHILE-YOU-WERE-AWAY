@@ -35,7 +35,7 @@ public final class StoryNpc extends PathfinderMob {
     }
     @Override public InteractionResult mobInteract(Player player,InteractionHand hand) {
         if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
-        if(player instanceof ServerPlayer p)return NpcEvents.interact(this,p)?InteractionResult.CONSUME:InteractionResult.PASS;
+        if(player instanceof ServerPlayer p)return (ReturnNetworkEvents.interactNpc(this,p)||NpcEvents.interact(this,p))?InteractionResult.CONSUME:InteractionResult.PASS;
         return InteractionResult.SUCCESS;
     }
 }

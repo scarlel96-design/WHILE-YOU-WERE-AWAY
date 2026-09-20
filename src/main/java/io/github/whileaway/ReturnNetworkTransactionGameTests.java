@@ -34,7 +34,7 @@ public final class ReturnNetworkTransactionGameTests {
     }
     @GameTest(template="empty")
     public static void staleReturnNetworkDraftRejected(GameTestHelper h) throws Exception {
-        Path p=file("stale-"); NarrativeData d=new NarrativeData(); canonical(d,p,h);
+        Path p=file("stale-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h);
         ReturnNetworkState old=d.returnNetwork(); d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());
         CompoundTag durable=disk(p).getCompound("returnNetwork").copy();
         boolean rejected=false; try{d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());}catch(IllegalStateException e){rejected=e.getMessage().contains("STALE_DRAFT");}
@@ -42,14 +42,14 @@ public final class ReturnNetworkTransactionGameTests {
     }
     @GameTest(template="empty")
     public static void returnNetworkCommitSurvivesFreshStoryReload(GameTestHelper h) throws Exception {
-        Path p=file("reload-"); NarrativeData d=new NarrativeData(); canonical(d,p,h);
+        Path p=file("reload-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h);
         ReturnNetworkState c=d.commitReturnNetwork(d.returnNetwork(),discovered(),h.getLevel().registryAccess()).state();
         NarrativeData fresh=NarrativeData.load(disk(p),h.getLevel().registryAccess());
         h.assertTrue(fresh.returnNetwork().save().equals(c.save()),"fresh disk load sees committed state"); h.succeed();
     }
     @GameTest(template="empty")
     public static void externalStoryFileChangeBlocksReturnNetworkCommit(GameTestHelper h) throws Exception {
-        Path p=file("external-"); NarrativeData d=new NarrativeData(); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork();
+        Path p=file("external-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork();
         Files.write(p,new byte[]{1,2,3,4}); boolean rejected=false;
         try{d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());}catch(UncheckedIOException e){rejected=true;}
         h.assertTrue(rejected&&!d.storySaveWritable(),"source mismatch blocks writer");
@@ -57,7 +57,7 @@ public final class ReturnNetworkTransactionGameTests {
     }
     @GameTest(template="empty")
     public static void failedCommitDoesNotPublishDraft(GameTestHelper h) throws Exception {
-        Path p=file("iofail-"); NarrativeData d=new NarrativeData(); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork(); byte[] before=bytes(p);
+        Path p=file("iofail-"); NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d); canonical(d,p,h); ReturnNetworkState old=d.returnNetwork(); byte[] before=bytes(p);
         d.setStoryWriterForTest((root,target)->{throw new IOException("injected");}); boolean failed=false;
         try{d.commitReturnNetwork(old,discovered(),h.getLevel().registryAccess());}catch(UncheckedIOException e){failed=true;}
         h.assertTrue(failed,"injected write failure visible");

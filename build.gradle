@@ -172,6 +172,14 @@ neoForge {
                 systemProperty 'whileaway.evidence',file('evidence/npc-path/closure/copy/copy-client').absolutePath
             }
         }
+        ['Seed','CutA','CutB','CutC','CutD','CutE','CutF','CutGPre','CutG','Reopen','Normal','Environment','Nether','End','Chunk','Death2Off','Death4On','Death5Off','CopyHold','CopyReopen','CorruptBinding','CorruptShared'].each { mode ->
+            create("network${mode}") {
+                client(); gameDirectory=file('../../work/return-network-client')
+                systemProperty 'whileaway.networkSmoke',mode
+                systemProperty 'whileaway.networkWorld',project.findProperty('networkWorld') ?: (mode.startsWith('Cut')||mode=='Reopen' ? 'network-verified' : 'world-'+mode)
+                systemProperty 'whileaway.evidence',file('evidence/return-network-integration/client').absolutePath
+            }
+        }
         recoveryLegacy {
             client()
             gameDirectory = file('../../work/recovery-smoke')
@@ -186,7 +194,7 @@ neoForge {
             // otherwise old test reservations accumulate into the production capacity guard.
             def invocation=java.util.UUID.randomUUID().toString()
             gameDirectory=file('../../work/gametest-isolated/'+invocation)
-            systemProperty 'whileaway.testEvidence',file('evidence/return-network-contract/gametest/'+invocation).absolutePath
+            systemProperty 'whileaway.testEvidence',file('evidence/return-network-integration/gametest/'+invocation).absolutePath
             systemProperty 'whileaway.testFixtures',file('evidence/reuse/baseline').absolutePath
             systemProperty 'neoforge.enabledGameTestNamespaces', 'whileaway'
         }
@@ -639,3 +647,25 @@ tasks.named('runRecoveryLegacy').configure {
     }
 }
 
+
+// Dedicated compound-event profiles: silence and right-monitor bounds are asserted in-client.
+['Seed','CutA','CutB','CutC','CutD','CutE','CutF','CutGPre','CutG','Reopen','Normal','Environment','Nether','End','Chunk','Death2Off','Death4On','Death5Off','CopyHold','CopyReopen','CorruptBinding','CorruptShared'].each { mode ->
+    tasks.named("runNetwork${mode}").configure {
+        if(mode.startsWith('Cut')) ignoreExitValue=true
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/return-network-integration/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/return-network-client');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/return-network-integration/client').mkdirs()
+            file("evidence/return-network-integration/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            if(!file("evidence/return-network-integration/client/${mode}.txt").text.contains("PASS ${mode}"))throw new GradleException('Network client gate incomplete')
+            logger.lifecycle("NETWORK_CHILD_EXIT=${executionResult.get().exitValue}")
+        }
+    }
+}

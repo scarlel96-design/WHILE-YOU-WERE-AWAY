@@ -1,0 +1,10 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=46332
+INPUT cp=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fcb44094e2d0d5ac47cb678ab9ba5530d87b7e4aa13b8e2b87c63d48cdfe7dea, detail=LOAD_OK]
+PROGRESS cp=1 npc=(40.3283338666281, 65.0, 62.36725328737204) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PROGRESS cp=1 npc=(44.02994726478191, 65.0, 49.113362734299436) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+DEATH cp=4 keep=true
+PASS exception Death4On heldTicks=120 cp=4 unchanged=true actualUnloaded=false
+PROGRESS cp=4 npc=(44.38505248873381, 65.0, 48.03950434907081) player=(45.5, 65.0, 47.5) wait=NONE path=ARRIVED attempts=0 followRange=24.0
+PASS Death4On cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[PARTICIPANT_JOINED, SHARED_EXPERIENCE, AFTERMATH, PATTERN_MATCH_EVIDENCE, OLD_PATTERN_EVIDENCE, INTERVENTION, SIGNAL_DISCOVERED, COMPLETE, RESPONSE, NEXT_PREREQUISITE]
+DISK sha256=7f1a1461c8eccee5416b4edc199ed8a06528ea8464723144a71d85f214731625

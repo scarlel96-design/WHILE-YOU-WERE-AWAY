@@ -131,6 +131,7 @@ for(int i=0;i<actors.size();i++) {
 var actor=StoryActorRecord.load(actors.getCompound(i));
 if(data.actors.putIfAbsent(actor.storyId,actor)!=null)throw new IllegalStateException("MANUAL_DIAGNOSTIC Duplicate story actor "+actor.storyId);
 }
+ReturnNetworkIntegrity.requireValid(data.returnNetwork,data.actors);
 if(!data.save(new CompoundTag(),registry).equals(root))data.setDirty();
 return data;
 }
@@ -212,19 +213,39 @@ throw new java.io.UncheckedIOException("STORY_WRITE_BLOCKED original preserved",
 if(boundary==ReturnNetworkBoundary.NO_CHANGE)
 return new ReturnNetworkCommit(boundary,returnNetwork,expectedHash,false);
 
+// NPC receipts and event facts belong to the SAME durable envelope. Do not mutate the live actor first.
+var proposedActors=new TreeMap<String,StoryActorRecord>(actors);
+var resident=actors.get(NpcEvents.STORY);
+if(resident!=null) {
+    var copy=StoryActorRecord.load(resident.save());
+    // Loading normalizes nonterminal checkpoint runtime. This resident is already completed.
+    if(validated.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE))copy.facts.add(ReturnNetworkIntegrity.SHARED);
+    if(validated.facts.contains(ReturnNetworkState.Fact.AFTERMATH))copy.facts.add(ReturnNetworkIntegrity.AFTERMATH);
+    proposedActors.put(copy.storyId,copy);
+}
+ReturnNetworkIntegrity.requireValid(returnNetwork,actors);
+ReturnNetworkIntegrity.requireValid(validated,proposedActors);
 var envelope=new CompoundTag();
-envelope.put("data",savePayload(new CompoundTag(),registry,validated));
+var payload=savePayload(new CompoundTag(),registry,validated);
+var proposedList=new ListTag();proposedActors.values().forEach(a->proposedList.add(a.save()));payload.put("actors",proposedList);
+envelope.put("data",payload);
 NbtUtils.addCurrentDataVersion(envelope);
 try {
 storyWriter.write(envelope,storageFile);
+var persisted=NbtIo.readCompressed(storageFile,NbtAccounter.create(64*1024*1024));
+if(!persisted.equals(envelope))throw new java.io.IOException("return_network_readback_mismatch");
 String durableHash=StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile));
 expectedHash=durableHash;
 returnNetwork=validated;
+if(resident!=null) { resident.facts.clear();resident.facts.addAll(proposedActors.get(resident.storyId).facts); }
 setDirty(false);
 return new ReturnNetworkCommit(boundary,validated,durableHash,true);
 } catch(java.io.IOException ex) {
 storySaveWritable=false;
 throw new java.io.UncheckedIOException("RETURN_NETWORK_COMMIT_FAILED original_or_atomic_target_preserved",ex);
+} catch(RuntimeException ex) {
+storySaveWritable=false;
+throw ex;
 }
 }
 

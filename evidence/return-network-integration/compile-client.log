@@ -1,0 +1,36 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+
+> Task :compileJava
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\client\ReturnNetworkSmoke.java:87: error: incompatible types: IntegratedServer cannot be converted to DimensionDataStorage
+                    note("INPUT cp="+entryCheckpoint+" uuid="+entity+" instance="+instance+" generation="+generation+" load="+StoryStorage.status(server));
+                                                                                                                                                  ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\client\ReturnNetworkSmoke.java:87: error: incompatible types: IntegratedServer cannot be converted to DimensionDataStorage
+                      note("INPUT cp="+entryCheckpoint+" uuid="+entity+" instance="+instance+" generation="+generation+" load="+StoryStorage.status(server));
+                                                                                                                                                    ^
+  Note: Some input files use or override a deprecated API.
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 33s
+2 actionable tasks: 1 executed, 1 up-to-date

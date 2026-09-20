@@ -1,0 +1,7 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=7756
+INPUT cp=2 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=88a9390d2ea9d8797793049720a1750228725f714b30928119e432149d3d3a25, detail=LOAD_OK]
+PROGRESS cp=2 npc=(40.384212977447326, 65.0, 62.08683009822359) player=(44.5, 65.0, 48.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PROGRESS cp=2 npc=(44.02212126883173, 65.0, 49.12351138996773) player=(44.5, 65.0, 48.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+DISK sha256=9608cc40db39b12799185bd83701ba4a2d83fb968be70773629dd3c11dfc3995
+PASS CutC boundary=RN_C_PATTERN cp=3 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 facts=[OLD_PATTERN_EVIDENCE, PARTICIPANT_JOINED, SIGNAL_DISCOVERED] worldFlushBeforeCut=false

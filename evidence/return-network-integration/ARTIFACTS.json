@@ -1,0 +1,27 @@
+[
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\dist\\return-network-integration\\whileaway-0.3.1-return-network-integration.jar",
+    "sha256": "c3820a1ce4551c9260b90b00676cd904314f48af14ae04363515f66b08fe3162",
+    "bytes": 596777
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\dist\\return-network-integration\\whileaway-0.3.1-return-network-integration-source.zip",
+    "sha256": "c15db2d1ff80613c29885a409ad4091a6b639eb9a21611f94c9fc1fffdbeddda",
+    "bytes": 2273771
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-integration\\DIFF.patch",
+    "sha256": "7b2164cf914c62918dfb7e09626c1b2c9cd97d3242d29b7d8057562a0efcd33a",
+    "bytes": 71825
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-integration\\VERIFICATION.txt",
+    "sha256": "2bc03e78931d592e8a04485a648c04703d3dea691811ea03bb145c25f507e693",
+    "bytes": 24927
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-integration\\ROLLBACK.sh",
+    "sha256": "da5eabec1fa4565ab209f213fb89942866f70e73170855b55f7b5f0f36b60957",
+    "bytes": 640
+  }
+]

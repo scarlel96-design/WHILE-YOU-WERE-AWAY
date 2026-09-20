@@ -3,8 +3,8 @@ package io.github.whileaway;
 import java.util.*;
 import net.minecraft.nbt.*;
 
-/** Immutable event contract, not a live adapter. Never infer permanent facts on load.
- * The future adapter must persist each returned draft BEFORE presenting its effects. */
+/** Immutable event contract. Never infer permanent facts on load.
+ * The live adapter must persist each returned draft BEFORE presenting its effects. */
 public final class ReturnNetworkState {
     public static final String ID="return_network_first_response";
     public enum Stage { NOT_STARTED, DISCOVERED, NPC_JOINED, SIGNAL_OBSERVED, INTERVENTION_COMMITTED, RESPONSE_OBSERVED, COMPLETED }

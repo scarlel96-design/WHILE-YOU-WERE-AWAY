@@ -108,7 +108,7 @@ public final class ActorGameTests {
             var t=new CompoundTag();t.putInt("schema",schema);
             var a=NarrativeData.load(t,h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
             var b=NarrativeData.load(t.copy(),h.getLevel().registryAccess()).save(new CompoundTag(),h.getLevel().registryAccess());
-            h.assertTrue(a.equals(b)&&a.getInt("schema")==4&&a.getList("actors",10).isEmpty(),"old save deterministically gains empty optional registry");
+            h.assertTrue(a.equals(b)&&a.getInt("schema")==5&&a.getList("actors",10).isEmpty(),"old save deterministically gains empty optional registry");
         }h.succeed();
     }
     @GameTest(template="empty")

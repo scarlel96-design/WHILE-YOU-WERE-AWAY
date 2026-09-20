@@ -105,7 +105,7 @@ public final class StoryEvents {
                     e.scenes.values().forEach(r->c.getSource().sendSuccess(()->Component.literal(r.eventId()+" "+r.id+" "+r.progress.state+" checkpoint="+r.progress.checkpoint+" reason="+r.progress.reason),false));return 1;
                 }))
                 .then(Commands.literal("integrity").executes(c->{
-                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(StoryActors.integrity(p.getServer()));
+                    var p=c.getSource().getPlayerOrException();var issues=new ArrayList<>(StoryActors.integrity(p.getServer()));issues.addAll(ReturnNetworkEvents.integrity(p.getServer()));
                     if(StoryStorage.available(p.getServer()))issues.addAll(SceneRecovery.integrity(NarrativeData.get(p.getServer()).entry(p.getUUID())));
                     c.getSource().sendSuccess(()->Component.literal(issues.isEmpty()?"PASS scene integrity":String.join("; ",issues)),false);return issues.isEmpty()?1:0;
                 })))

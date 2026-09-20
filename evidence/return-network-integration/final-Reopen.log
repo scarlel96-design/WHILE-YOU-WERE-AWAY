@@ -1,0 +1,108 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :downloadAssets UP-TO-DATE
+> Task :writeNetworkReopenLegacyClasspath
+> Task :prepareNetworkReopenRun
+
+> Task :runNetworkReopen
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[21:15:22] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeclientdev, --version, 21.1.249, --assetIndex, 17, --assetsDir, C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\gradle-home\\caches\\neoformruntime\\assets, --gameDir, ., --fml.fmlVersion, 4.0.44, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.249, --fml.neoFormVersion, 20240808.144430]
+[21:15:22] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.5+11-LTS
+[21:15:22] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.5 by Eclipse Adoptium; OS Windows 11 arch amd64 version 10.0
+[21:15:22] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: Loading ImmediateWindowProvider fmlearlywindow
+MONITOR_AGENT configured GLFW creation/placement x=2680 y=120
+[21:15:22] [main/INFO] [EARLYDISPLAY/]: Trying GL version 4.6
+[21:15:22] [main/INFO] [EARLYDISPLAY/]: Requested GL version 4.6 got version 4.6
+[21:15:22] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/gradle-home/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar%23138!/ Service=ModLauncher Env=CLIENT
+[21:15:23] [pool-2-thread-1/INFO] [EARLYDISPLAY/]: GL info: Intel(R) UHD Graphics 770 GL version 4.6.0 - Build 32.0.101.7088, Intel
+[21:15:23] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[21:15:23] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		GeckoLib 4 4.9.2 (geckolib)
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.249 (neoforge)
+		While You Were Away / 네가 없는 동안 0.3.1-dev.1 (whileaway)
+[21:15:25] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[21:15:25] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeclientdev' with arguments [--version, 21.1.249, --gameDir, ., --assetsDir, C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\caches\neoformruntime\assets, --assetIndex, 17]
+[21:15:25] [main/WARN] [mixin/]: Reference map 'geckolib.refmap.json' for geckolib.mixins.json could not be read. If this is a development environment you can ignore this message
+[21:15:29] [Datafixer Bootstrap/INFO] [mojang/DataFixerBuilder]: 229 Datafixer optimizations took 568 milliseconds
+[21:15:29] [pool-8-thread-1/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.3).
+[21:15:37] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[21:15:37] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[21:15:37] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[21:15:37] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[21:15:37] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[21:15:37] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/moddev/artifacts/neoforge-21.1.249.jar%23189!/assets/.mcassetsroot' uses unexpected schema
+[21:15:37] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/moddev/artifacts/neoforge-21.1.249.jar%23189!/data/.mcassetsroot' uses unexpected schema
+[21:15:37] [Render thread/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[21:15:37] [Render thread/INFO] [minecraft/Minecraft]: Setting user: Dev
+[21:15:37] [Render thread/INFO] [minecraft/Minecraft]: Backend library: LWJGL version 3.3.3+5
+[21:15:37] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.249, for MC 1.21.1
+[21:15:38] [Render thread/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: []
+[21:15:39] [Render thread/INFO] [minecraft/ReloadableResourceManager]: Reloading ResourceManager: vanilla, mod_resources, mod/geckolib, mod/neoforge, mod/whileaway
+[21:15:39] [Worker-Main-22/INFO] [minecraft/UnihexProvider]: Found unifont_jp_patch-15.1.05.hex, loading
+[21:15:39] [Worker-Main-17/INFO] [minecraft/UnihexProvider]: Found unifont_all_no_pua-15.1.05.hex, loading
+[21:15:41] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:item.goat_horn.play
+[21:15:41] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:entity.goat.screaming.horn_break
+[21:15:41] [Render thread/INFO] [mojang/Library]: OpenAL initialized on device OpenAL Soft on 스피커(Creative Pebble X Plus)
+[21:15:41] [Render thread/INFO] [minecraft/SoundEngine]: Sound engine started
+[21:15:41] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x256x4 minecraft:textures/atlas/signs.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 128x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[21:15:42] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x512x0 minecraft:textures/atlas/gui.png-atlas
+[21:15:42] [Render thread/WARN] [minecraft/ShaderInstance]: Shader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
+[21:15:42] [Render thread/INFO] [ne.ne.ne.cl.en.an.js.AnimationLoader/]: Loaded 0 entity animations
+[21:15:44] [Render thread/INFO] [minecraft/RecipeManager]: Loaded 1290 recipes
+[21:15:44] [Render thread/INFO] [minecraft/AdvancementTree]: Loaded 1399 advancements
+[21:15:45] [Server thread/INFO] [minecraft/IntegratedServer]: Starting integrated minecraft server version 1.21.1
+[21:15:45] [Server thread/INFO] [minecraft/MinecraftServer]: Generating keypair
+[21:15:46] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[21:15:47] [progressListener/INFO] [minecraft/LoggerChunkProgressListener]: 스폰 영역 준비 중: 0%
+[21:15:47] [progressListener/INFO] [minecraft/LoggerChunkProgressListener]: 스폰 영역 준비 중: 0%
+[21:15:47] [progressListener/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 1047 ms
+[21:15:47] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[21:15:47] [Server thread/INFO] [minecraft/IntegratedServer]: Changing view distance to 8, from 10
+[21:15:47] [Server thread/INFO] [minecraft/IntegratedServer]: Changing simulation distance to 5, from 0
+[21:15:49] [Server thread/INFO] [minecraft/PlayerList]: Dev[local:E:13f57ff3] logged in with entity id 9 at (40.5, 65.0, 68.5)
+[21:15:49] [Server thread/INFO] [minecraft/MinecraftServer]: Dev이(가) 게임에 참여했습니다
+[21:15:49] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] [네가 없는 동안] 숲과 평원의 폐역을 찾아보세요. 기록 블록을 우클릭하면 책을 얻습니다.
+[21:15:49] [Render thread/INFO] [minecraft/AdvancementTree]: Loaded 2 advancements
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (network-verified): All chunks are saved
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (quiet_city): All chunks are saved
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[21:15:57] [Render thread/INFO] [minecraft/Minecraft]: Stopping!
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Return network fixture]'/minecraft:overworld
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Return network fixture]'/minecraft:the_end
+[21:15:57] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Return network fixture]'/whileaway:quiet_city
+[21:15:58] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Return network fixture]'/minecraft:the_nether
+[21:15:58] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (network-verified): All chunks are saved
+[21:15:58] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[21:15:58] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (quiet_city): All chunks are saved
+[21:15:58] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[21:15:58] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+NETWORK_CHILD_EXIT=0
+
+BUILD SUCCESSFUL in 50s
+7 actionable tasks: 3 executed, 4 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.2.1/userguide/configuration_cache_enabling.html

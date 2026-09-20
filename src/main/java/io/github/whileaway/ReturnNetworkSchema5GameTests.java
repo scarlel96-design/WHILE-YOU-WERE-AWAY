@@ -50,7 +50,8 @@ public final class ReturnNetworkSchema5GameTests {
     }
     @GameTest(template="empty")
     public static void schema5RoundTripsReturnNetwork(GameTestHelper h) {
-        CompoundTag root=new NarrativeData().save(new CompoundTag(),h.getLevel().registryAccess());
+        NarrativeData base=new NarrativeData(); ReturnNetworkFixtures.resident(base);
+        CompoundTag root=base.save(new CompoundTag(),h.getLevel().registryAccess());
         root.put("returnNetwork",discovered().save());
         NarrativeData d=NarrativeData.load(root,h.getLevel().registryAccess());
         h.assertTrue(d.returnNetwork().save().equals(discovered().save()),"schema5 Return Network round-trip");

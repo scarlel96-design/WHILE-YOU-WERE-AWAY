@@ -44,7 +44,10 @@ public final class NpcNavigation {
         }
         if(!budget.ready(now))return state=budget.unreachable()?NpcEnvironment.Path.UNREACHABLE:NpcEnvironment.Path.TEMPORARY_FAILURE;
         budget.attempted(now);
-        var path=nav.createPath(destination,0);
+        // The adapter admits targets up to 48 blocks away. The two-argument API instead
+        // silently uses FOLLOW_RANGE (24 for Yeoul), producing false UNREACHABLE results.
+        // 1.21.1 PathNavigationRegion uses getChunkNow: this does not load missing chunks.
+        var path=nav.createPath(destination,0,48);
         if(path==null||!path.canReach()||!nav.moveTo(path,.65)){
             nav.stop();budget.failed(now);
             return state=budget.unreachable()?NpcEnvironment.Path.UNREACHABLE:NpcEnvironment.Path.TEMPORARY_FAILURE;

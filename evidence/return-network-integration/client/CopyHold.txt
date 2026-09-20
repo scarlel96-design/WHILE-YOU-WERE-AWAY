@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=47316
+INPUT cp=3 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=9608cc40db39b12799185bd83701ba4a2d83fb968be70773629dd3c11dfc3995, detail=LOAD_OK]
+PASS CopyHold cp=3 unchanged while original completed; generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add
+DISK sha256=9608cc40db39b12799185bd83701ba4a2d83fb968be70773629dd3c11dfc3995

@@ -62,5 +62,16 @@
   "scene.whileaway.seven.2": "출발음은 아직 끝나지 않았다.",
   "entity.whileaway.story_npc": "여울",
   "story.whileaway.yeoul.introduction": "여울: 이 불은 내가 살펴볼게요. 돌아오는 길이 헷갈리지 않도록.",
-  "story.whileaway.yeoul.settled": "여울이 귀환등 곁에서 새 일과를 시작했습니다."
+  "story.whileaway.yeoul.settled": "여울이 귀환등 곁에서 새 일과를 시작했습니다.",
+  "story.whileaway.network.discovered": "폐전차의 낡은 중계함에서 낮은 신호가 반복된다. 여울과 함께 살펴보자.",
+  "story.whileaway.network.joined": "여울: 저 간격… 귀환등을 켤 때와 닮았어. 중계함을 직접 확인해 볼래?",
+  "story.whileaway.network.pattern": "조사 기록 — 짧게 두 번, 길게 한 번. 옛 설비가 같은 간격을 반복한다. [웅크린 채 중계함 사용: 연결 복구]",
+  "story.whileaway.network.interact_hint": "웅크린 채 중계함을 사용하면 연결을 복구한다.",
+  "story.whileaway.network.response": "신호 응답 — 짧게 두 번, 길게 한 번. 귀환등과 같은 간격이다. 중계함의 불이 남아 있다.",
+  "story.whileaway.network.shared": "여울: 내가 켠 등인데… 여기서도 답이 왔네.",
+  "story.whileaway.network.complete": "조사 기록 — 귀환등을 켠 뒤 옛 중계점이 응답했다. 이유는 아직 알 수 없다.",
+  "story.whileaway.network.aftermath": "여울: 가끔 저쪽 불도 확인해. 아직 켜져 있더라.",
+  "story.whileaway.network.evidence": "남은 기록 — 옛 신호의 반복 / 현재 귀환등과 일치한 응답.",
+  "story.whileaway.network.waiting_npc": "여울이 설비에 닿을 수 있는 길을 확인하자.",
+  "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다."
 }

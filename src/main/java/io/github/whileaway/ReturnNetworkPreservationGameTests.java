@@ -27,7 +27,7 @@ public final class ReturnNetworkPreservationGameTests {
     public static void schema5PreservesExistingPlayersAndActors(GameTestHelper h) throws Exception {
         Path root=Path.of(System.getProperty("whileaway.testEvidence","../evidence/lifecycle"),"return-network-schema5");
         Files.createDirectories(root); Path p=Files.createTempDirectory(root,"preserve-").resolve("whileaway_story.dat").toAbsolutePath().normalize();
-        NarrativeData d=new NarrativeData();
+        NarrativeData d=new NarrativeData(); ReturnNetworkFixtures.resident(d);
         UUID player=UUID.fromString("20000000-0000-0000-0000-000000000002");
         d.discover(player,io.github.whileaway.core.Clue.STATION); d.entry(player).cityVisited=true;
         StoryActorRecord a=new StoryActorRecord("npc:test","event:test","witness","minecraft:pig","minecraft:overworld",

@@ -1,0 +1,5 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=49076
+INPUT cp=6 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=01b6dbb482f71c93ad25895e1a97b4b15e50be85b229791c573b3b34f5418be0, detail=LOAD_OK]
+PASS Reopen cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[RESPONSE, SIGNAL_DISCOVERED, PATTERN_MATCH_EVIDENCE, INTERVENTION, PARTICIPANT_JOINED, COMPLETE, NEXT_PREREQUISITE, SHARED_EXPERIENCE, AFTERMATH, OLD_PATTERN_EVIDENCE]
+DISK sha256=5c7817559ada82797e71c35158c79cfb82ee19a3a99b1f2e1139b11119859874

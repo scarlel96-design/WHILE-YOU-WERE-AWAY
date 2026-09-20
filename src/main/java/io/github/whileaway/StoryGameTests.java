@@ -201,7 +201,7 @@ public final class StoryGameTests {
             var loaded=NarrativeData.load(t,h.getLevel().registryAccess());var a=loaded.entry(id);
             h.assertTrue(a.cityShockTriggered==(version==3&&oldFlag),"legacy flag preserved/defaulted");
             h.assertTrue(a.cityClues==5&&a.station.equals(e.station),"old story facts retained");
-            h.assertTrue(loaded.save(new CompoundTag(),h.getLevel().registryAccess()).getInt("schema")==4,"explicit schema 4 save");
+            h.assertTrue(loaded.save(new CompoundTag(),h.getLevel().registryAccess()).getInt("schema")==5,"explicit schema 5 save");
         }
         h.succeed();
     }
@@ -381,7 +381,7 @@ public final class StoryGameTests {
         boolean durable=false;
         try {
             var d=new NarrativeData();d.discover(new UUID(0,91),Clue.STATION);d.save(file.toFile(),h.getLevel().registryAccess());
-            durable=java.nio.file.Files.exists(file)&&net.minecraft.nbt.NbtIo.readCompressed(file,net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("data").getInt("schema")==4;
+            durable=java.nio.file.Files.exists(file)&&net.minecraft.nbt.NbtIo.readCompressed(file,net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("data").getInt("schema")==5;
         } finally {blocked.countDown();net.neoforged.neoforge.common.IOUtilities.waitUntilIOWorkerComplete();}
         h.assertTrue(durable,"Framework Failure: checkpoint save returned before queued disk write");h.succeed();
     }

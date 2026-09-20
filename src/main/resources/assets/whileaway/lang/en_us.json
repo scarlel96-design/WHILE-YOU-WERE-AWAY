@@ -62,5 +62,16 @@
   "scene.whileaway.seven.2": "The departure chime never ended.",
   "entity.whileaway.story_npc": "Yeoul",
   "story.whileaway.yeoul.introduction": "Yeoul: I will look after this light. So the way back stays familiar.",
-  "story.whileaway.yeoul.settled": "Yeoul has begun a new routine beside the return light."
+  "story.whileaway.yeoul.settled": "Yeoul has begun a new routine beside the return light.",
+  "story.whileaway.network.discovered": "A quiet signal repeats inside the old tram relay. Look closer with Yeoul.",
+  "story.whileaway.network.joined": "Yeoul: That interval feels like our return light. Could you inspect the relay?",
+  "story.whileaway.network.pattern": "Evidence — Two short pulses, one long. The old relay repeats the pattern. [Sneak-use relay: restore connection]",
+  "story.whileaway.network.interact_hint": "Sneak-use the relay to restore its connection.",
+  "story.whileaway.network.response": "Signal response — Two short pulses, one long. The return-light pattern. The relay stays lit.",
+  "story.whileaway.network.shared": "Yeoul: It was the light I turned on… but something answered here too.",
+  "story.whileaway.network.complete": "Evidence — The old relay answered after the return light was lit. The reason is still unknown.",
+  "story.whileaway.network.aftermath": "Yeoul: I check that light sometimes. It is still on.",
+  "story.whileaway.network.evidence": "Retained evidence — The old repeating signal / A response matching the current return light.",
+  "story.whileaway.network.waiting_npc": "Check that Yeoul can reach the equipment.",
+  "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection."
 }

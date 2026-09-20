@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=12512
+PASS CorruptBinding saveDispatches=3 writeBlocked=true emptyCampaign=false originalHash=1921308b80e334fbe05100e38bfe29f87892a156716b59f83f127f561694d498 diagnostic=STORY_LOAD outcome=CORRUPT recovery=MANUAL_DIAGNOSTIC saveFormat=5 actorSchema=1 actors=1 writeBlocked=true phase=load original_quarantined reason=RETURN_NETWORK_CORRUPT field=participant_uuid
+DISK sha256=1921308b80e334fbe05100e38bfe29f87892a156716b59f83f127f561694d498

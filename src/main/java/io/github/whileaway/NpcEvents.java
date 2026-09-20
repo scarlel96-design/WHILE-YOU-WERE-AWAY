@@ -59,6 +59,7 @@ public final class NpcEvents {
         var level=(ServerLevel)npc.level();var server=level.getServer();
         var problems=NpcState.integrity(r);
         if(!problems.isEmpty()){StoryStorage.block(server,String.join(";",problems));npc.getNavigation().stop();return;}
+        if(r.checkpoint.checkpoint==4 && ReturnNetworkEvents.update(npc,r))return;
         var home=NpcState.home(r);
         var nearby=witness(level,npc.blockPosition());
         // No off-screen auto-failure. NPC's life may continue when loaded; event movement needs a living witness.

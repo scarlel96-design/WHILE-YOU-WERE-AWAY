@@ -1,0 +1,2 @@
+{"pid":36336,"pass":true,"exit":0,"command":"gradlew.bat --offline runNetworkCutA ","processExited":true,"childExit":-1073740791,"elapsedSeconds":53,"mode":"CutA"}
+{"pid":41420,"pass":false,"exit":1,"command":"gradlew.bat --offline runNetworkCutB ","processExited":true,"childExit":null,"elapsedSeconds":179,"mode":"CutB"}

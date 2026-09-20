@@ -1,0 +1,9 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=12424
+INPUT cp=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fcb44094e2d0d5ac47cb678ab9ba5530d87b7e4aa13b8e2b87c63d48cdfe7dea, detail=LOAD_OK]
+PROGRESS cp=1 npc=(40.370327153184746, 65.0, 62.15696428657741) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PROGRESS cp=1 npc=(44.16040105156559, 65.0, 48.943091770073366) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PASS exception Environment obstruction and missing equipment each held120 ticks; fixture restored; identity unchanged
+PROGRESS cp=6 npc=(44.492138407749486, 65.0, 50.61159456447066) player=(45.5, 65.0, 47.5) wait=NONE path=AVAILABLE attempts=2 followRange=24.0
+PASS Environment cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[OLD_PATTERN_EVIDENCE, COMPLETE, SIGNAL_DISCOVERED, SHARED_EXPERIENCE, PATTERN_MATCH_EVIDENCE, PARTICIPANT_JOINED, RESPONSE, NEXT_PREREQUISITE, AFTERMATH, INTERVENTION]
+DISK sha256=75317cf840200944f0d9d0aad397cffeb038dd1e591a6159a8811e8dd416240f

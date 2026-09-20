@@ -89,6 +89,7 @@ public final class WhileAway {
         NeoForge.EVENT_BUS.register(new StoryActors());
         NeoForge.EVENT_BUS.register(new CanonicalRecovery());
         NeoForge.EVENT_BUS.register(new NpcEvents());
+        NeoForge.EVENT_BUS.register(new ReturnNetworkEvents());
     }
     private void attributes(EntityAttributeCreationEvent event) { event.put(WAYFARER.get(), Wayfarer.attributes().build()); event.put(STORY_NPC.get(),StoryNpc.attributes().build()); }
 }
