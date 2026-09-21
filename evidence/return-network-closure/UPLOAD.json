@@ -1,0 +1,22 @@
+{
+  "sourceIdenticalAfterValidation": true,
+  "paths": [
+    "src/main/java/io/github/whileaway/client",
+    "tools",
+    "docs/return-network-closure",
+    "evidence/return-network-closure",
+    "dist/return-network-closure-preflight"
+  ],
+  "baseline": "7aa36c50ea0f13201304e0ad0f25c6b3f7a5edf3",
+  "uploadedCommit": "e7115dd053a691c9aae3766ce1dc30ebaba0e119",
+  "status": "PARTIAL / safe pause before Phase E",
+  "verifiedRemoteHead": "e7115dd053a691c9aae3766ce1dc30ebaba0e119",
+  "sourceZip": "9b77d81bea39c4cea7673fa604e6f8d0af9e6852943ff3772e2d9567fdef1f17",
+  "rawLogs": "11 ignored-by-default log files explicitly added in evidence-only commit",
+  "note": "This receipt is the only addition after the verified upload. Source ZIP is identical in implementation/source; later commits contain raw-log publication and this receipt only.",
+  "firstUpload": "FAILED curl55 connection reset; retried HTTP1.1 and per-command postBuffer",
+  "uploadExit": 0,
+  "branch": "work/return-network-integration",
+  "implementationCommit": "16af959fb4b2f0c45ae6f7e8b5f35d82869d6812",
+  "sourceTree": "0f37667faaeadc8dd381e03fc6085463d7207af8"
+}
