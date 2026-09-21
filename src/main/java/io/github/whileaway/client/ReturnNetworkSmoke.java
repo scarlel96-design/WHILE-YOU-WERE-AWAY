@@ -121,6 +121,7 @@ public final class ReturnNetworkSmoke {
                     if((held+=10)<100)return;
                     note("PASS "+MODE+" cp=3 unchanged while original completed; generation="+generation+" uuid="+entity+" instance="+instance);finish(server);return;
                 }
+                if(ReturnNetworkClosureProbe.step(server,p,city,s,r))return;
                 if(exception(server,p,city,s,r))return;
                 var actual=StoryActors.find(server,r.entityId);if(!(actual instanceof StoryNpc npc))return;
                 if(ticks%200==0)note("PROGRESS cp="+s.stage.ordinal()+" npc="+npc.position()+" player="+p.position()+" wait="+ReturnNetworkEvents.waitState(city)+" path="+npc.storyNavigation().state()+" attempts="+npc.storyNavigation().attempts()+" followRange="+npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE));

@@ -1,0 +1,4 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53720
+PASS Seed actual Yeoul event completed via interaction and path; uuid=6e91a7b4-1ba4-4d11-9a4a-dc9dddbdc21a instance=620606dd-1458-48ef-a25a-cb055fb097f8 generation=0
+DISK sha256=90d54ee7d8af37a325076a6037d680ac0490f2cea8dec754a2b1013a480ad3cb

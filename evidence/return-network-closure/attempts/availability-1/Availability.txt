@@ -1,0 +1,29 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=52644
+INPUT cp=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fcb44094e2d0d5ac47cb678ab9ba5530d87b7e4aa13b8e2b87c63d48cdfe7dea, detail=LOAD_OK]
+AVAILABILITY start cp=1 event=3de51bf7-dab0-4947-89a3-6e808bd3a590 npc=BlockPos{x=38, y=65, z=72} npcChunk=[2, 4] relayChunk=[2, 2] cachedWait=NONE
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+AVAILABILITY phase=1 npcChunk=true npcStore=true canonical=true relayChunk=true player=(40.5, 90.0, 104.5)
+FAIL java.lang.IllegalStateException: availability combination not reproduced within bounded real observation window

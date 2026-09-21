@@ -1,0 +1,27 @@
+[
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\dist\\return-network-closure-preflight\\whileaway-0.3.1-return-network-closure-preflight.jar",
+    "sha256": "9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e",
+    "bytes": 644246
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\dist\\return-network-closure-preflight\\whileaway-0.3.1-return-network-closure-preflight-source.zip",
+    "sha256": "9b77d81bea39c4cea7673fa604e6f8d0af9e6852943ff3772e2d9567fdef1f17",
+    "bytes": 2201129
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-closure\\DIFF.patch",
+    "sha256": "3418883743a3f34f0cdcf710d835c19aaa7d465b4cc955afd444b61afedce91a",
+    "bytes": 14011
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-closure\\VERIFICATION.txt",
+    "sha256": "d848c505b0e8baf30d3959b582b97ee074c1f1d1a2045adef3bea119e00cbbe6",
+    "bytes": 17453
+  },
+  {
+    "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-closure\\ROLLBACK.sh",
+    "sha256": "0fa927c711c05c5694def9deb232f92185433c077a62b00d96d5add1301167df",
+    "bytes": 790
+  }
+]

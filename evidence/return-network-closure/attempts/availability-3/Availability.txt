@@ -1,0 +1,12 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=56176
+INPUT cp=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fcb44094e2d0d5ac47cb678ab9ba5530d87b7e4aa13b8e2b87c63d48cdfe7dea, detail=LOAD_OK]
+AVAILABILITY start cp=1 event=c66df9c5-9221-433b-8eb2-b26f9d3b8d3a npc=BlockPos{x=38, y=65, z=72} npcChunk=[2, 4] relayChunk=[2, 2] cachedWait=NONE
+PASS availability phase=1 heldTicks=80 eventUnchanged=true identityUnchanged=true npc=true relay=false cachedWait=PLAYER_ABSENT
+PASS availability phase=2 heldTicks=80 eventUnchanged=true identityUnchanged=true npc=false relay=true cachedWait=PLAYER_ABSENT
+AVAILABILITY storage-gap=NOT_REPRODUCED natural return next; no actor teleport/no force chunk
+PROGRESS cp=1 npc=(40.9256698077149, 65.0, 60.24751075846981) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PROGRESS cp=3 npc=(44.38505248873381, 65.0, 48.03950434907081) player=(45.5, 65.0, 47.5) wait=NONE path=ARRIVED attempts=1 followRange=24.0
+PROGRESS cp=6 npc=(42.76980968868223, 65.0, 57.16852569151901) player=(45.5, 65.0, 47.5) wait=NONE path=AVAILABLE attempts=2 followRange=24.0
+PASS Availability cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[RESPONSE, PARTICIPANT_JOINED, INTERVENTION, AFTERMATH, SHARED_EXPERIENCE, SIGNAL_DISCOVERED, OLD_PATTERN_EVIDENCE, PATTERN_MATCH_EVIDENCE, COMPLETE, NEXT_PREREQUISITE]
+DISK sha256=9a9f633f4047528ebedd1c0e35cf1fd535e224028f0a65616f4b232ceaedf7b9

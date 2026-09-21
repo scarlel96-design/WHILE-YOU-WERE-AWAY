@@ -1,0 +1,191 @@
+diff --git a/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java b/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
+index 3935242..3598f9a 100644
+--- a/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
++++ b/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
+@@ -121,6 +121,7 @@ public final class ReturnNetworkSmoke {
+                     if((held+=10)<100)return;
+                     note("PASS "+MODE+" cp=3 unchanged while original completed; generation="+generation+" uuid="+entity+" instance="+instance);finish(server);return;
+                 }
++                if(ReturnNetworkClosureProbe.step(server,p,city,s,r))return;
+                 if(exception(server,p,city,s,r))return;
+                 var actual=StoryActors.find(server,r.entityId);if(!(actual instanceof StoryNpc npc))return;
+                 if(ticks%200==0)note("PROGRESS cp="+s.stage.ordinal()+" npc="+npc.position()+" player="+p.position()+" wait="+ReturnNetworkEvents.waitState(city)+" path="+npc.storyNavigation().state()+" attempts="+npc.storyNavigation().attempts()+" followRange="+npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE));
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/client/ReturnNetworkClosureProbe.java
+@@ -0,0 +1,76 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++
++/** Opt-in copied-world availability probe; no actor relocation or chunk tickets.
++ * Only the test player moves. Chunk/entity readiness is read from the real server. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class ReturnNetworkClosureProbe {
++    private static final String MODE=System.getProperty("whileaway.networkSmoke","");
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/return-network-closure/client"));
++    private static int phase,stable,observations;
++    private static CompoundTag frozen;
++    private static BlockPos npcPosition;
++    private static UUID event,entity,instance;
++    private static int generation;
++    private static boolean storageGap;
++    private static void check(boolean ok,String msg){if(!ok)throw new IllegalStateException(msg);}
++    private static void note(String s)throws Exception {Files.createDirectories(E);Files.writeString(E.resolve(MODE+".txt"),s+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}
++    @SubscribeEvent public static void boundary(RecoveryBoundaryEvent e) {
++        if(!MODE.equals("Availability")||!e.boundary.equals("RN_A_DISCOVERED")||phase!=0)return;
++        try {
++            var server=e.player.getServer();var d=NarrativeData.get(server);var r=d.actors.get(NpcEvents.STORY);
++            frozen=d.returnNetwork().save();event=d.returnNetwork().instance;entity=r.entityId;instance=r.instanceId;generation=r.generation;
++            npcPosition=r.position;
++            check(new ChunkPos(npcPosition).toLong()!=new ChunkPos(ReturnNetworkEvents.RELAY).toLong(),"availability fixture requires actual separated approach chunks");
++            server.getPlayerList().setViewDistance(2);server.getPlayerList().setSimulationDistance(5);
++            phase=1;e.player.setGameMode(GameType.SPECTATOR);
++            e.player.teleportTo(e.player.serverLevel(),40.5,90,120.5,Set.of(),0,0);
++            note("AVAILABILITY start cp=1 event="+event+" npc="+npcPosition+" npcChunk="+new ChunkPos(npcPosition)+" relayChunk="+new ChunkPos(ReturnNetworkEvents.RELAY)+" cachedWait="+ReturnNetworkEvents.waitState(e.player.serverLevel()));
++        }catch(Exception x){throw new IllegalStateException("availability fixture",x);}
++    }
++    public static boolean step(MinecraftServer server,ServerPlayer p,ServerLevel city,ReturnNetworkState s,StoryActorRecord r)throws Exception {
++        if(MODE.equals("EnvironmentMatrix"))return ReturnNetworkEnvironmentProbe.step(server,p,city,s,r);
++        if(!MODE.equals("Availability")||phase==0||phase>=3)return false;
++        check(frozen.equals(s.save()),"availability changed durable event");
++        check(entity.equals(r.entityId)&&instance.equals(r.instanceId)&&generation==r.generation,"availability changed actor identity");
++        boolean npcChunk=city.hasChunkAt(npcPosition),npcStore=city.areEntitiesLoaded(new ChunkPos(npcPosition).toLong());
++        var actual=city.getEntity(entity);boolean npc=actual!=null&&StoryActors.canonical(actual,r);
++        boolean relay=city.hasChunkAt(ReturnNetworkEvents.RELAY);
++        if(npcChunk&&!npcStore&&!storageGap){storageGap=true;note("OBSERVED real NPC chunk present / entity storage unavailable cp=1");}
++        if(++observations%10==0)note("AVAILABILITY phase="+phase+" npcChunk="+npcChunk+" npcStore="+npcStore+" canonical="+npc+" relayChunk="+relay+" player="+p.position());
++        check(observations<300,"availability combination not reproduced within bounded real observation window");
++        boolean ready=phase==1?npc&&!relay:!npc&&!npcStore&&relay;
++        if(!ready){
++            stable=0;
++            // Probe real player-ticket boundaries, never fake a component's availability.
++            // Wait30s for tickets before moving one more chunk; a bounded miss is still FAIL.
++            if(observations%60==0&&npc==relay){
++                double delta=phase==1?(npc?16:-16):(relay?-16:16);
++                note("FIXTURE ticket boundary step playerZ="+(p.getZ()+delta));
++                p.teleportTo(city,p.getX(),p.getY(),p.getZ()+delta,Set.of(),0,0);
++            }
++            return true;
++        }
++        stable+=10;if(stable<80)return true;
++        if(phase==2)check(ReturnNetworkEvents.originalEquipment(city),"loaded relay differs from original equipment");
++        server.saveEverything(true,true,true);
++        Files.copy(server.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat"),E.resolve("Availability-phase"+phase+".dat"),StandardCopyOption.REPLACE_EXISTING);
++        note("PASS availability phase="+phase+" heldTicks="+stable+" eventUnchanged=true identityUnchanged=true npc="+npc+" relay="+relay+" cachedWait="+ReturnNetworkEvents.waitState(city));
++        stable=0;observations=0;phase++;
++        if(phase==2)p.teleportTo(city,40.5,90,-23.5,Set.of(),0,0);
++        else {note("AVAILABILITY storage-gap="+(storageGap?"OBSERVED":"NOT_REPRODUCED")+" natural return next; no actor teleport/no force chunk");p.setGameMode(GameType.CREATIVE);p.teleportTo(city,45.5,65,47.5,Set.of(),90,0);}
++        return true;
++    }
++}
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/client/ReturnNetworkEnvironmentProbe.java
+@@ -0,0 +1,97 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.entity.StoryNpc;
++import io.github.whileaway.content.RelayBlock;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.phys.Vec3;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++
++/** Copied-world fault injection only; never activated by normal gameplay. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class ReturnNetworkEnvironmentProbe {
++    private static final boolean ENABLED="EnvironmentMatrix".equals(System.getProperty("whileaway.networkSmoke",""));
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/return-network-closure/client"));
++    private static final Map<BlockPos,BlockState> saved=new LinkedHashMap<>(), expected=new LinkedHashMap<>();
++    private static int phase,variant=-1;
++    private static long began;
++    private static CompoundTag frozen;
++    private static Vec3 collisionStart;
++    private static void check(boolean b,String m){if(!b)throw new IllegalStateException(m);}
++    private static void note(String s)throws Exception {Files.writeString(E.resolve("EnvironmentMatrix.txt"),s+"\n",StandardOpenOption.APPEND);}
++    private static void put(ServerLevel l,BlockPos p,BlockState b){check(l.hasChunkAt(p),"fixture chunk unavailable");saved.putIfAbsent(p,l.getBlockState(p));expected.put(p,b);l.setBlock(p,b,3);}
++    private static void restore(ServerLevel l){saved.forEach((p,b)->l.setBlock(p,b,3));saved.clear();expected.clear();}
++    private static void untouched(ServerLevel l){expected.forEach((p,b)->check(l.getBlockState(p).equals(b),"production modified fixture block "+p));}
++    @SubscribeEvent public static void boundary(RecoveryBoundaryEvent e){
++        if(!ENABLED)return;
++        var l=e.player.serverLevel();var d=NarrativeData.get(e.player.getServer());
++        if(e.boundary.equals("RN_A_DISCOVERED")&&phase==0){
++            var a=l.getEntity(d.actors.get(NpcEvents.STORY).entityId);check(a instanceof StoryNpc,"actual NPC required");
++            var at=a.blockPosition();
++            for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)if(x!=0||z!=0)for(int y=0;y<2;y++)put(l,at.offset(x,y,z),Blocks.BARRIER.defaultBlockState());
++            frozen=d.returnNetwork().save();began=l.getGameTime();phase=1;
++        }else if(e.boundary.equals("RN_D_INTERVENTION")&&phase==4){
++            frozen=d.returnNetwork().save();put(l,ReturnNetworkEvents.STAND,Blocks.DIAMOND_BLOCK.defaultBlockState());phase=5;
++        }
++    }
++    public static boolean step(MinecraftServer server,ServerPlayer p,ServerLevel l,ReturnNetworkState s,StoryActorRecord r)throws Exception {
++        if(!ENABLED||phase==0||phase==7)return false;
++        var entity=l.getEntity(r.entityId);check(entity instanceof StoryNpc,"fixture NPC disappeared");var npc=(StoryNpc)entity;
++        if(phase==1){
++            check(frozen.equals(s.save()),"closed route advanced checkpoint");untouched(l);
++            if(l.getGameTime()-began<220)return true;
++            check(npc.storyNavigation().state()==NpcEnvironment.Path.UNREACHABLE||npc.storyNavigation().state()==NpcEnvironment.Path.TEMPORARY_FAILURE,"expected bounded path failure");
++            note("PASS closed NPC route realPath="+npc.storyNavigation().state()+" attempts="+npc.storyNavigation().attempts()+" cp=1 unchanged=true noObstacleDeletion=true");
++            restore(l);phase=2;return true;
++        }
++        if(phase==2){if(s.stage!=ReturnNetworkState.Stage.NPC_JOINED)return false;note("PASS path restored NPC walked naturally to relay same identity");frozen=s.save();phase=3;}
++        if(phase==3){
++            check(frozen.equals(s.save()),"environment variant advanced durable state");
++            if(variant<0){variant=0;beginVariant(l,p,npc);return true;}
++            untouched(l);if(l.getGameTime()-began<100)return true;
++            if(variant<=4)check(!ReturnNetworkEvents.environmentReady(l,s),"bad environment treated ready");
++            if(variant==5)check(!ReturnNetworkEvents.interactEquipment(p,ReturnNetworkEvents.RELAY),"out-of-reach equipment interaction accepted");
++            if(variant==6)note("COLLISION actual NPC displacementSquared="+npc.position().distanceToSqr(collisionStart));
++            if(variant==7)check(ReturnNetworkEvents.environmentReady(l,s),"unrelated lighting changed structural validity");
++            note("PASS environment variant="+variant+" cp=2 durableUnchanged=true playerBlocksPreserved=true");
++            restore(l);p.teleportTo(l,45.5,65,47.5,Set.of(),90,0);
++            if(++variant<8){beginVariant(l,p,npc);return true;}
++            phase=4;return true;
++        }
++        if(phase==4)return false;
++        if(phase==5){
++            check(frozen.equals(s.save())&&ReturnNetworkEvents.activatedEquipment(l),"intervention physical application did not follow durable commit");
++            restore(l);put(l,ReturnNetworkEvents.RELAY,WhileAway.RELAY.get().defaultBlockState().setValue(RelayBlock.LIT,false));
++            began=l.getGameTime();phase=6;return true;
++        }
++        check(phase==6&&frozen.equals(s.save()),"unlit relay advanced response");untouched(l);
++        if(l.getGameTime()-began<120)return true;
++        check(!ReturnNetworkEvents.environmentReady(l,s),"unlit structural relay accepted");
++        note("PASS structural LIT loss cp=4 unchanged; restore original activated relay; production never flickered it");
++        restore(l);phase=7;p.teleportTo(l,45.5,65,47.5,Set.of(),90,0);return true;
++    }
++    private static void beginVariant(ServerLevel l,ServerPlayer p,StoryNpc npc){
++        began=l.getGameTime();var stand=ReturnNetworkEvents.STAND;var relay=ReturnNetworkEvents.RELAY;
++        switch(variant){
++            case 0->put(l,stand,Blocks.DIAMOND_BLOCK.defaultBlockState());
++            case 1->put(l,stand,Blocks.WATER.defaultBlockState());
++            case 2->put(l,stand.above(),Blocks.DIAMOND_BLOCK.defaultBlockState());
++            case 3->put(l,relay,Blocks.AIR.defaultBlockState());
++            case 4->put(l,relay,Blocks.REDSTONE_LAMP.defaultBlockState());
++            case 5->p.teleportTo(l,relay.getX()+8.5,65,relay.getZ()+.5,Set.of(),90,0);
++            case 6->{collisionStart=npc.position();p.teleportTo(l,npc.getX()+.2,npc.getY(),npc.getZ(),Set.of(),90,0);}
++            case 7->put(l,relay.above(),Blocks.SEA_LANTERN.defaultBlockState());
++            default->throw new IllegalStateException("variant");
++        }
++    }
++}

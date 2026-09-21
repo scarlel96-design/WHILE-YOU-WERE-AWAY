@@ -1,0 +1,9 @@
+{
+  "changedExistingClasses": [
+    "io/github/whileaway/client/ReturnNetworkSmoke.class"
+  ],
+  "unchangedExistingClasses": 119,
+  "unchangedAssets": 69,
+  "productionSemantics": "UNCHANGED",
+  "jar": "9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e"
+}

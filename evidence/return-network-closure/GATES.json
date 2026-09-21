@@ -1,0 +1,119 @@
+{
+  "status": "PARTIAL",
+  "phaseA": "AUDITED",
+  "phaseB": "independent availability and return verified; present-chunk/pending-store transition NOT REPRODUCED",
+  "phaseC": "PASS scripted real-client matrix and fresh-process reopen",
+  "phaseD": "PASS new world prerequisite completion and fresh-process resident regression",
+  "phaseE": "NOT STARTED",
+  "phasesFtoI": "NOT STARTED / NOT SEALED",
+  "gameTests": 102,
+  "coreAssertions": 176857,
+  "newClientPasses": 6,
+  "newClientAttempts": 8,
+  "finalSourceClientPasses": 5,
+  "historicalThisMilestonePass": "Availability attempt3 superseded by final-source attempt4",
+  "failedFixtureAttempts": [
+    "Availability1 (both loaded)",
+    "Availability2 (both unloaded)"
+  ],
+  "clientRows": [
+    {
+      "world": "closure-EnvironmentMatrix",
+      "rightMonitor": true,
+      "pass": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-closure.init.gradle runClosureReopen -PclosureWorld=closure-EnvironmentMatrix",
+      "childExit": 0,
+      "pid": 54656,
+      "mode": "Reopen",
+      "elapsedSeconds": 53,
+      "muted": true,
+      "attempt": 1,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "processExited": true
+    },
+    {
+      "world": "",
+      "rightMonitor": true,
+      "pass": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-closure.init.gradle runClosureSeed",
+      "childExit": 0,
+      "pid": 53720,
+      "mode": "Seed",
+      "elapsedSeconds": 74,
+      "muted": true,
+      "attempt": 1,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "processExited": true
+    },
+    {
+      "world": "npc-CutB",
+      "rightMonitor": true,
+      "pass": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-closure.init.gradle runClosureReturnLight -PclosureWorld=npc-CutB",
+      "childExit": 0,
+      "pid": 50764,
+      "mode": "ReturnLight",
+      "elapsedSeconds": 51,
+      "muted": true,
+      "attempt": 1,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "processExited": true
+    },
+    {
+      "rightMonitor": true,
+      "pid": 3180,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-closure.init.gradle runClosureAvailability -PclosureWorld=closure-Availability4",
+      "exit": 0,
+      "processExited": true,
+      "sourceUnchanged": true,
+      "mode": "Availability",
+      "attempt": 4,
+      "elapsedSeconds": 85,
+      "pass": true,
+      "childExit": 0,
+      "world": "closure-Availability4",
+      "muted": true
+    }
+  ],
+  "collisionDisplacementSquared": 0.21761583335811552,
+  "diskEvidence": [
+    {
+      "file": "client\\Availability-phase1.dat",
+      "sha256": "789c1b54768d959e3ae05d1118b3d598aab6bc9a2ea1876c8cc4a0b62a63f2ee"
+    },
+    {
+      "file": "client\\Availability-phase2.dat",
+      "sha256": "789c1b54768d959e3ae05d1118b3d598aab6bc9a2ea1876c8cc4a0b62a63f2ee"
+    },
+    {
+      "file": "client\\Availability.dat",
+      "sha256": "fe4e489e8e14f0ffc837e32b2da823a34aea52fb8363c5182734eea09fa155ae"
+    },
+    {
+      "file": "client\\EnvironmentMatrix.dat",
+      "sha256": "6f6902bcc8ca8e8aec71b8b493a2c7a5a658fd56e23ff82330c4bda00fc18655"
+    },
+    {
+      "file": "client\\Reopen.dat",
+      "sha256": "0bee22bddce5112e3c6a7171c8c70b78945014b6993ff6ef9ca44e70af369f65"
+    },
+    {
+      "file": "client\\ReturnLight\\ResumeB.dat",
+      "sha256": "511d0ae0af2ee5c35dc4ccb67372170b92ddb0dc8c34390ada2f851a4f43ab38"
+    },
+    {
+      "file": "client\\Seed.dat",
+      "sha256": "90d54ee7d8af37a325076a6037d680ac0490f2cea8dec754a2b1013a480ad3cb"
+    }
+  ],
+  "campaign": "PARTIAL",
+  "version": "0.3.1-dev.1",
+  "saveFormat": 5,
+  "actorSchema": 1,
+  "returnNetworkSchema": 1,
+  "nextSubsystem": "NOT STARTED",
+  "pause": "usage-aware safe boundary before production signal integration"
+}
