@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "baselineCommit": "b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8",
+  "output": "BASELINE PASS: preserved MAIN JAR/source hashes and ZIP CRC; no support runtime integration",
+  "input": "baseline/main.jar + baseline/main-source.zip",
+  "command": "python tools/ci/probe-return-network-support.py baseline",
+  "remoteBranch": "work/return-network-integration",
+  "remoteTip": "b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8"
+}

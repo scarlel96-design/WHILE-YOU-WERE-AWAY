@@ -1,0 +1,53 @@
+Current: 0.3.1-dev.1 / return-network-integration / PARTIAL / support V1 automation complete
+Branch: work/return-network-integration
+Baseline local/remote: b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8
+Changed fields: NONE in existing persistent/runtime schemas; five NEW Java support/test files.
+Save5, optionalActor1, ReturnNetwork1, art2; checkpoint0-6 and production commit ordering UNCHANGED.
+Caveman HOLD. No NEW REAL CLIENT, no CI claim, no release/event seal.
+
+BASELINE
+Command: python tools/ci/probe-return-network-support.py baseline
+Input: preserved baseline/main.jar and baseline/main-source.zip
+Output: BASELINE PASS: preserved MAIN JAR/source hashes and ZIP CRC; no support runtime integration
+Exit: 0
+JAR SHA256: c3820a1ce4551c9260b90b00676cd904314f48af14ae04363515f66b08fe3162
+Source SHA256: c15db2d1ff80613c29885a409ad4091a6b639eb9a21611f94c9fc1fffdbeddda
+
+MODIFIED
+Command: javac --release 21 -d build/support-main src/main/java/io/github/whileaway/support/ReturnNetworkSignal.java src/main/java/io/github/whileaway/support/ReturnNetworkLoadAssessment.java src/test/java/io/github/whileaway/support/ReturnNetworkSignalTests.java src/test/java/io/github/whileaway/support/ReturnNetworkLoadTests.java
+Output: (none); exit0.
+Command: java -cp build/support-main io.github.whileaway.support.ReturnNetworkSignalTests
+Output: RESULT PASS 27/27; exit0.
+Command: java -cp build/support-main io.github.whileaway.support.ReturnNetworkLoadTests
+Output: PASS ReturnNetworkLoadTests assertions=53 scope=pure-diagnostic no-world-side-effects no-runtime-wiring; exit0.
+Command: .\gradlew.bat --offline -I tools/ci/return-network-support.init.gradle runGameTestServer build --rerun-tasks
+Input: complete original95 GameTests +7 new, same production Java/assets; JDK21.0.5, cached ../gradle-home.
+Output run1: All 102 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 58s
+Output final run2: All 102 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 54s
+Exit: 0 each. 102 unique cases, not204. No actual client.
+Command: python tools/ci/probe-return-network-support.py modified
+Output: MODIFIED PASS: 120 existing classes and 102 asset entries byte-identical; support-only additions
+Exit: 0
+Command: python tools/ci/audit-return-network-closure-support.py --self-test
+Output: PASS audit self-test: forbidden APIs, helper world writes, comment handling
+Exit: 0
+Command: python tools/ci/audit-return-network-closure-support.py
+Output: status STATIC_PASS, protectedExistingFiles2116, errors[]; exit0.
+
+ROLLBACK (pre-publication source-copy preflight; final published-copy result is in POST_PACKAGE.json)
+Command: "C:\Program Files\Git\bin\bash.exe" evidence/return-network-support-v1/ROLLBACK.sh build/return-network-support-rollback/test.zip
+Input: disposable baseline source plus five support Java additions; SHA256 fa6b78fbb658a1785ce175d1438f349c3907a9f42e201c208b7287d0dfac7a23
+Output: ROLLBACK PASS: disposable support ZIP restored to MAIN source bundle; production source, JAR and worlds untouched
+Exit: 0. Restricted-context attempt failed before script start with signal pipe Win32error5, exit -1073741502; approved-context retry passed.
+Restored SHA256: c15db2d1ff80613c29885a409ad4091a6b639eb9a21611f94c9fc1fffdbeddda
+Restored state: source archive identical to preserved MAIN source; no source-tree/JAR/world changes; not a save downgrade.
+
+FOUR ARTIFACTS
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-support-v1\whileaway-gpt-support-return-network-closure-v1.zip
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\return-network-support-v1\DIFF.patch
+VERIFICATION: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\return-network-support-v1\VERIFICATION.txt
+ROLLBACK: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\return-network-support-v1\ROLLBACK.sh
+
+Model work: two explicitly requested Sol High assignments; parent Codex review, docs/tools and final validation. No Terra/Luna. No measured token savings. Signal four pre-fix errors preserved; final27 cases passed. Load diagnostics are not physical chunk proof. All original classes/assets remain byte-identical; the new signal helper has no runtime callers. See REPORT.md for full failure history and exact next steps.
+Next: MAIN actual independent NPC/relay loading, path/light/player obstruction, return-light client regression, transient carrier integration/tuning, restart/readability and event seal decision. Same-chunk(2,2), stale cached wait without live NPC, structural LIT=true and exact-tick dispatch are integration hazards. All world/schema/write-guard semantics unchanged.
+Archive report is immutable pre-publication snapshot; final artifact hashes and upload commits are post-package sidecar receipts.

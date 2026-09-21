@@ -1,0 +1,35 @@
+PASS semantic order and immutability
+PASS timing validation and exact gaps
+PASS timeline rejects origin mismatch
+PASS timeline rejects gap mismatch
+PASS timeline rejects SHORT LONG SHORT
+PASS deterministic planning
+PASS overflow rejection
+PASS exact match and observer separation
+PASS wrong order rejected
+PASS no partial observation match
+PASS duplicate identity rejected
+PASS wrong timing and gap rejected
+PASS mismatched observer and session rejected
+PASS poll and dispatch deduplicate
+PASS late poll first deadline requires restart
+PASS late poll second deadline requires restart
+PASS late poll long deadline requires restart
+PASS suspend before first requires restart
+PASS suspend between pulses requires restart
+PASS suspend inside pulse requires restart
+PASS final pulse interruption requires restart
+PASS repeated suspend is explicit exception
+PASS readiness loss requires restart
+PASS restart entire plan and exact recovery match
+PASS restart overflow leaves old state consistent
+PASS completed replay policy
+PASS transient boundary has no persistence API
+RESULT PASS 27/27
+PASS A player absence precedes dimension, NPC, relay, environment and path
+PASS B wrong dimension precedes NPC and relay observations
+PASS C NPC chunk, entity storage, canonical identity and relay reload remain distinct
+PASS D environment precedes path and ARRIVED is the only ready classification
+PASS RELOAD player precedence is reevaluated before NPC and relay readiness
+PASS READ_ONLY every path classification denies fact mutation
+PASS ReturnNetworkLoadTests assertions=53 scope=pure-diagnostic no-world-side-effects no-runtime-wiring

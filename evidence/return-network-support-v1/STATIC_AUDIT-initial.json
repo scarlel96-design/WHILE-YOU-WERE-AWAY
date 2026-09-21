@@ -1,0 +1,16 @@
+{
+  "baseline": "b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8",
+  "status": "FAIL",
+  "protectedExistingFiles": 2116,
+  "sourceSha256": {
+    "src/main/java/io/github/whileaway/ReturnNetworkSupportGameTests.java": "f2f2134c39192a614ae73bc31568625d8e6b1ef452ebd55ba58cdfcfa80ec762",
+    "src/main/java/io/github/whileaway/support/ReturnNetworkLoadAssessment.java": "02791c94e35e1c5a391105d9d38bbaadc30d0acb84e641f4f937302bf3bbe29b",
+    "src/main/java/io/github/whileaway/support/ReturnNetworkSignal.java": "7f0888432d70a7f185c24460eb64cd34980f4c91216887dd389f67d087a9fa4c",
+    "src/test/java/io/github/whileaway/support/ReturnNetworkLoadTests.java": "df665331b39a5c54245a7cac832666e4108297feb0a4b5f7f6e6f5355df4a14c",
+    "src/test/java/io/github/whileaway/support/ReturnNetworkSignalTests.java": "dcbf73dcc38eb18205bcfbd9c148f8699d3a477db67832d9276d557cec421dd2"
+  },
+  "errors": [
+    "helper_not_pure src/test/java/io/github/whileaway/support/ReturnNetworkSignalTests.java"
+  ],
+  "limits": "Allowlist + normalized baseline hashes + lexical checks; no proof of real chunk unload, human observation or event closure."
+}

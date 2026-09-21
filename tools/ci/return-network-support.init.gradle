@@ -1,0 +1,8 @@
+// New evidence only; no edits to production build configuration or historical evidence.
+gradle.projectsEvaluated {
+    // Configure the NeoForge run model: its generated JVM argument file takes
+    // precedence over a systemProperty set directly on the launch task.
+    rootProject.neoForge.runs.named('gameTestServer').configure {
+        systemProperty 'whileaway.testEvidence', rootProject.file('evidence/return-network-support-v1/gametest/' + java.util.UUID.randomUUID()).absolutePath
+    }
+}

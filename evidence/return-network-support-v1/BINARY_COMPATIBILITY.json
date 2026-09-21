@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "unchangedExistingClasses": 120,
+  "unchangedAssetEntries": 102,
+  "addedEntries": [
+    "io/github/whileaway/ReturnNetworkSupportGameTests.class",
+    "io/github/whileaway/support/",
+    "io/github/whileaway/support/ReturnNetworkLoadAssessment$Desired.class",
+    "io/github/whileaway/support/ReturnNetworkLoadAssessment$Path.class",
+    "io/github/whileaway/support/ReturnNetworkLoadAssessment$Result.class",
+    "io/github/whileaway/support/ReturnNetworkLoadAssessment$Snapshot.class",
+    "io/github/whileaway/support/ReturnNetworkLoadAssessment.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$CarrierContract.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$CompletedReplayPolicy.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$EmittedPulse.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$MatchResult.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$ObservedPulse.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$ObserverContract.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$Pulse.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$PulseClass.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$SessionState.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$SignalUse.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$Timeline.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$Timing.class",
+    "io/github/whileaway/support/ReturnNetworkSignal$TransientSession.class",
+    "io/github/whileaway/support/ReturnNetworkSignal.class"
+  ],
+  "runtimeWiringChanged": false,
+  "newRealClient": "NOT RUN"
+}

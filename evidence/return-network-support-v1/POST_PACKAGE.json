@@ -1,0 +1,38 @@
+{
+  "artifact": [
+    {
+      "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\dist\\return-network-support-v1\\whileaway-gpt-support-return-network-closure-v1.zip",
+      "bytes": 2418214,
+      "sha256": "24b676bef766abddf7a9186284749ddf7613f739fc809be0a80bc59122335318"
+    },
+    {
+      "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-support-v1\\DIFF.patch",
+      "bytes": 69876,
+      "sha256": "db6a07535d85a1ffa58b06debff7c8ee9f76b90483c3a8292d236cbf3ce8b94b"
+    },
+    {
+      "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-support-v1\\VERIFICATION.txt",
+      "bytes": 4991,
+      "sha256": "b80242d585c18d580dcbbbc6956019f5044a63a7c328bf9b85044d9a53d4d630"
+    },
+    {
+      "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-integration\\evidence\\return-network-support-v1\\ROLLBACK.sh",
+      "bytes": 820,
+      "sha256": "b96e4aba295ed05c98769020513a36c7905a1213a5a12c3cb021f5ed71b2887c"
+    }
+  ],
+  "archiveSourceManifest": "PASS: every packaged addition matches current file and stored digest",
+  "archiveCrc": "PASS",
+  "rollbackExecutableZipMode": "0755",
+  "rollbackCommand": "\"C:\\Program Files\\Git\\bin\\bash.exe\" evidence/return-network-support-v1/ROLLBACK.sh build/return-network-support-rollback/test.zip",
+  "rollbackInputSha256": "24b676bef766abddf7a9186284749ddf7613f739fc809be0a80bc59122335318",
+  "rollbackOutput": "ROLLBACK PASS: disposable support ZIP restored to MAIN source bundle; production source, JAR and worlds untouched",
+  "rollbackExit": 0,
+  "restoredSourceSha256": "c15db2d1ff80613c29885a409ad4091a6b639eb9a21611f94c9fc1fffdbeddda",
+  "modifiedBundleRetained": true,
+  "runtimeWorldsTouched": false,
+  "newRealClient": "NOT RUN",
+  "originalSixStagedDeletions": "preserved",
+  "eventStatus": "PARTIAL",
+  "uploadStatus": "awaiting commit/push; see UPLOAD.json"
+}

@@ -1,0 +1,19 @@
+COMMAND: & 'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\javac.exe' --release 21 -d 'build\support-signal' src\main\java\io\github\whileaway\support\ReturnNetworkSignal.java src\test\java\io\github\whileaway\support\ReturnNetworkSignalTests.java
+JAVAC_EXIT: 0
+COMMAND: & 'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe' -cp 'build\support-signal' io.github.whileaway.support.ReturnNetworkSignalTests
+PASS semantic order and immutability
+PASS timing validation and gaps
+PASS deterministic planning
+PASS overflow rejection
+PASS exact match and observer separation
+PASS wrong order rejected
+PASS partial sequence rejected
+PASS duplicate identity rejected
+PASS wrong timing and gap rejected
+PASS poll and dispatch deduplicate
+PASS new session replays whole sequence
+PASS suspend prevents catch-up burst
+PASS completed replay policy
+PASS transient boundary has no persistence API
+RESULT PASS 14/14
+JAVA_EXIT: 0

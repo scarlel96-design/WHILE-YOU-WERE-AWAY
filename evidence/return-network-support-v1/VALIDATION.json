@@ -1,0 +1,47 @@
+{
+  "baseline": {
+    "command": "python tools/ci/probe-return-network-support.py baseline",
+    "exit": 0,
+    "output": "{\n  \"exit\": 0,\n  \"baselineCommit\": \"b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8\",\n  \"output\": \"BASELINE PASS: preserved MAIN JAR/source hashes and ZIP CRC; no support runtime integration\",\n  \"input\": \"baseline/main.jar + baseline/main-source.zip\",\n  \"command\": \"python tools/ci/probe-return-network-support.py baseline\",\n  \"remoteBranch\": \"work/return-network-integration\",\n  \"remoteTip\": \"b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8\"\n}\n"
+  },
+  "pure": {
+    "command": "javac --release 21 -d build/support-main <two support helpers and two test classes>; java -cp build/support-main io.github.whileaway.support.ReturnNetworkSignalTests; java -cp build/support-main io.github.whileaway.support.ReturnNetworkLoadTests",
+    "exit": 0,
+    "signalCases": 27,
+    "loadAssertions": 53,
+    "log": "pure-main.log"
+  },
+  "gradle": {
+    "command": ".\\gradlew.bat --offline -I tools/ci/return-network-support.init.gradle runGameTestServer build --rerun-tasks",
+    "exits": [
+      0,
+      0
+    ],
+    "uniqueGameTests": 102,
+    "originalGameTests": 95,
+    "newGameTests": 7,
+    "coreAssertionsPerRun": 176857,
+    "logs": [
+      "gradle-1.log",
+      "gradle-2.log"
+    ],
+    "finalEvidence": "gametest/35307dd7-9978-4416-a950-70f539daa5ef"
+  },
+  "binary": {
+    "command": "python tools/ci/probe-return-network-support.py modified",
+    "exit": 0,
+    "output": "MODIFIED PASS: 120 existing classes and 102 asset entries byte-identical; support-only additions"
+  },
+  "rollbackPreflight": {
+    "command": "\"C:\\Program Files\\Git\\bin\\bash.exe\" evidence/return-network-support-v1/ROLLBACK.sh build/return-network-support-rollback/test.zip",
+    "exit": 0,
+    "restrictedAttemptExit": -1073741502,
+    "inputSha256": "fa6b78fbb658a1785ce175d1438f349c3907a9f42e201c208b7287d0dfac7a23",
+    "restoredSha256": "c15db2d1ff80613c29885a409ad4091a6b639eb9a21611f94c9fc1fffdbeddda",
+    "output": "ROLLBACK PASS: disposable support ZIP restored to MAIN source bundle; production source, JAR and worlds untouched"
+  },
+  "newRealClient": "NOT RUN",
+  "ci": "NOT RUN",
+  "currentEvent": "PARTIAL",
+  "schemasChanged": false
+}

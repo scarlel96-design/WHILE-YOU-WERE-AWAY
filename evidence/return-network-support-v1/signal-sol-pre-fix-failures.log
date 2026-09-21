@@ -1,0 +1,9 @@
+COMMAND: & 'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\javac.exe' --release 21 -d 'build\support-signal' src\main\java\io\github\whileaway\support\ReturnNetworkSignal.java src\test\java\io\github\whileaway\support\ReturnNetworkSignalTests.java
+JAVAC_EXIT: 0
+COMMAND: & 'C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot\bin\java.exe' -cp 'build\support-signal' io.github.whileaway.support.ReturnNetworkSignalTests
+FAIL PRE-FIX regression probe: java.lang.AssertionError: final-pulse interruption resume throws IllegalArgumentException: completesAtTick must equal the final pulse end | missed first deadline silently strands the sequence without restart state | Timeline accepts origin different from first pulse start | mid-pulse interruption can still produce exact full match
+java.lang.AssertionError: final-pulse interruption resume throws IllegalArgumentException: completesAtTick must equal the final pulse end | missed first deadline silently strands the sequence without restart state | Timeline accepts origin different from first pulse start | mid-pulse interruption can still produce exact full match
+	at io.github.whileaway.support.ReturnNetworkSignalTests.preFixRegressionProbe(ReturnNetworkSignalTests.java:93)
+	at io.github.whileaway.support.ReturnNetworkSignalTests.run(ReturnNetworkSignalTests.java:290)
+	at io.github.whileaway.support.ReturnNetworkSignalTests.main(ReturnNetworkSignalTests.java:31)
+JAVA_EXIT: 1

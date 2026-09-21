@@ -1,0 +1,14 @@
+{
+  "baseline": "b5d26787e4532cffd6379a6ea1e4cc8b6898ebe8",
+  "status": "STATIC_PASS",
+  "protectedExistingFiles": 2116,
+  "sourceSha256": {
+    "src/main/java/io/github/whileaway/ReturnNetworkSupportGameTests.java": "f475575f9866847598d39c3127683dfd0656f4fac23bf9fd439174bd2763df03",
+    "src/main/java/io/github/whileaway/support/ReturnNetworkLoadAssessment.java": "397401f965339da3bb9342da2442072c266061273ca890181fa056ce940d36e6",
+    "src/main/java/io/github/whileaway/support/ReturnNetworkSignal.java": "7e00efc61170f2888fc8fb2f99bb3a290ab41bc46b808509a39f66c4306838a1",
+    "src/test/java/io/github/whileaway/support/ReturnNetworkLoadTests.java": "df665331b39a5c54245a7cac832666e4108297feb0a4b5f7f6e6f5355df4a14c",
+    "src/test/java/io/github/whileaway/support/ReturnNetworkSignalTests.java": "553cdd743536604dfdca5efd1d5827852325dedb4153adde9c3e637d45969c37"
+  },
+  "errors": [],
+  "limits": "Allowlist + normalized baseline hashes + lexical checks; no proof of real chunk unload, human observation or event closure."
+}
