@@ -121,6 +121,7 @@ public final class ReturnNetworkSmoke {
                     if((held+=10)<100)return;
                     note("PASS "+MODE+" cp=3 unchanged while original completed; generation="+generation+" uuid="+entity+" instance="+instance);finish(server);return;
                 }
+                if(ReturnNetworkSignalSmoke.step(city,s))return;
                 if(ReturnNetworkClosureProbe.step(server,p,city,s,r))return;
                 if(exception(server,p,city,s,r))return;
                 var actual=StoryActors.find(server,r.entityId);if(!(actual instanceof StoryNpc npc))return;
@@ -137,7 +138,12 @@ public final class ReturnNetworkSmoke {
                 if(!ReturnNetworkEvents.activatedEquipment(city)) {
                     p.setShiftKeyDown(true);p.gameMode.useItemOn(p,city,p.getMainHandItem(),InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(ReturnNetworkEvents.RELAY),Direction.EAST,ReturnNetworkEvents.RELAY,false));p.setShiftKeyDown(false);return;
                 }
-                check(ActorCandidates.inspect(server,r).outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"canonical count not one");
+                var candidate=ActorCandidates.inspect(server,r);
+                // A hard cut can leave the saved snapshot chunk unready even when the bound NPC is loaded.
+                // Uniqueness of the loaded canonical NPC is independent of that missing-actor readiness gate.
+                check(candidate.matches()==1&&(candidate.outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE
+                    ||candidate.outcome()==ActorCandidates.Outcome.UNLOADED_OR_UNCONFIRMED),
+                    "canonical count not one: "+candidate+" savedPosition="+r.position+" actualPosition="+npc.position());
                 check(ReturnNetworkEvents.integrity(server).isEmpty(),"world integrity");
                 check(r.facts.contains(ReturnNetworkIntegrity.SHARED)&&r.facts.contains(ReturnNetworkIntegrity.AFTERMATH),"NPC aftermath lost");
                 stable+=10;if(stable<160)return;

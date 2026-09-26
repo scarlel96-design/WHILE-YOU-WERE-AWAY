@@ -1,0 +1,12 @@
+BOUNDARY RN_SIGNAL_PREPARED_RESPONSE tick=960 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=0
+BOUNDARY RN_SIGNAL_ON_RESPONSE_0 tick=970 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=1
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_1 tick=982 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=1
+BOUNDARY RN_SIGNAL_ON_RESPONSE_1 tick=998 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=2
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_2 tick=1010 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=2
+BOUNDARY RN_SIGNAL_ON_RESPONSE_2 tick=1026 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=3
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_3 tick=1062 cp=4 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=3
+PASS emitted_without_observation cp=4 heldTicks=40 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a
+BOUNDARY RN_E_RESPONSE tick=1101 cp=5 session=82847cd1-1d1b-4bba-b53c-a28c6317ed7a emitted=3
+BOUNDARY RN_F_SHARED tick=1111 cp=5 session=none emitted=0
+BOUNDARY RN_G_BEFORE_COMPLETE tick=1120 cp=5 session=none emitted=0
+BOUNDARY RN_G_COMPLETED tick=1120 cp=6 session=none emitted=0

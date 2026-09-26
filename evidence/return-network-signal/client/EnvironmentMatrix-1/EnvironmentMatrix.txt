@@ -1,0 +1,21 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=47440
+INPUT cp=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fcb44094e2d0d5ac47cb678ab9ba5530d87b7e4aa13b8e2b87c63d48cdfe7dea, detail=LOAD_OK]
+PASS closed NPC route realPath=UNREACHABLE attempts=3 cp=1 unchanged=true noObstacleDeletion=true
+PROGRESS cp=1 npc=(38.795188543091896, 65.0, 71.74562541584511) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=4 followRange=24.0
+PROGRESS cp=1 npc=(41.448256873924244, 65.0, 58.30017563853602) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=4 followRange=24.0
+PASS path restored NPC walked naturally to relay same identity
+PASS environment variant=0 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PASS environment variant=1 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PASS environment variant=2 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PASS environment variant=3 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PASS environment variant=4 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PASS environment variant=5 cp=2 durableUnchanged=true playerBlocksPreserved=true
+COLLISION actual NPC displacementSquared=0.5747901108298732
+PASS environment variant=6 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PASS environment variant=7 cp=2 durableUnchanged=true playerBlocksPreserved=true
+PROGRESS cp=2 npc=(44.08124606031286, 65.0, 48.07456580601505) player=(45.5, 65.0, 47.5) wait=NONE path=ARRIVED attempts=5 followRange=24.0
+PASS structural LIT loss cp=4 unchanged; restore original activated relay; production never flickered it
+PROGRESS cp=4 npc=(44.08124606031286, 65.0, 48.07456580601505) player=(45.5, 65.0, 47.5) wait=NONE path=ARRIVED attempts=5 followRange=24.0
+PASS EnvironmentMatrix cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[AFTERMATH, NEXT_PREREQUISITE, PARTICIPANT_JOINED, INTERVENTION, COMPLETE, SHARED_EXPERIENCE, RESPONSE, OLD_PATTERN_EVIDENCE, PATTERN_MATCH_EVIDENCE, SIGNAL_DISCOVERED]
+DISK sha256=12ba35ac4496651f289b51a01f8523718a7741dbca7650ce15f10083ac5f22a4

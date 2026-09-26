@@ -1,0 +1,25 @@
+BOUNDARY RN_A_DISCOVERED tick=563 cp=1 session=none emitted=0
+BOUNDARY RN_B_NPC_JOINED tick=932 cp=2 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_OLD_PATTERN tick=932 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=0
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_0 tick=942 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=1
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_1 tick=954 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=1
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_1 tick=970 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=2
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_2 tick=982 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=2
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_2 tick=998 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=3
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_3 tick=1034 cp=2 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=3
+PASS emitted_without_observation cp=2 heldTicks=40 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e
+BOUNDARY RN_C_PATTERN tick=1072 cp=3 session=7e6c92b7-c75c-4ba2-8bcc-79bddcf0b10e emitted=3
+BOUNDARY RN_D_INTERVENTION tick=1082 cp=4 session=none emitted=0
+BOUNDARY RN_PRESENTING tick=1092 cp=4 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_RESPONSE tick=1269 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=0
+BOUNDARY RN_SIGNAL_ON_RESPONSE_0 tick=1279 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=1
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_1 tick=1291 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=1
+BOUNDARY RN_SIGNAL_ON_RESPONSE_1 tick=1307 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=2
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_2 tick=1319 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=2
+BOUNDARY RN_SIGNAL_ON_RESPONSE_2 tick=1335 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=3
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_3 tick=1371 cp=4 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=3
+PASS emitted_without_observation cp=4 heldTicks=40 session=2363f3d2-dbca-4713-8e25-80de48f788a4
+BOUNDARY RN_E_RESPONSE tick=1402 cp=5 session=2363f3d2-dbca-4713-8e25-80de48f788a4 emitted=3
+BOUNDARY RN_F_SHARED tick=1412 cp=5 session=none emitted=0
+BOUNDARY RN_G_BEFORE_COMPLETE tick=1419 cp=5 session=none emitted=0
+BOUNDARY RN_G_COMPLETED tick=1419 cp=6 session=none emitted=0

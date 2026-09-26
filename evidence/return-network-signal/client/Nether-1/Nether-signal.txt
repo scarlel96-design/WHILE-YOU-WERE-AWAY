@@ -1,0 +1,17 @@
+BOUNDARY RN_A_DISCOVERED tick=563 cp=1 session=none emitted=0
+BOUNDARY RN_B_NPC_JOINED tick=930 cp=2 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_OLD_PATTERN tick=931 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=0
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_0 tick=941 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=1
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_1 tick=953 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=1
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_1 tick=969 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=2
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_2 tick=981 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=2
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_2 tick=997 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=3
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_3 tick=1033 cp=2 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=3
+PASS emitted_without_observation cp=2 heldTicks=40 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0
+BOUNDARY RN_C_PATTERN tick=1071 cp=3 session=0409b9b7-1618-4eb9-9bb1-81cdfb6e18d0 emitted=3
+BOUNDARY RN_D_INTERVENTION tick=1081 cp=4 session=none emitted=0
+BOUNDARY RN_PRESENTING tick=1090 cp=4 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_RESPONSE tick=1216 cp=4 session=88ae62c7-ef74-43cf-9b2c-3a1893617366 emitted=0
+BOUNDARY RN_SIGNAL_ON_RESPONSE_0 tick=1226 cp=4 session=88ae62c7-ef74-43cf-9b2c-3a1893617366 emitted=1
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_1 tick=1238 cp=4 session=88ae62c7-ef74-43cf-9b2c-3a1893617366 emitted=1
+BOUNDARY RN_SIGNAL_ON_RESPONSE_1 tick=1254 cp=4 session=88ae62c7-ef74-43cf-9b2c-3a1893617366 emitted=2

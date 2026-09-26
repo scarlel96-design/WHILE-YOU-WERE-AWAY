@@ -1,0 +1,22 @@
+BOUNDARY RN_A_DISCOVERED tick=543 cp=1 session=none emitted=0
+BOUNDARY RN_B_NPC_JOINED tick=931 cp=2 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_OLD_PATTERN tick=939 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=0
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_0 tick=949 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=1
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_1 tick=961 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=1
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_1 tick=977 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=2
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_2 tick=989 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=2
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_2 tick=1005 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=3
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_3 tick=1041 cp=2 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=3
+PASS emitted_without_observation cp=2 heldTicks=40 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8
+BOUNDARY RN_C_PATTERN tick=1079 cp=3 session=2d7ecd33-4125-4650-8c13-6ced6c62faf8 emitted=3
+BOUNDARY RN_D_INTERVENTION tick=1089 cp=4 session=none emitted=0
+BOUNDARY RN_PRESENTING tick=1091 cp=4 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_RESPONSE tick=1101 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=0
+BOUNDARY RN_SIGNAL_ON_RESPONSE_0 tick=1111 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=1
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_1 tick=1123 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=1
+BOUNDARY RN_SIGNAL_ON_RESPONSE_1 tick=1139 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=2
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_2 tick=1151 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=2
+BOUNDARY RN_SIGNAL_ON_RESPONSE_2 tick=1167 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=3
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_3 tick=1203 cp=4 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=3
+PASS emitted_without_observation cp=4 heldTicks=40 session=4028b9cf-4006-4441-9a65-f20d5d65e35e
+BOUNDARY RN_E_RESPONSE tick=1239 cp=5 session=4028b9cf-4006-4441-9a65-f20d5d65e35e emitted=3

@@ -1,0 +1,183 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :downloadAssets UP-TO-DATE
+> Task :writeGameTestServerLegacyClasspath UP-TO-DATE
+> Task :prepareGameTestServerRun
+> Task :runGameTestServer
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[12:42:32] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeserverdev, --gameDir, ., --fml.fmlVersion, 4.0.44, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.249, --fml.neoFormVersion, 20240808.144430]
+[12:42:32] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.5+11-LTS
+[12:42:32] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.5 by Eclipse Adoptium; OS Windows 11 arch amd64 version 10.0
+[12:42:35] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgeserverdev
+[12:42:35] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/gradle-home/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar%2394!/ Service=ModLauncher Env=SERVER
+[12:42:48] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[12:42:48] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		GeckoLib 4 4.9.2 (geckolib)
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.249 (neoforge)
+		While You Were Away / 네가 없는 동안 0.3.1-dev.1 (whileaway)
+[12:43:02] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[12:43:02] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeserverdev' with arguments [--gameDir, .]
+[12:43:03] [main/WARN] [mixin/]: Reference map 'geckolib.refmap.json' for geckolib.mixins.json could not be read. If this is a development environment you can ignore this message
+[12:43:15] [main/WARN] [os.ut.pl.wi.WmiQueryHandler/]: COM exception querying Win32_Processor, which might not be on your system. Will not attempt to query it again. Error was -2147217405: (HRESULT: 80041003)
+[12:43:15] [main/WARN] [os.ut.pl.wi.WmiQueryHandler/]: COM exception querying Win32_Processor, which might not be on your system. Will not attempt to query it again. Error was -2147217405: (HRESULT: 80041003)
+[12:43:16] [main/WARN] [os.ut.pl.wi.WmiQueryHandler/]: COM exception querying Win32_PhysicalMemory, which might not be on your system. Will not attempt to query it again. Error was -2147217405: (HRESULT: 80041003)
+[12:43:40] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.3).
+[12:45:54] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[12:45:55] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[12:45:55] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[12:45:55] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[12:45:55] [main/WARN] [minecraft/Commands]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[12:45:57] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.249, for MC 1.21.1
+[12:46:06] [main/ERROR] [minecraft/Settings]: Failed to load properties from file: server.properties
+java.nio.file.NoSuchFileException: server.properties
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:85) ~[?:?] {}
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103) ~[?:?] {}
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108) ~[?:?] {}
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.newByteChannel(WindowsFileSystemProvider.java:234) ~[?:?] {}
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:379) ~[?:?] {}
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:431) ~[?:?] {}
+	at java.base/java.nio.file.spi.FileSystemProvider.newInputStream(FileSystemProvider.java:420) ~[?:?] {}
+	at java.base/java.nio.file.Files.newInputStream(Files.java:159) ~[?:?] {}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.dedicated.Settings.loadFromFile(Settings.java:38) ~[neoforge-21.1.249.jar%23125!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.dedicated.DedicatedServerProperties.fromFile(DedicatedServerProperties.java:132) ~[neoforge-21.1.249.jar%23125!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.dedicated.DedicatedServerSettings.<init>(DedicatedServerSettings.java:12) ~[neoforge-21.1.249.jar%23125!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.Main.main(Main.java:125) ~[neoforge-21.1.249.jar%23125!/:?] {re:classloading}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.44/net.neoforged.fml.loading.targets.CommonLaunchHandler.runTarget(CommonLaunchHandler.java:136) ~[loader-4.0.44.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.44/net.neoforged.fml.loading.targets.CommonLaunchHandler.serverService(CommonLaunchHandler.java:128) ~[loader-4.0.44.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.44/net.neoforged.fml.loading.targets.NeoForgeServerDevLaunchHandler.runService(NeoForgeServerDevLaunchHandler.java:23) ~[loader-4.0.44.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.44/net.neoforged.fml.loading.targets.CommonLaunchHandler.lambda$launchService$4(CommonLaunchHandler.java:118) ~[loader-4.0.44.jar%23102!/:4.0] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch(LaunchServiceHandlerDecorator.java:30) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:53) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:71) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.Launcher.run(Launcher.java:103) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.Launcher.main(Launcher.java:74) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:26) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@11.0.5/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:23) [modlauncher-11.0.5.jar%2382!/:?] {}
+	at cpw.mods.bootstraplauncher@2.0.2/cpw.mods.bootstraplauncher.BootstrapLauncher.run(BootstrapLauncher.java:210) [bootstraplauncher-2.0.2.jar:?] {}
+	at cpw.mods.bootstraplauncher@2.0.2/cpw.mods.bootstraplauncher.BootstrapLauncher.main(BootstrapLauncher.java:69) [bootstraplauncher-2.0.2.jar:?] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+[12:46:07] [main/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[12:46:08] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/moddev/artifacts/neoforge-21.1.249.jar%23125!/assets/.mcassetsroot' uses unexpected schema
+[12:46:08] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/moddev/artifacts/neoforge-21.1.249.jar%23125!/data/.mcassetsroot' uses unexpected schema
+[12:46:08] [main/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: [whileaway]
+[12:46:44] [main/INFO] [minecraft/RecipeManager]: Loaded 1291 recipes
+[12:46:50] [main/INFO] [minecraft/AdvancementTree]: Loaded 1400 advancements
+[12:47:08] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[12:47:09] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 2%
+[12:47:09] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 2%
+[12:47:09] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 2%
+[12:47:10] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 4%
+[12:47:10] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 18%
+[12:47:11] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 51%
+[12:47:11] [worldgen/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 51%
+[12:47:12] [Server thread/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 3448 ms
+[12:47:12] [Server thread/INFO] [minecraft/GameTestServer]: Started game test server
+[12:47:12] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[12:47:12] [Server thread/INFO] [minecraft/GameTestServer]: 108 tests are now running at position 5943708, -59, 13531498!
+[12:47:23] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'defaultBatch:0' (50 tests)...
+[12:47:23] [Server thread/WARN] [minecraft/MinecraftServer]: Can't keep up! Is the server overloaded? Running 11356ms or 227 ticks behind
+[12:47:24] [Server thread/INFO] [minecraft/GameTestServer]: [                                                                                                            ]
+[12:47:24] [Server thread/ERROR] [io.gi.wh.StoryStorage/]: STORY_LOAD outcome=CORRUPT recovery=MANUAL_DIAGNOSTIC saveFormat=5 actorSchema=1 actors=1 writeBlocked=true phase=load original_quarantined reason=RN_PARTICIPANT_IDENTITY_MISMATCH
+[12:47:25] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++                                                               ]
+[12:47:31] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'defaultBatch:1' (50 tests)...
+[12:47:31] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++                                                          ]
+[12:47:42] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[12:47:42] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[12:47:42] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[12:47:42] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[12:47:42] [Server thread/INFO] [io.gi.wh.StoryActors/]: EVENT_RECOVERY eventId=candidate_event previousState=PREPARED restoredCheckpoint=1 reason=missing_loaded_actor entitiesRemoved=0 entitiesRecreated=1 generation=0
+[12:47:43] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ++                 ]
+[12:47:48] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[12:47:48] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[12:47:48] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[12:47:48] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[12:47:48] [Server thread/INFO] [io.gi.wh.StoryActors/]: EVENT_RECOVERY eventId=test:meeting previousState=ACTIVE restoredCheckpoint=2 reason=missing_loaded_actor entitiesRemoved=0 entitiesRecreated=1 generation=1
+[12:47:48] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'defaultBatch:2' (7 tests)...
+[12:47:48] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:48] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:48] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:48] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/WARN] [minecraft/MinecraftServer]: Can't keep up! Is the server overloaded? Running 10525ms or 210 ticks behind
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:49] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:50] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        ]
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  +   ]
+[12:47:54] [Server thread/INFO] [minecraft/GameTestRunner]: Running test batch 'return_network_support_fixed_world:0' (1 tests)...
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ]
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ]
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: [++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++]
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: ========= 108 GAME TESTS COMPLETE IN 42.31 s ======================
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: All 108 required tests passed :)
+[12:47:54] [Server thread/INFO] [minecraft/GameTestServer]: ====================================================
+[12:47:54] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[12:47:54] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[12:47:54] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[12:47:56] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:overworld
+[12:48:04] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_nether
+[12:48:04] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[Test Level]'/minecraft:the_end
+[12:48:04] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[12:48:04] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[12:48:04] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[12:48:04] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[12:48:05] [Server thread/INFO] [minecraft/GameTestServer]: Game test server shutting down
+
+> Task :jarJar NO-SOURCE
+> Task :jar
+> Task :assemble
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :coreTest
+PASS core assertions=176857
+
+> Task :test
+> Task :check
+> Task :build
+
+BUILD SUCCESSFUL in 10m 53s
+11 actionable tasks: 5 executed, 6 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.2.1/userguide/configuration_cache_enabling.html

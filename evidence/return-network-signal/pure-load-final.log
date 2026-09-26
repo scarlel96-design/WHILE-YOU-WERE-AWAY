@@ -1,0 +1,7 @@
+PASS A player absence precedes dimension, NPC, relay, environment and path
+PASS B wrong dimension precedes NPC and relay observations
+PASS C NPC chunk, entity storage, canonical identity and relay reload remain distinct
+PASS D environment precedes path and ARRIVED is the only ready classification
+PASS RELOAD player precedence is reevaluated before NPC and relay readiness
+PASS READ_ONLY every path classification denies fact mutation
+PASS ReturnNetworkLoadTests assertions=53 scope=pure-diagnostic no-world-side-effects no-runtime-wiring

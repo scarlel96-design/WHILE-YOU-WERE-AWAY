@@ -1,0 +1,660 @@
+diff --git a/.gitattributes b/.gitattributes
+index 780e5e5..72baab8 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -1,3 +1,5 @@
+ /evidence/return-network-integration/** -text
+ /dist/return-network-integration/** -text
+ /evidence/return-network-integration/ROLLBACK.sh text eol=lf
++/dist/return-network-signal/ROLLBACK.sh text eol=lf
++/dist/return-network-signal/DIFF.patch -text
+diff --git a/docs/return-network-signal/HANDOFF.md b/docs/return-network-signal/HANDOFF.md
+new file mode 100644
+index 0000000..0cc9c9c
+--- /dev/null
++++ b/docs/return-network-signal/HANDOFF.md
+@@ -0,0 +1,25 @@
++# Return Network First Response — final-integration handoff
++
++## Current
++
++《네가 없는 동안》 0.3.1-dev.1, `work/return-network-integration`. First compound event **PARTIAL**; campaign **PARTIAL**; 0.3.2 not promoted. Save format 5, optional Actor schema 1, Return Network schema 1, city art revision 2. Caveman held. No next subsystem started.
++
++## Baseline and changes
++
++Input commit `2bbef42cad5d35a569ab1744f39e31770d56b7f0`; baseline JAR SHA-256 `9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e`, source ZIP `9b77d81bea39c4cea7673fa604e6f8d0af9e6852943ff3772e2d9567fdef1f17`. Both remain in `evidence/return-network-signal/baseline/`.
++
++`ReturnNetworkEvents` connects a transient SHORT–SHORT–LONG presentation to the existing story event. A 10-tick lead is followed by 12-tick SHORT, 16-tick gap, 12-tick SHORT, 16-tick gap, and 36-tick LONG. The relay's persistent LIT state is not flickered. Vanilla electric-spark particles and quiet bell notes are separate presentation carriers. A complete session plus an explicit interaction by the same player is required before the existing cp3/cp5 observation commits. Emission alone does not fabricate observation. A missed tick, unavailable component, or interrupted session restarts the complete pattern with a fresh runtime session. No pulse progress is saved.
++
++`ReturnNetworkPlayback` holds the runtime playback contract. `ReturnNetworkPlaybackGameTests` adds six GameTests. `ReturnNetworkSignalSmoke` and the Gradle/PowerShell matrix tools provide opt-in actual-client evidence. `ReturnNetworkSmoke` was adjusted only in its smoke assertion: exact single canonical actor identity remains required even if the diagnostic search reports unloaded/unconfirmed during entity readiness. The protected save, actor, transaction, integrity, and navigation classes remain byte-unchanged from the input commit. Existing durable checkpoint meanings 0–6, candidate/integrity/write/readback/hash/publish ordering, and save schemas remain unchanged. Existing old cp3/5/6 saves remain valid without replay.
++
++## Evidence and limits
++
++Final-source `runGameTestServer build`: 108 GameTests PASS, 176,857 core assertions PASS, exit 0. Standalone signal tests: 27/27 PASS, exit 0. Standalone load diagnostics: 53 assertions PASS, exit 0. Final evidence audit: 27 accepted actual-client runs from 31 attempts; four failed command rows remain recorded. The clients used silent audio and right secondary DISPLAY1. Actual runs cover normal cp0–6, signal cuts/restarts, completion replay, NPC/relay availability, environment/path/light loss and recovery, Nether, real chunk unload, death with KeepInventory OFF, and Return-Light regression. See `evidence/return-network-signal/GATES.json`, `commands.jsonl`, `tests-2.log`, and individual client evidence.
++
++The four retained failures were: CutBefore-1 wrapper exit 1 after an intentional hard process cut (boundary and disk state separately confirmed); Reopen-4 stopped before completion at cp4 and Reopen-5 completed the same world; Reopen-10 smoke canonical-count diagnostic failed at cp6, while the story file retained one actor and Reopen-11/13 passed fresh-process reads of that world; Nether-1 stopped at cp4 and Nether-2 passed on a separate copy. The precise transient readiness cause of Reopen-10 remains unproven. No production actor-identity policy was altered to mask it.
++
++No unaided human scene-readability playtest or audible listening was performed. Visual frames and tick logs demonstrate distinct pulse intervals and spatial anchoring, but they do not prove a player recognizes SHORT–SHORT–LONG without explanatory text. This is the seal blocker. First compound event therefore remains **PARTIAL**, and the next subsystem remains **NOT STARTED**.
++
++## Next start point
++
++Run an unaided scene-readability check on the exact packaged JAR, with both visual accessibility and audible rhythm assessed if the silent-client policy is lifted. Reproduce or explain the Reopen-10 entity-readiness diagnostic, then perform the final full-event regression and decide SEALED only if no critical blocker remains. Do not begin Item/Reward/Structure systems or 0.3.2 promotion as part of this closure.
+diff --git a/docs/return-network-signal/IMPLEMENTATION.md b/docs/return-network-signal/IMPLEMENTATION.md
+new file mode 100644
+index 0000000..b5ceed1
+--- /dev/null
++++ b/docs/return-network-signal/IMPLEMENTATION.md
+@@ -0,0 +1,21 @@
++# Signal runtime integration — design/audit
++Baseline `2bbef42cad5d35a569ab1744f39e31770d56b7f0`. Local/remote matched and worktree was clean at resume. Preserved closure-preflight JAR `9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e` / source `9b77d81bea39c4cea7673fa604e6f8d0af9e6852943ff3772e2d9567fdef1f17` in `evidence/return-network-signal/baseline`.
++
++## Semantic contract
++Checkpoint numbers/facts/transaction/schema remain unchanged. Runtime integration changes WHEN observation can be committed: cp3 requires complete old-pattern playback plus explicit equipment interaction; cp5 requires complete response playback plus explicit equipment interaction. Emission alone no longer implies player observation. This is an intentional player-interaction gate, not a new durable fact. Old saved cp3/5/6 remain accepted; no retroactive replay requirement.
++
++ReturnNetworkPlayback delegates canonical pulse order to existing Support ReturnNetworkSignal. Runtime:10tick lead-in,12tick SHORT,16gap,12SHORT,16gap,36LONG. At nominal20TPS:0.5s lead,0.6s/0.8s/0.6s/0.8s/1.8s. Tuning is not narrative canon; low TPS stretches wall time. Every server Post tick drives playback, independently of10tick NPC navigation. Missed/duplicate tick, readiness loss or carrier rejection cancels the entire transient session. Next start uses a new UUID and complete pattern. Nothing is serialized.
++
++Carrier: vanilla ELECTRIC_SPARK above original relay, every active tick;24 particles with bounded spread. Minecraft1.21.1 GlowParticle.ElectricSparkProvider verified locally: lifetime2-3ticks, well below16tick gap. Quiet note-block bell at volume0.12/pitch1.5 every4active ticks. No persistent LIT toggle, block writes, camera movement, force load, teleport, new entity/reward/monster or audio framework. The existing explicit intervention setBlock remains unchanged.
++
++Participant: exact canonical NPC, same dimension, arrived at STAND; original session observer alive/non-spectator/within6blocks; environmentReady. Confirmation additionally uses existing5block interaction reach and same observer UUID. Signal packets are technical delivery attempts, NOT claims about human perception. The new neutral completion prompt invites inspection without spelling out pattern order. Existing evidence text remains after confirmed observation.
++
++Completed event stays quiet; no automatic ambient replay implemented. cp5+ receipts are never generated by the playback driver. Existing commitReturnNetwork handles all durable commits and readback/hash publication unchanged. Current save5/Actor1/ReturnNetwork1 remain. No Scenario/Audio/Fear framework, transaction subsystem, art work, release promotion or Caveman.
++
++## Test contract
++Six new GameTests cover exact durations/gaps/edges, skipped tick, readiness interruption at multiple boundaries, new-session restart, carrier failure, quiet completed session. Existing102 tests retained. Standalone Support signal27 and load53 rerun separately. Opt-in ReturnNetworkSignalSmoke emits diagnostics, intentional hard exits, screenshot evidence and a40tick no-confirmation hold atcp2 andcp4. The fixture camera aims at the relay only to record screenshots; this is NOT production camera behavior or unaided exploration evidence.
++
++Hard exits on Windows may return native -1073740791 even after the intentional boundary Runtime.halt(0). Cut tasks alone accept0 or that observed abrupt-exit code, and only with exact PASS boundary, matching durable NBT, no-flush marker, PID termination and successful fresh-process recovery. Normal clients must exit0. First CutBefore runner failure is retained, not rewritten as a normal zero exit.
++
++## Failure surfaces still distinct
++Actual renderer frames show light present/absent and spatial anchoring. Server boundary logs prove12/12/36tick emissions and16tick gaps. These do not, by themselves, prove unaided player comprehension or audible quality. All clients remain muted on right secondary DISPLAY1. Final seal requires a separate scene-readability decision, not merely an increased PASS count.
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+index d824be5..1df749a 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+@@ -1,6 +1,8 @@
+ package io.github.whileaway;
+ 
+ import java.util.*;
++import io.github.whileaway.support.ReturnNetworkPlayback;
++import net.minecraft.core.particles.ParticleTypes;
+ import io.github.whileaway.content.RelayBlock;
+ import io.github.whileaway.entity.StoryNpc;
+ import net.minecraft.core.BlockPos;
+@@ -20,7 +22,7 @@ public final class ReturnNetworkEvents {
+     public static final BlockPos RELAY=new BlockPos(42,68,46), STAND=new BlockPos(44,65,47);
+     public static final String LOCATION="quiet_city:tram_relay";
+     private static final Map<ServerLevel,Runtime> RUNTIME=new WeakHashMap<>();
+-    private static final class Runtime { int responseTicks; ReturnNetworkState.Wait wait=ReturnNetworkState.Wait.NONE; }
++    private static final class Runtime { ReturnNetworkPlayback playback; UUID observer; boolean prompted; ReturnNetworkState.Wait wait=ReturnNetworkState.Wait.NONE; }
+     private static Runtime runtime(ServerLevel l){return RUNTIME.computeIfAbsent(l,k->new Runtime());}
+     private static void say(ServerPlayer p,String key){p.displayClientMessage(Component.translatable("story.whileaway.network."+key),false);}
+     public static boolean originalEquipment(ServerLevel l){return l.getBlockState(RELAY).is(Blocks.OXIDIZED_CUT_COPPER);}
+@@ -52,9 +54,11 @@ public final class ReturnNetworkEvents {
+         }
+     }
+     @SubscribeEvent public void tick(ServerTickEvent.Post e) {
+-        var server=e.getServer();if(server.getTickCount()%20!=0||!StoryStorage.available(server))return;
++        var server=e.getServer();if(!StoryStorage.available(server))return;
+         var l=server.getLevel(CityDistrict.KEY);if(l==null||!campaignLocation(l))return;
+         var d=NarrativeData.get(server);var s=d.returnNetwork();
++        signalTick(l,s);
++        if(server.getTickCount()%20!=0)return;
+         if(s.stage!=ReturnNetworkState.Stage.NOT_STARTED||!ReturnNetworkIntegrity.prerequisite(d.actors.get(NpcEvents.STORY)))return;
+         if(!environmentReady(l,s))return;
+         var p=l.players().stream().filter(v->v.isAlive()&&!v.isSpectator()&&v.blockPosition().distSqr(RELAY)<=36).findFirst().orElse(null);
+@@ -76,22 +80,18 @@ public final class ReturnNetworkEvents {
+             return false;
+         }
+         var rt=runtime(l);var p=NpcEvents.witness(l,RELAY);
+-        if(p==null){rt.wait=ReturnNetworkState.Wait.PLAYER_ABSENT;rt.responseTicks=0;npc.storyNavigation().externalPause(npc);return true;}
+-        if(!environmentReady(l,s)){rt.wait=ReturnNetworkState.Wait.WAITING_ENVIRONMENT;rt.responseTicks=0;npc.storyNavigation().externalPause(npc);return true;}
++        if(p==null){rt.wait=ReturnNetworkState.Wait.PLAYER_ABSENT;rt.playback=null;npc.storyNavigation().externalPause(npc);return true;}
++        if(!environmentReady(l,s)){rt.wait=ReturnNetworkState.Wait.WAITING_ENVIRONMENT;rt.playback=null;npc.storyNavigation().externalPause(npc);return true;}
+         var path=npc.storyNavigation().step(npc,STAND);
+-        if(path!=NpcEnvironment.Path.ARRIVED){rt.wait=path==NpcEnvironment.Path.AVAILABLE?ReturnNetworkState.Wait.WAITING_NPC:ReturnNetworkState.Wait.WAITING_ENVIRONMENT;rt.responseTicks=0;return true;}
++        if(path!=NpcEnvironment.Path.ARRIVED){rt.wait=path==NpcEnvironment.Path.AVAILABLE?ReturnNetworkState.Wait.WAITING_NPC:ReturnNetworkState.Wait.WAITING_ENVIRONMENT;rt.playback=null;return true;}
+         rt.wait=ReturnNetworkState.Wait.NONE;
+         npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);
+         if(s.stage==ReturnNetworkState.Stage.DISCOVERED) {
+             if(commit(p,s.join(new ReturnNetworkState.Participant(r.storyId,r.instanceId,r.entityId,r.generation)),"RN_B_NPC_JOINED"))say(p,"joined");
+         }else if(s.stage==ReturnNetworkState.Stage.INTERVENTION_COMMITTED) {
+-            if(s.presentation==ReturnNetworkState.Presentation.NONE){commit(p,s.beginPresentation(),"RN_PRESENTING");rt.responseTicks=0;return true;}
+-            rt.responseTicks+=10;
+-            if(rt.responseTicks>=40&&commit(p,s.observeResponse(),"RN_E_RESPONSE")) {
+-                // Facts precede ephemeral sound. Reopening exposes the retained relay/evidence instead of replaying the sound.
+-                l.playSound(null,RELAY,SoundEvents.NOTE_BLOCK_BELL.value(),SoundSource.BLOCKS,.3f,.65f);
+-                say(p,"response");rt.responseTicks=0;
+-            }
++            if(s.presentation==ReturnNetworkState.Presentation.NONE){commit(p,s.beginPresentation(),"RN_PRESENTING");rt.playback=null;return true;}
++            // A full response presentation remains transient; only an explicit equipment interaction confirms observation.
++            if(rt.playback==null)startSignal(l,p,ReturnNetworkPlayback.Purpose.RESPONSE);
+         }else if(s.stage==ReturnNetworkState.Stage.RESPONSE_OBSERVED&&s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)) {
+             RecoveryBoundaryEvent.emit(p,ReturnNetworkState.ID,"RN_G_BEFORE_COMPLETE",5);
+             if(commit(p,s.complete(),"RN_G_COMPLETED"))say(p,"complete");
+@@ -125,7 +125,16 @@ public final class ReturnNetworkEvents {
+         var r=d.actors.get(NpcEvents.STORY);var e=r==null?null:l.getEntity(r.entityId);
+         if(!(e instanceof StoryNpc npc)||!StoryActors.canonical(npc,r)||npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)>1.4){say(p,"waiting_npc");return true;}
+         if(s.stage==ReturnNetworkState.Stage.NPC_JOINED&&environmentReady(l,s)) {
+-            if(commit(p,s.observePattern(),"RN_C_PATTERN"))say(p,"pattern");return true;
++            var rt=runtime(l);
++            if(confirmedSignal(l,p,ReturnNetworkPlayback.Purpose.OLD_PATTERN)) {
++                if(commit(p,s.observePattern(),"RN_C_PATTERN")){rt.playback=null;say(p,"pattern");}
++            }else if(rt.playback==null)startSignal(l,p,ReturnNetworkPlayback.Purpose.OLD_PATTERN);
++            return true;
++        }
++        if(s.stage==ReturnNetworkState.Stage.INTERVENTION_COMMITTED && s.presentation==ReturnNetworkState.Presentation.PRESENTING
++            && confirmedSignal(l,p,ReturnNetworkPlayback.Purpose.RESPONSE)) {
++            if(commit(p,s.observeResponse(),"RN_E_RESPONSE")){runtime(l).playback=null;say(p,"response");}
++            return true;
+         }
+         if(s.stage==ReturnNetworkState.Stage.SIGNAL_OBSERVED) {
+             if(!environmentReady(l,s)){say(p,"waiting_environment");return true;}
+@@ -141,6 +150,44 @@ public final class ReturnNetworkEvents {
+         if(s.stage.ordinal()>=5)say(p,"evidence");
+         return true;
+     }
++    /** Runtime diagnostic only: no snapshot/save API, no persistent signal tick. */
++    public static ReturnNetworkPlayback signal(ServerLevel l){return runtime(l).playback;}
++    private static void startSignal(ServerLevel l,ServerPlayer p,ReturnNetworkPlayback.Purpose purpose) {
++        var rt=runtime(l);rt.prompted=false;rt.observer=p.getUUID();rt.playback=new ReturnNetworkPlayback(purpose,l.getGameTime());
++        say(p,"listening");
++        RecoveryBoundaryEvent.emit(p,ReturnNetworkState.ID,"RN_SIGNAL_PREPARED_"+purpose, NarrativeData.get(l.getServer()).returnNetwork().stage.ordinal());
++    }
++    private static boolean signalReady(ServerLevel l,ReturnNetworkState s,ServerPlayer p) {
++        if(p==null||p.serverLevel()!=l||!p.isAlive()||p.isSpectator()||p.distanceToSqr(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5)>36
++            ||!environmentReady(l,s))return false;
++        var r=NarrativeData.get(l.getServer()).actors.get(NpcEvents.STORY);
++        var e=r==null?null:l.getEntity(r.entityId);
++        return e instanceof StoryNpc npc&&StoryActors.canonical(npc,r)&&npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)<=1.4;
++    }
++    private static boolean confirmedSignal(ServerLevel l,ServerPlayer p,ReturnNetworkPlayback.Purpose purpose) {
++        var rt=runtime(l);
++        return rt.playback!=null&&rt.playback.purpose()==purpose&&rt.playback.complete()&&p.getUUID().equals(rt.observer)
++            &&signalReady(l,NarrativeData.get(l.getServer()).returnNetwork(),p);
++    }
++    private static void signalTick(ServerLevel l,ReturnNetworkState s) {
++        var rt=runtime(l);var play=rt.playback;if(play==null)return;
++        var p=l.getServer().getPlayerList().getPlayer(rt.observer);
++        boolean stage=play.purpose()==ReturnNetworkPlayback.Purpose.OLD_PATTERN?s.stage==ReturnNetworkState.Stage.NPC_JOINED
++            :s.stage==ReturnNetworkState.Stage.INTERVENTION_COMMITTED&&s.presentation==ReturnNetworkState.Presentation.PRESENTING;
++        var frame=play.tick(l.getGameTime(),stage&&signalReady(l,s,p));
++        if(play.interrupted()){rt.playback=null;return;}
++        if(frame.pulse()>=0) {
++            // Spark lifetime in Minecraft1.21.1 is 2-3 ticks, below the 16-tick gap. No block state changes.
++            boolean sent=l.sendParticles(p,ParticleTypes.ELECTRIC_SPARK,true,RELAY.getX()+.5,RELAY.getY()+1.15,RELAY.getZ()+.5,24,.28,.12,.28,0);
++            if(!sent){play.carrierFailed();rt.playback=null;return;}
++            // Quiet repeated carrier notes sustain a pulse for its full short/long duration.
++            if((l.getGameTime()-play.origin())%4==0)l.playSound(null,RELAY,SoundEvents.NOTE_BLOCK_BELL.value(),SoundSource.BLOCKS,.12f,1.5f);
++        }
++        if(frame.onset())RecoveryBoundaryEvent.emit(p,ReturnNetworkState.ID,"RN_SIGNAL_ON_"+play.purpose()+"_"+frame.pulse(),s.stage.ordinal());
++        if(frame.offset())RecoveryBoundaryEvent.emit(p,ReturnNetworkState.ID,"RN_SIGNAL_OFF_"+play.purpose()+"_"+play.emitted(),s.stage.ordinal());
++        if(frame.complete()&&!rt.prompted){rt.prompted=true;say(p,"signal_ready");}
++        // No fact commit here. Emission/technical delivery != player observation. Confirmation is an interaction.
++    }
+     @SubscribeEvent public void blockUse(PlayerInteractEvent.RightClickBlock e) {
+         if(e.getHand()!=InteractionHand.MAIN_HAND||!e.getPos().equals(RELAY)||!e.getLevel().dimension().equals(CityDistrict.KEY))return;
+         if(e.getEntity() instanceof ServerPlayer p&&interactEquipment(p,e.getPos())){e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);}
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkPlaybackGameTests.java b/src/main/java/io/github/whileaway/ReturnNetworkPlaybackGameTests.java
+new file mode 100644
+index 0000000..365739e
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnNetworkPlaybackGameTests.java
+@@ -0,0 +1,33 @@
++package io.github.whileaway;
++import io.github.whileaway.support.ReturnNetworkPlayback;
++import net.minecraft.gametest.framework.*;
++import net.neoforged.neoforge.gametest.*;
++@GameTestHolder(WhileAway.ID) @PrefixGameTestTemplate(false)
++public final class ReturnNetworkPlaybackGameTests {
++ @GameTest(template="empty") public static void playbackExactDurationsAndGaps(GameTestHelper h){
++  var p=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.RESPONSE,0);int[] seen=new int[3];int on=0,off=0;
++  for(int t=1;t<=103;t++){var f=p.tick(t,true);if(f.pulse()>=0)seen[f.pulse()]++;if(f.onset())on++;if(f.offset())off++;}
++  h.assertTrue(java.util.Arrays.equals(seen,new int[]{12,12,36})&&on==3&&off==3&&p.complete(),"exact visible durations, three on/off edges");h.succeed();
++ }
++ @GameTest(template="empty") public static void playbackSkippedTickRestartsWithoutBurst(GameTestHelper h){
++  var p=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.RESPONSE,0);p.tick(1,true);var f=p.tick(40,true);
++  h.assertTrue(p.interrupted()&&p.emitted()==0&&!f.onset()&&!p.complete(),"no catch-up on missed tick");h.succeed();
++ }
++ @GameTest(template="empty") public static void playbackReadinessLossAtEveryBoundary(GameTestHelper h){
++  for(int cut:new int[]{1,10,22,38,50,66,80,102}){var p=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.RESPONSE,0);for(int t=1;t<cut;t++)p.tick(t,true);p.tick(cut,false);p.tick(cut+1,true);h.assertTrue(p.interrupted()&&!p.complete(),"availability loss cannot resume partial sequence");}h.succeed();
++ }
++ @GameTest(template="empty") public static void playbackFreshSessionAfterInterruption(GameTestHelper h){
++  var old=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.RESPONSE,0);for(int t=1;t<50;t++)old.tick(t,true);old.tick(50,false);
++  var fresh=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.RESPONSE,50);for(int t=51;t<=152;t++)fresh.tick(t,true);
++  h.assertTrue(!old.id().equals(fresh.id())&&old.interrupted()&&fresh.complete()&&fresh.emitted()==3,"no cross-session progress");h.succeed();
++ }
++ @GameTest(template="empty") public static void playbackCarrierFailureNeverConfirms(GameTestHelper h){
++  var p=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.OLD_PATTERN,0);for(int t=1;t<=102;t++)p.tick(t,true);p.carrierFailed();
++  h.assertTrue(!p.complete()&&p.interrupted(),"failed carrier revokes transient confirmation only");h.succeed();
++ }
++ @GameTest(template="empty") public static void playbackCompletedNoAutomaticReplay(GameTestHelper h){
++  var p=new ReturnNetworkPlayback(ReturnNetworkPlayback.Purpose.RESPONSE,0);for(int t=1;t<=102;t++)p.tick(t,true);
++  for(int t=103;t<=302;t++){var f=p.tick(t,true);h.assertTrue(!f.onset()&&f.pulse()==-1&&p.complete(),"completed frame remains quiet");}
++  h.assertTrue(p.emitted()==3,"no duplicate emit");h.succeed();
++ }
++}
+diff --git a/src/main/java/io/github/whileaway/client/ReturnNetworkSignalSmoke.java b/src/main/java/io/github/whileaway/client/ReturnNetworkSignalSmoke.java
+new file mode 100644
+index 0000000..8de3f66
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/client/ReturnNetworkSignalSmoke.java
+@@ -0,0 +1,57 @@
++package io.github.whileaway.client;
++import io.github.whileaway.*;
++import java.nio.file.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.Screenshot;
++import net.minecraft.nbt.*;
++import net.minecraft.server.level.*;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in observer/fault injector. Never installed as campaign state. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class ReturnNetworkSignalSmoke {
++ private static final boolean ENABLED=Boolean.getBoolean("whileaway.signalSmoke");
++ private static final String MODE=System.getProperty("whileaway.networkSmoke","");
++ private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/return-network-signal/client"));
++ private static volatile long captureUntil;private static int frames,clientTicks,hold;private static boolean oldHeld,responseHeld;
++ private static void note(String s){try{Files.createDirectories(E);Files.writeString(E.resolve(MODE+"-signal.txt"),s+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception x){throw new IllegalStateException(x);}}
++ @SubscribeEvent public static void boundary(RecoveryBoundaryEvent e){
++  if(!ENABLED||!e.eventId.equals(ReturnNetworkState.ID))return;
++  var l=e.player.serverLevel();var play=ReturnNetworkEvents.signal(l);
++  note("BOUNDARY "+e.boundary+" tick="+l.getGameTime()+" cp="+e.checkpoint+" session="+(play==null?"none":play.id())+" emitted="+(play==null?0:play.emitted()));
++  if(e.boundary.startsWith("RN_SIGNAL_PREPARED")&&MODE.equals("Normal")) {
++   // Fixture camera only; production never changes camera.
++   e.player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,net.minecraft.world.phys.Vec3.atCenterOf(ReturnNetworkEvents.RELAY).add(0,1,0));
++   captureUntil=System.nanoTime()+8_000_000_000L;
++  }
++  String target=switch(MODE){case "CutBefore"->"RN_SIGNAL_PREPARED_RESPONSE";case "CutGap1"->"RN_SIGNAL_OFF_RESPONSE_1";case "CutGap2"->"RN_SIGNAL_OFF_RESPONSE_2";case "CutLong"->"RN_SIGNAL_ON_RESPONSE_2";case "CutEnd"->"RN_SIGNAL_OFF_RESPONSE_3";default->"";};
++  if(!target.equals(e.boundary))return;
++  try {
++   var server=l.getServer();var d=NarrativeData.get(server);var r=d.actors.get(NpcEvents.STORY);
++   var file=server.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat");var disk=NbtIo.readCompressed(file,NbtAccounter.unlimitedHeap()).getCompound("data");
++   if(!disk.getCompound("returnNetwork").equals(d.returnNetwork().save())||e.checkpoint!=4)throw new IllegalStateException("signal cut disk/state mismatch");
++   Files.copy(file,E.resolve(MODE+".dat"));
++   String pass="PASS "+MODE+" boundary="+target+" cp=4 uuid="+r.entityId+" instance="+r.instanceId+" generation="+r.generation+" worldFlushBeforeCut=false";
++   Files.writeString(E.resolve(MODE+".txt"),pass+"\n",StandardOpenOption.APPEND);note(pass);Runtime.getRuntime().halt(0);
++  }catch(Exception x){note("FAIL "+x);Runtime.getRuntime().halt(8);}
++ }
++ public static boolean step(ServerLevel l,ReturnNetworkState s){
++  if(!ENABLED)return false;var p=ReturnNetworkEvents.signal(l);
++  boolean eligible=s.stage.ordinal()==2&&!oldHeld||s.stage.ordinal()==4&&!responseHeld;
++  if(eligible&&p!=null&&p.complete()){
++   hold+=10;if(hold<40)return true;
++   note("PASS emitted_without_observation cp="+s.stage.ordinal()+" heldTicks="+hold+" session="+p.id());hold=0;
++   if(s.stage.ordinal()==2)oldHeld=true;else responseHeld=true;
++  }
++  return false;
++ }
++ @SubscribeEvent public static void capture(ClientTickEvent.Post e){
++  if(!ENABLED||!MODE.equals("Normal")||System.nanoTime()>captureUntil||++clientTicks%5!=0)return;
++  var mc=Minecraft.getInstance();if(mc.level==null)return;
++  try {Files.createDirectories(E);Screenshot.grab(E.toFile(),String.format("signal-%03d.png",frames++),mc.getMainRenderTarget(),m->{});}catch(Exception x){note("CAPTURE_FAIL "+x);}
++ }
++}
+diff --git a/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java b/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
+index 3598f9a..89808f5 100644
+--- a/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
++++ b/src/main/java/io/github/whileaway/client/ReturnNetworkSmoke.java
+@@ -121,6 +121,7 @@ public final class ReturnNetworkSmoke {
+                     if((held+=10)<100)return;
+                     note("PASS "+MODE+" cp=3 unchanged while original completed; generation="+generation+" uuid="+entity+" instance="+instance);finish(server);return;
+                 }
++                if(ReturnNetworkSignalSmoke.step(city,s))return;
+                 if(ReturnNetworkClosureProbe.step(server,p,city,s,r))return;
+                 if(exception(server,p,city,s,r))return;
+                 var actual=StoryActors.find(server,r.entityId);if(!(actual instanceof StoryNpc npc))return;
+@@ -137,7 +138,12 @@ public final class ReturnNetworkSmoke {
+                 if(!ReturnNetworkEvents.activatedEquipment(city)) {
+                     p.setShiftKeyDown(true);p.gameMode.useItemOn(p,city,p.getMainHandItem(),InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(ReturnNetworkEvents.RELAY),Direction.EAST,ReturnNetworkEvents.RELAY,false));p.setShiftKeyDown(false);return;
+                 }
+-                check(ActorCandidates.inspect(server,r).outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE,"canonical count not one");
++                var candidate=ActorCandidates.inspect(server,r);
++                // A hard cut can leave the saved snapshot chunk unready even when the bound NPC is loaded.
++                // Uniqueness of the loaded canonical NPC is independent of that missing-actor readiness gate.
++                check(candidate.matches()==1&&(candidate.outcome()==ActorCandidates.Outcome.EXACT_SINGLE_CANDIDATE
++                    ||candidate.outcome()==ActorCandidates.Outcome.UNLOADED_OR_UNCONFIRMED),
++                    "canonical count not one: "+candidate+" savedPosition="+r.position+" actualPosition="+npc.position());
+                 check(ReturnNetworkEvents.integrity(server).isEmpty(),"world integrity");
+                 check(r.facts.contains(ReturnNetworkIntegrity.SHARED)&&r.facts.contains(ReturnNetworkIntegrity.AFTERMATH),"NPC aftermath lost");
+                 stable+=10;if(stable<160)return;
+diff --git a/src/main/java/io/github/whileaway/support/ReturnNetworkPlayback.java b/src/main/java/io/github/whileaway/support/ReturnNetworkPlayback.java
+new file mode 100644
+index 0000000..de021d9
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/support/ReturnNetworkPlayback.java
+@@ -0,0 +1,38 @@
++package io.github.whileaway.support;
++
++import java.util.UUID;
++
++/** Transient every-tick driver. Packet delivery is NOT proof of human perception. */
++public final class ReturnNetworkPlayback {
++    public enum Purpose { OLD_PATTERN, RESPONSE }
++    public static final ReturnNetworkSignal.Timing TIMING=new ReturnNetworkSignal.Timing(12,36,16,16);
++    public record Frame(int pulse,boolean onset,boolean offset,boolean complete) {}
++    private final ReturnNetworkSignal.TransientSession session;
++    private final Purpose purpose;
++    private long lastTick=-1;
++    private int active=-1;
++    private boolean interrupted;
++    public ReturnNetworkPlayback(Purpose purpose,long now) {
++        this.purpose=purpose;
++        session=ReturnNetworkSignal.TransientSession.start(UUID.randomUUID().toString(),ReturnNetworkSignal.SignalUse.CORE,
++            Math.addExact(now,10),TIMING,ReturnNetworkSignal.CompletedReplayPolicy.NO_REPLAY);
++    }
++    public Frame tick(long now,boolean ready) {
++        if(interrupted)return new Frame(-1,false,false,false);
++        if(!ready||(lastTick>=0&&now!=lastTick+1)){interrupted=true;return new Frame(-1,false,active>=0,false);}
++        lastTick=now;
++        var emitted=session.poll(now);
++        if(session.state()==ReturnNetworkSignal.SessionState.RESTART_REQUIRED){interrupted=true;return new Frame(-1,false,active>=0,false);}
++        int current=-1;
++        for(var p:session.timeline().pulses())if(now>=p.startTick()&&now<p.endTickExclusive())current=p.identityIndex();
++        boolean end=active>=0&&current!=active;active=current;
++        return new Frame(current,!emitted.isEmpty(),end,session.completed());
++    }
++    public void carrierFailed(){interrupted=true;}
++    public boolean interrupted(){return interrupted;}
++    public boolean complete(){return !interrupted&&session.completed();}
++    public Purpose purpose(){return purpose;}
++    public String id(){return session.sessionIdentity();}
++    public long origin(){return session.timeline().originTick();}
++    public int emitted(){return session.emissions().size();}
++}
+diff --git a/src/main/resources/assets/whileaway/lang/en_us.json b/src/main/resources/assets/whileaway/lang/en_us.json
+index 0b7b54c..aed6ac1 100644
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -73,5 +73,7 @@
+   "story.whileaway.network.aftermath": "Yeoul: I check that light sometimes. It is still on.",
+   "story.whileaway.network.evidence": "Retained evidence — The old repeating signal / A response matching the current return light.",
+   "story.whileaway.network.waiting_npc": "Check that Yeoul can reach the equipment.",
+-  "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection."
++  "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection.",
++  "story.whileaway.network.listening": "A faint light and tone repeat above the relay.",
++  "story.whileaway.network.signal_ready": "The signal has stopped. You can examine the equipment again."
+ }
+diff --git a/src/main/resources/assets/whileaway/lang/ko_kr.json b/src/main/resources/assets/whileaway/lang/ko_kr.json
+index e8841bc..cad37ad 100644
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -73,5 +73,7 @@
+   "story.whileaway.network.aftermath": "여울: 가끔 저쪽 불도 확인해. 아직 켜져 있더라.",
+   "story.whileaway.network.evidence": "남은 기록 — 옛 신호의 반복 / 현재 귀환등과 일치한 응답.",
+   "story.whileaway.network.waiting_npc": "여울이 설비에 닿을 수 있는 길을 확인하자.",
+-  "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다."
++  "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다.",
++  "story.whileaway.network.listening": "중계함 위에서 희미한 빛과 소리가 반복된다.",
++  "story.whileaway.network.signal_ready": "신호가 멎었다. 설비를 다시 살펴볼 수 있다."
+ }
+diff --git a/tools/ci/return-network-signal.init.gradle b/tools/ci/return-network-signal.init.gradle
+new file mode 100644
+index 0000000..04536e7
+--- /dev/null
++++ b/tools/ci/return-network-signal.init.gradle
+@@ -0,0 +1,41 @@
++// Isolated MAIN signal profile. Existing run tasks/evidence remain untouched.
++gradle.afterProject { p, state ->
++    if (p != rootProject || !p.plugins.hasPlugin('net.neoforged.moddev')) return
++    ['Normal','Reopen','CutBefore','CutGap1','CutGap2','CutLong','CutEnd','CutE','CutF','CutG','Availability','EnvironmentMatrix','Nether','Chunk','Death4Off','ReturnLight'].each { mode ->
++        def label=mode=='ReturnLight'?'ResumeB':mode
++        def evidenceDir='evidence/return-network-signal/client/'+(p.findProperty('signalRun') ?: mode)+(mode=='ReturnLight'?'/ReturnLight':'')
++        p.neoForge.runs.create('signal' + mode) {
++            client()
++            systemProperty 'whileaway.signalSmoke','true'
++            gameDirectory = p.file('../../work/return-network-signal-client')
++            if(mode=='ReturnLight')systemProperty 'whileaway.npcSmoke',label
++            else systemProperty 'whileaway.networkSmoke',mode
++            systemProperty 'whileaway.networkWorld', p.findProperty('signalWorld') ?: 'signal-' + mode
++            systemProperty 'whileaway.evidence', p.file(evidenceDir).absolutePath
++        }
++        p.tasks.named('runSignal' + mode).configure {
++            if(mode.startsWith('Cut')) ignoreExitValue=true
++            doFirst {
++                def monitor = new groovy.json.JsonSlurper().parse(p.file('evidence/return-network-signal/monitor.json'))
++                jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED', "-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++                ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
++                def dir=p.file('../../work/return-network-signal-client');dir.mkdirs()
++                def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
++                lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:2','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
++                new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
++                p.file(evidenceDir).mkdirs()
++                def marker=p.file("${evidenceDir}/${label}.txt")
++                if(marker.exists())throw new GradleException('Preserve previous client marker before retry: '+mode)
++                marker.setText('RUNNING\n','UTF-8')
++            }
++            doLast {
++                def marker=p.file("${evidenceDir}/${label}.txt").text
++                if(!marker.contains("PASS ${label} ")||marker.contains('FAIL '))throw new GradleException('Signal client gate incomplete: '+mode)
++                logger.lifecycle("SIGNAL_CHILD_EXIT=${executionResult.get().exitValue}")
++            }
++        }
++    }
++    p.neoForge.runs.named('gameTestServer').configure {
++        systemProperty 'whileaway.testEvidence',p.file('evidence/return-network-signal/gametest/'+java.util.UUID.randomUUID()).absolutePath
++    }
++}
+diff --git a/tools/package-return-network-signal.py b/tools/package-return-network-signal.py
+new file mode 100644
+index 0000000..09ced49
+--- /dev/null
++++ b/tools/package-return-network-signal.py
+@@ -0,0 +1,56 @@
++"""Package the current Return Network source and verified JAR without touching baselines."""
++
++from __future__ import annotations
++
++import hashlib
++import shutil
++import zipfile
++from pathlib import Path
++
++
++ROOT = Path(__file__).resolve().parents[1]
++OUT = ROOT / "dist" / "return-network-signal"
++JAR_INPUT = ROOT / "build" / "libs" / "whileaway-0.3.1-dev.1.jar"
++JAR_OUTPUT = OUT / "whileaway-0.3.1-return-network-signal.jar"
++SOURCE_OUTPUT = OUT / "whileaway-0.3.1-return-network-signal-source.zip"
++ROOT_FILES = (
++    ".gitattributes", ".gitignore", "AGENTS.md", "README.md", "build.gradle",
++    "gradle.properties", "gradlew", "gradlew.bat", "settings.gradle",
++)
++SOURCE_DIRS = ("src", "docs", "tools", "gradle", ".github")
++EXCLUDED_PARTS = {"__pycache__", ".gradle", "build", "dist", "evidence", "logs", ".git"}
++
++
++def digest(path: Path) -> str:
++    h = hashlib.sha256()
++    with path.open("rb") as stream:
++        for block in iter(lambda: stream.read(1024 * 1024), b""):
++            h.update(block)
++    return h.hexdigest()
++
++
++def main() -> None:
++    if not JAR_INPUT.is_file():
++        raise SystemExit(f"missing verified build: {JAR_INPUT}")
++    OUT.mkdir(parents=True, exist_ok=True)
++    shutil.copy2(JAR_INPUT, JAR_OUTPUT)
++    files = [ROOT / name for name in ROOT_FILES if (ROOT / name).is_file()]
++    for directory in SOURCE_DIRS:
++        files.extend(
++            path for path in (ROOT / directory).rglob("*")
++            if path.is_file()
++            and not any(part in EXCLUDED_PARTS for part in path.relative_to(ROOT).parts)
++            and path.suffix != ".pyc"
++        )
++    with zipfile.ZipFile(SOURCE_OUTPUT, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
++        for path in sorted(files, key=lambda p: p.relative_to(ROOT).as_posix()):
++            archive.write(path, path.relative_to(ROOT).as_posix())
++    for path in (JAR_OUTPUT, SOURCE_OUTPUT):
++        print(f"PACKAGED {path} size={path.stat().st_size} sha256={digest(path)}")
++    with zipfile.ZipFile(SOURCE_OUTPUT) as archive:
++        assert archive.testzip() is None
++        print(f"SOURCE_ZIP_ENTRIES={len(archive.namelist())} TESTZIP=PASS")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/run-return-network-signal-matrix.ps1 b/tools/run-return-network-signal-matrix.ps1
+new file mode 100644
+index 0000000..047a38b
+--- /dev/null
++++ b/tools/run-return-network-signal-matrix.ps1
+@@ -0,0 +1,29 @@
++param([switch]$Cuts,[switch]$Exceptions,[switch]$ResumeAfterFirstCut,[switch]$ResumeAfterGap2)
++$ErrorActionPreference='Stop'
++Set-Location (Split-Path -Parent $PSScriptRoot)
++$seed=(Resolve-Path '../return-network-client/saves/network-seed-preserved').Path
++$saves=(Resolve-Path '../return-network-signal-client/saves').Path
++function Fresh([string]$name,[string]$inputPath=$seed){$p=Join-Path $saves $name;if(Test-Path -LiteralPath $p){throw "Preserve existing world $name"};Copy-Item -LiteralPath $inputPath -Destination $p -Recurse}
++if($Cuts){
++ $i=2
++ $modes=@('CutBefore','CutGap1','CutGap2','CutLong','CutEnd','CutE','CutF','CutG')
++ if($ResumeAfterFirstCut){& ./tools/run-return-network-signal.ps1 -Mode Reopen -World signal-CutBefore -Attempt 2;if($LASTEXITCODE -ne 0){throw 'First recovery failed'};$i=3;$modes=$modes[1..7]}
++ if($ResumeAfterGap2){$i=6;$modes=$modes[3..7]}
++ foreach($m in $modes) {
++  $world="signal-$m";Fresh $world
++  & ./tools/run-return-network-signal.ps1 -Mode $m -World $world -Attempt 1
++  if($LASTEXITCODE -ne 0){throw "Cut failed $m"}
++  & ./tools/run-return-network-signal.ps1 -Mode Reopen -World $world -Attempt $i
++  if($LASTEXITCODE -ne 0){throw "Recovery failed $m"};$i++
++ }
++}
++if($Exceptions){
++ foreach($m in @('Availability','EnvironmentMatrix','Nether','Chunk','Death4Off')) {
++  $world="signal-$m";Fresh $world
++  & ./tools/run-return-network-signal.ps1 -Mode $m -World $world -Attempt 1
++  if($LASTEXITCODE -ne 0){throw "Exception failed $m"}
++ }
++ Fresh 'npc-CutB' (Resolve-Path '../return-network-closure-client/saves/network').Path
++ & ./tools/run-return-network-signal.ps1 -Mode ReturnLight -World npc-CutB -Attempt 1
++ if($LASTEXITCODE -ne 0){throw 'Return-Light regression failed'}
++}
+diff --git a/tools/run-return-network-signal.ps1 b/tools/run-return-network-signal.ps1
+new file mode 100644
+index 0000000..5353a8b
+--- /dev/null
++++ b/tools/run-return-network-signal.ps1
+@@ -0,0 +1,33 @@
++param([Parameter(Mandatory=$true)][string]$Mode,[string]$World,[int]$Attempt=1)
++$ErrorActionPreference='Stop'
++$root=Split-Path -Parent $PSScriptRoot
++Set-Location $root
++$env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot'
++$env:GRADLE_USER_HOME=(Resolve-Path '..\gradle-home').Path
++$e=Join-Path $root 'evidence/return-network-signal'
++$label=if($Mode -eq 'ReturnLight'){'ResumeB'}else{$Mode}
++$run="$Mode-$Attempt"; $dir=if($Mode -eq 'ReturnLight'){Join-Path $e "client/$run/ReturnLight"}else{Join-Path $e "client/$run"}
++$log=Join-Path $e "client-$Mode-$Attempt.log"
++if(Test-Path -LiteralPath $log){throw 'Preserve existing log; choose a new attempt'}
++$sources=@(Get-ChildItem -LiteralPath (Join-Path $root 'src') -Recurse -File | Sort-Object FullName | ForEach-Object { @{path=$_.FullName.Substring($root.Length+1);hash=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash} })
++$sources | ConvertTo-Json | Set-Content -Encoding utf8NoBOM (Join-Path $e "sources-$Mode-$Attempt.json")
++$argsList=@('--offline','-I','tools/ci/return-network-signal.init.gradle',"runSignal$Mode","-PsignalRun=$run")
++if($World){$argsList+="-PsignalWorld=$World"}
++$start=Get-Date
++& .\gradlew.bat @argsList *> $log
++$code=$LASTEXITCODE
++$pidFile=Join-Path $dir "$label.pid"
++$clientPid=if(Test-Path -LiteralPath $pidFile){[int](Get-Content -LiteralPath $pidFile)}else{0}
++$exited=$clientPid -gt 0 -and !(Get-Process -Id $clientPid -ErrorAction SilentlyContinue)
++$marker=Join-Path $dir "$label.txt"
++$pass=(Test-Path -LiteralPath $marker) -and (Select-String -LiteralPath $marker -SimpleMatch "PASS $label " -Quiet) -and !(Select-String -LiteralPath $marker -SimpleMatch 'FAIL ' -Quiet)
++$text=if(Test-Path -LiteralPath $marker){Get-Content -Raw -LiteralPath $marker}else{''}
++$child=(Select-String -LiteralPath $log -Pattern 'SIGNAL_CHILD_EXIT=(-?\d+)' | Select-Object -Last 1)
++$childExit=if($child){[long]$child.Matches[0].Groups[1].Value}else{$null}
++$expectedExit=($childExit -eq 0) -or ($Mode.StartsWith('Cut') -and $childExit -eq -1073740791 -and $text.Contains('boundary=') -and $text.Contains('worldFlushBeforeCut=false'))
++$sourceUnchanged=$true
++foreach($s in $sources){if((Get-FileHash -LiteralPath (Join-Path $root $s.path)).Hash -ne $s.hash){$sourceUnchanged=$false}}
++$row=@{mode=$Mode;attempt=$Attempt;world=$World;command="gradlew.bat $($argsList -join ' ')";exit=$code;childExit=$childExit;expectedExit=$expectedExit;pid=$clientPid;processExited=$exited;pass=$pass;muted=$text.Contains('all sound categories=0');rightMonitor=$text.Contains('PASS monitor DISPLAY1');sourceUnchanged=$sourceUnchanged;elapsedSeconds=[int]((Get-Date)-$start).TotalSeconds}
++$row | ConvertTo-Json -Compress | Add-Content -Encoding utf8NoBOM (Join-Path $e 'commands.jsonl')
++$row | ConvertTo-Json -Compress
++if($code -ne 0 -or !$exited -or !$pass -or !$expectedExit -or !$sourceUnchanged){Get-Content -LiteralPath $log -Tail 20;throw 'Signal client gate incomplete'}
+diff --git a/tools/verify-return-network-signal.py b/tools/verify-return-network-signal.py
+new file mode 100644
+index 0000000..d2a05cc
+--- /dev/null
++++ b/tools/verify-return-network-signal.py
+@@ -0,0 +1,78 @@
++"""Verify new signal evidence and preserve every failed client attempt."""
++from pathlib import Path
++import hashlib,importlib.util,json,re,subprocess,sys
++sys.dont_write_bytecode=True
++R=Path(__file__).resolve().parents[1];E=R/'evidence/return-network-signal'
++h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++sp=importlib.util.spec_from_file_location('nbt',R/'tools/read-world-nbt.py');nbt=importlib.util.module_from_spec(sp);sp.loader.exec_module(nbt)
++rows=[json.loads(v) for v in (E/'commands.jsonl').read_text(encoding='utf-8-sig').splitlines()]
++failures=[r for r in rows if not r['pass'] or r['exit']!=0]
++expected_failures={('Reopen',4),('Reopen',10),('Nether',1),('CutBefore',1)}
++assert {(r['mode'],r['attempt']) for r in failures}==expected_failures,failures
++for r in failures:
++ assert r['exit']==1 and r['processExited'],r
++assert 'Signal client gate incomplete: Reopen' in (E/'client-Reopen-4.log').read_text(encoding='utf-8-sig')
++assert 'canonical count not one' in (E/'client-Reopen-10.log').read_text(encoding='utf-8-sig')
++assert 'Signal client gate incomplete: Nether' in (E/'client-Nether-1.log').read_text(encoding='utf-8-sig')
++# Normal-1 predates the final signal source. CutBefore-1 reached the verified boundary
++# but its original wrapper rejected the intentional Windows hard-exit code.
++final=[r for r in rows if r['pass'] and (r['exit']==0 or (r['mode'],r['attempt'])==('CutBefore',1))
++       and (r['mode'],r['attempt'])!=('Normal',1)]
++required={'Normal','Reopen','CutBefore','CutGap1','CutGap2','CutLong','CutEnd','CutE','CutF','CutG','Availability','EnvironmentMatrix','Nether','Chunk','Death4Off','ReturnLight'}
++assert required.issubset({r['mode'] for r in final}),required-{r['mode'] for r in final}
++def directory(r):return E/'client'/f"{r['mode']}-{r['attempt']}"/('ReturnLight' if r['mode']=='ReturnLight' else '')
++def disk(r):
++ name='ResumeB' if r['mode']=='ReturnLight' else r['mode']
++ return nbt.read(directory(r)/(name+'.dat'))['data']
++def actor(d):
++ a=[a for a in d['actors'] if a['storyId']=='npc:yeoul'];assert len(a)==1;return a[0]
++def identity(d):
++ a=actor(d);return (a['entityUUID'],a['instanceId'],a['generation'])
++for r in final:
++ assert all(r[k] for k in ['pass','processExited','sourceUnchanged','muted','rightMonitor']),r
++ if r['mode']=='CutBefore' and r['attempt']==1:
++  # Preserve the original wrapper failure; adjudicate only with explicit boundary/disk and fresh recovery below.
++  assert r['exit']==1 and r['childExit'] is None
++  assert 'non-zero exit value -1073740791' in (E/'client-CutBefore-1.log').read_text(encoding='utf-8-sig')
++ else:
++  assert r['exit']==0 and (r['childExit']==0 or r['mode'].startswith('Cut') and r['childExit']==-1073740791),r
++ # Smoke-only diagnostics evolved after the first hard cuts. All production
++ # source and assets must remain byte-identical across the accepted runs.
++ for s in json.loads((E/f"sources-{r['mode']}-{r['attempt']}.json").read_text(encoding='utf-8-sig')):
++  if s['path'].replace('\\','/').endswith('/client/ReturnNetworkSmoke.java'):continue
++  assert h(R/s['path']).upper()==s['hash'],(r['mode'],r['attempt'],s['path'])
++ d=disk(r);assert d['schema']==5 and d['actorSchema']==1 and actor(d)['generation']==0
++ if r['mode']=='ReturnLight':assert 'returnNetwork' not in d and actor(d)['checkpoint']==4;continue
++ event=d['returnNetwork'];assert len(event['facts'])==len(set(event['facts']))
++ if not r['mode'].startswith('Cut'):assert event['checkpoint']==6,r
++for cut in [r for r in final if r['mode'].startswith('Cut')]:
++ resumes=[r for r in final if r['mode']=='Reopen' and r['world']==cut['world']]
++ assert resumes,cut
++ # A later fresh process reopens the same world after a failed diagnostic or
++ # an already successful recovery; compare against the latest valid readback.
++ resume=max(resumes,key=lambda r:r['attempt'])
++ before=disk(cut);after=disk(resume);assert identity(before)==identity(after)
++ a=before['returnNetwork'];b=after['returnNetwork'];assert a['instance']==b['instance'] and a['checkpoint']<=b['checkpoint']==6 and set(a['facts'])<=set(b['facts'])
++ if cut['mode'] in {'CutBefore','CutGap1','CutGap2','CutLong','CutEnd'}:
++  assert a['checkpoint']==4
++  old=(directory(cut)/(cut['mode']+'-signal.txt')).read_text();fresh=(directory(resume)/'Reopen-signal.txt').read_text()
++  oldIds=set(re.findall(r'PREPARED_RESPONSE.*?session=([^ ]+)',old));newIds=set(re.findall(r'PREPARED_RESPONSE.*?session=([^ ]+)',fresh))
++  assert len(oldIds)==len(newIds)==1 and oldIds.isdisjoint(newIds)
++normal=next(r for r in final if r['mode']=='Normal');lines=(directory(normal)/'Normal-signal.txt').read_text()
++for purpose in ['OLD_PATTERN','RESPONSE']:
++ on=[int(re.search(rf'RN_SIGNAL_ON_{purpose}_{i} tick=(\d+)',lines)[1]) for i in range(3)]
++ off=[int(re.search(rf'RN_SIGNAL_OFF_{purpose}_{i} tick=(\d+)',lines)[1]) for i in range(1,4)]
++ assert [off[i]-on[i] for i in range(3)]==[12,12,36]
++ assert [on[i+1]-off[i] for i in range(2)]==[16,16]
++assert 'emitted_without_observation cp=2 heldTicks=40' in lines and 'emitted_without_observation cp=4 heldTicks=40' in lines
++quiet=next(r for r in final if r['mode']=='Reopen' and r['world']==normal['world']);assert disk(normal)['returnNetwork']==disk(quiet)['returnNetwork'] and identity(disk(normal))==identity(disk(quiet))
++q=directory(quiet)/'Reopen-signal.txt';assert not q.exists() or 'RN_SIGNAL_ON_' not in q.read_text()
++log=(E/'tests-2.log').read_text(encoding='utf-8-sig');assert 'All 108 required tests passed' in log and 'PASS core assertions=176857' in log and 'BUILD SUCCESSFUL' in log
++assert 'RESULT PASS 27/27' in (E/'pure-signal-final.log').read_text() and 'assertions=53' in (E/'pure-load-final.log').read_text()
++protected=['NarrativeData.java','StoryStorage.java','ReturnNetworkState.java','ReturnNetworkIntegrity.java','StoryActors.java','StoryActorRecord.java','NpcNavigation.java']
++for name in protected:
++ p='src/main/java/io/github/whileaway/'+name
++ assert subprocess.check_output(['git','diff','2bbef42','--',p],cwd=R)==b'',p
++result=dict(status='PARTIAL',productionSignal='CONNECTED',timing=dict(short=12,long=36,gap=16,leadIn=10),finalSourceClientPasses=len(final),attempts=len(rows),failedAttempts=failures,gameTests=108,coreAssertions=176857,signalPureTests=27,loadAssertions=53,saveFormat=5,actorSchema=1,returnNetworkSchema=1,protectedFilesUnchanged=protected,newClientRows=final,visualFrames='captured and reviewed: pulses and gaps visible',humanUnaidedReadability='NOT TESTED',audibleListening='NOT RUN (muted policy)',firstCompoundEvent='PARTIAL pending full scene readability/seal review',nextSubsystem='NOT STARTED',diskHashes=[dict(run=f"{r['mode']}-{r['attempt']}",sha256=h(directory(r)/(('ResumeB' if r['mode']=='ReturnLight' else r['mode'])+'.dat'))) for r in final])
++(E/'GATES.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
++print(f'PASS signal integration verification: {len(final)} accepted client runs / {len(rows)} attempts; {len(failures)} retained failed command rows; 108 GameTests; Core176857; exact12/12/36 and16-tick gaps; unique fresh sessions; no completed replay; schema unchanged. Overall PARTIAL.')

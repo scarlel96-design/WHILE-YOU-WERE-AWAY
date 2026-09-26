@@ -1,0 +1,50 @@
+RETURN NETWORK FIRST RESPONSE / 0.3.1-dev.1 / PARTIAL
+
+Changed branch/field: work/return-network-integration; ReturnNetworkEvents.startSignal/confirmedSignal/tick runtime presentation and observer gate. Persistent save format 5, optional Actor schema 1, Return Network schema 1 and checkpoints 0–6 remain unchanged.
+
+Four required artifact paths:
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\whileaway-0.3.1-return-network-signal.jar
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\DIFF.patch
+VERIFICATION.txt: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\VERIFICATION.txt
+ROLLBACK.sh: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\ROLLBACK.sh
+Additional source ZIP: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\whileaway-0.3.1-return-network-signal-source.zip
+
+BASELINE
+Command: Get-FileHash evidence/return-network-signal/baseline/main.jar -Algorithm SHA256
+Input: preserved baseline JAR from commit 2bbef42cad5d35a569ab1744f39e31770d56b7f0.
+Literal result: BASELINE_SHA256=9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e
+Exit status: 0.
+Preserved baseline source ZIP SHA-256: 9b77d81bea39c4cea7673fa604e6f8d0af9e6852943ff3772e2d9567fdef1f17.
+
+MODIFIED
+Command: $env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot'; $env:GRADLE_USER_HOME=(Resolve-Path ..\gradle-home).Path; .\gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runGameTestServer build
+Input: final production source in work/return-network-integration, 0.3.1-dev.1.
+Literal output: All 108 required tests passed :)
+Literal output: PASS core assertions=176857
+Literal output: BUILD SUCCESSFUL in 10m 53s
+Exit status: 0. Full output: evidence/return-network-signal/tests-2.log.
+Command: python tools/package-return-network-signal.py
+Input: build/libs/whileaway-0.3.1-dev.1.jar plus current src/docs/tools/gradle build files.
+Literal output: PACKAGED C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\whileaway-0.3.1-return-network-signal.jar size=657256 sha256=1c8308708d33d9d6e00b1695645c339a66af03e12328182d6034dc3192b93492
+Literal output: PACKAGED C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\return-network-signal\whileaway-0.3.1-return-network-signal-source.zip size=848167 sha256=ef4ee32941308b79cb7e37b399d368e6348a4d3d0438219b5be2f629e02ee0a1
+Literal output: SOURCE_ZIP_ENTRIES=344 TESTZIP=PASS
+Exit status: 0.
+DIFF.patch: size 52732; SHA-256 55633b827489146e4839fa146a43bc34fce22b6dde023331a21c1e3c1a1b9da6.
+
+ROLLBACK
+Command: $probe=Join-Path $env:TEMP 'whileaway-return-network-rollback-probe.jar'; Copy-Item -LiteralPath dist/return-network-signal/whileaway-0.3.1-return-network-signal.jar -Destination $probe -Force; & 'C:\Program Files\Git\bin\bash.exe' dist/return-network-signal/ROLLBACK.sh ($probe -replace '\\','/')
+Input: separate modified-JAR copy; original modified artifact and all world files untouched.
+Literal output before rollback: ROLLBACK_INPUT_SHA256=1c8308708d33d9d6e00b1695645c339a66af03e12328182d6034dc3192b93492
+Literal output: ROLLBACK_OK SHA256=9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e
+Literal output after rollback: ROLLBACK_COPY_SHA256=9e90a695dfa14ab193849335cb28dffa0d27cb8d212cc87387e260b0f8cb637e
+Literal output confirming modified artifact retained: MODIFIED_JAR_SHA256=1c8308708d33d9d6e00b1695645c339a66af03e12328182d6034dc3192b93492
+Exit status: 0 on the successful rollback script invocation and post-hash check. An earlier sandboxed Bash launch failed before script execution with Win32 error 5 and exit -1073741502; it made no change to the probe. The successful run used the same script without that launch restriction.
+Restored behavior/status: the probe contains the verified baseline JAR; the deliverable MODIFIED_FILE remains the changed JAR. ROLLBACK.sh restores only a supplied JAR file; it does not downgrade or edit a world save.
+
+Additional checks:
+Pure signal command: java -cp 'build/classes/java/test;build/classes/java/main' io.github.whileaway.support.ReturnNetworkSignalTests -> RESULT PASS 27/27, exit 0.
+Pure load command: java -cp 'build/classes/java/test;build/classes/java/main' io.github.whileaway.support.ReturnNetworkLoadTests -> PASS ReturnNetworkLoadTests assertions=53 scope=pure-diagnostic no-world-side-effects no-runtime-wiring, exit 0.
+Audit command: python tools/verify-return-network-signal.py -> PASS signal integration verification: 27 accepted client runs / 31 attempts; 4 retained failed command rows; 108 GameTests; Core176857; exact12/12/36 and16-tick gaps; unique fresh sessions; no completed replay; schema unchanged. Overall PARTIAL. Exit 0.
+Actual-client runs are silent on right secondary DISPLAY1. They test signal cut/reconnect, completion replay, NPC/relay availability, environment/path/light recovery, Nether, chunk unload, death, and prerequisite Return-Light. Four failed command rows and explanations remain in evidence/return-network-signal/GATES.json and docs/return-network-signal/HANDOFF.md.
+
+Final first compound event status: PARTIAL. Unaided human comprehension of SHORT–SHORT–LONG and audible readability are not yet tested; these are required before SEALED. Campaign PARTIAL, 0.3.2 not promoted, next subsystem not started.

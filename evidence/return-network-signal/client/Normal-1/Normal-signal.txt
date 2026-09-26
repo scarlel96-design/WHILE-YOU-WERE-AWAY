@@ -1,0 +1,25 @@
+BOUNDARY RN_A_DISCOVERED tick=523 cp=1 session=none emitted=0
+BOUNDARY RN_B_NPC_JOINED tick=890 cp=2 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_OLD_PATTERN tick=890 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=0
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_0 tick=900 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=1
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_1 tick=912 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=1
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_1 tick=928 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=2
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_2 tick=940 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=2
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_2 tick=956 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=3
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_3 tick=992 cp=2 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=3
+PASS emitted_without_observation cp=2 heldTicks=40 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59
+BOUNDARY RN_C_PATTERN tick=1030 cp=3 session=9f6f1480-a5e9-451b-af6d-165bcfcb3f59 emitted=3
+BOUNDARY RN_D_INTERVENTION tick=1040 cp=4 session=none emitted=0
+BOUNDARY RN_PRESENTING tick=1050 cp=4 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_RESPONSE tick=1060 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=0
+BOUNDARY RN_SIGNAL_ON_RESPONSE_0 tick=1070 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=1
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_1 tick=1082 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=1
+BOUNDARY RN_SIGNAL_ON_RESPONSE_1 tick=1098 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=2
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_2 tick=1110 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=2
+BOUNDARY RN_SIGNAL_ON_RESPONSE_2 tick=1126 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=3
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_3 tick=1162 cp=4 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=3
+PASS emitted_without_observation cp=4 heldTicks=40 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076
+BOUNDARY RN_E_RESPONSE tick=1200 cp=5 session=22bfdcae-5c4c-48f6-85f5-9eb4ca229076 emitted=3
+BOUNDARY RN_F_SHARED tick=1210 cp=5 session=none emitted=0
+BOUNDARY RN_G_BEFORE_COMPLETE tick=1220 cp=5 session=none emitted=0
+BOUNDARY RN_G_COMPLETED tick=1220 cp=6 session=none emitted=0

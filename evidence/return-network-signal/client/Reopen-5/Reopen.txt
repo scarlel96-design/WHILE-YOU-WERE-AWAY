@@ -1,0 +1,6 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=53344
+INPUT cp=4 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=b8ea9cac9ec845dcc6c07ec0dae0e44475508a4c131446203aaa6f80573f72a9, detail=LOAD_OK]
+PROGRESS cp=4 npc=(43.01401825833441, 65.0, 53.13120158948141) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PASS Reopen cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[INTERVENTION, AFTERMATH, OLD_PATTERN_EVIDENCE, PARTICIPANT_JOINED, NEXT_PREREQUISITE, SHARED_EXPERIENCE, COMPLETE, RESPONSE, PATTERN_MATCH_EVIDENCE, SIGNAL_DISCOVERED]
+DISK sha256=cf59e287ded694b667c67378d66b1555544377132ca1cd63ae2595c8bcc78f21

@@ -1,0 +1,9 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=48968
+INPUT cp=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 load=Status[outcome=LOADED, recovery=SAFE_AUTO_RECOVER, saveFormat=5, actorSchema=1, actorCount=1, writable=true, originalHash=fcb44094e2d0d5ac47cb678ab9ba5530d87b7e4aa13b8e2b87c63d48cdfe7dea, detail=LOAD_OK]
+PROGRESS cp=1 npc=(39.73443746556319, 65.0, 63.47263332466409) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PROGRESS cp=1 npc=(43.47147588335143, 65.0, 50.28636558325179) player=(45.5, 65.0, 47.5) wait=WAITING_NPC path=AVAILABLE attempts=1 followRange=24.0
+PASS exception Nether heldTicks=120 cp=4 unchanged=true actualUnloaded=false
+PROGRESS cp=6 npc=(44.47328351619588, 65.0, 48.39767040895232) player=(45.5, 65.0, 47.5) wait=NONE path=AVAILABLE attempts=1 followRange=24.0
+PASS Nether cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true facts=[PARTICIPANT_JOINED, OLD_PATTERN_EVIDENCE, NEXT_PREREQUISITE, COMPLETE, SHARED_EXPERIENCE, SIGNAL_DISCOVERED, INTERVENTION, PATTERN_MATCH_EVIDENCE, RESPONSE, AFTERMATH]
+DISK sha256=ffa6ea576feaa7d87bb3dadad09495f54b80d4b6995ea66367e8c0bf6c91ae83

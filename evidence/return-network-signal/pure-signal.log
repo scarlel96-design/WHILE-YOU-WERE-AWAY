@@ -1,0 +1,28 @@
+PASS semantic order and immutability
+PASS timing validation and exact gaps
+PASS timeline rejects origin mismatch
+PASS timeline rejects gap mismatch
+PASS timeline rejects SHORT LONG SHORT
+PASS deterministic planning
+PASS overflow rejection
+PASS exact match and observer separation
+PASS wrong order rejected
+PASS no partial observation match
+PASS duplicate identity rejected
+PASS wrong timing and gap rejected
+PASS mismatched observer and session rejected
+PASS poll and dispatch deduplicate
+PASS late poll first deadline requires restart
+PASS late poll second deadline requires restart
+PASS late poll long deadline requires restart
+PASS suspend before first requires restart
+PASS suspend between pulses requires restart
+PASS suspend inside pulse requires restart
+PASS final pulse interruption requires restart
+PASS repeated suspend is explicit exception
+PASS readiness loss requires restart
+PASS restart entire plan and exact recovery match
+PASS restart overflow leaves old state consistent
+PASS completed replay policy
+PASS transient boundary has no persistence API
+RESULT PASS 27/27

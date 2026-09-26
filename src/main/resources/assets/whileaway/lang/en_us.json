@@ -73,5 +73,7 @@
   "story.whileaway.network.aftermath": "Yeoul: I check that light sometimes. It is still on.",
   "story.whileaway.network.evidence": "Retained evidence — The old repeating signal / A response matching the current return light.",
   "story.whileaway.network.waiting_npc": "Check that Yeoul can reach the equipment.",
-  "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection."
+  "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection.",
+  "story.whileaway.network.listening": "A faint light and tone repeat above the relay.",
+  "story.whileaway.network.signal_ready": "The signal has stopped. You can examine the equipment again."
 }

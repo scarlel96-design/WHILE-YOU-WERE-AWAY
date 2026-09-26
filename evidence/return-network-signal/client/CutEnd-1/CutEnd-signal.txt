@@ -1,0 +1,21 @@
+BOUNDARY RN_A_DISCOVERED tick=543 cp=1 session=none emitted=0
+BOUNDARY RN_B_NPC_JOINED tick=919 cp=2 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_OLD_PATTERN tick=928 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=0
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_0 tick=938 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=1
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_1 tick=950 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=1
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_1 tick=966 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=2
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_2 tick=978 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=2
+BOUNDARY RN_SIGNAL_ON_OLD_PATTERN_2 tick=994 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=3
+BOUNDARY RN_SIGNAL_OFF_OLD_PATTERN_3 tick=1030 cp=2 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=3
+PASS emitted_without_observation cp=2 heldTicks=40 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c
+BOUNDARY RN_C_PATTERN tick=1068 cp=3 session=b07b5989-d7f2-474d-ac1d-80b6369ebf9c emitted=3
+BOUNDARY RN_D_INTERVENTION tick=1077 cp=4 session=none emitted=0
+BOUNDARY RN_PRESENTING tick=1079 cp=4 session=none emitted=0
+BOUNDARY RN_SIGNAL_PREPARED_RESPONSE tick=1089 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=0
+BOUNDARY RN_SIGNAL_ON_RESPONSE_0 tick=1099 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=1
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_1 tick=1111 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=1
+BOUNDARY RN_SIGNAL_ON_RESPONSE_1 tick=1127 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=2
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_2 tick=1139 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=2
+BOUNDARY RN_SIGNAL_ON_RESPONSE_2 tick=1155 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=3
+BOUNDARY RN_SIGNAL_OFF_RESPONSE_3 tick=1191 cp=4 session=88768ed9-47ed-434a-be51-241684ad2c52 emitted=3
+PASS CutEnd boundary=RN_SIGNAL_OFF_RESPONSE_3 cp=4 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add generation=0 worldFlushBeforeCut=false

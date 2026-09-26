@@ -1,3 +1,5 @@
 /evidence/return-network-integration/** -text
 /dist/return-network-integration/** -text
 /evidence/return-network-integration/ROLLBACK.sh text eol=lf
+/dist/return-network-signal/ROLLBACK.sh text eol=lf
+/dist/return-network-signal/DIFF.patch -text

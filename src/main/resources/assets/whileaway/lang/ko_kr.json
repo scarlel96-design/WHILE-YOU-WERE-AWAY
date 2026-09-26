@@ -73,5 +73,7 @@
   "story.whileaway.network.aftermath": "여울: 가끔 저쪽 불도 확인해. 아직 켜져 있더라.",
   "story.whileaway.network.evidence": "남은 기록 — 옛 신호의 반복 / 현재 귀환등과 일치한 응답.",
   "story.whileaway.network.waiting_npc": "여울이 설비에 닿을 수 있는 길을 확인하자.",
-  "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다."
+  "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다.",
+  "story.whileaway.network.listening": "중계함 위에서 희미한 빛과 소리가 반복된다.",
+  "story.whileaway.network.signal_ready": "신호가 멎었다. 설비를 다시 살펴볼 수 있다."
 }

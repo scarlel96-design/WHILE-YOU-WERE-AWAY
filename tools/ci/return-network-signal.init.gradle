@@ -1,0 +1,41 @@
+// Isolated MAIN signal profile. Existing run tasks/evidence remain untouched.
+gradle.afterProject { p, state ->
+    if (p != rootProject || !p.plugins.hasPlugin('net.neoforged.moddev')) return
+    ['Normal','Reopen','CutBefore','CutGap1','CutGap2','CutLong','CutEnd','CutE','CutF','CutG','Availability','EnvironmentMatrix','Nether','Chunk','Death4Off','ReturnLight'].each { mode ->
+        def label=mode=='ReturnLight'?'ResumeB':mode
+        def evidenceDir='evidence/return-network-signal/client/'+(p.findProperty('signalRun') ?: mode)+(mode=='ReturnLight'?'/ReturnLight':'')
+        p.neoForge.runs.create('signal' + mode) {
+            client()
+            systemProperty 'whileaway.signalSmoke','true'
+            gameDirectory = p.file('../../work/return-network-signal-client')
+            if(mode=='ReturnLight')systemProperty 'whileaway.npcSmoke',label
+            else systemProperty 'whileaway.networkSmoke',mode
+            systemProperty 'whileaway.networkWorld', p.findProperty('signalWorld') ?: 'signal-' + mode
+            systemProperty 'whileaway.evidence', p.file(evidenceDir).absolutePath
+        }
+        p.tasks.named('runSignal' + mode).configure {
+            if(mode.startsWith('Cut')) ignoreExitValue=true
+            doFirst {
+                def monitor = new groovy.json.JsonSlurper().parse(p.file('evidence/return-network-signal/monitor.json'))
+                jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED', "-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+                ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+                def dir=p.file('../../work/return-network-signal-client');dir.mkdirs()
+                def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+                lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:2','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
+                new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+                p.file(evidenceDir).mkdirs()
+                def marker=p.file("${evidenceDir}/${label}.txt")
+                if(marker.exists())throw new GradleException('Preserve previous client marker before retry: '+mode)
+                marker.setText('RUNNING\n','UTF-8')
+            }
+            doLast {
+                def marker=p.file("${evidenceDir}/${label}.txt").text
+                if(!marker.contains("PASS ${label} ")||marker.contains('FAIL '))throw new GradleException('Signal client gate incomplete: '+mode)
+                logger.lifecycle("SIGNAL_CHILD_EXIT=${executionResult.get().exitValue}")
+            }
+        }
+    }
+    p.neoForge.runs.named('gameTestServer').configure {
+        systemProperty 'whileaway.testEvidence',p.file('evidence/return-network-signal/gametest/'+java.util.UUID.randomUUID()).absolutePath
+    }
+}

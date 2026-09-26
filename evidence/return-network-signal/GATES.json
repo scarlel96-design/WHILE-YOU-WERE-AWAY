@@ -1,0 +1,639 @@
+{
+  "status": "PARTIAL",
+  "productionSignal": "CONNECTED",
+  "timing": {
+    "short": 12,
+    "long": 36,
+    "gap": 16,
+    "leadIn": 10
+  },
+  "finalSourceClientPasses": 27,
+  "attempts": 31,
+  "failedAttempts": [
+    {
+      "rightMonitor": true,
+      "pass": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutBefore -PsignalRun=CutBefore-1 -PsignalWorld=signal-CutBefore",
+      "attempt": 1,
+      "processExited": true,
+      "muted": true,
+      "mode": "CutBefore",
+      "sourceUnchanged": true,
+      "elapsedSeconds": 110,
+      "exit": 1,
+      "world": "signal-CutBefore",
+      "pid": 45148,
+      "childExit": null
+    },
+    {
+      "expectedExit": false,
+      "elapsedSeconds": 92,
+      "rightMonitor": true,
+      "pass": false,
+      "sourceUnchanged": true,
+      "exit": 1,
+      "muted": true,
+      "world": "signal-CutGap2",
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-4 -PsignalWorld=signal-CutGap2",
+      "childExit": null,
+      "mode": "Reopen",
+      "attempt": 4,
+      "pid": 54828,
+      "processExited": true
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-10 -PsignalWorld=signal-CutG",
+      "pass": false,
+      "rightMonitor": true,
+      "mode": "Reopen",
+      "attempt": 10,
+      "muted": true,
+      "elapsedSeconds": 113,
+      "exit": 1,
+      "sourceUnchanged": true,
+      "expectedExit": false,
+      "processExited": true,
+      "world": "signal-CutG",
+      "childExit": null,
+      "pid": 56220
+    },
+    {
+      "sourceUnchanged": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalNether -PsignalRun=Nether-1 -PsignalWorld=signal-Nether",
+      "rightMonitor": true,
+      "processExited": true,
+      "childExit": null,
+      "pid": 1124,
+      "world": "signal-Nether",
+      "expectedExit": false,
+      "muted": true,
+      "mode": "Nether",
+      "elapsedSeconds": 122,
+      "pass": false,
+      "exit": 1,
+      "attempt": 1
+    }
+  ],
+  "gameTests": 108,
+  "coreAssertions": 176857,
+  "signalPureTests": 27,
+  "loadAssertions": 53,
+  "saveFormat": 5,
+  "actorSchema": 1,
+  "returnNetworkSchema": 1,
+  "protectedFilesUnchanged": [
+    "NarrativeData.java",
+    "StoryStorage.java",
+    "ReturnNetworkState.java",
+    "ReturnNetworkIntegrity.java",
+    "StoryActors.java",
+    "StoryActorRecord.java",
+    "NpcNavigation.java"
+  ],
+  "newClientRows": [
+    {
+      "pid": 23788,
+      "childExit": 0,
+      "rightMonitor": true,
+      "processExited": true,
+      "exit": 0,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalNormal -PsignalRun=Normal-2 -PsignalWorld=signal-normal-final",
+      "pass": true,
+      "elapsedSeconds": 124,
+      "sourceUnchanged": true,
+      "world": "signal-normal-final",
+      "attempt": 2,
+      "mode": "Normal",
+      "muted": true
+    },
+    {
+      "pid": 41896,
+      "childExit": 0,
+      "rightMonitor": true,
+      "processExited": true,
+      "exit": 0,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-1 -PsignalWorld=signal-normal-final",
+      "pass": true,
+      "elapsedSeconds": 77,
+      "sourceUnchanged": true,
+      "world": "signal-normal-final",
+      "attempt": 1,
+      "mode": "Reopen",
+      "muted": true
+    },
+    {
+      "rightMonitor": true,
+      "pass": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutBefore -PsignalRun=CutBefore-1 -PsignalWorld=signal-CutBefore",
+      "attempt": 1,
+      "processExited": true,
+      "muted": true,
+      "mode": "CutBefore",
+      "sourceUnchanged": true,
+      "elapsedSeconds": 110,
+      "exit": 1,
+      "world": "signal-CutBefore",
+      "pid": 45148,
+      "childExit": null
+    },
+    {
+      "expectedExit": true,
+      "elapsedSeconds": 107,
+      "rightMonitor": true,
+      "pass": true,
+      "sourceUnchanged": true,
+      "exit": 0,
+      "muted": true,
+      "world": "signal-CutBefore",
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-2 -PsignalWorld=signal-CutBefore",
+      "childExit": 0,
+      "mode": "Reopen",
+      "attempt": 2,
+      "pid": 42488,
+      "processExited": true
+    },
+    {
+      "expectedExit": true,
+      "elapsedSeconds": 93,
+      "rightMonitor": true,
+      "pass": true,
+      "sourceUnchanged": true,
+      "exit": 0,
+      "muted": true,
+      "world": "signal-CutGap1",
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutGap1 -PsignalRun=CutGap1-1 -PsignalWorld=signal-CutGap1",
+      "childExit": -1073740791,
+      "mode": "CutGap1",
+      "attempt": 1,
+      "pid": 46780,
+      "processExited": true
+    },
+    {
+      "expectedExit": true,
+      "elapsedSeconds": 103,
+      "rightMonitor": true,
+      "pass": true,
+      "sourceUnchanged": true,
+      "exit": 0,
+      "muted": true,
+      "world": "signal-CutGap1",
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-3 -PsignalWorld=signal-CutGap1",
+      "childExit": 0,
+      "mode": "Reopen",
+      "attempt": 3,
+      "pid": 37696,
+      "processExited": true
+    },
+    {
+      "expectedExit": true,
+      "elapsedSeconds": 99,
+      "rightMonitor": true,
+      "pass": true,
+      "sourceUnchanged": true,
+      "exit": 0,
+      "muted": true,
+      "world": "signal-CutGap2",
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutGap2 -PsignalRun=CutGap2-1 -PsignalWorld=signal-CutGap2",
+      "childExit": -1073740791,
+      "mode": "CutGap2",
+      "attempt": 1,
+      "pid": 4084,
+      "processExited": true
+    },
+    {
+      "exit": 0,
+      "world": "signal-CutGap2",
+      "rightMonitor": true,
+      "elapsedSeconds": 336,
+      "expectedExit": true,
+      "mode": "Reopen",
+      "pid": 53344,
+      "pass": true,
+      "muted": true,
+      "processExited": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-5 -PsignalWorld=signal-CutGap2",
+      "sourceUnchanged": true,
+      "childExit": 0,
+      "attempt": 5
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutLong -PsignalRun=CutLong-1 -PsignalWorld=signal-CutLong",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "CutLong",
+      "attempt": 1,
+      "muted": true,
+      "elapsedSeconds": 126,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutLong",
+      "childExit": -1073740791,
+      "pid": 21256
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-6 -PsignalWorld=signal-CutLong",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "Reopen",
+      "attempt": 6,
+      "muted": true,
+      "elapsedSeconds": 123,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutLong",
+      "childExit": 0,
+      "pid": 61396
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutEnd -PsignalRun=CutEnd-1 -PsignalWorld=signal-CutEnd",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "CutEnd",
+      "attempt": 1,
+      "muted": true,
+      "elapsedSeconds": 203,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutEnd",
+      "childExit": -1073740791,
+      "pid": 16872
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-7 -PsignalWorld=signal-CutEnd",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "Reopen",
+      "attempt": 7,
+      "muted": true,
+      "elapsedSeconds": 105,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutEnd",
+      "childExit": 0,
+      "pid": 24020
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutE -PsignalRun=CutE-1 -PsignalWorld=signal-CutE",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "CutE",
+      "attempt": 1,
+      "muted": true,
+      "elapsedSeconds": 156,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutE",
+      "childExit": -1073740791,
+      "pid": 32716
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-8 -PsignalWorld=signal-CutE",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "Reopen",
+      "attempt": 8,
+      "muted": true,
+      "elapsedSeconds": 185,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutE",
+      "childExit": 0,
+      "pid": 56412
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutF -PsignalRun=CutF-1 -PsignalWorld=signal-CutF",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "CutF",
+      "attempt": 1,
+      "muted": true,
+      "elapsedSeconds": 195,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutF",
+      "childExit": -1073740791,
+      "pid": 59184
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-9 -PsignalWorld=signal-CutF",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "Reopen",
+      "attempt": 9,
+      "muted": true,
+      "elapsedSeconds": 180,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutF",
+      "childExit": 0,
+      "pid": 51352
+    },
+    {
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutG -PsignalRun=CutG-1 -PsignalWorld=signal-CutG",
+      "pass": true,
+      "rightMonitor": true,
+      "mode": "CutG",
+      "attempt": 1,
+      "muted": true,
+      "elapsedSeconds": 188,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "expectedExit": true,
+      "processExited": true,
+      "world": "signal-CutG",
+      "childExit": -1073740791,
+      "pid": 5784
+    },
+    {
+      "exit": 0,
+      "pass": true,
+      "processExited": true,
+      "rightMonitor": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-11 -PsignalWorld=signal-CutG",
+      "muted": true,
+      "world": "signal-CutG",
+      "attempt": 11,
+      "mode": "Reopen",
+      "pid": 60012,
+      "elapsedSeconds": 95,
+      "expectedExit": true,
+      "sourceUnchanged": true,
+      "childExit": 0
+    },
+    {
+      "processExited": true,
+      "pid": 25784,
+      "attempt": 2,
+      "world": "signal-CutG2",
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalCutG -PsignalRun=CutG-2 -PsignalWorld=signal-CutG2",
+      "rightMonitor": true,
+      "expectedExit": true,
+      "pass": true,
+      "elapsedSeconds": 282,
+      "exit": 0,
+      "muted": true,
+      "childExit": -1073740791,
+      "mode": "CutG",
+      "sourceUnchanged": true
+    },
+    {
+      "pass": true,
+      "expectedExit": true,
+      "mode": "Reopen",
+      "exit": 0,
+      "pid": 6256,
+      "sourceUnchanged": true,
+      "elapsedSeconds": 99,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-12 -PsignalWorld=signal-CutG2",
+      "processExited": true,
+      "muted": true,
+      "attempt": 12,
+      "childExit": 0,
+      "rightMonitor": true,
+      "world": "signal-CutG2"
+    },
+    {
+      "sourceUnchanged": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalAvailability -PsignalRun=Availability-1 -PsignalWorld=signal-Availability",
+      "rightMonitor": true,
+      "processExited": true,
+      "childExit": 0,
+      "pid": 41136,
+      "world": "signal-Availability",
+      "expectedExit": true,
+      "muted": true,
+      "mode": "Availability",
+      "elapsedSeconds": 233,
+      "pass": true,
+      "exit": 0,
+      "attempt": 1
+    },
+    {
+      "sourceUnchanged": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalEnvironmentMatrix -PsignalRun=EnvironmentMatrix-1 -PsignalWorld=signal-EnvironmentMatrix",
+      "rightMonitor": true,
+      "processExited": true,
+      "childExit": 0,
+      "pid": 47440,
+      "world": "signal-EnvironmentMatrix",
+      "expectedExit": true,
+      "muted": true,
+      "mode": "EnvironmentMatrix",
+      "elapsedSeconds": 194,
+      "pass": true,
+      "exit": 0,
+      "attempt": 1
+    },
+    {
+      "elapsedSeconds": 150,
+      "expectedExit": true,
+      "world": "signal-Nether2",
+      "childExit": 0,
+      "muted": true,
+      "rightMonitor": true,
+      "exit": 0,
+      "sourceUnchanged": true,
+      "pass": true,
+      "pid": 48968,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalNether -PsignalRun=Nether-2 -PsignalWorld=signal-Nether2",
+      "mode": "Nether",
+      "processExited": true,
+      "attempt": 2
+    },
+    {
+      "exit": 0,
+      "muted": true,
+      "elapsedSeconds": 150,
+      "rightMonitor": true,
+      "processExited": true,
+      "pid": 4004,
+      "world": "signal-Chunk",
+      "childExit": 0,
+      "expectedExit": true,
+      "sourceUnchanged": true,
+      "mode": "Chunk",
+      "pass": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalChunk -PsignalRun=Chunk-1 -PsignalWorld=signal-Chunk",
+      "attempt": 1
+    },
+    {
+      "expectedExit": true,
+      "pid": 14584,
+      "attempt": 1,
+      "processExited": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalDeath4Off -PsignalRun=Death4Off-1 -PsignalWorld=signal-Death4Off",
+      "elapsedSeconds": 144,
+      "mode": "Death4Off",
+      "world": "signal-Death4Off",
+      "childExit": 0,
+      "rightMonitor": true,
+      "sourceUnchanged": true,
+      "muted": true,
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "attempt": 1,
+      "pass": true,
+      "rightMonitor": true,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReturnLight -PsignalRun=ReturnLight-1 -PsignalWorld=npc-CutB",
+      "processExited": true,
+      "pid": 56244,
+      "expectedExit": true,
+      "world": "npc-CutB",
+      "mode": "ReturnLight",
+      "elapsedSeconds": 96,
+      "childExit": 0,
+      "muted": true,
+      "exit": 0,
+      "sourceUnchanged": true
+    },
+    {
+      "pass": true,
+      "childExit": 0,
+      "world": "signal-CutG",
+      "exit": 0,
+      "command": "gradlew.bat --offline -I tools/ci/return-network-signal.init.gradle runSignalReopen -PsignalRun=Reopen-13 -PsignalWorld=signal-CutG",
+      "sourceUnchanged": true,
+      "rightMonitor": true,
+      "attempt": 13,
+      "pid": 1092,
+      "expectedExit": true,
+      "muted": true,
+      "mode": "Reopen",
+      "processExited": true,
+      "elapsedSeconds": 109
+    }
+  ],
+  "visualFrames": "captured and reviewed: pulses and gaps visible",
+  "humanUnaidedReadability": "NOT TESTED",
+  "audibleListening": "NOT RUN (muted policy)",
+  "firstCompoundEvent": "PARTIAL pending full scene readability/seal review",
+  "nextSubsystem": "NOT STARTED",
+  "diskHashes": [
+    {
+      "run": "Normal-2",
+      "sha256": "ca53852c47288d2778b12af6e60221487d368ad3e7713398b2d3e7c4c70820b1"
+    },
+    {
+      "run": "Reopen-1",
+      "sha256": "5cb6ab18d81a2ca193c9244491c4775e10196369ae8f9c718e1d360527bbba8b"
+    },
+    {
+      "run": "CutBefore-1",
+      "sha256": "5b8b66516980013ca9b391da6a9621240c2d9b3d30361f51e18e453854cb251f"
+    },
+    {
+      "run": "Reopen-2",
+      "sha256": "843a1ce8978c8abc5fc196f0bcd8f545cf2c371677b48c804a9ac2873135c9cf"
+    },
+    {
+      "run": "CutGap1-1",
+      "sha256": "bfa2b7d018797bd9aa750612d090bb56b1b20dc5d5c9a460d039440e917703b9"
+    },
+    {
+      "run": "Reopen-3",
+      "sha256": "50d006a50cd479a48c92ea9eb081a8e2a617b7a33f6e5c61d23e80f7d0f7838b"
+    },
+    {
+      "run": "CutGap2-1",
+      "sha256": "651063e2077e51ca2f1f637077fa29736a1dc3ae8aa833ef5a3f8082717aa5b7"
+    },
+    {
+      "run": "Reopen-5",
+      "sha256": "cf59e287ded694b667c67378d66b1555544377132ca1cd63ae2595c8bcc78f21"
+    },
+    {
+      "run": "CutLong-1",
+      "sha256": "53ebd2629dd9e5a26640cda254ef6459dbae30e7703a50fb4d73d26ad7eff17e"
+    },
+    {
+      "run": "Reopen-6",
+      "sha256": "fb0c2fb821fbaab1dc3dbb984cc14c6d131c2f29b9c11ddf03092d8e1172af15"
+    },
+    {
+      "run": "CutEnd-1",
+      "sha256": "d2b717339d688daaf79bc3287a38f89df075aa3360c160d95a7019d2da0973f1"
+    },
+    {
+      "run": "Reopen-7",
+      "sha256": "d1a16fcf60b0455c9b8869b1520ba6d80a5703abf941e5ad09867ad72c2073fd"
+    },
+    {
+      "run": "CutE-1",
+      "sha256": "6f808123d2e15cbebae2c6be66c660ccd7703611a89a60b0e0abd58f894cceb9"
+    },
+    {
+      "run": "Reopen-8",
+      "sha256": "7cf257f15788435f5fa7e28ba12b496ae63dd643f7f3dd5e5afa5dab6e891338"
+    },
+    {
+      "run": "CutF-1",
+      "sha256": "b2abf2024bcac77b8b3ed913f6e6fae3245962653915f62c80f3897e2be2ed1b"
+    },
+    {
+      "run": "Reopen-9",
+      "sha256": "32b3b215705859cf5a8eb14dac0a56b622294930be68580bb8ec9209ffa2efd7"
+    },
+    {
+      "run": "CutG-1",
+      "sha256": "31740aa44ae4de61e0f20a8883a6c7726a061a162abf29a7a14a6f11398204bb"
+    },
+    {
+      "run": "Reopen-11",
+      "sha256": "886716bbf7bfdb6d11e805246e294959985e17adeb9b2cb935e794027773e049"
+    },
+    {
+      "run": "CutG-2",
+      "sha256": "a8ca4ebd9c45e51056af95ff33a5fb7cc12e6d5655d06a0a0b959208c4751472"
+    },
+    {
+      "run": "Reopen-12",
+      "sha256": "3b46cc3235a7c5b8678cf037545f7f4e22edb2bf2786a8717e6417d216ce08e4"
+    },
+    {
+      "run": "Availability-1",
+      "sha256": "dbb73f00ac6a42c8b2ae8808d26fc66f27e55b97755945f3122eae61688a769d"
+    },
+    {
+      "run": "EnvironmentMatrix-1",
+      "sha256": "12ba35ac4496651f289b51a01f8523718a7741dbca7650ce15f10083ac5f22a4"
+    },
+    {
+      "run": "Nether-2",
+      "sha256": "ffa6ea576feaa7d87bb3dadad09495f54b80d4b6995ea66367e8c0bf6c91ae83"
+    },
+    {
+      "run": "Chunk-1",
+      "sha256": "7e884a8259b8e0303bcb0e89ab9931fbf451f918d96895cc8e207052abeafe5e"
+    },
+    {
+      "run": "Death4Off-1",
+      "sha256": "36d80064ed89a3a17bbf74ce7060735732bbbabde389d2febcd59e9d56757913"
+    },
+    {
+      "run": "ReturnLight-1",
+      "sha256": "be848e8f944c7b97f42c8735eaeec662174208a12795522dffb203fc32846a58"
+    },
+    {
+      "run": "Reopen-13",
+      "sha256": "e869e685ea60a1fd4b9c872c1e1dee1be1e2675b97b601005a3a34adac6d5687"
+    }
+  ]
+}
