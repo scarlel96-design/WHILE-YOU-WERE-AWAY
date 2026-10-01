@@ -1,0 +1,11 @@
+RETURN NETWORK SIGNAL — GITHUB PUBLICATION
+Repository: https://github.com/scarlel96-design/WHILE-YOU-WERE-AWAY
+Branch: work/return-network-integration
+Implementation and validation commit: 09f41c9510288e74102ad7db5681256928d92c8f
+Verified remote ref after push: 09f41c9510288e74102ad7db5681256928d92c8f
+Push output: refs/heads/work/return-network-integration:refs/heads/work/return-network-integration 2bbef42..09f41c9; Done
+Source status: first compound event PARTIAL; campaign PARTIAL; 0.3.2 not promoted.
+Artifact directory: dist/return-network-signal/
+JAR SHA-256: 1c8308708d33d9d6e00b1695645c339a66af03e12328182d6034dc3192b93492
+Source ZIP SHA-256: ef4ee32941308b79cb7e37b399d368e6348a4d3d0438219b5be2f629e02ee0a1
+This publication note is metadata-only; production source, save schemas, tests, packages and prior evidence are unchanged.
