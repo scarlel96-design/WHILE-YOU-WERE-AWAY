@@ -1,0 +1,41 @@
+RETURN NETWORK FINAL CLOSURE — manual readability preparation / PARTIAL
+
+Current production branch: work/return-network-integration
+Current production HEAD before this support change: 4f334e8fc31d6835fb7188ddad2a0a928e930d08
+Production save format: 5; actor schema: optional 1; Return Network schema: 1.
+Changed branch/field: isolated Gradle run configuration `returnNetworkHuman`; only the copied profile's options.txt enables master/block/ambient/voice sound. No NarrativeData, checkpoint, Actor, ReturnNetwork schema, or production signal timing changed.
+
+Four artifacts:
+MODIFIED_FILE: tools/ci/return-network-human.init.gradle
+DIFF_FILE: dist/return-network-final-closure/DIFF.patch
+VERIFICATION: dist/return-network-final-closure/VERIFICATION.txt
+ROLLBACK: dist/return-network-final-closure/ROLLBACK.sh
+
+BASELINE
+Command: $env:GRADLE_USER_HOME=(Resolve-Path '..\\gradle-home').Path; .\\gradlew.bat --offline help --task runReturnNetworkHuman
+Input: unchanged production checkout without the new init script applied
+Literal result: Task 'runReturnNetworkHuman' not found in root project 'while-you-were-away'. BUILD FAILED in 10s
+Exit: 1 (expected absence of isolated sound-on task)
+
+MODIFIED
+Command: $env:GRADLE_USER_HOME=(Resolve-Path '..\\gradle-home').Path; .\\gradlew.bat --offline -I tools/ci/return-network-human.init.gradle help --task runReturnNetworkHuman
+Input: tools/ci/return-network-human.init.gradle SHA-256 67D3B99D3517B31A4189F5635A4BAA49809EC7A85F019718E47EAF869467CC91
+Literal result: Detailed task information for runReturnNetworkHuman; Description Runs the returnNetworkHuman Minecraft run configuration.; BUILD SUCCESSFUL in 10s
+Exit: 0
+Launch command: $env:GRADLE_USER_HOME=(Resolve-Path '..\\gradle-home').Path; .\\gradlew.bat --offline -I tools/ci/return-network-human.init.gradle runReturnNetworkHuman
+Launch output: RETURN_NETWORK_HUMAN_PROFILE=C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-human-client; SOUND_ON=true; DISPLAY1=2680,120; Minecraft 1.21.1 / NeoForge 21.1.249 / mod 0.3.1-dev.1 loaded.
+Launch exit: still running at preparation time; human scene readability NOT TESTED.
+Copied input world: work/return-network-signal-client/saves/signal-CutBefore (checkpoint 4 boundary) → work/return-network-human-client/saves/return-network-human; 39 files; copied story SHA-256 843A1CE8978C8ABC5FC196F0BCD8F545CF2C371677B48C804A9AC2873135C9CF. Original world left unchanged.
+
+ROLLBACK
+Command: C:\\Program Files\\Git\\bin\\bash.exe dist/return-network-final-closure/ROLLBACK.sh dist/return-network-final-closure/rollback-test/return-network-human.init.gradle
+Input: a separate, byte-identical copy of MODIFIED_FILE
+Literal result: ROLLBACK_PASS added init script removed; baseline=ABSENT; ROLLBACK_EXIT=0; RESTORED_ABSENT=True; MODIFIED_REMAINS=True
+Exit: 0
+Restored behavior: test-copy task init script absent as in baseline. MODIFIED_FILE remains changed for manual test.
+First Git Bash attempt inside restricted execution failed before script start: fatal error - couldn't create signal pipe, Win32 error 5; exit -1073741502. Escalated rerun passed.
+
+Actor diagnostic investigation:
+Reopen-10 checkpoint 6 reported `canonical count not one`; file load recorded actorCount=1, same UUID b576b8cc-0a7d-45ea-8216-52f25bc0fc8a, instance 2ee78da8-6cfd-490b-8a2f-f037a46b5add, generation 0. Reopen-11 and Reopen-13 fresh processes on the same world passed checkpoint 6 with exactly one canonical actor and the same identity. Reopen-12 passed on another copy. The old smoke assertion required a ready-candidate outcome even when the snapshot chunk was not ready; current smoke permits one matching canonical actor under UNLOADED_OR_UNCONFIRMED and still rejects zero or multiple matches. The precise transient cause remains unproven; no production Actor policy changed. Classified KNOWN NON-BLOCKING DIAGNOSTIC ISSUE pending final client smoke.
+
+Event status: PARTIAL pending sound-on human readability and the final milestone gate.

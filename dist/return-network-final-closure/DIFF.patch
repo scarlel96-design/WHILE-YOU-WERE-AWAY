@@ -1,0 +1,28 @@
+diff --git a/tools/ci/return-network-human.init.gradle b/tools/ci/return-network-human.init.gradle
+new file mode 100644
+index 0000000..6490e07
+--- /dev/null
++++ b/tools/ci/return-network-human.init.gradle
+@@ -0,0 +1,22 @@
++// Isolated, sound-on session for the user's Return Network scene-readability check.
++// This task has no scripted story driver and does not change the normal muted runs.
++gradle.afterProject { p, state ->
++    if (p != rootProject || !p.plugins.hasPlugin('net.neoforged.moddev')) return
++    p.neoForge.runs.create('returnNetworkHuman') {
++        client()
++        gameDirectory = p.file('../../work/return-network-human-client')
++    }
++    p.tasks.named('runReturnNetworkHuman').configure {
++        doFirst {
++            def monitor = new groovy.json.JsonSlurper().parse(p.file('evidence/return-network-signal/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED', "-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            def dir = p.file('../../work/return-network-human-client')
++            dir.mkdirs()
++            def sound = [master:'0.5', music:'0.0', record:'0.0', weather:'0.0', block:'0.7', hostile:'0.0', neutral:'0.0', player:'0.0', ambient:'0.5', voice:'0.5']
++            def lines = sound.collect { category, volume -> "soundCategory_${category}:${volume}" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:4','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
++            new File(dir, 'options.txt').setText(lines.join('\n') + '\n', 'UTF-8')
++            logger.lifecycle("RETURN_NETWORK_HUMAN_PROFILE=${dir.absolutePath}; SOUND_ON=true; DISPLAY1=${monitor.x},${monitor.y}")
++        }
++    }
++}
