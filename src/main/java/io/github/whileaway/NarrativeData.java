@@ -49,6 +49,9 @@ public final Map<String,StoryActorRecord> actors=new TreeMap<>();
 
 public static final class Entry {
 public Progress progress = Progress.empty();
+public OpeningStage openingStage = OpeningStage.NOT_STARTED;
+public BlockPos openingReturnPosition;
+public float openingReturnYaw,openingReturnPitch;
 public BlockPos station;
 public UUID encounter;
 public long readingUntil;
@@ -96,6 +99,23 @@ for (int i = 0; i < list.size(); i++) {
 var t = list.getCompound(i);
 if (!t.hasUUID("id")) continue;
 var e = data.entry(t.getUUID("id"));
+if(t.contains("openingStage")) {
+if(!t.contains("openingStage",Tag.TAG_STRING))throw new IllegalStateException("field=players.openingStage wrong_type");
+try {e.openingStage=OpeningStage.valueOf(t.getString("openingStage"));}
+catch(IllegalArgumentException ex){throw new IllegalStateException("field=players.openingStage unsupported",ex);}
+if(e.openingStage!=OpeningStage.NOT_STARTED&&e.openingStage!=OpeningStage.COMPLETED&&!t.contains("openingReturnPosition",Tag.TAG_LONG))
+throw new IllegalStateException("field=players.openingReturnPosition missing_or_wrong_type");
+if(t.contains("openingReturnPosition")&&!t.contains("openingReturnPosition",Tag.TAG_LONG))
+throw new IllegalStateException("field=players.openingReturnPosition wrong_type");
+if(t.contains("openingReturnYaw")&&!t.contains("openingReturnYaw",Tag.TAG_FLOAT))
+throw new IllegalStateException("field=players.openingReturnYaw wrong_type");
+if(t.contains("openingReturnPitch")&&!t.contains("openingReturnPitch",Tag.TAG_FLOAT))
+throw new IllegalStateException("field=players.openingReturnPitch wrong_type");
+if(t.contains("openingReturnPosition",Tag.TAG_LONG))e.openingReturnPosition=BlockPos.of(t.getLong("openingReturnPosition"));
+e.openingReturnYaw=t.getFloat("openingReturnYaw");e.openingReturnPitch=t.getFloat("openingReturnPitch");
+if(!Float.isFinite(e.openingReturnYaw)||!Float.isFinite(e.openingReturnPitch))
+throw new IllegalStateException("field=players.openingReturnRotation non_finite");
+} else e.openingStage=OpeningStage.COMPLETED; // Existing worlds entered before the opening existed.
 e.progress = new Progress(t.getInt("clues"), t.getLong("next"), t.getInt("events"), t.getBoolean("complete"));
 if (t.contains("station")) e.station = BlockPos.of(t.getLong("station"));
 if (t.hasUUID("encounter")) e.encounter = t.getUUID("encounter");
@@ -140,6 +160,45 @@ private void verifySourceUnchanged() throws java.io.IOException {
 if(storageFile==null)return;
 if(expectedHash==null?!java.nio.file.Files.notExists(storageFile):!expectedHash.equals(StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile))))
 throw new java.io.IOException("source_changed_since_load");
+}
+
+/** Commit one semantic opening step before publishing it to the live player record. */
+public synchronized String commitOpening(UUID player,OpeningStage expected,BlockPos returnPosition,float yaw,float pitch,
+        HolderLookup.Provider registry) {
+if(!storySaveWritable)throw new IllegalStateException("STORY_WRITE_BLOCKED previous_guard_failure");
+if(storageFile==null)throw new IllegalStateException("OPENING_STORAGE_NOT_BOUND");
+var live=players.get(player);
+if(live==null||live.openingStage!=expected)throw new IllegalStateException("OPENING_STALE_STAGE");
+var next=expected.next();
+var origin=expected==OpeningStage.NOT_STARTED?Objects.requireNonNull(returnPosition,"returnPosition"):live.openingReturnPosition;
+if(origin==null)throw new IllegalStateException("OPENING_RETURN_POSITION_MISSING");
+if(!Float.isFinite(yaw)||!Float.isFinite(pitch))throw new IllegalStateException("OPENING_ROTATION_INVALID");
+try {verifySourceUnchanged();}
+catch(java.io.IOException ex){storySaveWritable=false;throw new java.io.UncheckedIOException("STORY_WRITE_BLOCKED source_changed",ex);}
+var payload=savePayload(new CompoundTag(),registry,returnNetwork);
+var records=payload.getList("players",Tag.TAG_COMPOUND);
+boolean found=false;
+for(int i=0;i<records.size();i++) {
+var t=records.getCompound(i);
+if(!t.getUUID("id").equals(player))continue;
+t.putString("openingStage",next.name());
+t.putLong("openingReturnPosition",origin.asLong());
+t.putFloat("openingReturnYaw",expected==OpeningStage.NOT_STARTED?yaw:live.openingReturnYaw);
+t.putFloat("openingReturnPitch",expected==OpeningStage.NOT_STARTED?pitch:live.openingReturnPitch);
+found=true;break;
+}
+if(!found)throw new IllegalStateException("OPENING_PLAYER_NOT_SAVED");
+var envelope=new CompoundTag();envelope.put("data",payload);NbtUtils.addCurrentDataVersion(envelope);
+try {
+storyWriter.write(envelope,storageFile);
+var persisted=NbtIo.readCompressed(storageFile,NbtAccounter.create(64*1024*1024));
+if(!persisted.equals(envelope))throw new java.io.IOException("opening_readback_mismatch");
+expectedHash=StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile));
+live.openingStage=next;live.openingReturnPosition=origin;
+if(expected==OpeningStage.NOT_STARTED){live.openingReturnYaw=yaw;live.openingReturnPitch=pitch;}
+setDirty(false);return expectedHash;
+} catch(java.io.IOException ex){storySaveWritable=false;throw new java.io.UncheckedIOException("OPENING_COMMIT_FAILED",ex);}
+catch(RuntimeException ex){storySaveWritable=false;throw ex;}
 }
 
 private ReturnNetworkBoundary validateDirectTransition(ReturnNetworkState before, ReturnNetworkState after) {
@@ -278,6 +337,9 @@ var list = new ListTag();
 players.forEach((id, e) -> {
 var t = new CompoundTag();
 t.putUUID("id", id); t.putInt("clues", e.progress.clues());
+t.putString("openingStage",e.openingStage.name());
+if(e.openingReturnPosition!=null)t.putLong("openingReturnPosition",e.openingReturnPosition.asLong());
+t.putFloat("openingReturnYaw",e.openingReturnYaw);t.putFloat("openingReturnPitch",e.openingReturnPitch);
 t.putLong("next", e.progress.nextEventTick()); t.putInt("events", e.progress.eventsPlayed());
 t.putBoolean("complete", e.progress.encounterComplete()); t.putLong("readingUntil", e.readingUntil);
 if (e.station != null) t.putLong("station", e.station.asLong());

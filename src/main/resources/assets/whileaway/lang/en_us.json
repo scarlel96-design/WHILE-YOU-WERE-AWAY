@@ -75,5 +75,12 @@
   "story.whileaway.network.waiting_npc": "Check that Yeoul can reach the equipment.",
   "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection.",
   "story.whileaway.network.listening": "A faint light and tone repeat above the relay.",
-  "story.whileaway.network.signal_ready": "The signal has stopped. You can examine the equipment again."
+  "story.whileaway.network.signal_ready": "The signal has stopped. You can examine the equipment again.",
+  "story.whileaway.opening.route": "Your feet already know the route.",
+  "story.whileaway.opening.rail": "The rail leads to a sealed passage. You think you carried something.",
+  "story.whileaway.opening.signal": "Operate the signal lever on the right.",
+  "story.whileaway.opening.gap": "…You do not remember passing the gate. Your feet keep moving.",
+  "story.whileaway.opening.voice": "A distant voice: 'That route is closed. Keep moving!'",
+  "story.whileaway.opening.last_gap": "…The last thing you heard was a rail signal.",
+  "story.whileaway.opening.overworld": "You wake in an unfamiliar Overworld. Your life here is yours to make."
 }

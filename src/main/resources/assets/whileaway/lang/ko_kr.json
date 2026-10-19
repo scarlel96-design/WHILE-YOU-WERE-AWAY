@@ -75,5 +75,12 @@
   "story.whileaway.network.waiting_npc": "여울이 설비에 닿을 수 있는 길을 확인하자.",
   "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다.",
   "story.whileaway.network.listening": "중계함 위에서 희미한 빛과 소리가 반복된다.",
-  "story.whileaway.network.signal_ready": "신호가 멎었다. 설비를 다시 살펴볼 수 있다."
+  "story.whileaway.network.signal_ready": "신호가 멎었다. 설비를 다시 살펴볼 수 있다.",
+  "story.whileaway.opening.route": "발은 이미 길을 기억한다.",
+  "story.whileaway.opening.rail": "철로는 막힌 문까지 이어진다. 손에는 무언가가 있었던 것 같다.",
+  "story.whileaway.opening.signal": "오른쪽 신호 레버를 작동해야 한다.",
+  "story.whileaway.opening.gap": "…문을 지난 기억이 없다. 그런데 발은 계속 움직이고 있다.",
+  "story.whileaway.opening.voice": "멀리서 들린다. ‘그쪽 길은 닫혔어. 계속 가!’",
+  "story.whileaway.opening.last_gap": "…마지막으로 들린 것은 철도 신호였다.",
+  "story.whileaway.opening.overworld": "눈을 뜨자 낯선 오버월드다. 이제는 스스로 살아가야 한다."
 }

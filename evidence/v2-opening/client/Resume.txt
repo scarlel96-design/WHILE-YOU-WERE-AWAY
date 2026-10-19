@@ -1,0 +1,3 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=47772
+PASS Resume stage=COMPLETED dimension=overworld gate=15_blocks lever=player_use gaps=2 diskHash=1ebdf2263ff91cdd47212ca767c86dad3a0b9cb5384bc002abccfd599ab152a9

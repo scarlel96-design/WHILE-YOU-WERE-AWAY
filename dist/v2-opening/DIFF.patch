@@ -1,0 +1,685 @@
+diff --git a/build.gradle b/build.gradle
+index 624dc80..832c364 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -180,6 +180,13 @@ neoForge {
+                 systemProperty 'whileaway.evidence',file('evidence/return-network-integration/client').absolutePath
+             }
+         }
++        ['Fresh','Reopen','Cut','Resume'].each { mode ->
++            create("opening${mode}") {
++                client(); gameDirectory=file('../../work/v2-opening-client')
++                systemProperty 'whileaway.openingSmoke',mode
++                systemProperty 'whileaway.evidence',file('evidence/v2-opening/client').absolutePath
++            }
++        }
+         recoveryLegacy {
+             client()
+             gameDirectory = file('../../work/recovery-smoke')
+@@ -669,3 +676,23 @@ tasks.named('runRecoveryLegacy').configure {
+         }
+     }
+ }
++
++['Fresh','Reopen','Cut','Resume'].each { mode ->
++    tasks.named("runOpening${mode}").configure {
++        doFirst {
++            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/return-network-integration/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
++            def dir=file('../../work/v2-opening-client');dir.mkdirs()
++            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
++            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
++            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
++            file('evidence/v2-opening/client').mkdirs()
++            file("evidence/v2-opening/client/${mode}.txt").setText('RUNNING\n','UTF-8')
++        }
++        doLast {
++            if(!file("evidence/v2-opening/client/${mode}.txt").text.contains("PASS ${mode}"))throw new GradleException('Opening client gate incomplete')
++            logger.lifecycle("OPENING_CHILD_EXIT=${executionResult.get().exitValue}")
++        }
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/NarrativeData.java b/src/main/java/io/github/whileaway/NarrativeData.java
+index 4fed800..8f7fb28 100644
+--- a/src/main/java/io/github/whileaway/NarrativeData.java
++++ b/src/main/java/io/github/whileaway/NarrativeData.java
+@@ -49,6 +49,9 @@ public final Map<String,StoryActorRecord> actors=new TreeMap<>();
+ 
+ public static final class Entry {
+ public Progress progress = Progress.empty();
++public OpeningStage openingStage = OpeningStage.NOT_STARTED;
++public BlockPos openingReturnPosition;
++public float openingReturnYaw,openingReturnPitch;
+ public BlockPos station;
+ public UUID encounter;
+ public long readingUntil;
+@@ -96,6 +99,23 @@ for (int i = 0; i < list.size(); i++) {
+ var t = list.getCompound(i);
+ if (!t.hasUUID("id")) continue;
+ var e = data.entry(t.getUUID("id"));
++if(t.contains("openingStage")) {
++if(!t.contains("openingStage",Tag.TAG_STRING))throw new IllegalStateException("field=players.openingStage wrong_type");
++try {e.openingStage=OpeningStage.valueOf(t.getString("openingStage"));}
++catch(IllegalArgumentException ex){throw new IllegalStateException("field=players.openingStage unsupported",ex);}
++if(e.openingStage!=OpeningStage.NOT_STARTED&&e.openingStage!=OpeningStage.COMPLETED&&!t.contains("openingReturnPosition",Tag.TAG_LONG))
++throw new IllegalStateException("field=players.openingReturnPosition missing_or_wrong_type");
++if(t.contains("openingReturnPosition")&&!t.contains("openingReturnPosition",Tag.TAG_LONG))
++throw new IllegalStateException("field=players.openingReturnPosition wrong_type");
++if(t.contains("openingReturnYaw")&&!t.contains("openingReturnYaw",Tag.TAG_FLOAT))
++throw new IllegalStateException("field=players.openingReturnYaw wrong_type");
++if(t.contains("openingReturnPitch")&&!t.contains("openingReturnPitch",Tag.TAG_FLOAT))
++throw new IllegalStateException("field=players.openingReturnPitch wrong_type");
++if(t.contains("openingReturnPosition",Tag.TAG_LONG))e.openingReturnPosition=BlockPos.of(t.getLong("openingReturnPosition"));
++e.openingReturnYaw=t.getFloat("openingReturnYaw");e.openingReturnPitch=t.getFloat("openingReturnPitch");
++if(!Float.isFinite(e.openingReturnYaw)||!Float.isFinite(e.openingReturnPitch))
++throw new IllegalStateException("field=players.openingReturnRotation non_finite");
++} else e.openingStage=OpeningStage.COMPLETED; // Existing worlds entered before the opening existed.
+ e.progress = new Progress(t.getInt("clues"), t.getLong("next"), t.getInt("events"), t.getBoolean("complete"));
+ if (t.contains("station")) e.station = BlockPos.of(t.getLong("station"));
+ if (t.hasUUID("encounter")) e.encounter = t.getUUID("encounter");
+@@ -142,6 +162,45 @@ if(expectedHash==null?!java.nio.file.Files.notExists(storageFile):!expectedHash.
+ throw new java.io.IOException("source_changed_since_load");
+ }
+ 
++/** Commit one semantic opening step before publishing it to the live player record. */
++public synchronized String commitOpening(UUID player,OpeningStage expected,BlockPos returnPosition,float yaw,float pitch,
++        HolderLookup.Provider registry) {
++if(!storySaveWritable)throw new IllegalStateException("STORY_WRITE_BLOCKED previous_guard_failure");
++if(storageFile==null)throw new IllegalStateException("OPENING_STORAGE_NOT_BOUND");
++var live=players.get(player);
++if(live==null||live.openingStage!=expected)throw new IllegalStateException("OPENING_STALE_STAGE");
++var next=expected.next();
++var origin=expected==OpeningStage.NOT_STARTED?Objects.requireNonNull(returnPosition,"returnPosition"):live.openingReturnPosition;
++if(origin==null)throw new IllegalStateException("OPENING_RETURN_POSITION_MISSING");
++if(!Float.isFinite(yaw)||!Float.isFinite(pitch))throw new IllegalStateException("OPENING_ROTATION_INVALID");
++try {verifySourceUnchanged();}
++catch(java.io.IOException ex){storySaveWritable=false;throw new java.io.UncheckedIOException("STORY_WRITE_BLOCKED source_changed",ex);}
++var payload=savePayload(new CompoundTag(),registry,returnNetwork);
++var records=payload.getList("players",Tag.TAG_COMPOUND);
++boolean found=false;
++for(int i=0;i<records.size();i++) {
++var t=records.getCompound(i);
++if(!t.getUUID("id").equals(player))continue;
++t.putString("openingStage",next.name());
++t.putLong("openingReturnPosition",origin.asLong());
++t.putFloat("openingReturnYaw",expected==OpeningStage.NOT_STARTED?yaw:live.openingReturnYaw);
++t.putFloat("openingReturnPitch",expected==OpeningStage.NOT_STARTED?pitch:live.openingReturnPitch);
++found=true;break;
++}
++if(!found)throw new IllegalStateException("OPENING_PLAYER_NOT_SAVED");
++var envelope=new CompoundTag();envelope.put("data",payload);NbtUtils.addCurrentDataVersion(envelope);
++try {
++storyWriter.write(envelope,storageFile);
++var persisted=NbtIo.readCompressed(storageFile,NbtAccounter.create(64*1024*1024));
++if(!persisted.equals(envelope))throw new java.io.IOException("opening_readback_mismatch");
++expectedHash=StoryStorage.digest(java.nio.file.Files.readAllBytes(storageFile));
++live.openingStage=next;live.openingReturnPosition=origin;
++if(expected==OpeningStage.NOT_STARTED){live.openingReturnYaw=yaw;live.openingReturnPitch=pitch;}
++setDirty(false);return expectedHash;
++} catch(java.io.IOException ex){storySaveWritable=false;throw new java.io.UncheckedIOException("OPENING_COMMIT_FAILED",ex);}
++catch(RuntimeException ex){storySaveWritable=false;throw ex;}
++}
++
+ private ReturnNetworkBoundary validateDirectTransition(ReturnNetworkState before, ReturnNetworkState after) {
+ if(before.save().equals(after.save()))return ReturnNetworkBoundary.NO_CHANGE;
+ 
+@@ -278,6 +337,9 @@ var list = new ListTag();
+ players.forEach((id, e) -> {
+ var t = new CompoundTag();
+ t.putUUID("id", id); t.putInt("clues", e.progress.clues());
++t.putString("openingStage",e.openingStage.name());
++if(e.openingReturnPosition!=null)t.putLong("openingReturnPosition",e.openingReturnPosition.asLong());
++t.putFloat("openingReturnYaw",e.openingReturnYaw);t.putFloat("openingReturnPitch",e.openingReturnPitch);
+ t.putLong("next", e.progress.nextEventTick()); t.putInt("events", e.progress.eventsPlayed());
+ t.putBoolean("complete", e.progress.encounterComplete()); t.putLong("readingUntil", e.readingUntil);
+ if (e.station != null) t.putLong("station", e.station.asLong());
+diff --git a/src/main/java/io/github/whileaway/NpcEvents.java b/src/main/java/io/github/whileaway/NpcEvents.java
+index d33e0d0..676e168 100644
+--- a/src/main/java/io/github/whileaway/NpcEvents.java
++++ b/src/main/java/io/github/whileaway/NpcEvents.java
+@@ -42,6 +42,11 @@ public final class NpcEvents {
+         return level.hasChunkAt(p)&&level.getBlockState(p).isAir()&&level.getBlockState(p.above()).isAir()
+             &&level.getFluidState(p).isEmpty()&&level.getBlockState(p.below()).isCollisionShapeFullBlock(level,p.below());
+     }
++    /** The settled resident checks the light during the day and returns home at night. */
++    static BlockPos residenceDestination(BlockPos home,long dayTime) {
++        long hour=Math.floorMod(dayTime,24000);
++        return hour>=5000&&hour<11000?home.east():home;
++    }
+     public static boolean interact(StoryNpc npc,ServerPlayer p) {
+         if(!StoryStorage.available(p.getServer())||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!p.isAlive())return false;
+         var r=NarrativeData.get(p.getServer()).actors.get(STORY);
+@@ -61,12 +66,13 @@ public final class NpcEvents {
+         if(!problems.isEmpty()){StoryStorage.block(server,String.join(";",problems));npc.getNavigation().stop();return;}
+         if(r.checkpoint.checkpoint==4 && ReturnNetworkEvents.update(npc,r))return;
+         var home=NpcState.home(r);
++        var destination=r.checkpoint.checkpoint==4?residenceDestination(home,level.getDayTime()):home;
+         var nearby=witness(level,npc.blockPosition());
+         // No off-screen auto-failure. NPC's life may continue when loaded; event movement needs a living witness.
+         if(r.checkpoint.checkpoint<4&&(nearby==null||!nearby.isAlive())){npc.storyNavigation().externalPause(npc);StoryActors.suspend(npc,r,"npc_no_witness");return;}
+         boolean arrived=false;
+         if(r.checkpoint.checkpoint>=2) {
+-            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),home);
++            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),destination);
+             if(!environment.dependenciesReady()) {
+                 npc.storyNavigation().externalPause(npc);
+                 npc.storyNavigation().diagnostic(npc,r,environment);
+@@ -74,7 +80,7 @@ public final class NpcEvents {
+                 if(r.checkpoint.checkpoint<4)StoryActors.suspend(npc,r,environment.diagnostic());
+                 return;
+             }
+-            var path=npc.storyNavigation().step(npc,home);
++            var path=npc.storyNavigation().step(npc,destination);
+             npc.storyNavigation().diagnostic(npc,r,environment.withPath(path));
+             if(path!=NpcEnvironment.Path.AVAILABLE&&path!=NpcEnvironment.Path.ARRIVED){
+                 if(path!=NpcEnvironment.Path.TEMPORARY_FAILURE&&r.checkpoint.checkpoint<4)StoryActors.suspend(npc,r,environment.withPath(path).diagnostic());
+diff --git a/src/main/java/io/github/whileaway/OpeningEvents.java b/src/main/java/io/github/whileaway/OpeningEvents.java
+new file mode 100644
+index 0000000..535c8f0
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/OpeningEvents.java
+@@ -0,0 +1,161 @@
++package io.github.whileaway;
++
++import java.util.HashMap;
++import java.util.Map;
++import java.util.Set;
++import java.util.UUID;
++import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
++import net.minecraft.core.registries.Registries;
++import net.minecraft.network.chat.Component;
++import net.minecraft.resources.ResourceKey;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.sounds.SoundEvents;
++import net.minecraft.sounds.SoundSource;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.block.LeverBlock;
++import net.minecraft.world.level.block.state.properties.AttachFace;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.neoforge.event.entity.player.PlayerEvent;
++import net.neoforged.neoforge.event.tick.PlayerTickEvent;
++
++/** A short playable memory route. Only semantic transitions enter story storage. */
++public final class OpeningEvents {
++    public static final ResourceKey<Level> MEMORY=ResourceKey.create(Registries.DIMENSION,WhileAway.id("memory_route"));
++    private static final int WALK_Y=129;
++    private static final BlockPos LEVER=new BlockPos(12,WALK_Y,1);
++    private static final BlockPos MARKER=new BlockPos(1,WALK_Y+3,3);
++    private final Map<UUID,Integer> shown=new HashMap<>();
++
++    @SubscribeEvent public void logout(PlayerEvent.PlayerLoggedOutEvent event) {
++        shown.remove(event.getEntity().getUUID());
++    }
++
++    @SubscribeEvent public void tick(PlayerTickEvent.Post event) {
++        if(!(event.getEntity() instanceof ServerPlayer p)||p.tickCount%5!=0||!StoryStorage.available(p.getServer()))return;
++        var server=p.getServer();
++        var data=NarrativeData.get(server);
++        var entry=data.entry(p.getUUID());
++        switch(entry.openingStage) {
++            case NOT_STARTED -> {
++                if(p.level().dimension()!=Level.OVERWORLD||!p.isAlive())return;
++                var memory=server.getLevel(MEMORY);
++                if(memory==null)return;
++                data.commitOpening(p.getUUID(),OpeningStage.NOT_STARTED,p.blockPosition(),p.getYRot(),p.getXRot(),server.registryAccess());
++                build(memory);
++                enter(p,memory);
++            }
++            case STARTED -> {
++                var memory=server.getLevel(MEMORY);
++                if(memory==null)return;
++                build(memory);
++                if(p.level().dimension()!=MEMORY) {
++                    if(p.isAlive())enter(p,memory);
++                    return;
++                }
++                advance(p,memory,data);
++            }
++            case TRANSITION -> {
++                if(p.level().dimension()==MEMORY) {
++                    leave(p,entry);
++                } else if(p.level().dimension()==Level.OVERWORLD) {
++                    data.commitOpening(p.getUUID(),OpeningStage.TRANSITION,null,0,0,server.registryAccess());
++                }
++            }
++            case OVERWORLD_COMMITTED -> {
++                if(p.level().dimension()==MEMORY) {
++                    leave(p,entry);
++                } else if(p.level().dimension()==Level.OVERWORLD) {
++                    data.commitOpening(p.getUUID(),OpeningStage.OVERWORLD_COMMITTED,null,0,0,server.registryAccess());
++                    p.sendSystemMessage(Component.translatable("story.whileaway.opening.overworld"));
++                }
++            }
++            case COMPLETED -> shown.remove(p.getUUID());
++        }
++    }
++
++    private void enter(ServerPlayer p,ServerLevel memory) {
++        if(p.teleportTo(memory,2.5,WALK_Y,0.5,Set.of(),-90,0)) {
++            p.setDeltaMovement(0,0,0);
++            p.fallDistance=0;
++            say(p,1,"story.whileaway.opening.route");
++        }
++    }
++
++    private void advance(ServerPlayer p,ServerLevel memory,NarrativeData data) {
++        if(p.getZ()<-2||p.getZ()>3||p.getY()<WALK_Y-2||p.getY()>WALK_Y+4)return;
++        int x=p.blockPosition().getX();
++        if(x>=7)say(p,2,"story.whileaway.opening.rail");
++        if(x>=11&&!powered(memory))say(p,3,"story.whileaway.opening.signal");
++        if(!powered(memory))return;
++        for(int z=-2;z<=2;z++)for(int y=WALK_Y;y<=WALK_Y+2;y++)
++            memory.setBlock(new BlockPos(16,y,z),Blocks.AIR.defaultBlockState(),2);
++        if(x>=19&&x<23&&shown.getOrDefault(p.getUUID(),0)<4) {
++            shown.put(p.getUUID(),4);
++            p.teleportTo(memory,23.5,WALK_Y,0.5,Set.of(),-90,0);
++            p.setDeltaMovement(0,0,0);
++            say(p,5,"story.whileaway.opening.gap");
++            return;
++        }
++        if(x>=27)say(p,6,"story.whileaway.opening.voice");
++        if(x>=33&&x<36&&shown.getOrDefault(p.getUUID(),0)<7) {
++            shown.put(p.getUUID(),7);
++            p.teleportTo(memory,36.5,WALK_Y,0.5,Set.of(),-90,0);
++            p.setDeltaMovement(0,0,0);
++            say(p,8,"story.whileaway.opening.last_gap");
++            return;
++        }
++        if(x>=39) {
++            var entry=data.entry(p.getUUID());
++            data.commitOpening(p.getUUID(),OpeningStage.STARTED,null,0,0,p.getServer().registryAccess());
++            leave(p,entry);
++        }
++    }
++
++    private boolean powered(ServerLevel level) {
++        var state=level.getBlockState(LEVER);
++        return state.is(Blocks.LEVER)&&state.getValue(LeverBlock.POWERED);
++    }
++
++    private void leave(ServerPlayer p,NarrativeData.Entry entry) {
++        var overworld=p.getServer().overworld();
++        var landing=CityTransit.findLanding(overworld,entry.openingReturnPosition,8);
++        if(landing==null)return;
++        if(p.teleportTo(overworld,landing.getX()+.5,landing.getY(),landing.getZ()+.5,Set.of(),entry.openingReturnYaw,entry.openingReturnPitch)) {
++            p.setDeltaMovement(0,0,0);
++            p.fallDistance=0;
++        }
++    }
++
++    private void say(ServerPlayer p,int marker,String key) {
++        if(shown.getOrDefault(p.getUUID(),0)>=marker)return;
++        shown.put(p.getUUID(),marker);
++        p.displayClientMessage(Component.translatable(key),true);
++        if(marker==2||marker==5||marker==8)
++            p.level().playSound(null,p.blockPosition(),SoundEvents.NOTE_BLOCK_BELL.value(),SoundSource.BLOCKS,.18f,
++                marker==8?.75f:1.25f);
++    }
++
++    private void build(ServerLevel level) {
++        if(level.getBlockState(MARKER).is(Blocks.CHISELED_DEEPSLATE))return;
++        for(int x=0;x<=41;x++)for(int z=-3;z<=3;z++) {
++            var floor=new BlockPos(x,WALK_Y-1,z);
++            level.setBlock(floor,(z==0?Blocks.POLISHED_DEEPSLATE:Blocks.DEEPSLATE_BRICKS).defaultBlockState(),2);
++            for(int y=WALK_Y;y<=WALK_Y+2;y++) {
++                var pos=new BlockPos(x,y,z);
++                var wall=Math.abs(z)==3;
++                level.setBlock(pos,wall?Blocks.DEEPSLATE_BRICKS.defaultBlockState():Blocks.AIR.defaultBlockState(),2);
++            }
++        }
++        for(int x=3;x<=10;x++)level.setBlock(new BlockPos(x,WALK_Y,-1),Blocks.RAIL.defaultBlockState(),2);
++        for(int z=-2;z<=2;z++)for(int y=WALK_Y;y<=WALK_Y+2;y++)
++            level.setBlock(new BlockPos(16,y,z),Blocks.IRON_BARS.defaultBlockState(),2);
++        level.setBlock(new BlockPos(11,WALK_Y,2),Blocks.REDSTONE_LAMP.defaultBlockState(),2);
++        level.setBlock(LEVER,Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACE,AttachFace.FLOOR)
++            .setValue(LeverBlock.FACING,Direction.NORTH),2);
++        level.setBlock(new BlockPos(28,WALK_Y,2),Blocks.OAK_SIGN.defaultBlockState(),2);
++        level.setBlock(MARKER,Blocks.CHISELED_DEEPSLATE.defaultBlockState(),2);
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/OpeningGameTests.java b/src/main/java/io/github/whileaway/OpeningGameTests.java
+new file mode 100644
+index 0000000..ea36600
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/OpeningGameTests.java
+@@ -0,0 +1,70 @@
++package io.github.whileaway;
++
++import java.nio.file.Files;
++import java.nio.file.Path;
++import java.util.Arrays;
++import java.util.UUID;
++import net.minecraft.core.BlockPos;
++import net.minecraft.gametest.framework.GameTest;
++import net.minecraft.gametest.framework.GameTestHelper;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.NbtAccounter;
++import net.minecraft.nbt.NbtIo;
++import net.neoforged.neoforge.gametest.GameTestHolder;
++import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
++
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class OpeningGameTests {
++    private static Path file() throws Exception {
++        var root=Path.of(System.getProperty("whileaway.testEvidence"),"opening");
++        Files.createDirectories(root);
++        return Files.createTempDirectory(root,"story-").resolve("whileaway_story.dat").toAbsolutePath();
++    }
++
++    private static CompoundTag disk(Path file) throws Exception {
++        return NbtIo.readCompressed(file,NbtAccounter.unlimitedHeap()).getCompound("data");
++    }
++
++    @GameTest(template="empty") public static void openingStagesSurviveDiskReload(GameTestHelper h) throws Exception {
++        var file=file();var id=UUID.randomUUID();var origin=new BlockPos(73,82,-46);
++        var data=new NarrativeData();data.entry(id);data.bindStorage(file,null);
++        for(var stage:OpeningStage.values()) {
++            if(stage==OpeningStage.COMPLETED)break;
++            data.commitOpening(id,stage,origin,37.5f,-12.25f,h.getLevel().registryAccess());
++            var loaded=NarrativeData.load(disk(file),h.getLevel().registryAccess());
++            var entry=loaded.entry(id);
++            h.assertTrue(entry.openingStage==stage.next(),"opening stage must be durable and monotonic");
++            h.assertTrue(origin.equals(entry.openingReturnPosition),"return location must survive reload");
++            h.assertTrue(entry.openingReturnYaw==37.5f&&entry.openingReturnPitch==-12.25f,"view must survive reload");
++            loaded.bindStorage(file,StoryStorage.digest(Files.readAllBytes(file)));
++            data=loaded;
++        }
++        byte[] before=Files.readAllBytes(file);boolean rejected=false;
++        try{data.commitOpening(id,OpeningStage.NOT_STARTED,origin,0,0,h.getLevel().registryAccess());}
++        catch(IllegalStateException ex){rejected=ex.getMessage().contains("OPENING_STALE_STAGE");}
++        h.assertTrue(rejected&&Arrays.equals(before,Files.readAllBytes(file)),"stale opening transition leaves disk intact");
++        h.succeed();
++    }
++
++    @GameTest(template="empty") public static void openingWriterFailureBlocksLivePublish(GameTestHelper h) throws Exception {
++        var file=file();var id=UUID.randomUUID();var data=new NarrativeData();data.entry(id);data.bindStorage(file,null);
++        data.setStoryWriterForTest((root,target)->{});boolean rejected=false;
++        try{data.commitOpening(id,OpeningStage.NOT_STARTED,new BlockPos(0,70,0),0,0,h.getLevel().registryAccess());}
++        catch(java.io.UncheckedIOException ex){rejected=true;}
++        h.assertTrue(rejected&&!data.storySaveWritable()&&data.entry(id).openingStage==OpeningStage.NOT_STARTED
++            &&Files.notExists(file),"failed write must retain origin state and block later writes");
++        h.succeed();
++    }
++
++    @GameTest(template="empty") public static void legacyPlayerDoesNotReplayOpening(GameTestHelper h) throws Exception {
++        var id=UUID.randomUUID();var data=new NarrativeData();data.entry(id);
++        var saved=data.save(new CompoundTag(),h.getLevel().registryAccess());
++        saved.getList("players",10).getCompound(0).remove("openingStage");
++        saved.getList("players",10).getCompound(0).remove("openingReturnYaw");
++        saved.getList("players",10).getCompound(0).remove("openingReturnPitch");
++        var loaded=NarrativeData.load(saved,h.getLevel().registryAccess());
++        h.assertTrue(loaded.entry(id).openingStage==OpeningStage.COMPLETED,"legacy player must enter current gameplay");
++        h.succeed();
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/OpeningStage.java b/src/main/java/io/github/whileaway/OpeningStage.java
+new file mode 100644
+index 0000000..2f232d5
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/OpeningStage.java
+@@ -0,0 +1,20 @@
++package io.github.whileaway;
++
++/** Durable steps for the playable memory route. Presentation timing is transient. */
++public enum OpeningStage {
++    NOT_STARTED,
++    STARTED,
++    TRANSITION,
++    OVERWORLD_COMMITTED,
++    COMPLETED;
++
++    public OpeningStage next() {
++        return switch (this) {
++            case NOT_STARTED -> STARTED;
++            case STARTED -> TRANSITION;
++            case TRANSITION -> OVERWORLD_COMMITTED;
++            case OVERWORLD_COMMITTED -> COMPLETED;
++            case COMPLETED -> throw new IllegalStateException("opening_already_completed");
++        };
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/StoryEvents.java b/src/main/java/io/github/whileaway/StoryEvents.java
+index 9d293ef..40c9595 100644
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -38,7 +38,7 @@ public final class StoryEvents {
+             if(!StoryStorage.available(p.getServer())){p.sendSystemMessage(Component.literal("WhileAway: story load blocked; original preserved; recovery pending."));return;}
+             var d=NarrativeData.get(p.getServer()); var e=d.entry(p.getUUID());
+             e.progress=e.progress.defer(p.getServer().overworld().getGameTime()+600); d.setDirty();
+-            p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
++            if(e.openingStage==OpeningStage.COMPLETED)p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
+         }
+     }
+     @SubscribeEvent public void logout(PlayerEvent.PlayerLoggedOutEvent event) {
+@@ -51,6 +51,7 @@ public final class StoryEvents {
+         Vec3 old=positions.put(id,p.position());
+         if(old!=null && old.distanceToSqr(p.position())>.03) activeUntil.put(id,now+100);
+         var data=NarrativeData.get(p.getServer()); var e=data.entry(id);
++        if(e.openingStage!=OpeningStage.COMPLETED)return;
+         if(SceneRecovery.busy(p))return;
+         if(e.station==null) return;
+         boolean near=p.blockPosition().distSqr(e.station)<32*32;
+diff --git a/src/main/java/io/github/whileaway/WhileAway.java b/src/main/java/io/github/whileaway/WhileAway.java
+index 11ff30b..e9eda1b 100644
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -83,6 +83,7 @@ public final class WhileAway {
+             }));
+         });
+         NeoForge.EVENT_BUS.register(new StoryEvents());
++        NeoForge.EVENT_BUS.register(new OpeningEvents());
+         NeoForge.EVENT_BUS.register(new CityDistrict());
+         NeoForge.EVENT_BUS.register(new CityHorror());
+         NeoForge.EVENT_BUS.register(new SceneRecovery());
+diff --git a/src/main/java/io/github/whileaway/client/OpeningSmoke.java b/src/main/java/io/github/whileaway/client/OpeningSmoke.java
+new file mode 100644
+index 0000000..f891dce
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/client/OpeningSmoke.java
+@@ -0,0 +1,143 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.NarrativeData;
++import io.github.whileaway.OpeningEvents;
++import io.github.whileaway.OpeningStage;
++import io.github.whileaway.StoryStorage;
++import io.github.whileaway.WhileAway;
++import java.nio.file.Files;
++import java.nio.file.Path;
++import java.util.Set;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.screens.TitleScreen;
++import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
++import net.minecraft.nbt.NbtAccounter;
++import net.minecraft.nbt.NbtIo;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.Difficulty;
++import net.minecraft.world.InteractionHand;
++import net.minecraft.world.level.GameRules;
++import net.minecraft.world.level.GameType;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.LevelSettings;
++import net.minecraft.world.level.WorldDataConfiguration;
++import net.minecraft.world.level.levelgen.WorldOptions;
++import net.minecraft.world.level.levelgen.presets.WorldPresets;
++import net.minecraft.world.level.storage.LevelResource;
++import net.minecraft.world.phys.BlockHitResult;
++import net.minecraft.world.phys.Vec3;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in real-client check for the first opening route and its saved return. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class OpeningSmoke {
++    private static final String MODE=System.getProperty("whileaway.openingSmoke","");
++    private static final String WORLD=MODE.equals("Cut")||MODE.equals("Resume")
++        ?"opening-v2-resume-fixture":"opening-v2-fixture-2";
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/v2-opening/client"));
++    private static boolean launched;
++    private static volatile boolean queued,finished;
++    private static int ticks,step;
++    private static void check(boolean ok,String message){if(!ok)throw new IllegalStateException(message);}
++    private static void note(String line) throws Exception {
++        Files.createDirectories(E);
++        Files.writeString(E.resolve(MODE+".txt"),line+"\n",java.nio.file.StandardOpenOption.CREATE,
++            java.nio.file.StandardOpenOption.APPEND);
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
++        if(MODE.isEmpty()||finished)return;
++        var mc=Minecraft.getInstance();
++        try {
++            if(!launched&&mc.screen instanceof TitleScreen) {
++                launched=true;note(ClientTestEnvironment.verify(E,MODE));
++                if(MODE.equals("Fresh")||MODE.equals("Cut")) {
++                    check(Files.notExists(mc.gameDirectory.toPath().resolve("saves").resolve(WORLD)),"fixture world already exists");
++                    var rules=new GameRules();rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(false,null);
++                    mc.createWorldOpenFlows().createFreshLevel(WORLD,
++                        new LevelSettings("Opening V2 fixture",GameType.SURVIVAL,false,Difficulty.NORMAL,true,rules,WorldDataConfiguration.DEFAULT),
++                        new WorldOptions(74192361L,true,false),WorldPresets::createNormalWorldDimensions,new TitleScreen());
++                } else mc.createWorldOpenFlows().openWorld(WORLD,mc::stop);
++            }
++            if(++ticks>12000)throw new IllegalStateException("opening timeout step="+step);
++            if(mc.player==null||mc.getSingleplayerServer()==null||queued||ticks%10!=0)return;
++            queued=true;
++            mc.getSingleplayerServer().execute(()->{
++                try {
++                    var server=mc.getSingleplayerServer();
++                    ServerPlayer p=server.getPlayerList().getPlayer(mc.player.getUUID());
++                    if(p==null||!StoryStorage.available(server))return;
++                    var data=NarrativeData.get(server);var state=data.entry(p.getUUID()).openingStage;
++                    var memory=server.getLevel(OpeningEvents.MEMORY);
++                    check(memory!=null,"memory dimension absent");
++                    if(MODE.equals("Reopen")) {
++                        check(state==OpeningStage.COMPLETED&&p.level().dimension()==Level.OVERWORLD,"completed opening replayed");
++                        if(step++<5)return;
++                        note("PASS Reopen stage="+state+" dimension=overworld stableTicks=50");
++                        finish(mc,server);return;
++                    }
++                    if(MODE.equals("Resume")&&step==0) {
++                        check(state==OpeningStage.STARTED&&p.level().dimension()==OpeningEvents.MEMORY,
++                            "interrupted opening did not resume in memory");
++                        check(p.getX()>=27&&p.getX()<33,"first gap replay moved player backward");
++                        p.teleportTo(memory,33.5,129,.5,Set.of(),-90,0);step=3;
++                        return;
++                    }
++                    if(step>=4&&state==OpeningStage.COMPLETED&&p.level().dimension()==Level.OVERWORLD) {
++                        var file=server.getWorldPath(LevelResource.ROOT).resolve("data/whileaway_story.dat");
++                        var disk=NbtIo.readCompressed(file,NbtAccounter.unlimitedHeap()).getCompound("data");
++                        var records=disk.getList("players",10);boolean found=false;
++                        for(int i=0;i<records.size();i++) {
++                            var record=records.getCompound(i);
++                            if(record.hasUUID("id")&&record.getUUID("id").equals(p.getUUID()))
++                                found=record.getString("openingStage").equals("COMPLETED");
++                        }
++                        check(found,"completed stage absent on disk");
++                        note("PASS "+MODE+" stage=COMPLETED dimension=overworld gate=15_blocks lever=player_use gaps=2 diskHash="+
++                            StoryStorage.digest(Files.readAllBytes(file)));
++                        finish(mc,server);return;
++                    }
++                    if(state!=OpeningStage.STARTED||p.level().dimension()!=OpeningEvents.MEMORY)return;
++                    switch(step) {
++                        case 0 -> {
++                            check(memory.getBlockState(new BlockPos(16,129,0)).is(net.minecraft.world.level.block.Blocks.IRON_BARS),"service gate absent");
++                            for(int y=129;y<=131;y++)for(int z=-2;z<=2;z++)
++                                check(memory.getBlockState(new BlockPos(16,y,z)).is(net.minecraft.world.level.block.Blocks.IRON_BARS),"service gate bypass");
++                            p.teleportTo(memory,12.5,129,.5,Set.of(),-90,0);step++;
++                        }
++                        case 1 -> {
++                            var lever=new BlockPos(12,129,1);
++                            p.gameMode.useItemOn(p,memory,p.getMainHandItem(),InteractionHand.MAIN_HAND,
++                                new BlockHitResult(Vec3.atCenterOf(lever),Direction.NORTH,lever,false));
++                            check(memory.getBlockState(lever).getValue(net.minecraft.world.level.block.LeverBlock.POWERED),"player block use did not power signal");
++                            p.teleportTo(memory,19.5,129,.5,Set.of(),-90,0);step++;
++                        }
++                        case 2 -> {
++                            if(p.getX()<23)return;
++                            if(MODE.equals("Cut")) {
++                                p.teleportTo(memory,29.5,129,.5,Set.of(),-90,0);
++                                note("PASS Cut stage=STARTED dimension=memory_route x=29 after_first_gap");
++                                finish(mc,server);return;
++                            }
++                            p.teleportTo(memory,33.5,129,.5,Set.of(),-90,0);step++;
++                        }
++                        case 3 -> {if(p.getX()<36)return;p.teleportTo(memory,39.5,129,.5,Set.of(),-90,0);step++;}
++                        case 4 -> {check(state==OpeningStage.STARTED,"opening stage changed early");step++;}
++                        default -> {}
++                    }
++                }catch(Exception ex){fail(ex);}
++                finally {queued=false;}
++            });
++        }catch(Exception ex){fail(ex);}
++    }
++    private static void finish(Minecraft mc,net.minecraft.server.MinecraftServer server) throws Exception {
++        finished=true;server.saveEverything(true,true,true);server.halt(false);mc.execute(mc::stop);
++    }
++    private static void fail(Exception ex) {
++        try{note("FAIL "+ex);}catch(Exception ignored){}
++        ex.printStackTrace();Runtime.getRuntime().halt(8);
++    }
++}
+diff --git a/src/main/resources/assets/whileaway/lang/en_us.json b/src/main/resources/assets/whileaway/lang/en_us.json
+index aed6ac1..a9d546e 100644
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -75,5 +75,12 @@
+   "story.whileaway.network.waiting_npc": "Check that Yeoul can reach the equipment.",
+   "story.whileaway.network.waiting_environment": "Equipment or access has changed. Progress is retained. Sneak-use the original relay housing to reapply the connection.",
+   "story.whileaway.network.listening": "A faint light and tone repeat above the relay.",
+-  "story.whileaway.network.signal_ready": "The signal has stopped. You can examine the equipment again."
++  "story.whileaway.network.signal_ready": "The signal has stopped. You can examine the equipment again.",
++  "story.whileaway.opening.route": "Your feet already know the route.",
++  "story.whileaway.opening.rail": "The rail leads to a sealed passage. You think you carried something.",
++  "story.whileaway.opening.signal": "Operate the signal lever on the right.",
++  "story.whileaway.opening.gap": "…You do not remember passing the gate. Your feet keep moving.",
++  "story.whileaway.opening.voice": "A distant voice: 'That route is closed. Keep moving!'",
++  "story.whileaway.opening.last_gap": "…The last thing you heard was a rail signal.",
++  "story.whileaway.opening.overworld": "You wake in an unfamiliar Overworld. Your life here is yours to make."
+ }
+diff --git a/src/main/resources/assets/whileaway/lang/ko_kr.json b/src/main/resources/assets/whileaway/lang/ko_kr.json
+index cad37ad..80c622c 100644
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -75,5 +75,12 @@
+   "story.whileaway.network.waiting_npc": "여울이 설비에 닿을 수 있는 길을 확인하자.",
+   "story.whileaway.network.waiting_environment": "설비나 접근로가 달라졌다. 기록은 유지된다. 원래 중계함에서 웅크려 사용하면 연결을 다시 적용할 수 있다.",
+   "story.whileaway.network.listening": "중계함 위에서 희미한 빛과 소리가 반복된다.",
+-  "story.whileaway.network.signal_ready": "신호가 멎었다. 설비를 다시 살펴볼 수 있다."
++  "story.whileaway.network.signal_ready": "신호가 멎었다. 설비를 다시 살펴볼 수 있다.",
++  "story.whileaway.opening.route": "발은 이미 길을 기억한다.",
++  "story.whileaway.opening.rail": "철로는 막힌 문까지 이어진다. 손에는 무언가가 있었던 것 같다.",
++  "story.whileaway.opening.signal": "오른쪽 신호 레버를 작동해야 한다.",
++  "story.whileaway.opening.gap": "…문을 지난 기억이 없다. 그런데 발은 계속 움직이고 있다.",
++  "story.whileaway.opening.voice": "멀리서 들린다. ‘그쪽 길은 닫혔어. 계속 가!’",
++  "story.whileaway.opening.last_gap": "…마지막으로 들린 것은 철도 신호였다.",
++  "story.whileaway.opening.overworld": "눈을 뜨자 낯선 오버월드다. 이제는 스스로 살아가야 한다."
+ }
+diff --git a/src/main/resources/data/whileaway/dimension/memory_route.json b/src/main/resources/data/whileaway/dimension/memory_route.json
+new file mode 100644
+index 0000000..9b02261
+--- /dev/null
++++ b/src/main/resources/data/whileaway/dimension/memory_route.json
+@@ -0,0 +1,16 @@
++{
++  "type": "whileaway:quiet_city",
++  "generator": {
++    "type": "minecraft:flat",
++    "settings": {
++      "biome": "whileaway:quiet_city",
++      "lakes": false,
++      "features": false,
++      "structure_overrides": [],
++      "layers": [
++        { "height": 1, "block": "minecraft:bedrock" },
++        { "height": 127, "block": "minecraft:deepslate" }
++      ]
++    }
++  }
++}

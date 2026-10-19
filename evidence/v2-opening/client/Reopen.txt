@@ -1,0 +1,3 @@
+RUNNING
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=42228
+PASS Reopen stage=COMPLETED dimension=overworld stableTicks=50
