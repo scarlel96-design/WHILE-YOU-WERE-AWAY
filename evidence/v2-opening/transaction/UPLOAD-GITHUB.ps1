@@ -21,6 +21,19 @@ function Invoke-GitHubJson([string]$Method, [string]$Path, $Payload) {
     Invoke-RestMethod @args
 }
 
+function Read-GitBlobBytes([string]$Sha) {
+    $start = [Diagnostics.ProcessStartInfo]::new('git', "cat-file blob $Sha")
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    $start.UseShellExecute = $false
+    $process = [Diagnostics.Process]::Start($start)
+    $buffer = [IO.MemoryStream]::new()
+    $process.StandardOutput.BaseStream.CopyTo($buffer)
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "git cat-file failed: $Sha" }
+    $buffer.ToArray()
+}
+
 $currentBranch = Invoke-GitHubJson 'Get' "branches/$Branch" $null
 if ($currentBranch.commit.sha -ne $BaseCommit) {
     throw "Remote branch changed: $($currentBranch.commit.sha)"
@@ -36,7 +49,7 @@ foreach ($path in $paths) {
     }
     $mode = $Matches[1]
     $expectedBlob = $Matches[2]
-    $bytes = [IO.File]::ReadAllBytes((Join-Path (Get-Location) $path))
+    $bytes = Read-GitBlobBytes $expectedBlob
     $blob = Invoke-GitHubJson 'Post' 'git/blobs' @{ content = [Convert]::ToBase64String($bytes); encoding = 'base64' }
     if ($blob.sha -ne $expectedBlob) { throw "Blob hash mismatch: $path" }
     $treeEntries += @{ path = $path.Replace('\', '/'); mode = $mode; type = 'blob'; sha = $blob.sha }
