@@ -38,7 +38,7 @@ public final class StoryEvents {
             if(!StoryStorage.available(p.getServer())){p.sendSystemMessage(Component.literal("WhileAway: story load blocked; original preserved; recovery pending."));return;}
             var d=NarrativeData.get(p.getServer()); var e=d.entry(p.getUUID());
             e.progress=e.progress.defer(p.getServer().overworld().getGameTime()+600); d.setDirty();
-            p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
+            if(e.openingStage==OpeningStage.COMPLETED)p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
         }
     }
     @SubscribeEvent public void logout(PlayerEvent.PlayerLoggedOutEvent event) {
@@ -51,6 +51,7 @@ public final class StoryEvents {
         Vec3 old=positions.put(id,p.position());
         if(old!=null && old.distanceToSqr(p.position())>.03) activeUntil.put(id,now+100);
         var data=NarrativeData.get(p.getServer()); var e=data.entry(id);
+        if(e.openingStage!=OpeningStage.COMPLETED)return;
         if(SceneRecovery.busy(p))return;
         if(e.station==null) return;
         boolean near=p.blockPosition().distSqr(e.station)<32*32;

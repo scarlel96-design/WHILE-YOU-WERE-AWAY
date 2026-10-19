@@ -180,6 +180,13 @@ neoForge {
                 systemProperty 'whileaway.evidence',file('evidence/return-network-integration/client').absolutePath
             }
         }
+        ['Fresh','Reopen','Cut','Resume'].each { mode ->
+            create("opening${mode}") {
+                client(); gameDirectory=file('../../work/v2-opening-client')
+                systemProperty 'whileaway.openingSmoke',mode
+                systemProperty 'whileaway.evidence',file('evidence/v2-opening/client').absolutePath
+            }
+        }
         recoveryLegacy {
             client()
             gameDirectory = file('../../work/recovery-smoke')
@@ -666,6 +673,26 @@ tasks.named('runRecoveryLegacy').configure {
         doLast {
             if(!file("evidence/return-network-integration/client/${mode}.txt").text.contains("PASS ${mode}"))throw new GradleException('Network client gate incomplete')
             logger.lifecycle("NETWORK_CHILD_EXIT=${executionResult.get().exitValue}")
+        }
+    }
+}
+
+['Fresh','Reopen','Cut','Resume'].each { mode ->
+    tasks.named("runOpening${mode}").configure {
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(file('evidence/return-network-integration/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { k,v -> systemProperty "whileaway.monitor${k}",monitor[v].toString() }
+            def dir=file('../../work/v2-opening-client');dir.mkdirs()
+            def lines=['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].collect { "soundCategory_${it}:0.0" }
+            lines.addAll(['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:false','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700'])
+            new File(dir,'options.txt').setText(lines.join('\n')+'\n','UTF-8')
+            file('evidence/v2-opening/client').mkdirs()
+            file("evidence/v2-opening/client/${mode}.txt").setText('RUNNING\n','UTF-8')
+        }
+        doLast {
+            if(!file("evidence/v2-opening/client/${mode}.txt").text.contains("PASS ${mode}"))throw new GradleException('Opening client gate incomplete')
+            logger.lifecycle("OPENING_CHILD_EXIT=${executionResult.get().exitValue}")
         }
     }
 }

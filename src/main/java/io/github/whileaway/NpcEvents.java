@@ -42,6 +42,11 @@ public final class NpcEvents {
         return level.hasChunkAt(p)&&level.getBlockState(p).isAir()&&level.getBlockState(p.above()).isAir()
             &&level.getFluidState(p).isEmpty()&&level.getBlockState(p.below()).isCollisionShapeFullBlock(level,p.below());
     }
+    /** The settled resident checks the light during the day and returns home at night. */
+    static BlockPos residenceDestination(BlockPos home,long dayTime) {
+        long hour=Math.floorMod(dayTime,24000);
+        return hour>=5000&&hour<11000?home.east():home;
+    }
     public static boolean interact(StoryNpc npc,ServerPlayer p) {
         if(!StoryStorage.available(p.getServer())||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!p.isAlive())return false;
         var r=NarrativeData.get(p.getServer()).actors.get(STORY);
@@ -61,12 +66,13 @@ public final class NpcEvents {
         if(!problems.isEmpty()){StoryStorage.block(server,String.join(";",problems));npc.getNavigation().stop();return;}
         if(r.checkpoint.checkpoint==4 && ReturnNetworkEvents.update(npc,r))return;
         var home=NpcState.home(r);
+        var destination=r.checkpoint.checkpoint==4?residenceDestination(home,level.getDayTime()):home;
         var nearby=witness(level,npc.blockPosition());
         // No off-screen auto-failure. NPC's life may continue when loaded; event movement needs a living witness.
         if(r.checkpoint.checkpoint<4&&(nearby==null||!nearby.isAlive())){npc.storyNavigation().externalPause(npc);StoryActors.suspend(npc,r,"npc_no_witness");return;}
         boolean arrived=false;
         if(r.checkpoint.checkpoint>=2) {
-            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),home);
+            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),destination);
             if(!environment.dependenciesReady()) {
                 npc.storyNavigation().externalPause(npc);
                 npc.storyNavigation().diagnostic(npc,r,environment);
@@ -74,7 +80,7 @@ public final class NpcEvents {
                 if(r.checkpoint.checkpoint<4)StoryActors.suspend(npc,r,environment.diagnostic());
                 return;
             }
-            var path=npc.storyNavigation().step(npc,home);
+            var path=npc.storyNavigation().step(npc,destination);
             npc.storyNavigation().diagnostic(npc,r,environment.withPath(path));
             if(path!=NpcEnvironment.Path.AVAILABLE&&path!=NpcEnvironment.Path.ARRIVED){
                 if(path!=NpcEnvironment.Path.TEMPORARY_FAILURE&&r.checkpoint.checkpoint<4)StoryActors.suspend(npc,r,environment.withPath(path).diagnostic());

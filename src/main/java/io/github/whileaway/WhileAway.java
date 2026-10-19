@@ -83,6 +83,7 @@ public final class WhileAway {
             }));
         });
         NeoForge.EVENT_BUS.register(new StoryEvents());
+        NeoForge.EVENT_BUS.register(new OpeningEvents());
         NeoForge.EVENT_BUS.register(new CityDistrict());
         NeoForge.EVENT_BUS.register(new CityHorror());
         NeoForge.EVENT_BUS.register(new SceneRecovery());
