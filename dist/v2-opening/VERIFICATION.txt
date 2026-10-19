@@ -1,0 +1,50 @@
+V2-01 OPENING TRANSACTION VERIFICATION
+
+Changed branch: work/v2-playable-core
+Changed field: NarrativeData.Entry.openingStage and openingReturnPosition.
+Additional runtime change: NpcEvents.residenceDestination selects the settled resident's work or home destination by day time.
+Input commit: 87917ce518b5dbdd0d9631e600033f5060523b0a
+Save format: 5. Actor schema: optional 1. Return Network schema: 1.
+
+Four transaction artifacts:
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-opening\transaction\MODIFIED_FILE
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-opening\transaction\DIFF_FILE
+VERIFICATION.txt: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-opening\transaction\VERIFICATION.txt
+ROLLBACK.sh: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-opening\transaction\ROLLBACK.sh
+
+BASELINE
+Command: .\gradlew.bat --no-daemon compileJava test --console=plain
+Input: commit 87917ce518b5dbdd0d9631e600033f5060523b0a before Opening edits.
+Literal result: BUILD SUCCESSFUL in 6m 20s
+Exit status: 0
+BASELINE_FILE SHA-256: 259ba59126764362ad84f1f51d85c441f9beb2ec6c5f206fbf176a4a65d920bf
+
+MODIFIED
+Command: .\gradlew.bat --no-daemon compileJava test --console=plain
+Input: working tree with Opening and Yeoul residenceDestination edits.
+Literal result: BUILD SUCCESSFUL in 30s
+Exit status: 0
+MODIFIED_FILE SHA-256: 5b335ac44ea2d5dcb8bb28144f02041f19adc159ef7879fc7c9571636c82edf0
+Restored behavior: New players enter the playable memory route. Existing players remain in their current Overworld story. The resident visits the light during the day and returns home at night.
+Final build command: .\gradlew.bat --no-daemon build --console=plain
+Final build literal output: PASS core assertions=176857; BUILD SUCCESSFUL in 10s
+Final build exit status: 0
+Final GameTest command: .\gradlew.bat --no-daemon runGameTestServer --console=plain
+Final GameTest result: 111 tests were started; BUILD SUCCESSFUL in 47s
+Final GameTest exit status: 0
+
+ROLLBACK
+Command: bash evidence/v2-opening/transaction/ROLLBACK.sh evidence/v2-opening/transaction/ROLLBACK_PROBE
+Input: separate ROLLBACK_PROBE copy of MODIFIED_FILE.
+Literal output: 259ba59126764362ad84f1f51d85c441f9beb2ec6c5f206fbf176a4a65d920bf *evidence/v2-opening/transaction/ROLLBACK_PROBE
+Exit status: 0
+Restored behavior/status: Probe copy matches BASELINE_FILE. MODIFIED_FILE remains changed and retains its modified hash.
+
+Real client evidence, muted on right secondary DISPLAY1:
+Fresh: PASS stage=COMPLETED, dimension=overworld, lever=player_use, gaps=2.
+Reopen: PASS stage=COMPLETED, dimension=overworld, stableTicks=50.
+Cut: PASS stage=STARTED, dimension=memory_route, x=29 after_first_gap.
+Resume: PASS stage=COMPLETED, dimension=overworld, lever=player_use, gaps=2.
+
+Milestone status: V2-01 PARTIAL. The full survival, Returner, recovery, and reinterpretation flow remains to be built and verified.
+The four real-client runs were scripted client checks, not an unassisted human playthrough.
