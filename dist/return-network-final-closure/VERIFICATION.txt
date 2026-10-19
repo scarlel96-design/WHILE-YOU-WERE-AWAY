@@ -24,7 +24,7 @@ Literal result: Detailed task information for runReturnNetworkHuman; Description
 Exit: 0
 Launch command: $env:GRADLE_USER_HOME=(Resolve-Path '..\\gradle-home').Path; .\\gradlew.bat --offline -I tools/ci/return-network-human.init.gradle runReturnNetworkHuman
 Launch output: RETURN_NETWORK_HUMAN_PROFILE=C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\return-network-human-client; SOUND_ON=true; DISPLAY1=2680,120; Minecraft 1.21.1 / NeoForge 21.1.249 / mod 0.3.1-dev.1 loaded.
-Launch exit: still running at preparation time; human scene readability NOT TESTED.
+Launch exit: 1 after orderly cancellation before a world was joined. Sound engine initialized with OpenAL Creative Pebble X Plus, but the game window did not appear in the available computer-control window list; no live scene audio was captured or heard. Human scene readability NOT TESTED.
 Copied input world: work/return-network-signal-client/saves/signal-CutBefore (checkpoint 4 boundary) → work/return-network-human-client/saves/return-network-human; 39 files; copied story SHA-256 843A1CE8978C8ABC5FC196F0BCD8F545CF2C371677B48C804A9AC2873135C9CF. Original world left unchanged.
 
 ROLLBACK
@@ -38,4 +38,23 @@ First Git Bash attempt inside restricted execution failed before script start: f
 Actor diagnostic investigation:
 Reopen-10 checkpoint 6 reported `canonical count not one`; file load recorded actorCount=1, same UUID b576b8cc-0a7d-45ea-8216-52f25bc0fc8a, instance 2ee78da8-6cfd-490b-8a2f-f037a46b5add, generation 0. Reopen-11 and Reopen-13 fresh processes on the same world passed checkpoint 6 with exactly one canonical actor and the same identity. Reopen-12 passed on another copy. The old smoke assertion required a ready-candidate outcome even when the snapshot chunk was not ready; current smoke permits one matching canonical actor under UNLOADED_OR_UNCONFIRMED and still rejects zero or multiple matches. The precise transient cause remains unproven; no production Actor policy changed. Classified KNOWN NON-BLOCKING DIAGNOSTIC ISSUE pending final client smoke.
 
-Event status: PARTIAL pending sound-on human readability and the final milestone gate.
+Acoustic self-assessment (actual Minecraft bell OGG, pitch 1.5, 4-tick retrigger, configured gain):
+Artifact: dist/return-network-final-closure/signal-acoustic-preview.wav; 576044 bytes; SHA-256 AA5976B71F6CBADBB8038EE91447ECC482E81214591502F25DDC0371E3BFA24E.
+Command/input: local synthesis of the exact bell OGG from the NeoForge asset cache, using production 12/16/12/16/36 tick pulse schedule, 4-tick bell retriggers, 20 ticks/second, pitch 1.5 and gain 0.12 * 0.5 * 0.7. Synthesis result: exit 0; WAV generated.
+Literal analysis result: source OGG 48000 Hz / 0.439 s; pitch-adjusted bell approximately 0.293 s; SHORT 0.6 s, SHORT 0.6 s, LONG 1.8 s, gap 0.8 s; 20 ms RMS threshold sweep 0.00015–0.0006 detects three groups 0.00–0.64 s, 1.40–2.04 s, 2.80–4.64 s (0.64/0.64/1.84 s). Peak 0.009319 (-40.6 dBFS), global RMS 0.001667.
+Assessment: SHORT-SHORT-LONG temporal distinction PASS by wave-form measurement. Real speaker audibility, subjective rhythm, and full scene causality NOT TESTED; no audio input/capture was available to this agent. Low absolute peak is a tuning risk, not a measured in-game failure. Production gain/timing unchanged.
+
+Final milestone gate:
+Command: $env:GRADLE_USER_HOME=(Resolve-Path '..\gradle-home').Path; .\gradlew.bat --offline runGameTestServer build --console=plain *> dist\return-network-final-closure\final-gate.log
+Input: final production source at HEAD 405ee7a4079591ed5ef5d95e570672a90659e8b8; production files unchanged from 4f334e8fc31d6835fb7188ddad2a0a928e930d08.
+Literal result: All 108 required tests passed :); PASS core assertions=176857; BUILD SUCCESSFUL in 52s; FINAL_GATE_EXIT=0.
+Exit: 0. Log SHA-256 B74289670EDAEAAC2CD726D47E8AC090B0F6F9A5AA173E31B251F28F806F272F.
+
+Targeted actual client smoke:
+Command: pwsh -NoProfile -File tools\run-return-network-signal.ps1 -Mode Normal -World signal-normal-closure-30 -Attempt 30
+Input: isolated copied world, whose actual loaded checkpoint was 6; muted scripted client on DISPLAY1.
+Literal result: PASS Normal cp=6 canonical=1 generation=0 uuid=b576b8cc-0a7d-45ea-8216-52f25bc0fc8a instance=2ee78da8-6cfd-490b-8a2f-f037a46b5add stableTicks=160 aftermath=true; disk SHA-256 66f2fe56f8eb8bb3f2e42c00bb5608f415511cf25b1b03de45dc519346556f6a.
+Exit: 0; process exited, 65 s. This run proves completed-event revisit/canonical identity only; it does not prove a fresh 0-to-6 progression or audible signal. Evidence file evidence/return-network-signal/client/Normal-30/Normal.txt SHA-256 EF5350EC69EEE98883195B40AB1FC1C25E8F1C41138C953CC9148F790A895E78.
+
+Actor diagnostic final classification: known non-blocking transient diagnostic mismatch. Disk actor count and later fresh-process canonical count remain 1 with unchanged UUID/instance/generation. Exact transient cause remains unproven; no Actor production change.
+Event status: PARTIAL. 108 GameTests, 176857 core assertions, build and targeted completed-event client smoke PASS; sound waveform distinction PASS; actual sound-on human readability and full scene causality NOT TESTED. Next start point: sound-on world join/capture, assess perceived level and rhythm in context, then decide seal. No next subsystem started.

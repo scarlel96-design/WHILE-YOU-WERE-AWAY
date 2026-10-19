@@ -1,0 +1,1 @@
+PASS schema4 disk cycles=450; scenes=3; boundaries=5; repeats=30

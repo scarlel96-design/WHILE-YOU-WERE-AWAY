@@ -1,0 +1,650 @@
+[
+  {
+    "hash": "DBBAB07CD4E26EBA40DF59225959DBD3AE9991E9E24CBDD6E791D0BD65EAD79E",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ActorCandidates.java"
+  },
+  {
+    "hash": "9CBC38D73590DC73467411F8329AD0BF9F68370E7A56BF03888618033856EEA9",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ActorGameTests.java"
+  },
+  {
+    "hash": "7C3865A98085562EFDD7AC0B4AEB3F0C967CFE3EC88993703CCA328214A6F760",
+    "path": "src\\main\\java\\io\\github\\whileaway\\CanonicalGameTests.java"
+  },
+  {
+    "hash": "9398BAD672AF4E2E2E06563BD7A4DA93E5248370D84371666F515F45358976CB",
+    "path": "src\\main\\java\\io\\github\\whileaway\\CanonicalRecovery.java"
+  },
+  {
+    "hash": "56FB8B9AA6375270B3EDDA81D78FA0419E5ACA3056C062335136D1E253991662",
+    "path": "src\\main\\java\\io\\github\\whileaway\\CityDistrict.java"
+  },
+  {
+    "hash": "56DDCEF16532433196CA5FAB4C5091C20B1767D80565A7C0F9F2F3FFC1F3ECF3",
+    "path": "src\\main\\java\\io\\github\\whileaway\\CityHorror.java"
+  },
+  {
+    "hash": "9CA9819902C25C1B16A2232731CBEA615F3995DA73779E2BDE42E7DC21595447",
+    "path": "src\\main\\java\\io\\github\\whileaway\\CityInvestigation.java"
+  },
+  {
+    "hash": "5F8DD32DD31B57D7EC4677AF12231705CF212ADB48402B703FD98B03BC0A3489",
+    "path": "src\\main\\java\\io\\github\\whileaway\\CityTransit.java"
+  },
+  {
+    "hash": "364F03547556493E5C0EDA1D6893DF93830FF1455797ECB8D1D2C19E5DCD68CB",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ActorExceptionsSmoke.java"
+  },
+  {
+    "hash": "0E22749C37B3E7BD195CEEECAE26875BB4A83B4DBFFAAB3B8F69291D801D461F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ActorSmoke.java"
+  },
+  {
+    "hash": "562883A62488A1EA4900CC75E68694C87704001E962BDE934736E15389AB025F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\BoundarySmoke.java"
+  },
+  {
+    "hash": "B7058262EE5500342CFB80F221CF2533F5E90355E373902D3E337EC7D0CCB718",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\CanonicalSmoke.java"
+  },
+  {
+    "hash": "EE161383E792D039C666D9A2B707FBA3B0C077F8500707CD0F6D0ABA811DF79F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\CitySmoke.java"
+  },
+  {
+    "hash": "345AF8D65434B5BF1731A037E46264B31304778CB9FC7AD6273100AABEE3E39C",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ClientAudio.java"
+  },
+  {
+    "hash": "7209F83FD67A31FE495DA6C762EFEA16A206241E8B9CD8813814080115000018",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ClientScene.java"
+  },
+  {
+    "hash": "2B273A4B1D4AF99A8D2A96FEA2C55D000CCB2FD10CBA01C3774F7344083AD980",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ClientSetup.java"
+  },
+  {
+    "hash": "E97125B47321AC6E8BCCD225D8123F3EE5F54F36999B7C88BBB35BF89DF50D46",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ClientSmoke.java"
+  },
+  {
+    "hash": "8633B7A68BA517A94E8C8D739C69842BBBE074C476E650030809685ED1C1569F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ClientTestEnvironment.java"
+  },
+  {
+    "hash": "CFF0FD4BFF67CDEEAA6336D0DBE300E29D94BA39B25DC5B995D85F4C7D2ED404",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\LoadGuardSmoke.java"
+  },
+  {
+    "hash": "87B5496939E6B850BECA6B1CB9A563AC04AB86AE89C99F887C67A5AA17E90080",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\NpcCopySmoke.java"
+  },
+  {
+    "hash": "935956571F8CFDBA64CBD77E7EB72460FC8A9F9A4B4142F519A930F809524B05",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\NpcCorruptionSmoke.java"
+  },
+  {
+    "hash": "E51FBF5EA7E08B02C69D0B2A339AAC84B47B2F703D847A787EDBC2214D5178C8",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\NpcEnvironmentSmoke.java"
+  },
+  {
+    "hash": "981A6CFECAB93C18396E6F67402D4CD0410183165805E23773AF7CACF1CDCE32",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\NpcExceptionSmoke.java"
+  },
+  {
+    "hash": "A61D3C8D2312A7FCEC8500F1F63558087E0E0FF0D15D58AF12F6B47FE4CB6D15",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\NpcSmoke.java"
+  },
+  {
+    "hash": "FCB401B075D6126A4CAC02C179431FD46366607858A6C60D2CF6E8F75CE0ACE3",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\NpcWorldSmoke.java"
+  },
+  {
+    "hash": "EADB9A6A5FA68CDE4B3C195A715C7E0ABA8CA7D59A78FB4896D125117239E9D9",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\RecoverySmoke.java"
+  },
+  {
+    "hash": "3D1F021AC1A0C05786C0A7FAD7BE4A150A2463DF84B3477974E66C95EC7A2CC2",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ReturnNetworkClosureProbe.java"
+  },
+  {
+    "hash": "3FB6B6AAD75F3EE32B964835532427889F6C94ED213AD3F42CF40AC5E465882C",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ReturnNetworkEnvironmentProbe.java"
+  },
+  {
+    "hash": "75A69AA6767CCD1995EB00A13EE1F0D108EDBED9D24AB2EAB8F6886E0008E5E5",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ReturnNetworkSignalSmoke.java"
+  },
+  {
+    "hash": "D62529C1E3175EB093D8D546A6FFDD216C9E2C36AAA5270A2C1CF126D3491CE0",
+    "path": "src\\main\\java\\io\\github\\whileaway\\client\\ReturnNetworkSmoke.java"
+  },
+  {
+    "hash": "DC0F46EFE1EB92BBB1D018B83FE99318F3A658E38B059DC6BE7A4BAE74786038",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ClientConfig.java"
+  },
+  {
+    "hash": "3132FEC3BD4FA082AF7D5940A7215EB960FE353DB22D3CE99B3294F6CFAD8549",
+    "path": "src\\main\\java\\io\\github\\whileaway\\content\\NoteBlock.java"
+  },
+  {
+    "hash": "E4DAC8849A8ECA26AA9FA33723D53438859A83875D27BDC4F01A5FEEBA93FDDE",
+    "path": "src\\main\\java\\io\\github\\whileaway\\content\\NoteItem.java"
+  },
+  {
+    "hash": "C14BB327D8B7DC791CA4C15658EACCA1806A5E1743AE54B62CE4BAA5913B9413",
+    "path": "src\\main\\java\\io\\github\\whileaway\\content\\RelayBlock.java"
+  },
+  {
+    "hash": "C4A5828F5F9960053E665D1C8E7E05EC41D23AB9F3A44516EA4FA968D3B983D0",
+    "path": "src\\main\\java\\io\\github\\whileaway\\content\\ReturnLightBlock.java"
+  },
+  {
+    "hash": "7AD96608D7410C9F18B0ABE5D25BA71710BA2242D957D7A57292A8776B5ABB3E",
+    "path": "src\\main\\java\\io\\github\\whileaway\\content\\StationBlock.java"
+  },
+  {
+    "hash": "C312ECEC0FA7A7A4C9FC196D3CE7FCBEB977BACE007971AA30C2CBB0B54D8571",
+    "path": "src\\main\\java\\io\\github\\whileaway\\content\\StationEntity.java"
+  },
+  {
+    "hash": "67075C494F30985BB8EF9EE928F977B213C00D1224897474B51F433DF9D4AC34",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\ActorPresencePolicy.java"
+  },
+  {
+    "hash": "512FA04D7894111D29FECED606E023581671B357F617FA42F11BF51703DCC03F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\CityAccess.java"
+  },
+  {
+    "hash": "76EFA333C35BD4E1EF6E4CCC479E1B0484CC9C4C27FBB3AAE8935C101ED053C8",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\CityArtLayout.java"
+  },
+  {
+    "hash": "A8B4C9E1E1EFB0CB203F71EE0B26287425F30AA00292039FA62EE2546C7F7447",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\CityLayout.java"
+  },
+  {
+    "hash": "E114A9B8836AEDCA5E3A6F7B2E68CB39E99C0D2E84E95B2F67701733A16868DC",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\Clue.java"
+  },
+  {
+    "hash": "E46E1D91DF0C8B6DDD886DC84A77481FE5E30D2D92036460E7501161FD37A874",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\Director.java"
+  },
+  {
+    "hash": "28964E5656842E2ED2D041B2789A79B6834284D0C131C5E84168E8603A96440B",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\EventCheckpoint.java"
+  },
+  {
+    "hash": "8864A4A4B7BB3C6ED4E9F0EA80DA0D9B5DD7AF642C55B5B01BF6F04125800CCD",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\NpcPathBudget.java"
+  },
+  {
+    "hash": "706F7347099C29998A27EDF3CD60FB2E125DB3A4CF70EABFEAB575CC6E3BB8A7",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\Progress.java"
+  },
+  {
+    "hash": "B8C9546C1797C7D6C82850518898F55ACCB9BFCF9CB25D9928F5C2B8C54C7E30",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\SceneTimeline.java"
+  },
+  {
+    "hash": "8FAEBD86BE3974A83F647423A014D5C0FCDAC5892263707B69D77F8FE037CD0F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\core\\ThreatPolicy.java"
+  },
+  {
+    "hash": "B7547827A47ED77D6A1695FC210EE080E6213798387B2C591E35DEC4C1B3E9A6",
+    "path": "src\\main\\java\\io\\github\\whileaway\\entity\\StoryNpc.java"
+  },
+  {
+    "hash": "25D66C277A446E8DEF088EAAD8431A0319C7C2BAF32B68CB60F6278DA254B572",
+    "path": "src\\main\\java\\io\\github\\whileaway\\entity\\Wayfarer.java"
+  },
+  {
+    "hash": "6BEC18337E8C1D19007C182D5C626BD640837E9BAC42A1242075F709EEC7063A",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NarrativeData.java"
+  },
+  {
+    "hash": "85190E119ABBD07D1282EF8D9F794FB6896A294A83C5D1C788230574DB282C2F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcEnvironment.java"
+  },
+  {
+    "hash": "3965999591791AEA9C50952585911B6076C9023AC6801FD8CF6E6E5522D52206",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcEnvironmentGameTests.java"
+  },
+  {
+    "hash": "A4F2F6F36C09EE7FF66CE3FB2900B8C9329F4E90AEBE23CD826C045236839ADC",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcEvents.java"
+  },
+  {
+    "hash": "63899D032DDB6F7D71F6216370CE39FB7D82E8F069FE2BE2006AA6839420651D",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcExceptionGameTests.java"
+  },
+  {
+    "hash": "FE94C6F6985B9884E2C41BCDC8B770D519161FF1840E4A41057319D51FB88EC3",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcGameTests.java"
+  },
+  {
+    "hash": "F6A125C7FD58C06548535DC0417F37D2D3C847340DEA3D95159823CB53D17E73",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcNavigation.java"
+  },
+  {
+    "hash": "392ED5E8ACF8E65FF632191773753991C9E3F71B98CE19CED8B5674E869E6724",
+    "path": "src\\main\\java\\io\\github\\whileaway\\NpcState.java"
+  },
+  {
+    "hash": "CE3ED10908B963720422124A6C4EB29A078F5905E30F696985B18EB6D888301E",
+    "path": "src\\main\\java\\io\\github\\whileaway\\RecoveryBoundaryEvent.java"
+  },
+  {
+    "hash": "6A0B2699BD11FC5EEE71CB10411D6C5B4DCA28C3BDF4DE1C6D41AF46354EEB84",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkEvents.java"
+  },
+  {
+    "hash": "0113A061524604021C10CDEBE83C7D26EDC26708B75615A31DD17C9AB17394F5",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkFixtures.java"
+  },
+  {
+    "hash": "7C200BA5BAC0870D244E38A9D008B7933E845EBE304AC7F9821DD2D65710AA1A",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkGameTests.java"
+  },
+  {
+    "hash": "FE7F8023B02C2C44EAC3E82841D9DBCD7719969C525648182075FEC17DF78FD8",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkIntegrationGameTests.java"
+  },
+  {
+    "hash": "B397ABACFD2B1B60834CF2539C6ECADBAB7219D147E3D0B71F8D8CD29EA43F7B",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkIntegrity.java"
+  },
+  {
+    "hash": "AA1A4816804DCFBA35BD2E9607FC22D7113DC70ECDE95D9646F20940D0875474",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkPersistence.java"
+  },
+  {
+    "hash": "A8D876DE3BDB89A9CEED7B4FCFEFB1BEF977985BE6655F4B6E41169D0E8A81D4",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkPersistenceGameTests.java"
+  },
+  {
+    "hash": "081BB2686DE2D606CEE7F1E732A8F43CCD3AD69AE59EBB8A543C9EF2091A561C",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkPlaybackGameTests.java"
+  },
+  {
+    "hash": "559C1FDE72F861BCE5EB8133B002D5CAF65E92F8F686656D6364BEBC47CB6774",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkPreservationGameTests.java"
+  },
+  {
+    "hash": "9122089B49F007F6E53DF9C4B08F558C35C4C411BA1F41658AAAF78DD7CB7478",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkSchema5GameTests.java"
+  },
+  {
+    "hash": "02F411A2A1F7CC095C7B7E9F09E6679A12705218C7C0AFB70A61064778641CFE",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkState.java"
+  },
+  {
+    "hash": "F475575F9866847598D39C3127683DFD0656F4FAC23BF9FD439174BD2763DF03",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkSupportGameTests.java"
+  },
+  {
+    "hash": "C750193351033F0EF2DD30474BB9B52DB77AF0EFDAADB6123DBF1F87F12336AD",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ReturnNetworkTransactionGameTests.java"
+  },
+  {
+    "hash": "E5ED8DB7648E0DD2FA31D991FD2B5D4BF2BEE79A75739C54B8709BA4867068E6",
+    "path": "src\\main\\java\\io\\github\\whileaway\\SceneAck.java"
+  },
+  {
+    "hash": "AC4A31764FACFA0263CC482CEB0E5F1E5C358CE3E655416BFF6A3B75FACC4A0F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\ScenePayload.java"
+  },
+  {
+    "hash": "A12C64089FFC487994C4D2C33C655A4DE556464DACD788E1A17CDF15515BAB3A",
+    "path": "src\\main\\java\\io\\github\\whileaway\\SceneRecord.java"
+  },
+  {
+    "hash": "5181388A17C88621A5EACE0A9FD310FEA2E0B6CDEB32C49AACF51D1DB595F913",
+    "path": "src\\main\\java\\io\\github\\whileaway\\SceneRecovery.java"
+  },
+  {
+    "hash": "6807BD253B22FF3E3A792F9E735098A87F2E56895758F6C72ABE71C969664765",
+    "path": "src\\main\\java\\io\\github\\whileaway\\StoryActorRecord.java"
+  },
+  {
+    "hash": "933C496C5EDF95F9C514247879753469821A959C0AF907A522882EEEB7EC1E5B",
+    "path": "src\\main\\java\\io\\github\\whileaway\\StoryActors.java"
+  },
+  {
+    "hash": "65D68F3D81B380EAF9E4B29B1CBAAC3986EB69A1E873021EA126E8F9DACA6130",
+    "path": "src\\main\\java\\io\\github\\whileaway\\StoryConfig.java"
+  },
+  {
+    "hash": "267F0C615789399DA391BBD169BF02D8C5110DB8CECA9331F2B7BCC356E7F68F",
+    "path": "src\\main\\java\\io\\github\\whileaway\\StoryEvents.java"
+  },
+  {
+    "hash": "4A6DB3587B738B17776A373772801801C14FEF124A75F726165546B34A9AFFAE",
+    "path": "src\\main\\java\\io\\github\\whileaway\\StoryGameTests.java"
+  },
+  {
+    "hash": "4FE794B378348F0119D9EC546F5BC3BE32431AE1548F76C2C7422ED1974BA1FD",
+    "path": "src\\main\\java\\io\\github\\whileaway\\StoryStorage.java"
+  },
+  {
+    "hash": "397401F965339DA3BB9342DA2442072C266061273CA890181FA056CE940D36E6",
+    "path": "src\\main\\java\\io\\github\\whileaway\\support\\ReturnNetworkLoadAssessment.java"
+  },
+  {
+    "hash": "494E0BE28681D53108C3113489FC5347E198AE3C372DC4CDEE6D02C71CF38153",
+    "path": "src\\main\\java\\io\\github\\whileaway\\support\\ReturnNetworkPlayback.java"
+  },
+  {
+    "hash": "7E00EFC61170F2888FC8FB2F99BB3A290AB41BC46B808509A39F66C4306838A1",
+    "path": "src\\main\\java\\io\\github\\whileaway\\support\\ReturnNetworkSignal.java"
+  },
+  {
+    "hash": "71C4E120EE2080F5DAF0C73AF3DCDF1311F81CBB5E6985B7793D4D3A6730F0D3",
+    "path": "src\\main\\java\\io\\github\\whileaway\\WhileAway.java"
+  },
+  {
+    "hash": "DFBEB35D341F5B4CD223C0116276B58F8847CB0CF5E381DF05783D31C290E200",
+    "path": "src\\main\\resources\\assets\\whileaway\\animations\\wayfarer.animation.json"
+  },
+  {
+    "hash": "A1F4FE94658AD25C327C98EB7AF11933A65A703412B60FC264E2F5CDACCD856D",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\city_home_note.json"
+  },
+  {
+    "hash": "459114BBF9540A0E4FDD286BA662C21BA16B77E146B66FFE624F4ED66883D03E",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\city_intake_note.json"
+  },
+  {
+    "hash": "9EFA9A7727EE49010E1E51B72723248A4820C461CB28E3E0233FEDC30665C8BB",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\city_siren_note.json"
+  },
+  {
+    "hash": "ECC3813238E79AE4FB3418462BB3046B308840AF7AF448E32AEFF009C531CC7C",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\evacuation_note.json"
+  },
+  {
+    "hash": "196DA4081E51958B8295C8FC41DD6CB96703423AD115C09336458C824E757D1D",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\personal_note.json"
+  },
+  {
+    "hash": "2A2E93BE28D450DDA0FC57FDDB3A0C159D7A61F0159FA9C41DA861B9FD424274",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\return_light.json"
+  },
+  {
+    "hash": "9B76A83BBFE14F5187C2E9FEE6056C73E2389DE0A2985F273997ABE35F22A0C0",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\signal_relay.json"
+  },
+  {
+    "hash": "4E6D02F9AE9B50D50DD51D0B3A0E7D42D45D32ABB5FDD7A01450499A7EC63940",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\station_anchor.json"
+  },
+  {
+    "hash": "1B7DBCF3DB194BF459FE9F3CC1EAC74F8C6541F323D66E2FFE590D6688C649ED",
+    "path": "src\\main\\resources\\assets\\whileaway\\blockstates\\warning_note.json"
+  },
+  {
+    "hash": "C2FC26A0DC40C84073F95F2FF1A4A06D2C9D09F1920CD8B6DF1D7FC96324AD8B",
+    "path": "src\\main\\resources\\assets\\whileaway\\city_art.json"
+  },
+  {
+    "hash": "6B18C89BC1EA189729B50B43238B6546732B92E077EDD93CE1ED02A4E0DFCE10",
+    "path": "src\\main\\resources\\assets\\whileaway\\geo\\wayfarer.geo.json"
+  },
+  {
+    "hash": "101BD84DBBE7E8B252B0EAB9A266EFA056CD4A60579828BC8DC4437E250565B8",
+    "path": "src\\main\\resources\\assets\\whileaway\\lang\\en_us.json"
+  },
+  {
+    "hash": "F5801898E746E6C529714FA1A311C932F38C782A8FA5DCA16F6294C4DD9ABAEA",
+    "path": "src\\main\\resources\\assets\\whileaway\\lang\\ko_kr.json"
+  },
+  {
+    "hash": "2C97770C3231F20E282BFB5858BA655F399B7BF2DF9B8C7336ADCC5F7C0B2658",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\city_home_note.json"
+  },
+  {
+    "hash": "F4937FB28E3F116E9EF2E1F51EEE7697695C257FE5927C69310B20C62E136A4A",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\city_intake_note.json"
+  },
+  {
+    "hash": "49C62F0CE0CA078A9B2DE30B39887913CACBB84D573E717B8F28340E66604EB7",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\city_siren_note.json"
+  },
+  {
+    "hash": "2C97770C3231F20E282BFB5858BA655F399B7BF2DF9B8C7336ADCC5F7C0B2658",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\evacuation_note.json"
+  },
+  {
+    "hash": "2C97770C3231F20E282BFB5858BA655F399B7BF2DF9B8C7336ADCC5F7C0B2658",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\personal_note.json"
+  },
+  {
+    "hash": "B8F4EE1EE4D726FD7025EECACB6457EAA3D2E4219C937D50586567ED2E18C9F5",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\return_light.json"
+  },
+  {
+    "hash": "F334A09FD6E28C34B4804130135AA5D43EB7BB90B69C2C29A18A654B3B929321",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\signal_relay_lit.json"
+  },
+  {
+    "hash": "091A220A9139BC3227A50979DEB2723C3E50A6F309FB9E4820B390F2A96D6C63",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\signal_relay.json"
+  },
+  {
+    "hash": "A14B8EEEB8AC74223C2B9B3ABE63FCED701AE04B83724E1462D90AB5AB1CE0B5",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\station_anchor.json"
+  },
+  {
+    "hash": "59B6E3C232E037A09D52E6303E643783B2E0E99F76EED1CFC7CA699385E5DBA9",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\block\\warning_note.json"
+  },
+  {
+    "hash": "95DD9172747088CCE4A30D395D92BB8CCCB00B731FDECBEACD83FC0E018788C6",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\city_home_note.json"
+  },
+  {
+    "hash": "91D9127358B3F5DD71C1EA913FB4641607F654CC2CA281555D92129E28CD2205",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\city_home_record.json"
+  },
+  {
+    "hash": "9345A063396B9C3ED61FA06486ADB390ACE5A9854652490690852E01B04A7F32",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\city_intake_note.json"
+  },
+  {
+    "hash": "91D9127358B3F5DD71C1EA913FB4641607F654CC2CA281555D92129E28CD2205",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\city_intake_record.json"
+  },
+  {
+    "hash": "72746457B5CB585D6CE0309FA9B420392B36FAB755D96E2A480B44308D466B37",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\city_siren_note.json"
+  },
+  {
+    "hash": "91D9127358B3F5DD71C1EA913FB4641607F654CC2CA281555D92129E28CD2205",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\city_siren_record.json"
+  },
+  {
+    "hash": "FBDD525076E08E90AEDAEB0414D92647DC461684C2618E4D0519C1A7B45E7AB0",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\evacuation_note.json"
+  },
+  {
+    "hash": "91D9127358B3F5DD71C1EA913FB4641607F654CC2CA281555D92129E28CD2205",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\evacuation_record.json"
+  },
+  {
+    "hash": "37939189ADB6DBE19FDF9CF66095326927EDA3B099E78A2B6681A367AA3B3E07",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\personal_note.json"
+  },
+  {
+    "hash": "91D9127358B3F5DD71C1EA913FB4641607F654CC2CA281555D92129E28CD2205",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\personal_record.json"
+  },
+  {
+    "hash": "2DD19B1F714D0721B7D3FCE6130A8650CBF0D44BCDEC26D5DFCBE46DE03CD7A1",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\return_light.json"
+  },
+  {
+    "hash": "D128918D8D9D9AB893C65912FD8615FF02869F6597FA8CE841ACD480DBF0A28B",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\signal_relay.json"
+  },
+  {
+    "hash": "83B49E7734FACC44592300BFD9E9835FE962EBD5AD549CD84530EBBE813E11AC",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\station_anchor.json"
+  },
+  {
+    "hash": "C6DD27F4B2235A55E16CA376DBCC70B8E21393873D4879831D14A253538EF437",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\warning_note.json"
+  },
+  {
+    "hash": "91D9127358B3F5DD71C1EA913FB4641607F654CC2CA281555D92129E28CD2205",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\warning_record.json"
+  },
+  {
+    "hash": "754272DAC9040D7B6769A1E53011B64AEE4CAFA8D1D51750E6D3F62B4CA46D15",
+    "path": "src\\main\\resources\\assets\\whileaway\\models\\item\\wayfarer_spawn_egg.json"
+  },
+  {
+    "hash": "A2F084DA3AB679838E07259A43A23802B73A7D7FCA2523FBD72226FF5068B41D",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds.json"
+  },
+  {
+    "hash": "52BA1259211A89A00F2D306F8975910DF245C2A5B20F26E0FF71AA35A25677D1",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\distant_knock.ogg"
+  },
+  {
+    "hash": "EEBF3C322033F7E6D3F1C03A4AC517C7E22B5574ABB413A637E61A0070D2287C",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\homeward.ogg"
+  },
+  {
+    "hash": "305E88738378B2E892F927274DDC7F65B217AF6C54E258C10432030678F0288D",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\returning_steps.ogg"
+  },
+  {
+    "hash": "5169E4158B473FDF65C0290F0FA855F03D04F75711FDB7629418082BFFC8BA18",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\signal_wake.ogg"
+  },
+  {
+    "hash": "C3BF584631006377ACE581232201DBEED4E3AEDA6F9ABE5AC6DDCE57CB1D1FE2",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\station_unease.ogg"
+  },
+  {
+    "hash": "B2E0AA95252444270AA10CF23DF5765C005FEAD0FC6B5EE6AA2CF4DB1A23627A",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\wayfarer_attack.ogg"
+  },
+  {
+    "hash": "572EF06A2BB8AA231B0EA8A575113796C04B924AC373DEC3C044AFA16F0FFE96",
+    "path": "src\\main\\resources\\assets\\whileaway\\sounds\\wayfarer_breath.ogg"
+  },
+  {
+    "hash": "3045DA4B7C3DB8AA590DE6E2FCD36D96262ED7944982D0FFCD00AB7089FEE69C",
+    "path": "src\\main\\resources\\data\\minecraft\\tags\\block\\mineable\\pickaxe.json"
+  },
+  {
+    "hash": "D6801BDB5FEB9CB9012E9E8ED06BD363B5C30E5D0C4ACEB9C48A6D17120873CE",
+    "path": "src\\main\\resources\\data\\whileaway\\dimension_type\\quiet_city.json"
+  },
+  {
+    "hash": "DB96F43BB41C00BE8FB0A99C628A4E32A88BB155FD3D835C518B2FEF69557C72",
+    "path": "src\\main\\resources\\data\\whileaway\\dimension\\quiet_city.json"
+  },
+  {
+    "hash": "5E1B7CDC4991B365D4CC2D699657B57F0255F5634792D0673372D327288C570D",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\city_home_note.json"
+  },
+  {
+    "hash": "95B6C094A86BDFAF133E431FAA717DEB35DF5A1C5C0C02CBCD2A3E95051A95D9",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\city_intake_note.json"
+  },
+  {
+    "hash": "9FFB6CDDAB77759D1E8576F01442852B85FA7A501C3ED76454BFE1D2AA7D9E04",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\city_siren_note.json"
+  },
+  {
+    "hash": "F23C4C7E7BE73014291841E7412461334504A116A935D5FEA060CF461301C1A0",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\evacuation_note.json"
+  },
+  {
+    "hash": "34C02152C155488BCB87606158BAB9F02478F1449E696A2E4C14CCFBA3111EF3",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\personal_note.json"
+  },
+  {
+    "hash": "2CEF12D5DBC1FAC5AFD988F6B5D3FFD9A3EE50845BEA99BBE3E7837126876FB1",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\signal_relay.json"
+  },
+  {
+    "hash": "7F68F444E9B43FADF7681DCC13CD54C95AD968E990DCC7CA4544E233CF527A00",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\station_anchor.json"
+  },
+  {
+    "hash": "F1338E889B0D2D5DCC3C4790A622041D1928CDA0FEB270ADEFD4F42B409574BF",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\blocks\\warning_note.json"
+  },
+  {
+    "hash": "6987BF35661D80EA796CE60B4A544546551655DB7756CB3CC85DFDB097D86F93",
+    "path": "src\\main\\resources\\data\\whileaway\\loot_table\\chests\\station.json"
+  },
+  {
+    "hash": "E9F804A524A0BBDCAE012E5570BD9DC5F9ABA3C090B9153F971AF4F11A71FCFA",
+    "path": "src\\main\\resources\\data\\whileaway\\structure\\abandoned_station.nbt"
+  },
+  {
+    "hash": "F41CC1DC87328DAC70B26AC29E90E4FAF1DB9905F94E007B84448C3D7A539C7E",
+    "path": "src\\main\\resources\\data\\whileaway\\structure\\empty.nbt"
+  },
+  {
+    "hash": "3927C159B0C308B0DC5D85D56C63838B682FA1854BB3F76C42E62CFFA70C8749",
+    "path": "src\\main\\resources\\data\\whileaway\\tags\\block\\mineable\\pickaxe.json"
+  },
+  {
+    "hash": "904CF8B43BCA59661CA9EAD51ECCDDAA883B72E36E8C50A86CF0390F2E3BDB56",
+    "path": "src\\main\\resources\\data\\whileaway\\tags\\worldgen\\biome\\has_station.json"
+  },
+  {
+    "hash": "735EEA80892CEB68F96A4C8C26DBE78F7958A9189324B6204947D99E2385F922",
+    "path": "src\\main\\resources\\data\\whileaway\\tags\\worldgen\\structure\\stations.json"
+  },
+  {
+    "hash": "0034AE46157405CB33BFAFB37503E0DC87359A749BC7023194246C9BA703C860",
+    "path": "src\\main\\resources\\data\\whileaway\\worldgen\\biome\\quiet_city.json"
+  },
+  {
+    "hash": "186C06347290345B36B94B9F84BC9B4864D7C9BBF07C2CF8EC5A24F8D6847C6B",
+    "path": "src\\main\\resources\\data\\whileaway\\worldgen\\structure_set\\stations.json"
+  },
+  {
+    "hash": "033D7E8DE97A1752598E39A784B1A6D8F401EEC8EFBD06F768AB5857FF2C3280",
+    "path": "src\\main\\resources\\data\\whileaway\\worldgen\\structure\\abandoned_station.json"
+  },
+  {
+    "hash": "B4DE032568AB3F82C906F05D8005D79E376852798F03368BDAA8A1A90F43D9BB",
+    "path": "src\\main\\resources\\data\\whileaway\\worldgen\\template_pool\\station.json"
+  },
+  {
+    "hash": "AAAD55220A9D0D94E1CB2BD12EAF4EE30891855B4D60A618C8D27F9CE1F2E9C7",
+    "path": "src\\main\\resources\\META-INF\\neoforge.mods.toml"
+  },
+  {
+    "hash": "ACAFBF386AD7FFAB9ABC14E365C4065C58ADACCC7AB9DE19F69B410A760B79EF",
+    "path": "src\\main\\resources\\pack.mcmeta"
+  },
+  {
+    "hash": "1B9DE27940DBA4C6AD86FC4FD4634559A19351136FF90FC2F7C75A2B70A780F6",
+    "path": "src\\test\\java\\io\\github\\whileaway\\core\\ActorPresenceTests.java"
+  },
+  {
+    "hash": "51EA8E5BA48C09F2230EB99103618ED8025143EC1071D83F8BA21044EC4B3003",
+    "path": "src\\test\\java\\io\\github\\whileaway\\core\\CoreTests.java"
+  },
+  {
+    "hash": "7B5FDBEF9E5454AF81DD14C5C2F70E8E2393C69F26C4CD735DDDAE76D0344D12",
+    "path": "src\\test\\java\\io\\github\\whileaway\\core\\StoryPolicyTest.java"
+  },
+  {
+    "hash": "DF665331B39A5C54245A7CAC832666E4108297FEB0A4B5F7F6E6F5355DF4A14C",
+    "path": "src\\test\\java\\io\\github\\whileaway\\support\\ReturnNetworkLoadTests.java"
+  },
+  {
+    "hash": "553CDD743536604DFDCA5EFD1D5827852325DEDB4153ADDE9C3E637D45969C37",
+    "path": "src\\test\\java\\io\\github\\whileaway\\support\\ReturnNetworkSignalTests.java"
+  }
+]
