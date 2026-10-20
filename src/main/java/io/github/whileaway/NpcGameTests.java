@@ -53,7 +53,9 @@ public final class NpcGameTests {
         NpcState.settle(r);r.facts.add(NpcState.LINK);r.checkpoint.advance(4);
         var before=Set.copyOf(r.facts);
         h.assertTrue(NpcEvents.residenceDestination(home,4999).equals(home),"rest before work");
-        h.assertTrue(NpcEvents.residenceDestination(home,5000).equals(home.east()),"daytime light work");
+        h.assertTrue(NpcEvents.residenceDestination(home,5000).equals(home.offset(2,0,-4)),"morning approach inspection");
+        h.assertTrue(NpcEvents.residenceDestination(home,7499).equals(home.offset(2,0,-4)),"morning route remains stable");
+        h.assertTrue(NpcEvents.residenceDestination(home,7500).equals(home.east()),"daytime light work");
         h.assertTrue(NpcEvents.residenceDestination(home,10999).equals(home.east()),"work until end");
         h.assertTrue(NpcEvents.residenceDestination(home,11000).equals(home),"return home after work");
         var npc=WhileAway.STORY_NPC.get().create(h.getLevel());

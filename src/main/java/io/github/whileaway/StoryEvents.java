@@ -90,7 +90,6 @@ public final class StoryEvents {
             mob.bind(p.getUUID(),e.station);
             if(!StoryActors.beginChase(p,mob))return false;
             sound(p,WhileAway.BREATH.get(),SoundSource.HOSTILE,pos,.7f);
-            p.displayClientMessage(Component.translatable("story.whileaway.arrival"),true);
             return true;
         }
         return false;

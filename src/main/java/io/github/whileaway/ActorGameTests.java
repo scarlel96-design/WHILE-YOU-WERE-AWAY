@@ -133,6 +133,27 @@ public final class ActorGameTests {
         clean(h,r);h.succeed();
     }
     @GameTest(template="empty")
+    public static void unobservedArrivalTerminatesWithoutPlayerKnowledge(GameTestHelper h) {
+        var level=h.getLevel();var owner=UUID.randomUUID();
+        var actor=WhileAway.WAYFARER.get().create(level);
+        actor.bind(owner,h.absolutePos(new BlockPos(1,2,1)));
+        h.setBlock(new BlockPos(1,1,1),Blocks.STONE);
+        var pos=h.absolutePos(new BlockPos(1,2,1));
+        actor.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,0,0);
+        var data=NarrativeData.get(level.getServer());
+        data.entry(owner).encounter=actor.getUUID();
+        var record=StoryActors.prepare(actor,StoryActors.chaseId(owner),StoryActors.CHASE,"pursuer",UUID.randomUUID(),owner,true);
+        h.assertTrue(StoryActors.spawnPrepared(level,record,actor),"encounter actor spawned");
+        StoryActors.completeChase(actor);
+        h.assertTrue(data.entry(owner).progress.encounterComplete(),"arrival terminates encounter");
+        h.assertTrue(record.checkpoint.terminal()&&!record.facts.contains(StoryActors.CHASE_OBSERVED),
+            "termination does not invent player observation");
+        var loaded=StoryActorRecord.load(record.save());
+        h.assertTrue(loaded.facts.contains("encounter_complete")&&!loaded.facts.contains(StoryActors.CHASE_OBSERVED),
+            "story record preserves the separate facts after reload");
+        h.succeed();
+    }
+    @GameTest(template="empty")
     public static void spawnBeforeCommitReconcilesOnce(GameTestHelper h) {
         var a=villager(h);var r=prepare(h,a);h.assertTrue(h.getLevel().addFreshEntity(a),"world spawn before B write");
         h.assertTrue(r.checkpoint.checkpoint==0,"simulated prepare/spawn/commit gap");

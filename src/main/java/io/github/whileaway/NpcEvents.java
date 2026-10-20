@@ -45,7 +45,9 @@ public final class NpcEvents {
     /** The settled resident checks the light during the day and returns home at night. */
     static BlockPos residenceDestination(BlockPos home,long dayTime) {
         long hour=Math.floorMod(dayTime,24000);
-        return hour>=5000&&hour<11000?home.east():home;
+        if(hour>=5000&&hour<7500)return home.offset(2,0,-4); // Check the approach before tending the light.
+        if(hour>=7500&&hour<11000)return home.east();
+        return home;
     }
     static boolean workingHours(long dayTime) {
         long hour=Math.floorMod(dayTime,24000);
@@ -57,9 +59,11 @@ public final class NpcEvents {
         if(r==null||!StoryActors.canonical(npc,r)||r.checkpoint.terminal())return false;
         if(!NpcState.integrity(r).isEmpty()){StoryStorage.block(p.getServer(),String.join(";",NpcState.integrity(r)));return false;}
         if(r.checkpoint.checkpoint==4) {
-            if(NarrativeData.get(p.getServer()).returnNetwork().stage!=ReturnNetworkState.Stage.NOT_STARTED)return false;
             if(npc.tryOrdinaryTalk(p.serverLevel().getGameTime())) {
-                String key=workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
+                var network=NarrativeData.get(p.getServer()).returnNetwork();
+                String key=network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown()
+                    ?"story.whileaway.network.aftermath"
+                    :workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
                 p.displayClientMessage(Component.translatable(key),false);
                 npc.getLookControl().setLookAt(p);
             }

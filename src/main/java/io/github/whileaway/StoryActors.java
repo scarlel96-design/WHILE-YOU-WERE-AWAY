@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 public final class StoryActors {
     public static final String TAG="whileaway_actor";
     public static final String CHASE="wayfarer_first";
+    public static final String CHASE_OBSERVED="player_observed_returner";
     private static final Map<MinecraftServer,Map<String,Integer>> readyPasses=new WeakHashMap<>();
     public static String chaseId(UUID owner){return CHASE+":"+owner;}
     public static void persist(MinecraftServer server){var d=NarrativeData.get(server);d.setDirty();server.overworld().getDataStorage().save();}
@@ -220,7 +221,7 @@ public final class StoryActors {
         var e=NarrativeData.get(server).entry(r.owner);e.progress=e.progress.complete();e.encounter=null;
         r.checkpoint.advance(4);boolean notice=!r.noticeClaimed;r.noticeClaimed=true;persist(server);emit(server,r,"AFTER_COMPLETE");
         var p=server.getPlayerList().getPlayer(r.owner);
-        if(notice&&p!=null){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
+        if(notice&&p!=null&&r.facts.contains(CHASE_OBSERVED)){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
             if(StoryConfig.MUSIC.get())StoryEvents.music(p,WhileAway.RESOLVE.get(),.45f);}
     }
     public static void abort(MinecraftServer server,StoryActorRecord r) {

@@ -3,10 +3,9 @@ import com.mojang.serialization.MapCodec;
 import io.github.whileaway.WhileAway;
 import io.github.whileaway.NarrativeData;
 import io.github.whileaway.StoryStorage;
+import io.github.whileaway.StoryActors;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -27,10 +26,10 @@ public final class StationBlock extends BaseEntityBlock {
         if (!StoryStorage.available(serverPlayer.getServer())) return InteractionResult.FAIL;
         var entry = NarrativeData.get(serverPlayer.getServer()).entry(serverPlayer.getUUID());
         if (!entry.progress.encounterComplete() || !pos.equals(entry.station)) return InteractionResult.PASS;
-        serverPlayer.displayClientMessage(Component.translatable("story.whileaway.station_revisit"), false);
-        if (level instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + .5, pos.getY() + 1.1, pos.getZ() + .5, 4, .25, .08, .25, .01);
-        }
+        var actor=NarrativeData.get(serverPlayer.getServer()).actors.get(StoryActors.chaseId(serverPlayer.getUUID()));
+        boolean observed=actor!=null&&actor.facts.contains(StoryActors.CHASE_OBSERVED);
+        serverPlayer.displayClientMessage(Component.translatable(observed
+            ?"story.whileaway.station_revisit":"story.whileaway.station_revisit_unseen"), false);
         return InteractionResult.SUCCESS;
     }
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {

@@ -28,7 +28,7 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
     private static final RawAnimation HUNT = RawAnimation.begin().thenLoop("animation.wayfarer.hunt");
     private UUID witness;
     private BlockPos home;
-    private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks;
+    private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks, observationTicks;
     private boolean checkpointRestored;
     public Wayfarer(EntityType<? extends PathfinderMob> type, Level level) { super(type, level); setPersistenceRequired(); xpReward = 0; }
     public static AttributeSupplier.Builder attributes() {
@@ -55,17 +55,25 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
         if(!server.dimension().location().toString().equals(actorRecord.dimension)){getNavigation().stop();return;}
         restoreCheckpointRuntime(actorRecord);
         var player = server.getServer().getPlayerList().getPlayer(witness);
-        if (player == null) { getNavigation().stop(); StoryActors.suspend(this,actorRecord,"owner_offline"); return; }
+        if (player == null) { observationTicks=0; getNavigation().stop(); StoryActors.suspend(this,actorRecord,"owner_offline"); return; }
         // Absence, death and dimension travel suspend AI and active-time budgets; they are not story failures.
-        if (player.level() != level() || player.isDeadOrDying()) { getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_dead_or_other_dimension");return; }
-        if (!StoryActors.ownerPresent(server.getServer(),actorRecord)) {getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_left_region");return;}
+        if (player.level() != level() || player.isDeadOrDying()) { observationTicks=0; getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_dead_or_other_dimension");return; }
+        if (!StoryActors.ownerPresent(server.getServer(),actorRecord)) {observationTicks=0;getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_left_region");return;}
         if (player.isCreative() || player.isSpectator() || server.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL
-                || !StoryConfig.ENCOUNTERS.get()) { getNavigation().stop(); entityData.set(HUNTING, false); windup=0; return; }
+                || !StoryConfig.ENCOUNTERS.get()) { observationTicks=0; getNavigation().stop(); entityData.set(HUNTING, false); windup=0; return; }
         if(actorRecord.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED) {
             actorRecord.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,null);
         }
         if(tickCount%100==0)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,null);
         lifetime++;
+        // Require sustained, unobstructed player view before recording encounter knowledge.
+        if(!actorRecord.facts.contains(StoryActors.CHASE_OBSERVED)) {
+            Vec3 toward=getEyePosition().subtract(player.getEyePosition());
+            boolean visible=toward.lengthSqr()<=32*32 && toward.lengthSqr()>0.01
+                && player.getLookAngle().dot(toward.normalize())>=0.35 && player.hasLineOfSight(this);
+            observationTicks=visible?observationTicks+1:0;
+            if(observationTicks>=8)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,StoryActors.CHASE_OBSERVED);
+        }
         if (lifetime > 2400) { finish(true); return; }
         if (lifetime % 110 == 0) StoryEvents.sound(player, WhileAway.BREATH.get(), SoundSource.HOSTILE, blockPosition(), .5f);
         boolean hunting=entityData.get(HUNTING);
