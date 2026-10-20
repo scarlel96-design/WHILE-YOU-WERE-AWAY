@@ -101,6 +101,8 @@ FINAL_GRADLE_EXIT=0
 
 전체 로그: `evidence/v2-playable-core/v2-01b-transaction/final-gradle-host.log`.
 앞선 격리 실행은 Gradle daemon 연결에서 실패했다. 그 로그는 `final-gradle.log`에 보존했다.
+개발 중 전체 gate는 2회 성공했다. 초기 실행 이후 노출 시간 초기화를 보완했고, 최종 실행에서 다시 통과했다.
+패키지와 검증 복사본은 전용 `.gitattributes`로 원래 bytes를 보존한다. 원본 로그의 공백은 수정하지 않았다.
 
 ## 7. Human experience
 

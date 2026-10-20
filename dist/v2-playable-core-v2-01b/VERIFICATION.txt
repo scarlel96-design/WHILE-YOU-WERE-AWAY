@@ -95,3 +95,7 @@ An initial Git archive comparison found CRLF/LF differences. The final ZIP prese
 Next: restore the Computer Use runtime, then run the isolated DISPLAY1 new-world path.
 No V2-02 implementation or 0.3.2 promotion occurred.
 Publication: PUBLICATION.txt records the remotely verified implementation/evidence commits.
+
+Evidence transport: subtree .gitattributes preserves original bytes.
+Staged evidence audit: STAGED_EVIDENCE_BYTE_MATCH files=23
+Raw Gradle logs retain original trailing whitespace. Production source diff check passes.
