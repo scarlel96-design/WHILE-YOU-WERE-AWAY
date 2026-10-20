@@ -1,0 +1,224 @@
+diff --git a/src/main/java/io/github/whileaway/ActorGameTests.java b/src/main/java/io/github/whileaway/ActorGameTests.java
+index d5f234a..ce886ed 100644
+--- a/src/main/java/io/github/whileaway/ActorGameTests.java
++++ b/src/main/java/io/github/whileaway/ActorGameTests.java
+@@ -133,6 +133,27 @@ public final class ActorGameTests {
+         clean(h,r);h.succeed();
+     }
+     @GameTest(template="empty")
++    public static void unobservedArrivalTerminatesWithoutPlayerKnowledge(GameTestHelper h) {
++        var level=h.getLevel();var owner=UUID.randomUUID();
++        var actor=WhileAway.WAYFARER.get().create(level);
++        actor.bind(owner,h.absolutePos(new BlockPos(1,2,1)));
++        h.setBlock(new BlockPos(1,1,1),Blocks.STONE);
++        var pos=h.absolutePos(new BlockPos(1,2,1));
++        actor.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,0,0);
++        var data=NarrativeData.get(level.getServer());
++        data.entry(owner).encounter=actor.getUUID();
++        var record=StoryActors.prepare(actor,StoryActors.chaseId(owner),StoryActors.CHASE,"pursuer",UUID.randomUUID(),owner,true);
++        h.assertTrue(StoryActors.spawnPrepared(level,record,actor),"encounter actor spawned");
++        StoryActors.completeChase(actor);
++        h.assertTrue(data.entry(owner).progress.encounterComplete(),"arrival terminates encounter");
++        h.assertTrue(record.checkpoint.terminal()&&!record.facts.contains(StoryActors.CHASE_OBSERVED),
++            "termination does not invent player observation");
++        var loaded=StoryActorRecord.load(record.save());
++        h.assertTrue(loaded.facts.contains("encounter_complete")&&!loaded.facts.contains(StoryActors.CHASE_OBSERVED),
++            "story record preserves the separate facts after reload");
++        h.succeed();
++    }
++    @GameTest(template="empty")
+     public static void spawnBeforeCommitReconcilesOnce(GameTestHelper h) {
+         var a=villager(h);var r=prepare(h,a);h.assertTrue(h.getLevel().addFreshEntity(a),"world spawn before B write");
+         h.assertTrue(r.checkpoint.checkpoint==0,"simulated prepare/spawn/commit gap");
+diff --git a/src/main/java/io/github/whileaway/NpcEvents.java b/src/main/java/io/github/whileaway/NpcEvents.java
+index f435c3f..cbcd98e 100644
+--- a/src/main/java/io/github/whileaway/NpcEvents.java
++++ b/src/main/java/io/github/whileaway/NpcEvents.java
+@@ -45,7 +45,9 @@ public final class NpcEvents {
+     /** The settled resident checks the light during the day and returns home at night. */
+     static BlockPos residenceDestination(BlockPos home,long dayTime) {
+         long hour=Math.floorMod(dayTime,24000);
+-        return hour>=5000&&hour<11000?home.east():home;
++        if(hour>=5000&&hour<7500)return home.offset(2,0,-4); // Check the approach before tending the light.
++        if(hour>=7500&&hour<11000)return home.east();
++        return home;
+     }
+     static boolean workingHours(long dayTime) {
+         long hour=Math.floorMod(dayTime,24000);
+@@ -57,9 +59,11 @@ public final class NpcEvents {
+         if(r==null||!StoryActors.canonical(npc,r)||r.checkpoint.terminal())return false;
+         if(!NpcState.integrity(r).isEmpty()){StoryStorage.block(p.getServer(),String.join(";",NpcState.integrity(r)));return false;}
+         if(r.checkpoint.checkpoint==4) {
+-            if(NarrativeData.get(p.getServer()).returnNetwork().stage!=ReturnNetworkState.Stage.NOT_STARTED)return false;
+             if(npc.tryOrdinaryTalk(p.serverLevel().getGameTime())) {
+-                String key=workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
++                var network=NarrativeData.get(p.getServer()).returnNetwork();
++                String key=network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown()
++                    ?"story.whileaway.network.aftermath"
++                    :workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
+                 p.displayClientMessage(Component.translatable(key),false);
+                 npc.getLookControl().setLookAt(p);
+             }
+diff --git a/src/main/java/io/github/whileaway/NpcGameTests.java b/src/main/java/io/github/whileaway/NpcGameTests.java
+index 1fe6855..7bb2a4f 100644
+--- a/src/main/java/io/github/whileaway/NpcGameTests.java
++++ b/src/main/java/io/github/whileaway/NpcGameTests.java
+@@ -53,7 +53,9 @@ public final class NpcGameTests {
+         NpcState.settle(r);r.facts.add(NpcState.LINK);r.checkpoint.advance(4);
+         var before=Set.copyOf(r.facts);
+         h.assertTrue(NpcEvents.residenceDestination(home,4999).equals(home),"rest before work");
+-        h.assertTrue(NpcEvents.residenceDestination(home,5000).equals(home.east()),"daytime light work");
++        h.assertTrue(NpcEvents.residenceDestination(home,5000).equals(home.offset(2,0,-4)),"morning approach inspection");
++        h.assertTrue(NpcEvents.residenceDestination(home,7499).equals(home.offset(2,0,-4)),"morning route remains stable");
++        h.assertTrue(NpcEvents.residenceDestination(home,7500).equals(home.east()),"daytime light work");
+         h.assertTrue(NpcEvents.residenceDestination(home,10999).equals(home.east()),"work until end");
+         h.assertTrue(NpcEvents.residenceDestination(home,11000).equals(home),"return home after work");
+         var npc=WhileAway.STORY_NPC.get().create(h.getLevel());
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+index 1df749a..c70ff4d 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+@@ -102,7 +102,7 @@ public final class ReturnNetworkEvents {
+         if(!p.isAlive()||p.isSpectator()||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!StoryStorage.available(p.getServer()))return false;
+         var d=NarrativeData.get(p.getServer());var s=d.returnNetwork();var r=d.actors.get(NpcEvents.STORY);
+         if(r==null||!StoryActors.canonical(npc,r)||!exactLocation(s,p.serverLevel()))return false;
+-        if(s.stage==ReturnNetworkState.Stage.COMPLETED){say(p,"aftermath");return true;}
++        if(s.stage==ReturnNetworkState.Stage.COMPLETED)return false; // Resident dialogue owns completed-event visits.
+         if(s.stage!=ReturnNetworkState.Stage.RESPONSE_OBSERVED||!environmentReady(p.serverLevel(),s)
+             ||npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)>1.4)return false;
+         if(!s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)&&commit(p,s.shareExperience(),"RN_F_SHARED"))say(p,"shared");
+diff --git a/src/main/java/io/github/whileaway/StoryActors.java b/src/main/java/io/github/whileaway/StoryActors.java
+index 23da5a4..3d76bb3 100644
+--- a/src/main/java/io/github/whileaway/StoryActors.java
++++ b/src/main/java/io/github/whileaway/StoryActors.java
+@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+ public final class StoryActors {
+     public static final String TAG="whileaway_actor";
+     public static final String CHASE="wayfarer_first";
++    public static final String CHASE_OBSERVED="player_observed_returner";
+     private static final Map<MinecraftServer,Map<String,Integer>> readyPasses=new WeakHashMap<>();
+     public static String chaseId(UUID owner){return CHASE+":"+owner;}
+     public static void persist(MinecraftServer server){var d=NarrativeData.get(server);d.setDirty();server.overworld().getDataStorage().save();}
+@@ -220,7 +221,7 @@ public final class StoryActors {
+         var e=NarrativeData.get(server).entry(r.owner);e.progress=e.progress.complete();e.encounter=null;
+         r.checkpoint.advance(4);boolean notice=!r.noticeClaimed;r.noticeClaimed=true;persist(server);emit(server,r,"AFTER_COMPLETE");
+         var p=server.getPlayerList().getPlayer(r.owner);
+-        if(notice&&p!=null){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
++        if(notice&&p!=null&&r.facts.contains(CHASE_OBSERVED)){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
+             if(StoryConfig.MUSIC.get())StoryEvents.music(p,WhileAway.RESOLVE.get(),.45f);}
+     }
+     public static void abort(MinecraftServer server,StoryActorRecord r) {
+diff --git a/src/main/java/io/github/whileaway/StoryEvents.java b/src/main/java/io/github/whileaway/StoryEvents.java
+index 75c8cd0..e0eafae 100644
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -90,7 +90,6 @@ public final class StoryEvents {
+             mob.bind(p.getUUID(),e.station);
+             if(!StoryActors.beginChase(p,mob))return false;
+             sound(p,WhileAway.BREATH.get(),SoundSource.HOSTILE,pos,.7f);
+-            p.displayClientMessage(Component.translatable("story.whileaway.arrival"),true);
+             return true;
+         }
+         return false;
+diff --git a/src/main/java/io/github/whileaway/content/StationBlock.java b/src/main/java/io/github/whileaway/content/StationBlock.java
+index f53f0d7..609104e 100644
+--- a/src/main/java/io/github/whileaway/content/StationBlock.java
++++ b/src/main/java/io/github/whileaway/content/StationBlock.java
+@@ -3,10 +3,9 @@ import com.mojang.serialization.MapCodec;
+ import io.github.whileaway.WhileAway;
+ import io.github.whileaway.NarrativeData;
+ import io.github.whileaway.StoryStorage;
++import io.github.whileaway.StoryActors;
+ import net.minecraft.core.BlockPos;
+-import net.minecraft.core.particles.ParticleTypes;
+ import net.minecraft.network.chat.Component;
+-import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.InteractionResult;
+ import net.minecraft.world.entity.player.Player;
+@@ -27,10 +26,10 @@ public final class StationBlock extends BaseEntityBlock {
+         if (!StoryStorage.available(serverPlayer.getServer())) return InteractionResult.FAIL;
+         var entry = NarrativeData.get(serverPlayer.getServer()).entry(serverPlayer.getUUID());
+         if (!entry.progress.encounterComplete() || !pos.equals(entry.station)) return InteractionResult.PASS;
+-        serverPlayer.displayClientMessage(Component.translatable("story.whileaway.station_revisit"), false);
+-        if (level instanceof ServerLevel serverLevel) {
+-            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + .5, pos.getY() + 1.1, pos.getZ() + .5, 4, .25, .08, .25, .01);
+-        }
++        var actor=NarrativeData.get(serverPlayer.getServer()).actors.get(StoryActors.chaseId(serverPlayer.getUUID()));
++        boolean observed=actor!=null&&actor.facts.contains(StoryActors.CHASE_OBSERVED);
++        serverPlayer.displayClientMessage(Component.translatable(observed
++            ?"story.whileaway.station_revisit":"story.whileaway.station_revisit_unseen"), false);
+         return InteractionResult.SUCCESS;
+     }
+     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+diff --git a/src/main/java/io/github/whileaway/entity/Wayfarer.java b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+index 3ee2f90..5f8ea88 100644
+--- a/src/main/java/io/github/whileaway/entity/Wayfarer.java
++++ b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+@@ -28,7 +28,7 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+     private static final RawAnimation HUNT = RawAnimation.begin().thenLoop("animation.wayfarer.hunt");
+     private UUID witness;
+     private BlockPos home;
+-    private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks;
++    private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks, observationTicks;
+     private boolean checkpointRestored;
+     public Wayfarer(EntityType<? extends PathfinderMob> type, Level level) { super(type, level); setPersistenceRequired(); xpReward = 0; }
+     public static AttributeSupplier.Builder attributes() {
+@@ -55,17 +55,25 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+         if(!server.dimension().location().toString().equals(actorRecord.dimension)){getNavigation().stop();return;}
+         restoreCheckpointRuntime(actorRecord);
+         var player = server.getServer().getPlayerList().getPlayer(witness);
+-        if (player == null) { getNavigation().stop(); StoryActors.suspend(this,actorRecord,"owner_offline"); return; }
++        if (player == null) { observationTicks=0; getNavigation().stop(); StoryActors.suspend(this,actorRecord,"owner_offline"); return; }
+         // Absence, death and dimension travel suspend AI and active-time budgets; they are not story failures.
+-        if (player.level() != level() || player.isDeadOrDying()) { getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_dead_or_other_dimension");return; }
+-        if (!StoryActors.ownerPresent(server.getServer(),actorRecord)) {getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_left_region");return;}
++        if (player.level() != level() || player.isDeadOrDying()) { observationTicks=0; getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_dead_or_other_dimension");return; }
++        if (!StoryActors.ownerPresent(server.getServer(),actorRecord)) {observationTicks=0;getNavigation().stop();windup=Math.max(windup,30);StoryActors.suspend(this,actorRecord,"owner_left_region");return;}
+         if (player.isCreative() || player.isSpectator() || server.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL
+-                || !StoryConfig.ENCOUNTERS.get()) { getNavigation().stop(); entityData.set(HUNTING, false); windup=0; return; }
++                || !StoryConfig.ENCOUNTERS.get()) { observationTicks=0; getNavigation().stop(); entityData.set(HUNTING, false); windup=0; return; }
+         if(actorRecord.lifecycle==StoryActorRecord.Lifecycle.SUSPENDED) {
+             actorRecord.lifecycle=StoryActorRecord.Lifecycle.ACTIVE;StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,null);
+         }
+         if(tickCount%100==0)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,null);
+         lifetime++;
++        // Require sustained, unobstructed player view before recording encounter knowledge.
++        if(!actorRecord.facts.contains(StoryActors.CHASE_OBSERVED)) {
++            Vec3 toward=getEyePosition().subtract(player.getEyePosition());
++            boolean visible=toward.lengthSqr()<=32*32 && toward.lengthSqr()>0.01
++                && player.getLookAngle().dot(toward.normalize())>=0.35 && player.hasLineOfSight(this);
++            observationTicks=visible?observationTicks+1:0;
++            if(observationTicks>=8)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,StoryActors.CHASE_OBSERVED);
++        }
+         if (lifetime > 2400) { finish(true); return; }
+         if (lifetime % 110 == 0) StoryEvents.sound(player, WhileAway.BREATH.get(), SoundSource.HOSTILE, blockPosition(), .5f);
+         boolean hunting=entityData.get(HUNTING);
+diff --git a/src/main/resources/assets/whileaway/lang/en_us.json b/src/main/resources/assets/whileaway/lang/en_us.json
+index 6c594e6..d0a7104 100644
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -13,7 +13,8 @@
+   "story.whileaway.signal": "The signal leaves. No one wrote who receives it.",
+   "story.whileaway.arrival": "Leave the path clear. Something has not arrived yet.",
+   "story.whileaway.after": "The footsteps recede. Fresh scratches remain on the return marker at the station.",
+-  "story.whileaway.station_revisit": "The new marks point toward the end of the rails, not a name. Those footsteps were not following anyone.",
++  "story.whileaway.station_revisit": "Fresh scratches run toward the end of the rails. Footprints in the soil follow the same direction.",
++  "story.whileaway.station_revisit_unseen": "Fresh scratches mark the stone. Footprints in the soil lead toward the rails.",
+   "story.whileaway.recovery_unloaded": "Encounter entity is not loaded. Return to the station and retry.",
+   "story.whileaway.recovered": "Encounter cleared. Clues preserved; 30 seconds of grace.",
+   "record.whileaway.warning.1": "Return point\n\nDo not open for the second knock.\nDo not trust where the footprints point.\n\nLeave the path clear.\nIt has not arrived yet.",
+diff --git a/src/main/resources/assets/whileaway/lang/ko_kr.json b/src/main/resources/assets/whileaway/lang/ko_kr.json
+index 38915aa..f962a22 100644
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -13,7 +13,8 @@
+   "story.whileaway.signal": "이제 신호가 간다. 누가 받는지는 적혀 있지 않다.",
+   "story.whileaway.arrival": "길을 비켜라. 아직 도착하지 못한 것이 있다.",
+   "story.whileaway.after": "발소리가 멀어졌다. 역의 귀환 표석에는 새 긁힌 자국이 남았다.",
+-  "story.whileaway.station_revisit": "표석의 새 자국은 이름이 아니라 선로의 끝을 향한다. 누군가를 쫓은 발걸음은 아니었다.",
++  "story.whileaway.station_revisit": "표석의 새 긁힌 자국은 선로 끝 방향으로 이어진다. 흙에는 같은 방향의 발자국이 남았다.",
++  "story.whileaway.station_revisit_unseen": "표석에 새 긁힌 자국이 있다. 흙에는 선로 쪽으로 이어지는 발자국이 남았다.",
+   "story.whileaway.recovery_unloaded": "조우 개체가 현재 로드되어 있지 않습니다. 폐역으로 돌아온 뒤 다시 시도하세요.",
+   "story.whileaway.recovered": "조우를 정리했습니다. 기존 단서는 유지되고 30초의 준비 시간이 생깁니다.",
+   "record.whileaway.warning.1": "귀환 지점\n\n두 번째는 열어 주지 마.\n발자국이 향한 곳을 믿지 마.\n\n길을 막지 마라.\n저것은 아직 도착하지 못했다.",

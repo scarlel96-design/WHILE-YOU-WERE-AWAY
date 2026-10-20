@@ -1,0 +1,97 @@
+V2-01B — final verification, 2026-10-20
+Branch: work/v2-playable-core
+Baseline HEAD: 47b440befc881fc25b60374360ba4b07c88dbb4a
+Implementation HEAD: 0c1a97e823a0ef9974db6d9a07b2ee1eb04b3c8d
+V2-01: PARTIAL. Final real-client play: NOT TESTED.
+
+Changed field/branch:
+Wayfarer.tick records optional player_observed_returner after eight continuous visible ticks.
+StoryActors.confirmChase gates follow-up notification on that fact.
+StationBlock selects neutral revisit text when the fact is absent.
+NpcEvents restores ordinary dialogue and adds a morning inspection destination.
+ReturnNetworkEvents returns completed-event interaction to ordinary dialogue.
+StoryEvents removes the early arrival caption.
+Save format 5 / actorSchema optional 1 / Return Network schema 1 remain unchanged.
+
+Required artifacts:
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-playable-core\v2-01b-transaction\MODIFIED_FILE
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-playable-core\v2-01b-transaction\DIFF_FILE
+VERIFICATION.txt: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-playable-core\v2-01b-transaction\VERIFICATION.txt
+ROLLBACK.sh: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-playable-core\v2-01b-transaction\ROLLBACK.sh
+MODIFIED_FILE SHA-256: 638316575f1baafffc9fbead80f66858d12afc69a9ff7a21bec79e52d7366b91
+DIFF_FILE SHA-256: 289bc332b773a3d1b8f13cf5f6a6e662d1c14f68a0e6c98be6e7dddeb233d4d9
+Original Wayfarer SHA-256: 3c86f3eec516d1582bde0f0ac92a430d6a131edca4a16030cf97465c6337bf3c
+
+BASELINE — source/package audit, not a gameplay test
+Working directory: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration
+Command: python evidence/v2-playable-core/v2-01b-transaction/verify-source.py Baseline
+Input: baseline-source, SOURCE-HASHES.json, BASELINE.jar.
+Literal output: BASELINE_SOURCE_PACKAGE_PASS files=10 json=2 jar=valid
+Exit status: 0
+Original JAR SHA-256: b73f009f52564c7cb495603f51fe549716642a1d4e8a903b36b84933d7f194b4
+Original source ZIP SHA-256: cc204f8877d2950b53e4da10c3784cf8b26ead4c47c7909642ea3a107ab089cf
+Inherited baseline tests: 113 GameTests and 176858 core assertions; not newly rerun on baseline code.
+
+MODIFIED — source/package audit
+Command: python evidence/v2-playable-core/v2-01b-transaction/verify-source.py Modified
+Input: modified-source, SOURCE-HASHES.json, MODIFIED.jar.
+Literal output: MODIFIED_SOURCE_PACKAGE_PASS files=10 json=2 jar=valid
+Exit status: 0
+
+MODIFIED — final runtime automated gate
+Environment: GRADLE_USER_HOME=..\gradle-home
+Command: .\gradlew.bat --offline --no-daemon runGameTestServer coreTest build --console=plain
+Input: final implementation source, offline Minecraft/NeoForge dependencies.
+Literal relevant output:
+[18:18:09] [Server thread/INFO] [minecraft/GameTestServer]: ========= 114 GAME TESTS COMPLETE IN 12.06 s ======================
+[18:18:09] [Server thread/INFO] [minecraft/GameTestServer]: All 114 required tests passed :)
+PASS core assertions=176858
+BUILD SUCCESSFUL in 1m 11s
+FINAL_GRADLE_EXIT=0
+Exit status: 0
+Log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-playable-core\v2-01b-transaction\final-gradle-host.log
+Two successful automated gate runs occurred during development. Only the final run covers the final source.
+An intervening sandbox attempt exited 1 with: Could not connect to the Gradle daemon.
+That failed environment run is preserved in final-gradle.log.
+Command: git diff --check
+Literal output: (empty)
+Exit status: 0
+
+ROLLBACK — actual executable script, isolated package copy only
+Command: & 'C:\Program Files\Git\bin\bash.exe' -c 'chmod +x evidence/v2-playable-core/v2-01b-transaction/ROLLBACK.sh && evidence/v2-playable-core/v2-01b-transaction/ROLLBACK.sh evidence/v2-playable-core/v2-01b-transaction/ROLLBACK_PROBE.jar'
+Input: ROLLBACK_PROBE.jar initially copied from MODIFIED.jar; preserved BASELINE.jar.
+Literal output:
+ROLLBACK_PACKAGE_RESTORED sha256=b73f009f52564c7cb495603f51fe549716642a1d4e8a903b36b84933d7f194b4
+ROLLBACK_EXIT=0
+Exit status: 0
+Restored package hash: b73f009f52564c7cb495603f51fe549716642a1d4e8a903b36b84933d7f194b4
+Post-check literal result: ROLLBACK_BASELINE_CLASS_RESTORED
+Post-check: valid JAR; baseline StoryActors.class lacks player_observed_returner.
+Restored status: exact previous package bytes. No save/world/schema downgrade occurred.
+MODIFIED_FILE and MODIFIED.jar remain changed.
+
+Client evidence
+Development launch: 1 isolated muted launch; process ended normally, exit 0.
+Command: .\gradlew.bat --offline --no-daemon runV2Playable --console=plain
+This was a temporary local launch configuration, removed before the final production build.
+Literal output: BUILD SUCCESSFUL in 4m 29s
+Log: client-gradle.log
+Observed: mod loaded; SoundEngine started; Minecraft Stopping!.
+Not observed: new-world play, player input, scene readability, actual runtime window bounds.
+DISPLAY1 selection/configuration: monitor.json; not equivalent to verified window placement.
+Computer Use: initial call and reset retry both returned:
+failed to write kernel assets: 지정된 경로를 찾을 수 없습니다. (os error 3)
+Final source real-client acceptance: NOT TESTED.
+Human experience: NOT TESTED. AUDIO READABILITY: NOT HUMAN-VERIFIED.
+
+Packages
+JAR: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-playable-core-v2-01b\whileaway-0.3.1-v2-01b.jar
+JAR SHA-256: 8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+Source: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-playable-core-v2-01b\whileaway-0.3.1-v2-01b-source.zip
+Source SHA-256: 758ff53b2a039ec4c13b88a40737ba3dd63d04662e36d8747361df15c6900f38
+Source audit result: SOURCE_ZIP_BYTE_MATCH 174
+An initial Git archive comparison found CRLF/LF differences. The final ZIP preserves exact working bytes.
+
+Next: restore the Computer Use runtime, then run the isolated DISPLAY1 new-world path.
+No V2-02 implementation or 0.3.2 promotion occurred.
+Publication: PUBLICATION.txt records the remotely verified implementation/evidence commits.

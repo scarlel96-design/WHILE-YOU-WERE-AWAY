@@ -1,0 +1,52 @@
+[
+  {
+    "path": "src/main/java/io/github/whileaway/ActorGameTests.java",
+    "baseline_sha256": "a2ffb27be191910292c5071414c23af3165d4914262895c47fbcff51ae490e49",
+    "modified_sha256": "b48e98546b56ef6079ce06d644d0a2e06afec180ec3b711c5eec4f6b6b4ff8fd"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/NpcEvents.java",
+    "baseline_sha256": "26c72aeb8202e025eba3f06e24524dbeec7890fdc6a3a4b2fe04dbcb8217ab74",
+    "modified_sha256": "90d77a383a0b0dc7f60447c8f6eddec0ea3a98b7be2a6dd3c53120e31239040e"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/NpcGameTests.java",
+    "baseline_sha256": "92dbc3acb48ff85829b5f406059aa6c4545965a066036f4555c8a50d6d04538a",
+    "modified_sha256": "2598ba6c4048d9e67521a9de33bbdc58555b870aad1d1f7298b83f86526f9c32"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/ReturnNetworkEvents.java",
+    "baseline_sha256": "f8deeb6b37916e86de25edff52683d1f0492bb2cc593be58f890be2285e41d04",
+    "modified_sha256": "c2c7d5cf3d03b48e31ab5306eca6637f10a34ac4fe0cdaa90575266f2d5966de"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/StoryActors.java",
+    "baseline_sha256": "8bc447d2f6c5aae407aa93f7960eaf2f606ebfb5415b699fd57af234c8cbd3eb",
+    "modified_sha256": "51569faef1c977e8c50a8be2ee386ec3b017539766b6d067160f5562ebffac04"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/StoryEvents.java",
+    "baseline_sha256": "c80f6dfb384305b33c0dd7088a00867dfb536f0b743e5b9dce4218469379f688",
+    "modified_sha256": "6909f48ecddb212f437eae8ac4d8ae4f533efe7f332348c536d78992d1f56dcb"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/content/StationBlock.java",
+    "baseline_sha256": "f1c8b39f89bcaa69801f970c5100c2583670479f875ce932c6bbef7761d771d8",
+    "modified_sha256": "eb745f7ab84a353f307239c51b3360af6adb9848a5c0f0d55a0d6506cd31556b"
+  },
+  {
+    "path": "src/main/java/io/github/whileaway/entity/Wayfarer.java",
+    "baseline_sha256": "3c86f3eec516d1582bde0f0ac92a430d6a131edca4a16030cf97465c6337bf3c",
+    "modified_sha256": "638316575f1baafffc9fbead80f66858d12afc69a9ff7a21bec79e52d7366b91"
+  },
+  {
+    "path": "src/main/resources/assets/whileaway/lang/en_us.json",
+    "baseline_sha256": "40f01ce62b2a2e6ae08f7b12d1a2ba10fad7775ad5555619e263ce3fa9f43c9e",
+    "modified_sha256": "a9cb2d05da310f227dab3c22cb5d04f8cfb88dd1bf4c7f3e5a5b1f220024e43b"
+  },
+  {
+    "path": "src/main/resources/assets/whileaway/lang/ko_kr.json",
+    "baseline_sha256": "7aaba3700c7670a13e4ed26f959e8b9cad806bf9825e2f4fcde5ca4ea8b6a383",
+    "modified_sha256": "fd6fd9fdb415a8cdc5437227dfb05d5cc6f2f169751c12a07437ec0a20e8eb6e"
+  }
+]
