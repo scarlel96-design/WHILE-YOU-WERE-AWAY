@@ -1,0 +1,8 @@
+V2-01 playable-core increment publication
+Branch: work/v2-playable-core
+Production commit: 69193a689df52d7746bc2e874b76ebb4348af18d
+Remote readback: 69193a689df52d7746bc2e874b76ebb4348af18d refs/heads/work/v2-playable-core
+Source ZIP SHA-256: cc204f8877d2950b53e4da10c3784cf8b26ead4c47c7909642ea3a107ab089cf
+JAR SHA-256: b73f009f52564c7cb495603f51fe549716642a1d4e8a903b36b84933d7f194b4
+Validation: 113 GameTests PASS; 176858 core assertions PASS; build PASS; new real client NOT TESTED
+V2-01 status: PARTIAL
