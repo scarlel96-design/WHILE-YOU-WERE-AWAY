@@ -1,0 +1,91 @@
+V2-01B publication evidence — 2026-10-20
+Repository: scarlel96-design/WHILE-YOU-WERE-AWAY
+Branch: work/v2-playable-core
+Baseline: 47b440befc881fc25b60374360ba4b07c88dbb4a
+Implementation: 0c1a97e823a0ef9974db6d9a07b2ee1eb04b3c8d
+Package/report commit: c5371472546e4f361719dfa5e563f22897d95ca0
+Exact-byte evidence commit: a14602fd10b5c8432a31f7ccf324b3b06e29cbc8
+Push output: 47b440b..a14602f work/v2-playable-core -> work/v2-playable-core
+Push exit: 0
+Remote ls-remote: a14602fd10b5c8432a31f7ccf324b3b06e29cbc8 refs/heads/work/v2-playable-core
+GitHub API independently confirmed package inventory and evidence paths at that commit.
+ROLLBACK.sh remote mode: 100755
+Final confirmation commit changes publication metadata only. Production source remains at implementation commit.
+Working tree: tracked source clean; inherited unrelated untracked directories/files remain preserved.
+Milestone: PARTIAL. Final actual-client new-world play remains NOT TESTED.
+
+Remote package inventory:
+[
+  {
+    "path": "dist/v2-playable-core-v2-01b/.gitattributes",
+    "git_blob": "fa1385d99a319b43c06f5309d1aae9fdd3adea46",
+    "size": 8
+  },
+  {
+    "path": "dist/v2-playable-core-v2-01b/DIFF.patch",
+    "git_blob": "a293c7875aefd88bc4906982f94f4eae6cdfeb97",
+    "size": 18169
+  },
+  {
+    "path": "dist/v2-playable-core-v2-01b/SHA256SUMS.txt",
+    "git_blob": "92802c3a7616ecee62ebd0a17b884c8a06936643",
+    "size": 516
+  },
+  {
+    "path": "dist/v2-playable-core-v2-01b/STATUS.md",
+    "git_blob": "1c2bb06e6c375b6c3ae3e110457cc0b85ab252f3",
+    "size": 10534
+  },
+  {
+    "path": "dist/v2-playable-core-v2-01b/VERIFICATION.txt",
+    "git_blob": "a3b0618d54c3e501d5bfcc26fd1b861ba86102ce",
+    "size": 6618
+  },
+  {
+    "path": "dist/v2-playable-core-v2-01b/whileaway-0.3.1-v2-01b-source.zip",
+    "git_blob": "56dd3b48b19de9300bb47229c5559547917fbb98",
+    "size": 442611
+  },
+  {
+    "path": "dist/v2-playable-core-v2-01b/whileaway-0.3.1-v2-01b.jar",
+    "git_blob": "994ee0b546e81463fa4e6b78dc18674e8d639d06",
+    "size": 681703
+  }
+]
+
+Remote required evidence:
+[
+  {
+    "path": "evidence/v2-playable-core/v2-01b-transaction/DIFF_FILE",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "a293c7875aefd88bc4906982f94f4eae6cdfeb97",
+    "size": 18169,
+    "url": "https://api.github.com/repos/scarlel96-design/WHILE-YOU-WERE-AWAY/git/blobs/a293c7875aefd88bc4906982f94f4eae6cdfeb97"
+  },
+  {
+    "path": "evidence/v2-playable-core/v2-01b-transaction/MODIFIED_FILE",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "cb7051bc1774e87bbf005e172f414ecacb327279",
+    "size": 10895,
+    "url": "https://api.github.com/repos/scarlel96-design/WHILE-YOU-WERE-AWAY/git/blobs/cb7051bc1774e87bbf005e172f414ecacb327279"
+  },
+  {
+    "path": "evidence/v2-playable-core/v2-01b-transaction/ROLLBACK.sh",
+    "mode": "100755",
+    "type": "blob",
+    "sha": "883af7802dbfb482699235a48c860b97a4bb5c99",
+    "size": 630,
+    "url": "https://api.github.com/repos/scarlel96-design/WHILE-YOU-WERE-AWAY/git/blobs/883af7802dbfb482699235a48c860b97a4bb5c99"
+  },
+  {
+    "path": "evidence/v2-playable-core/v2-01b-transaction/VERIFICATION.txt",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "a3b0618d54c3e501d5bfcc26fd1b861ba86102ce",
+    "size": 6618,
+    "url": "https://api.github.com/repos/scarlel96-design/WHILE-YOU-WERE-AWAY/git/blobs/a3b0618d54c3e501d5bfcc26fd1b861ba86102ce"
+  }
+]
+
