@@ -11,7 +11,7 @@ Remote ls-remote: a14602fd10b5c8432a31f7ccf324b3b06e29cbc8 refs/heads/work/v2-pl
 GitHub API independently confirmed package inventory and evidence paths at that commit.
 ROLLBACK.sh remote mode: 100755
 Final confirmation commit changes publication metadata only. Production source remains at implementation commit.
-Working tree: tracked source clean; inherited unrelated untracked directories/files remain preserved.
+Working tree: tracked source clean; inherited untracked directories/files remain preserved.
 Milestone: PARTIAL. Final actual-client new-world play remains NOT TESTED.
 
 Remote package inventory:
@@ -89,3 +89,9 @@ Remote required evidence:
   }
 ]
 
+
+Development gate fixture directory: evidence/return-network-integration/gametest/fe653534-5f31-41fd-896c-8e2509bb3157
+Final gate fixture directory: evidence/return-network-integration/gametest/71e07388-eae6-4fdc-b328-e12adbf4b987
+Fixture hashes: FIXTURE-SHA256SUMS.txt
+Remote publication confirmation commit: 8799ad2cf6b0c3b665e734e560d8e87d39785b6a (verified with ls-remote).
+The final fixture attachment commit changes evidence only.
