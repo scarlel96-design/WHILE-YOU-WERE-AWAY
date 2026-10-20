@@ -38,7 +38,6 @@ public final class StoryEvents {
             if(!StoryStorage.available(p.getServer())){p.sendSystemMessage(Component.literal("WhileAway: story load blocked; original preserved; recovery pending."));return;}
             var d=NarrativeData.get(p.getServer()); var e=d.entry(p.getUUID());
             e.progress=e.progress.defer(p.getServer().overworld().getGameTime()+600); d.setDirty();
-            if(e.openingStage==OpeningStage.COMPLETED)p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
         }
     }
     @SubscribeEvent public void logout(PlayerEvent.PlayerLoggedOutEvent event) {
@@ -54,6 +53,8 @@ public final class StoryEvents {
         if(e.openingStage!=OpeningStage.COMPLETED)return;
         if(SceneRecovery.busy(p))return;
         if(e.station==null) return;
+        // The old network must answer before the return route can show its first presence.
+        if(data.returnNetwork().stage!=ReturnNetworkState.Stage.COMPLETED)return;
         boolean near=p.blockPosition().distSqr(e.station)<32*32;
         boolean hostile=!server.getEntitiesOfClass(Monster.class,p.getBoundingBox().inflate(12),m->m.getTarget()==p).isEmpty();
         boolean eligible=!p.isCreative()&&!p.isSpectator()&&p.isAlive()&&!p.isSleeping()&&p.getHealth()>=8

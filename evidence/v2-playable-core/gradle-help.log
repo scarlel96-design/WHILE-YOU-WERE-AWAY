@@ -1,0 +1,37 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Could not connect to the Gradle daemon.
+Daemon uid: 420f6cf6-b9e2-4643-9d45-71dfce461bd8 with diagnostics:
+Daemon pid: 46660
+  log file: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\daemon\9.2.1\daemon-46660.out.log
+----- Last 20 lines from daemon log file - daemon-46660.out.log -----
+2026-10-20T14:02:53.195+0900 [DEBUG] [org.gradle.internal.remote.internal.inet.InetAddresses] Is this a loopback interface? false
+2026-10-20T14:02:53.196+0900 [DEBUG] [org.gradle.internal.remote.internal.inet.InetAddresses] Adding IP addresses for network interface WAN Miniport (L2TP)
+2026-10-20T14:02:53.196+0900 [DEBUG] [org.gradle.internal.remote.internal.inet.InetAddresses] Is this a loopback interface? false
+2026-10-20T14:02:53.196+0900 [DEBUG] [org.gradle.internal.remote.internal.inet.InetAddresses] Adding IP addresses for network interface WAN Miniport (PPTP)
+2026-10-20T14:02:53.196+0900 [DEBUG] [org.gradle.internal.remote.internal.inet.InetAddresses] Is this a loopback interface? false
+2026-10-20T14:02:53.230+0900 [DEBUG] [org.gradle.internal.nativeintegration.services.NativeServices] Native-platform posix files integration is not available. Continuing with fallback.
+2026-10-20T14:02:53.261+0900 [INFO] [org.gradle.launcher.daemon.server.Daemon] start() called on daemon - DefaultDaemonContext[uid=420f6cf6-b9e2-4643-9d45-71dfce461bd8,javaHome=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\daemon,pid=46660,idleTimeout=120000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx3G,-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]
+2026-10-20T14:02:53.327+0900 [DEBUG] [org.gradle.internal.remote.internal.inet.TcpIncomingConnector] Listening on [8dac5995-d571-4cd6-9d39-44ddca425923 port:14966, addresses:[localhost/127.0.0.1]].
+2026-10-20T14:02:53.341+0900 [DEBUG] [org.gradle.launcher.daemon.server.Daemon] Daemon starting at: Tue Oct 20 14:02:53 GMT+09:00 2026, with address: [8dac5995-d571-4cd6-9d39-44ddca425923 port:14966, addresses:[localhost/127.0.0.1]]
+2026-10-20T14:02:53.341+0900 [INFO] [org.gradle.launcher.daemon.server.DaemonRegistryUpdater] Advertising the daemon address to the clients: [8dac5995-d571-4cd6-9d39-44ddca425923 port:14966, addresses:[localhost/127.0.0.1]]
+2026-10-20T14:02:53.341+0900 [DEBUG] [org.gradle.launcher.daemon.server.DaemonRegistryUpdater] Advertised daemon context: DefaultDaemonContext[uid=420f6cf6-b9e2-4643-9d45-71dfce461bd8,javaHome=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\daemon,pid=46660,idleTimeout=120000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx3G,-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]
+2026-10-20T14:02:53.342+0900 [DEBUG] [org.gradle.launcher.daemon.registry.PersistentDaemonRegistry] Storing daemon address: [8dac5995-d571-4cd6-9d39-44ddca425923 port:14966, addresses:[localhost/127.0.0.1]], context: DefaultDaemonContext[uid=420f6cf6-b9e2-4643-9d45-71dfce461bd8,javaHome=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\daemon,pid=46660,idleTimeout=120000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx3G,-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]
+2026-10-20T14:02:53.357+0900 [DEBUG] [org.gradle.cache.internal.DefaultFileLockManager] Waiting to acquire exclusive lock on daemon addresses registry.
+2026-10-20T14:02:53.361+0900 [DEBUG] [org.gradle.cache.internal.DefaultFileLockManager] Lock acquired on daemon addresses registry.
+2026-10-20T14:02:53.369+0900 [DEBUG] [org.gradle.cache.internal.DefaultFileLockManager] Releasing lock on daemon addresses registry.
+2026-10-20T14:02:53.370+0900 [LIFECYCLE] [org.gradle.launcher.daemon.server.Daemon] Daemon server started.
+2026-10-20T14:02:53.371+0900 [DEBUG] [org.gradle.launcher.daemon.bootstrap.DaemonStartupCommunication] Completed writing the daemon greeting. Closing streams...
+2026-10-20T14:02:53.384+0900 [DEBUG] [org.gradle.launcher.daemon.server.Daemon] stopOnExpiration() called on daemon
+2026-10-20T14:02:53.386+0900 [DEBUG] [org.gradle.launcher.daemon.server.Daemon] awaitExpiration() called on daemon
+2026-10-20T14:02:53.386+0900 [DEBUG] [org.gradle.launcher.daemon.server.DaemonStateCoordinator] daemon is running. Sleeping until state changes.----- End of the daemon log -----
+
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.

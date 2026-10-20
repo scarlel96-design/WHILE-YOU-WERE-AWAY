@@ -13,12 +13,13 @@ import net.minecraft.world.entity.ai.attributes.*;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-/** First encounter: a warned, localized patrol. Never griefs blocks or teleports. */
+/** First encounter: follow a return route and warn before reacting to an obstruction. */
 public final class Wayfarer extends PathfinderMob implements GeoEntity {
     private static final EntityDataAccessor<Boolean> HUNTING = SynchedEntityData.defineId(Wayfarer.class, EntityDataSerializers.BOOLEAN);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -27,7 +28,7 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
     private static final RawAnimation HUNT = RawAnimation.begin().thenLoop("animation.wayfarer.hunt");
     private UUID witness;
     private BlockPos home;
-    private int lifetime, windup, attackCooldown, huntTicks;
+    private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks;
     private boolean checkpointRestored;
     public Wayfarer(EntityType<? extends PathfinderMob> type, Level level) { super(type, level); setPersistenceRequired(); xpReward = 0; }
     public static AttributeSupplier.Builder attributes() {
@@ -68,14 +69,28 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
         if (lifetime > 2400) { finish(true); return; }
         if (lifetime % 110 == 0) StoryEvents.sound(player, WhileAway.BREATH.get(), SoundSource.HOSTILE, blockPosition(), .5f);
         boolean hunting=entityData.get(HUNTING);
-        if (!hunting && lifetime > 200 && distanceToSqr(player) < 5*5 && hasLineOfSight(player)) {
-            entityData.set(HUNTING,true); windup=30;
-            StoryActors.checkpoint(this,actorRecord,2,"pursuit_started");
-            StoryEvents.sound(player, WhileAway.ATTACK.get(), SoundSource.HOSTILE, blockPosition(), .65f);
+        if (!hunting && position().distanceToSqr(Vec3.atCenterOf(home)) < 2.5*2.5) { finish(true); return; }
+        boolean obstructed=blocksReturnRoute(position(),Vec3.atCenterOf(home),player.position())&&hasLineOfSight(player);
+        if (!hunting && obstructed && lifetime > 20) {
+            getNavigation().stop();getLookControl().setLookAt(player);
+            if (++warningTicks==1)StoryEvents.sound(player,WhileAway.BREATH.get(),SoundSource.HOSTILE,blockPosition(),.8f);
+            if (warningTicks>=50) {
+                entityData.set(HUNTING,true);windup=30;warningTicks=0;
+                StoryActors.checkpoint(this,actorRecord,2,"pursuit_started");
+                StoryEvents.sound(player,WhileAway.ATTACK.get(),SoundSource.HOSTILE,blockPosition(),.65f);
+            }
+            return;
         }
+        if(!hunting)warningTicks=0;
         if (entityData.get(HUNTING)) {
             huntTicks++;
             if (huntTicks > 600) { finish(true); return; }
+            if(!obstructed) {
+                getNavigation().stop();
+                if(++clearTicks>=40){finish(true);return;}
+                return;
+            }
+            clearTicks=0;
             if (windup > 0) { windup--; getNavigation().stop(); getLookControl().setLookAt(player); return; }
             if (tickCount % 10 == 0) getNavigation().moveTo(player, 1.25);
             if (attackCooldown > 0) attackCooldown--;
@@ -83,10 +98,19 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
                 doHurtTarget(player); attackCooldown=60; windup=20;
                 StoryEvents.sound(player, WhileAway.ATTACK.get(), SoundSource.HOSTILE, blockPosition(), .5f);
             }
-        } else if (tickCount % 60 == 0) {
-            int side=(lifetime / 240) % 2 == 0 ? -1 : 1;
-            getNavigation().moveTo(home.getX()+side*8+.5, home.getY(), home.getZ()+3.5, .65);
+        } else if (tickCount % 20 == 0) {
+            getNavigation().moveTo(home.getX()+.5, home.getY(), home.getZ()+.5, .7);
         }
+    }
+    /** A player blocks the route only when standing ahead and within its narrow corridor. */
+    public static boolean blocksReturnRoute(Vec3 actor,Vec3 destination,Vec3 player) {
+        double dx=destination.x-actor.x,dz=destination.z-actor.z;
+        double length=Math.sqrt(dx*dx+dz*dz);
+        if(length<1||Math.abs(player.y-actor.y)>2.5)return false;
+        double px=player.x-actor.x,pz=player.z-actor.z;
+        double forward=(px*dx+pz*dz)/length;
+        double side=Math.abs(px*dz-pz*dx)/length;
+        return forward>=0&&forward<=Math.min(length,5)&&side<=1.6;
     }
     public void restoreCheckpointRuntime(StoryActorRecord actorRecord) {
         if(!StoryActors.canonical(this,actorRecord))throw new IllegalStateException("RUNTIME_IDENTITY_CONFLICT");

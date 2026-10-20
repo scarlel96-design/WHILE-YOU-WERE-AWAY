@@ -1,11 +1,20 @@
 package io.github.whileaway.content;
 import com.mojang.serialization.MapCodec;
 import io.github.whileaway.WhileAway;
+import io.github.whileaway.NarrativeData;
+import io.github.whileaway.StoryStorage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public final class StationBlock extends BaseEntityBlock {
     public static final MapCodec<StationBlock> CODEC = simpleCodec(StationBlock::new);
@@ -13,6 +22,17 @@ public final class StationBlock extends BaseEntityBlock {
     @Override protected MapCodec<? extends BaseEntityBlock> codec() { return CODEC; }
     @Override protected RenderShape getRenderShape(BlockState s) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new StationEntity(pos, state); }
+    @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.sidedSuccess(level.isClientSide);
+        if (!StoryStorage.available(serverPlayer.getServer())) return InteractionResult.FAIL;
+        var entry = NarrativeData.get(serverPlayer.getServer()).entry(serverPlayer.getUUID());
+        if (!entry.progress.encounterComplete() || !pos.equals(entry.station)) return InteractionResult.PASS;
+        serverPlayer.displayClientMessage(Component.translatable("story.whileaway.station_revisit"), false);
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + .5, pos.getY() + 1.1, pos.getZ() + .5, 4, .25, .08, .25, .01);
+        }
+        return InteractionResult.SUCCESS;
+    }
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return level.isClientSide ? null : createTickerHelper(type, WhileAway.STATION_ENTITY.get(), StationEntity::tick);
     }

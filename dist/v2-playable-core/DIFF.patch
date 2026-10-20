@@ -1,0 +1,395 @@
+diff --git a/src/main/java/io/github/whileaway/ActorGameTests.java b/src/main/java/io/github/whileaway/ActorGameTests.java
+index 9b00e06..d5f234a 100644
+--- a/src/main/java/io/github/whileaway/ActorGameTests.java
++++ b/src/main/java/io/github/whileaway/ActorGameTests.java
+@@ -6,12 +6,22 @@ import net.minecraft.gametest.framework.*;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.world.entity.*;
+ import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.phys.Vec3;
+ import net.neoforged.neoforge.gametest.*;
+ 
+ /** Real server entity fixtures. Villagers test a reusable adapter, NOT a shipped story NPC. */
+ @GameTestHolder(WhileAway.ID)
+ @PrefixGameTestTemplate(false)
+ public final class ActorGameTests {
++    @GameTest(template="empty") public static void returnRouteWarnsOnlyForActualObstruction(GameTestHelper h) {
++        var actor=new Vec3(0,2,0);var destination=new Vec3(12,2,0);
++        h.assertTrue(io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(3,2,0)),"player ahead blocks return");
++        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(3,2,3)),"side passage stays safe");
++        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(-2,2,0)),"player behind stays safe");
++        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(7,2,0)),"distant player stays safe");
++        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(3,6,0)),"different floor stays safe");
++        h.succeed();
++    }
+     private static StoryActorRecord record() {
+         return new StoryActorRecord("test:npc","test:meeting","resident","minecraft:villager","minecraft:overworld",
+             UUID.fromString("00000000-0000-0000-0000-000000000001"),null,UUID.fromString("00000000-0000-0000-0000-000000000002"),new BlockPos(0,80,0),false);
+diff --git a/src/main/java/io/github/whileaway/NpcEvents.java b/src/main/java/io/github/whileaway/NpcEvents.java
+index 676e168..f435c3f 100644
+--- a/src/main/java/io/github/whileaway/NpcEvents.java
++++ b/src/main/java/io/github/whileaway/NpcEvents.java
+@@ -47,11 +47,24 @@ public final class NpcEvents {
+         long hour=Math.floorMod(dayTime,24000);
+         return hour>=5000&&hour<11000?home.east():home;
+     }
++    static boolean workingHours(long dayTime) {
++        long hour=Math.floorMod(dayTime,24000);
++        return hour>=5000&&hour<11000;
++    }
+     public static boolean interact(StoryNpc npc,ServerPlayer p) {
+         if(!StoryStorage.available(p.getServer())||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!p.isAlive())return false;
+         var r=NarrativeData.get(p.getServer()).actors.get(STORY);
+         if(r==null||!StoryActors.canonical(npc,r)||r.checkpoint.terminal())return false;
+         if(!NpcState.integrity(r).isEmpty()){StoryStorage.block(p.getServer(),String.join(";",NpcState.integrity(r)));return false;}
++        if(r.checkpoint.checkpoint==4) {
++            if(NarrativeData.get(p.getServer()).returnNetwork().stage!=ReturnNetworkState.Stage.NOT_STARTED)return false;
++            if(npc.tryOrdinaryTalk(p.serverLevel().getGameTime())) {
++                String key=workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
++                p.displayClientMessage(Component.translatable(key),false);
++                npc.getLookControl().setLookAt(p);
++            }
++            return true;
++        }
+         if(r.checkpoint.checkpoint!=1)return false;
+         r.facts.add(NpcState.MET+p.getUUID());r.facts.add(NpcState.DIALOGUE);
+         r.facts.add(NpcState.relationship("player:"+p.getUUID(),"first_conversation"));
+@@ -72,7 +85,8 @@ public final class NpcEvents {
+         if(r.checkpoint.checkpoint<4&&(nearby==null||!nearby.isAlive())){npc.storyNavigation().externalPause(npc);StoryActors.suspend(npc,r,"npc_no_witness");return;}
+         boolean arrived=false;
+         if(r.checkpoint.checkpoint>=2) {
+-            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),destination);
++            // Residence and light have fixed bindings; the daily movement target does not move them.
++            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),home);
+             if(!environment.dependenciesReady()) {
+                 npc.storyNavigation().externalPause(npc);
+                 npc.storyNavigation().diagnostic(npc,r,environment);
+@@ -99,7 +113,9 @@ public final class NpcEvents {
+         npc.getNavigation().stop();
+         // Look at the light instead of delivering explanatory monologues. The object must actually exist.
+         var light=home.offset(2,0,0);
+-        npc.getLookControl().setLookAt(light.getX()+.5,light.getY()+.5,light.getZ()+.5);
++        if(r.checkpoint.checkpoint<4||workingHours(level.getDayTime()))
++            npc.getLookControl().setLookAt(light.getX()+.5,light.getY()+.5,light.getZ()+.5);
++        else if(nearby!=null&&npc.distanceToSqr(nearby)<64)npc.getLookControl().setLookAt(nearby);
+         if(r.checkpoint.checkpoint==2) {
+             if(!NpcEnvironment.isReturnLight(level.getBlockState(light)))return;
+             r.facts.add(NpcState.ARRIVED);r.facts.add(NpcState.OBSERVED);
+diff --git a/src/main/java/io/github/whileaway/NpcGameTests.java b/src/main/java/io/github/whileaway/NpcGameTests.java
+index 8fe5887..1fe6855 100644
+--- a/src/main/java/io/github/whileaway/NpcGameTests.java
++++ b/src/main/java/io/github/whileaway/NpcGameTests.java
+@@ -46,4 +46,19 @@ public final class NpcGameTests {
+         h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==npc&&r.generation==0&&NpcState.integrity(r).isEmpty(),"completed event is not retired resident");
+         StoryActors.abort(h.getLevel().getServer(),r);h.succeed();
+     }
++    @GameTest(template="empty") public static void settledResidentHasDayWorkNightRestWithoutNewFacts(GameTestHelper h) {
++        var home=new BlockPos(4,2,0);var r=record();r.checkpoint.advance(1);
++        r.facts.add(NpcState.MET+UUID.randomUUID());r.facts.add(NpcState.DIALOGUE);r.checkpoint.advance(2);
++        r.facts.add(NpcState.ARRIVED);r.facts.add(NpcState.OBSERVED);r.checkpoint.advance(3);
++        NpcState.settle(r);r.facts.add(NpcState.LINK);r.checkpoint.advance(4);
++        var before=Set.copyOf(r.facts);
++        h.assertTrue(NpcEvents.residenceDestination(home,4999).equals(home),"rest before work");
++        h.assertTrue(NpcEvents.residenceDestination(home,5000).equals(home.east()),"daytime light work");
++        h.assertTrue(NpcEvents.residenceDestination(home,10999).equals(home.east()),"work until end");
++        h.assertTrue(NpcEvents.residenceDestination(home,11000).equals(home),"return home after work");
++        var npc=WhileAway.STORY_NPC.get().create(h.getLevel());
++        h.assertTrue(npc.tryOrdinaryTalk(100)&&!npc.tryOrdinaryTalk(159)&&npc.tryOrdinaryTalk(160),"ordinary speech is paced");
++        h.assertTrue(r.facts.equals(before)&&NpcState.integrity(r).isEmpty(),"ordinary life changes no durable story fact");
++        h.succeed();
++    }
+ }
+diff --git a/src/main/java/io/github/whileaway/StoryEvents.java b/src/main/java/io/github/whileaway/StoryEvents.java
+index 40c9595..75c8cd0 100644
+--- a/src/main/java/io/github/whileaway/StoryEvents.java
++++ b/src/main/java/io/github/whileaway/StoryEvents.java
+@@ -38,7 +38,6 @@ public final class StoryEvents {
+             if(!StoryStorage.available(p.getServer())){p.sendSystemMessage(Component.literal("WhileAway: story load blocked; original preserved; recovery pending."));return;}
+             var d=NarrativeData.get(p.getServer()); var e=d.entry(p.getUUID());
+             e.progress=e.progress.defer(p.getServer().overworld().getGameTime()+600); d.setDirty();
+-            if(e.openingStage==OpeningStage.COMPLETED)p.sendSystemMessage(Component.translatable("story.whileaway.welcome"));
+         }
+     }
+     @SubscribeEvent public void logout(PlayerEvent.PlayerLoggedOutEvent event) {
+@@ -54,6 +53,8 @@ public final class StoryEvents {
+         if(e.openingStage!=OpeningStage.COMPLETED)return;
+         if(SceneRecovery.busy(p))return;
+         if(e.station==null) return;
++        // The old network must answer before the return route can show its first presence.
++        if(data.returnNetwork().stage!=ReturnNetworkState.Stage.COMPLETED)return;
+         boolean near=p.blockPosition().distSqr(e.station)<32*32;
+         boolean hostile=!server.getEntitiesOfClass(Monster.class,p.getBoundingBox().inflate(12),m->m.getTarget()==p).isEmpty();
+         boolean eligible=!p.isCreative()&&!p.isSpectator()&&p.isAlive()&&!p.isSleeping()&&p.getHealth()>=8
+diff --git a/src/main/java/io/github/whileaway/content/StationBlock.java b/src/main/java/io/github/whileaway/content/StationBlock.java
+index 414fb31..f53f0d7 100644
+--- a/src/main/java/io/github/whileaway/content/StationBlock.java
++++ b/src/main/java/io/github/whileaway/content/StationBlock.java
+@@ -1,11 +1,20 @@
+ package io.github.whileaway.content;
+ import com.mojang.serialization.MapCodec;
+ import io.github.whileaway.WhileAway;
++import io.github.whileaway.NarrativeData;
++import io.github.whileaway.StoryStorage;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.particles.ParticleTypes;
++import net.minecraft.network.chat.Component;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.InteractionResult;
++import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.*;
+ import net.minecraft.world.level.block.entity.*;
+ import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.phys.BlockHitResult;
+ 
+ public final class StationBlock extends BaseEntityBlock {
+     public static final MapCodec<StationBlock> CODEC = simpleCodec(StationBlock::new);
+@@ -13,6 +22,17 @@ public final class StationBlock extends BaseEntityBlock {
+     @Override protected MapCodec<? extends BaseEntityBlock> codec() { return CODEC; }
+     @Override protected RenderShape getRenderShape(BlockState s) { return RenderShape.MODEL; }
+     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new StationEntity(pos, state); }
++    @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
++        if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.sidedSuccess(level.isClientSide);
++        if (!StoryStorage.available(serverPlayer.getServer())) return InteractionResult.FAIL;
++        var entry = NarrativeData.get(serverPlayer.getServer()).entry(serverPlayer.getUUID());
++        if (!entry.progress.encounterComplete() || !pos.equals(entry.station)) return InteractionResult.PASS;
++        serverPlayer.displayClientMessage(Component.translatable("story.whileaway.station_revisit"), false);
++        if (level instanceof ServerLevel serverLevel) {
++            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + .5, pos.getY() + 1.1, pos.getZ() + .5, 4, .25, .08, .25, .01);
++        }
++        return InteractionResult.SUCCESS;
++    }
+     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+         return level.isClientSide ? null : createTickerHelper(type, WhileAway.STATION_ENTITY.get(), StationEntity::tick);
+     }
+diff --git a/src/main/java/io/github/whileaway/core/CityAccess.java b/src/main/java/io/github/whileaway/core/CityAccess.java
+index 0b8529a..ae70a82 100644
+--- a/src/main/java/io/github/whileaway/core/CityAccess.java
++++ b/src/main/java/io/github/whileaway/core/CityAccess.java
+@@ -4,7 +4,7 @@ public final class CityAccess {
+     private CityAccess() {}
+     public static boolean canEnter(Progress p) {
+         return p.has(Clue.STATION) && p.has(Clue.SIGNAL_RESTORED)
+-            && p.has(Clue.PERSONAL_READ) && p.encounterComplete();
++            && p.has(Clue.PERSONAL_READ);
+     }
+     public static int read(int current, int bit) {
+         return (current | (bit & 7)) & 7;
+diff --git a/src/main/java/io/github/whileaway/core/Director.java b/src/main/java/io/github/whileaway/core/Director.java
+index 6f3d385..936e585 100644
+--- a/src/main/java/io/github/whileaway/core/Director.java
++++ b/src/main/java/io/github/whileaway/core/Director.java
+@@ -12,7 +12,8 @@ public final class Director {
+         return switch (p.stage()) {
+             case 1 -> p.eventsPlayed() < 1 ? Cue.DISTANT_KNOCK : Cue.NONE;
+             case 2 -> p.eventsPlayed() < 2 ? Cue.RETURNING_STEPS : Cue.NONE;
+-            case 3 -> Cue.MANIFEST;
++            case 3 -> p.eventsPlayed() < 1 ? Cue.DISTANT_KNOCK
++                : p.eventsPlayed() < 2 ? Cue.RETURNING_STEPS : Cue.MANIFEST;
+             default -> Cue.NONE;
+         };
+     }
+diff --git a/src/main/java/io/github/whileaway/entity/StoryNpc.java b/src/main/java/io/github/whileaway/entity/StoryNpc.java
+index 931eb5b..f95e519 100644
+--- a/src/main/java/io/github/whileaway/entity/StoryNpc.java
++++ b/src/main/java/io/github/whileaway/entity/StoryNpc.java
+@@ -14,7 +14,13 @@ import net.minecraft.world.level.Level;
+ /** Campaign entity, not a Villager test double. Appearance is explicitly provisional. */
+ public final class StoryNpc extends PathfinderMob {
+     private final NpcNavigation storyNavigation=new NpcNavigation();
++    private long lastOrdinaryTalkTick=Long.MIN_VALUE;
+     public NpcNavigation storyNavigation(){return storyNavigation;}
++    /** Ordinary dialogue is transient and does not change the campaign fact ledger. */
++    public boolean tryOrdinaryTalk(long gameTick) {
++        if(lastOrdinaryTalkTick!=Long.MIN_VALUE&&gameTick-lastOrdinaryTalkTick<60)return false;
++        lastOrdinaryTalkTick=gameTick;return true;
++    }
+     public StoryNpc(EntityType<? extends PathfinderMob> type,Level level) {
+         super(type,level);setPersistenceRequired();setCustomName(Component.translatable("entity.whileaway.story_npc"));
+     }
+diff --git a/src/main/java/io/github/whileaway/entity/Wayfarer.java b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+index 5032fdd..3ee2f90 100644
+--- a/src/main/java/io/github/whileaway/entity/Wayfarer.java
++++ b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+@@ -13,12 +13,13 @@ import net.minecraft.world.entity.ai.attributes.*;
+ import net.minecraft.world.entity.ai.goal.FloatGoal;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.level.Level;
++import net.minecraft.world.phys.Vec3;
+ import software.bernie.geckolib.animatable.GeoEntity;
+ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+ import software.bernie.geckolib.animation.*;
+ import software.bernie.geckolib.util.GeckoLibUtil;
+ 
+-/** First encounter: a warned, localized patrol. Never griefs blocks or teleports. */
++/** First encounter: follow a return route and warn before reacting to an obstruction. */
+ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+     private static final EntityDataAccessor<Boolean> HUNTING = SynchedEntityData.defineId(Wayfarer.class, EntityDataSerializers.BOOLEAN);
+     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+@@ -27,7 +28,7 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+     private static final RawAnimation HUNT = RawAnimation.begin().thenLoop("animation.wayfarer.hunt");
+     private UUID witness;
+     private BlockPos home;
+-    private int lifetime, windup, attackCooldown, huntTicks;
++    private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks;
+     private boolean checkpointRestored;
+     public Wayfarer(EntityType<? extends PathfinderMob> type, Level level) { super(type, level); setPersistenceRequired(); xpReward = 0; }
+     public static AttributeSupplier.Builder attributes() {
+@@ -68,14 +69,28 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+         if (lifetime > 2400) { finish(true); return; }
+         if (lifetime % 110 == 0) StoryEvents.sound(player, WhileAway.BREATH.get(), SoundSource.HOSTILE, blockPosition(), .5f);
+         boolean hunting=entityData.get(HUNTING);
+-        if (!hunting && lifetime > 200 && distanceToSqr(player) < 5*5 && hasLineOfSight(player)) {
+-            entityData.set(HUNTING,true); windup=30;
+-            StoryActors.checkpoint(this,actorRecord,2,"pursuit_started");
+-            StoryEvents.sound(player, WhileAway.ATTACK.get(), SoundSource.HOSTILE, blockPosition(), .65f);
++        if (!hunting && position().distanceToSqr(Vec3.atCenterOf(home)) < 2.5*2.5) { finish(true); return; }
++        boolean obstructed=blocksReturnRoute(position(),Vec3.atCenterOf(home),player.position())&&hasLineOfSight(player);
++        if (!hunting && obstructed && lifetime > 20) {
++            getNavigation().stop();getLookControl().setLookAt(player);
++            if (++warningTicks==1)StoryEvents.sound(player,WhileAway.BREATH.get(),SoundSource.HOSTILE,blockPosition(),.8f);
++            if (warningTicks>=50) {
++                entityData.set(HUNTING,true);windup=30;warningTicks=0;
++                StoryActors.checkpoint(this,actorRecord,2,"pursuit_started");
++                StoryEvents.sound(player,WhileAway.ATTACK.get(),SoundSource.HOSTILE,blockPosition(),.65f);
++            }
++            return;
+         }
++        if(!hunting)warningTicks=0;
+         if (entityData.get(HUNTING)) {
+             huntTicks++;
+             if (huntTicks > 600) { finish(true); return; }
++            if(!obstructed) {
++                getNavigation().stop();
++                if(++clearTicks>=40){finish(true);return;}
++                return;
++            }
++            clearTicks=0;
+             if (windup > 0) { windup--; getNavigation().stop(); getLookControl().setLookAt(player); return; }
+             if (tickCount % 10 == 0) getNavigation().moveTo(player, 1.25);
+             if (attackCooldown > 0) attackCooldown--;
+@@ -83,11 +98,20 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+                 doHurtTarget(player); attackCooldown=60; windup=20;
+                 StoryEvents.sound(player, WhileAway.ATTACK.get(), SoundSource.HOSTILE, blockPosition(), .5f);
+             }
+-        } else if (tickCount % 60 == 0) {
+-            int side=(lifetime / 240) % 2 == 0 ? -1 : 1;
+-            getNavigation().moveTo(home.getX()+side*8+.5, home.getY(), home.getZ()+3.5, .65);
++        } else if (tickCount % 20 == 0) {
++            getNavigation().moveTo(home.getX()+.5, home.getY(), home.getZ()+.5, .7);
+         }
+     }
++    /** A player blocks the route only when standing ahead and within its narrow corridor. */
++    public static boolean blocksReturnRoute(Vec3 actor,Vec3 destination,Vec3 player) {
++        double dx=destination.x-actor.x,dz=destination.z-actor.z;
++        double length=Math.sqrt(dx*dx+dz*dz);
++        if(length<1||Math.abs(player.y-actor.y)>2.5)return false;
++        double px=player.x-actor.x,pz=player.z-actor.z;
++        double forward=(px*dx+pz*dz)/length;
++        double side=Math.abs(px*dz-pz*dx)/length;
++        return forward>=0&&forward<=Math.min(length,5)&&side<=1.6;
++    }
+     public void restoreCheckpointRuntime(StoryActorRecord actorRecord) {
+         if(!StoryActors.canonical(this,actorRecord))throw new IllegalStateException("RUNTIME_IDENTITY_CONFLICT");
+         if(!checkpointRestored) {
+diff --git a/src/main/resources/assets/whileaway/lang/en_us.json b/src/main/resources/assets/whileaway/lang/en_us.json
+index a9d546e..6c594e6 100644
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -12,7 +12,8 @@
+   "story.whileaway.already_restored": "The signal is already awake.",
+   "story.whileaway.signal": "The signal leaves. No one wrote who receives it.",
+   "story.whileaway.arrival": "Leave the path clear. Something has not arrived yet.",
+-  "story.whileaway.after": "The footsteps recede. The records remain at the station. — End of first development slice",
++  "story.whileaway.after": "The footsteps recede. Fresh scratches remain on the return marker at the station.",
++  "story.whileaway.station_revisit": "The new marks point toward the end of the rails, not a name. Those footsteps were not following anyone.",
+   "story.whileaway.recovery_unloaded": "Encounter entity is not loaded. Return to the station and retry.",
+   "story.whileaway.recovered": "Encounter cleared. Clues preserved; 30 seconds of grace.",
+   "record.whileaway.warning.1": "Return point\n\nDo not open for the second knock.\nDo not trust where the footprints point.\n\nLeave the path clear.\nIt has not arrived yet.",
+@@ -43,7 +44,7 @@
+   "item.whileaway.city_intake_record": "Torn Intake Ledger",
+   "item.whileaway.city_home_record": "Dinner Kept Warm",
+   "item.whileaway.city_siren_record": "The Last Shift",
+-  "city.whileaway.locked": "After the footsteps end, read the personal record. The signal is waiting for an address.",
++  "city.whileaway.locked": "Read the personal record. The signal is waiting for an address.",
+   "city.whileaway.preparing": "Lights wake beyond the tracks. Touch the relay again in a moment.",
+   "city.whileaway.unavailable": "The signal has no destination in this world. Check the city dimension data.",
+   "city.whileaway.obstructed": "There is nowhere to stand. Clear the arrival area and try again.",
+@@ -63,6 +64,8 @@
+   "entity.whileaway.story_npc": "Yeoul",
+   "story.whileaway.yeoul.introduction": "Yeoul: I will look after this light. So the way back stays familiar.",
+   "story.whileaway.yeoul.settled": "Yeoul has begun a new routine beside the return light.",
++  "story.whileaway.yeoul.ordinary_work": "Yeoul: More dust around the light today. Where did I leave the broom?",
++  "story.whileaway.yeoul.ordinary_rest": "Yeoul: Work is done for today. Tomorrow I should open the window first.",
+   "story.whileaway.network.discovered": "A quiet signal repeats inside the old tram relay. Look closer with Yeoul.",
+   "story.whileaway.network.joined": "Yeoul: That interval feels like our return light. Could you inspect the relay?",
+   "story.whileaway.network.pattern": "Evidence — Two short pulses, one long. The old relay repeats the pattern. [Sneak-use relay: restore connection]",
+diff --git a/src/main/resources/assets/whileaway/lang/ko_kr.json b/src/main/resources/assets/whileaway/lang/ko_kr.json
+index 80c622c..38915aa 100644
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -12,7 +12,8 @@
+   "story.whileaway.already_restored": "신호는 이미 돌아왔다.",
+   "story.whileaway.signal": "이제 신호가 간다. 누가 받는지는 적혀 있지 않다.",
+   "story.whileaway.arrival": "길을 비켜라. 아직 도착하지 못한 것이 있다.",
+-  "story.whileaway.after": "발소리가 멀어졌다. 남겨진 기록은 아직 역에 있다. — 첫 개발 구간 종료",
++  "story.whileaway.after": "발소리가 멀어졌다. 역의 귀환 표석에는 새 긁힌 자국이 남았다.",
++  "story.whileaway.station_revisit": "표석의 새 자국은 이름이 아니라 선로의 끝을 향한다. 누군가를 쫓은 발걸음은 아니었다.",
+   "story.whileaway.recovery_unloaded": "조우 개체가 현재 로드되어 있지 않습니다. 폐역으로 돌아온 뒤 다시 시도하세요.",
+   "story.whileaway.recovered": "조우를 정리했습니다. 기존 단서는 유지되고 30초의 준비 시간이 생깁니다.",
+   "record.whileaway.warning.1": "귀환 지점\n\n두 번째는 열어 주지 마.\n발자국이 향한 곳을 믿지 마.\n\n길을 막지 마라.\n저것은 아직 도착하지 못했다.",
+@@ -43,7 +44,7 @@
+   "item.whileaway.city_intake_record": "접수대에서 찢어진 장부",
+   "item.whileaway.city_home_record": "차려 둔 저녁",
+   "item.whileaway.city_siren_record": "마지막 교대",
+-  "city.whileaway.locked": "발소리가 멎은 뒤, 남겨진 개인 기록을 읽으세요. 신호는 주소를 기다립니다.",
++  "city.whileaway.locked": "남겨진 개인 기록을 읽으세요. 신호는 주소를 기다립니다.",
+   "city.whileaway.preparing": "선로 너머에서 불이 하나씩 켜집니다. 잠시 뒤 신호기를 다시 만져 보세요.",
+   "city.whileaway.unavailable": "신호가 닿는 곳이 아직 월드에 없습니다. 도시 차원 데이터를 확인해 주세요.",
+   "city.whileaway.obstructed": "발을 놓을 자리가 없습니다. 출입구 주변을 비운 뒤 다시 시도하세요.",
+@@ -63,6 +64,8 @@
+   "entity.whileaway.story_npc": "여울",
+   "story.whileaway.yeoul.introduction": "여울: 이 불은 내가 살펴볼게요. 돌아오는 길이 헷갈리지 않도록.",
+   "story.whileaway.yeoul.settled": "여울이 귀환등 곁에서 새 일과를 시작했습니다.",
++  "story.whileaway.yeoul.ordinary_work": "여울: 오늘은 등 주변 먼지가 유난히 많네. 빗자루를 어디에 뒀더라?",
++  "story.whileaway.yeoul.ordinary_rest": "여울: 오늘 일은 끝났어. 내일은 먼저 창문을 열어야겠어.",
+   "story.whileaway.network.discovered": "폐전차의 낡은 중계함에서 낮은 신호가 반복된다. 여울과 함께 살펴보자.",
+   "story.whileaway.network.joined": "여울: 저 간격… 귀환등을 켤 때와 닮았어. 중계함을 직접 확인해 볼래?",
+   "story.whileaway.network.pattern": "조사 기록 — 짧게 두 번, 길게 한 번. 옛 설비가 같은 간격을 반복한다. [웅크린 채 중계함 사용: 연결 복구]",
+diff --git a/src/test/java/io/github/whileaway/core/CoreTests.java b/src/test/java/io/github/whileaway/core/CoreTests.java
+index 261aee6..c8c4e14 100644
+--- a/src/test/java/io/github/whileaway/core/CoreTests.java
++++ b/src/test/java/io/github/whileaway/core/CoreTests.java
+@@ -19,7 +19,7 @@ public final class CoreTests {
+         check(Director.choose(p,ctx(0))==Director.Cue.RETURNING_STEPS,"second warning");
+         p=p.discover(Clue.SIGNAL_RESTORED);
+         check(p.stage()==3,"explicit repair unlocks manifestation");
+-        check(Director.choose(p,ctx(0))==Director.Cue.MANIFEST,"manifest unlocked");
++        check(Director.choose(p,ctx(0))==Director.Cue.DISTANT_KNOCK,"first return-route anomaly");
+         for(int mask=0;mask<32;mask++) {
+             var q=new Progress(mask,100,0,false);
+             for(Clue clue:Clue.values()) {
+@@ -37,7 +37,8 @@ public final class CoreTests {
+         }
+         check(p.eventPlayed(100,200).nextEventTick()==300,"cooldown arithmetic");
+         check(Director.choose(p.eventPlayed(100,200),ctx(299))==Director.Cue.NONE,"repetition blocked");
+-        check(Director.choose(p.eventPlayed(100,200),ctx(300))==Director.Cue.MANIFEST,"boundary exact");
++        check(Director.choose(p.eventPlayed(100,200),ctx(300))==Director.Cue.RETURNING_STEPS,"second return-route anomaly");
++        check(Director.choose(p.eventPlayed(100,200).eventPlayed(300,200),ctx(500))==Director.Cue.MANIFEST,"presence follows two empty cues");
+         check(p.defer(800).defer(100).nextEventTick()==800,"grace never shortened");
+         check(new Progress(-1,-3,-2,false).distinctClues()==5,"unknown bits stripped");
+         check(new Progress(0,-3,-2,false).eventsPlayed()==0,"corrupt counter normalized");
+@@ -57,9 +58,9 @@ public final class CoreTests {
+         check(SceneTimeline.at(239).pressure()<.001,"smooth release");
+         check(SceneTimeline.at(240).caption()==0,"no stuck caption");
+         check(!CityAccess.canEnter(Progress.empty()),"city locked initially");
+-        var cityReady=p.discover(Clue.PERSONAL_READ).complete();
+-        check(CityAccess.canEnter(cityReady),"encounter and address unlock city");
+-        check(!CityAccess.canEnter(new Progress(cityReady.clues(),0,0,false)),"encounter required");
++        var cityReady=p.discover(Clue.PERSONAL_READ);
++        check(CityAccess.canEnter(cityReady),"address and repaired signal unlock city before encounter");
++        check(CityAccess.canEnter(cityReady.complete()),"completed encounter preserves city access");
+         check(!CityAccess.canEnter(new Progress(cityReady.clues()&~Clue.PERSONAL_READ.bit(),0,0,true)),"address required");
+         for(int bits=0;bits<8;bits++)for(int b:new int[]{1,2,4}) {
+             check(CityAccess.read(CityAccess.read(bits,b),b)==CityAccess.read(bits,b),"city records idempotent");

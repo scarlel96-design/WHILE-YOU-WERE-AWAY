@@ -12,7 +12,8 @@ public final class Director {
         return switch (p.stage()) {
             case 1 -> p.eventsPlayed() < 1 ? Cue.DISTANT_KNOCK : Cue.NONE;
             case 2 -> p.eventsPlayed() < 2 ? Cue.RETURNING_STEPS : Cue.NONE;
-            case 3 -> Cue.MANIFEST;
+            case 3 -> p.eventsPlayed() < 1 ? Cue.DISTANT_KNOCK
+                : p.eventsPlayed() < 2 ? Cue.RETURNING_STEPS : Cue.MANIFEST;
             default -> Cue.NONE;
         };
     }

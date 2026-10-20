@@ -14,7 +14,13 @@ import net.minecraft.world.level.Level;
 /** Campaign entity, not a Villager test double. Appearance is explicitly provisional. */
 public final class StoryNpc extends PathfinderMob {
     private final NpcNavigation storyNavigation=new NpcNavigation();
+    private long lastOrdinaryTalkTick=Long.MIN_VALUE;
     public NpcNavigation storyNavigation(){return storyNavigation;}
+    /** Ordinary dialogue is transient and does not change the campaign fact ledger. */
+    public boolean tryOrdinaryTalk(long gameTick) {
+        if(lastOrdinaryTalkTick!=Long.MIN_VALUE&&gameTick-lastOrdinaryTalkTick<60)return false;
+        lastOrdinaryTalkTick=gameTick;return true;
+    }
     public StoryNpc(EntityType<? extends PathfinderMob> type,Level level) {
         super(type,level);setPersistenceRequired();setCustomName(Component.translatable("entity.whileaway.story_npc"));
     }

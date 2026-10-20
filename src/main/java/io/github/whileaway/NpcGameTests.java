@@ -46,4 +46,19 @@ public final class NpcGameTests {
         h.assertTrue(StoryActors.reconcile(h.getLevel().getServer(),r)==npc&&r.generation==0&&NpcState.integrity(r).isEmpty(),"completed event is not retired resident");
         StoryActors.abort(h.getLevel().getServer(),r);h.succeed();
     }
+    @GameTest(template="empty") public static void settledResidentHasDayWorkNightRestWithoutNewFacts(GameTestHelper h) {
+        var home=new BlockPos(4,2,0);var r=record();r.checkpoint.advance(1);
+        r.facts.add(NpcState.MET+UUID.randomUUID());r.facts.add(NpcState.DIALOGUE);r.checkpoint.advance(2);
+        r.facts.add(NpcState.ARRIVED);r.facts.add(NpcState.OBSERVED);r.checkpoint.advance(3);
+        NpcState.settle(r);r.facts.add(NpcState.LINK);r.checkpoint.advance(4);
+        var before=Set.copyOf(r.facts);
+        h.assertTrue(NpcEvents.residenceDestination(home,4999).equals(home),"rest before work");
+        h.assertTrue(NpcEvents.residenceDestination(home,5000).equals(home.east()),"daytime light work");
+        h.assertTrue(NpcEvents.residenceDestination(home,10999).equals(home.east()),"work until end");
+        h.assertTrue(NpcEvents.residenceDestination(home,11000).equals(home),"return home after work");
+        var npc=WhileAway.STORY_NPC.get().create(h.getLevel());
+        h.assertTrue(npc.tryOrdinaryTalk(100)&&!npc.tryOrdinaryTalk(159)&&npc.tryOrdinaryTalk(160),"ordinary speech is paced");
+        h.assertTrue(r.facts.equals(before)&&NpcState.integrity(r).isEmpty(),"ordinary life changes no durable story fact");
+        h.succeed();
+    }
 }

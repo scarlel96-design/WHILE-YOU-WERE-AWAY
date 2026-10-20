@@ -47,11 +47,24 @@ public final class NpcEvents {
         long hour=Math.floorMod(dayTime,24000);
         return hour>=5000&&hour<11000?home.east():home;
     }
+    static boolean workingHours(long dayTime) {
+        long hour=Math.floorMod(dayTime,24000);
+        return hour>=5000&&hour<11000;
+    }
     public static boolean interact(StoryNpc npc,ServerPlayer p) {
         if(!StoryStorage.available(p.getServer())||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!p.isAlive())return false;
         var r=NarrativeData.get(p.getServer()).actors.get(STORY);
         if(r==null||!StoryActors.canonical(npc,r)||r.checkpoint.terminal())return false;
         if(!NpcState.integrity(r).isEmpty()){StoryStorage.block(p.getServer(),String.join(";",NpcState.integrity(r)));return false;}
+        if(r.checkpoint.checkpoint==4) {
+            if(NarrativeData.get(p.getServer()).returnNetwork().stage!=ReturnNetworkState.Stage.NOT_STARTED)return false;
+            if(npc.tryOrdinaryTalk(p.serverLevel().getGameTime())) {
+                String key=workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
+                p.displayClientMessage(Component.translatable(key),false);
+                npc.getLookControl().setLookAt(p);
+            }
+            return true;
+        }
         if(r.checkpoint.checkpoint!=1)return false;
         r.facts.add(NpcState.MET+p.getUUID());r.facts.add(NpcState.DIALOGUE);
         r.facts.add(NpcState.relationship("player:"+p.getUUID(),"first_conversation"));
@@ -72,7 +85,8 @@ public final class NpcEvents {
         if(r.checkpoint.checkpoint<4&&(nearby==null||!nearby.isAlive())){npc.storyNavigation().externalPause(npc);StoryActors.suspend(npc,r,"npc_no_witness");return;}
         boolean arrived=false;
         if(r.checkpoint.checkpoint>=2) {
-            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),destination);
+            // Residence and light have fixed bindings; the daily movement target does not move them.
+            var environment=NpcEnvironment.inspect(level,r.dimension,npc.blockPosition(),home);
             if(!environment.dependenciesReady()) {
                 npc.storyNavigation().externalPause(npc);
                 npc.storyNavigation().diagnostic(npc,r,environment);
@@ -99,7 +113,9 @@ public final class NpcEvents {
         npc.getNavigation().stop();
         // Look at the light instead of delivering explanatory monologues. The object must actually exist.
         var light=home.offset(2,0,0);
-        npc.getLookControl().setLookAt(light.getX()+.5,light.getY()+.5,light.getZ()+.5);
+        if(r.checkpoint.checkpoint<4||workingHours(level.getDayTime()))
+            npc.getLookControl().setLookAt(light.getX()+.5,light.getY()+.5,light.getZ()+.5);
+        else if(nearby!=null&&npc.distanceToSqr(nearby)<64)npc.getLookControl().setLookAt(nearby);
         if(r.checkpoint.checkpoint==2) {
             if(!NpcEnvironment.isReturnLight(level.getBlockState(light)))return;
             r.facts.add(NpcState.ARRIVED);r.facts.add(NpcState.OBSERVED);

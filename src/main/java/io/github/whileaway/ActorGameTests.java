@@ -6,12 +6,22 @@ import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.*;
 
 /** Real server entity fixtures. Villagers test a reusable adapter, NOT a shipped story NPC. */
 @GameTestHolder(WhileAway.ID)
 @PrefixGameTestTemplate(false)
 public final class ActorGameTests {
+    @GameTest(template="empty") public static void returnRouteWarnsOnlyForActualObstruction(GameTestHelper h) {
+        var actor=new Vec3(0,2,0);var destination=new Vec3(12,2,0);
+        h.assertTrue(io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(3,2,0)),"player ahead blocks return");
+        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(3,2,3)),"side passage stays safe");
+        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(-2,2,0)),"player behind stays safe");
+        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(7,2,0)),"distant player stays safe");
+        h.assertTrue(!io.github.whileaway.entity.Wayfarer.blocksReturnRoute(actor,destination,new Vec3(3,6,0)),"different floor stays safe");
+        h.succeed();
+    }
     private static StoryActorRecord record() {
         return new StoryActorRecord("test:npc","test:meeting","resident","minecraft:villager","minecraft:overworld",
             UUID.fromString("00000000-0000-0000-0000-000000000001"),null,UUID.fromString("00000000-0000-0000-0000-000000000002"),new BlockPos(0,80,0),false);

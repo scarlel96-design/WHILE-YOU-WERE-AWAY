@@ -19,7 +19,7 @@ public final class CoreTests {
         check(Director.choose(p,ctx(0))==Director.Cue.RETURNING_STEPS,"second warning");
         p=p.discover(Clue.SIGNAL_RESTORED);
         check(p.stage()==3,"explicit repair unlocks manifestation");
-        check(Director.choose(p,ctx(0))==Director.Cue.MANIFEST,"manifest unlocked");
+        check(Director.choose(p,ctx(0))==Director.Cue.DISTANT_KNOCK,"first return-route anomaly");
         for(int mask=0;mask<32;mask++) {
             var q=new Progress(mask,100,0,false);
             for(Clue clue:Clue.values()) {
@@ -37,7 +37,8 @@ public final class CoreTests {
         }
         check(p.eventPlayed(100,200).nextEventTick()==300,"cooldown arithmetic");
         check(Director.choose(p.eventPlayed(100,200),ctx(299))==Director.Cue.NONE,"repetition blocked");
-        check(Director.choose(p.eventPlayed(100,200),ctx(300))==Director.Cue.MANIFEST,"boundary exact");
+        check(Director.choose(p.eventPlayed(100,200),ctx(300))==Director.Cue.RETURNING_STEPS,"second return-route anomaly");
+        check(Director.choose(p.eventPlayed(100,200).eventPlayed(300,200),ctx(500))==Director.Cue.MANIFEST,"presence follows two empty cues");
         check(p.defer(800).defer(100).nextEventTick()==800,"grace never shortened");
         check(new Progress(-1,-3,-2,false).distinctClues()==5,"unknown bits stripped");
         check(new Progress(0,-3,-2,false).eventsPlayed()==0,"corrupt counter normalized");
@@ -57,9 +58,9 @@ public final class CoreTests {
         check(SceneTimeline.at(239).pressure()<.001,"smooth release");
         check(SceneTimeline.at(240).caption()==0,"no stuck caption");
         check(!CityAccess.canEnter(Progress.empty()),"city locked initially");
-        var cityReady=p.discover(Clue.PERSONAL_READ).complete();
-        check(CityAccess.canEnter(cityReady),"encounter and address unlock city");
-        check(!CityAccess.canEnter(new Progress(cityReady.clues(),0,0,false)),"encounter required");
+        var cityReady=p.discover(Clue.PERSONAL_READ);
+        check(CityAccess.canEnter(cityReady),"address and repaired signal unlock city before encounter");
+        check(CityAccess.canEnter(cityReady.complete()),"completed encounter preserves city access");
         check(!CityAccess.canEnter(new Progress(cityReady.clues()&~Clue.PERSONAL_READ.bit(),0,0,true)),"address required");
         for(int bits=0;bits<8;bits++)for(int b:new int[]{1,2,4}) {
             check(CityAccess.read(CityAccess.read(bits,b),b)==CityAccess.read(bits,b),"city records idempotent");
