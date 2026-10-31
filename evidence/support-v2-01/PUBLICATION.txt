@@ -1,0 +1,36 @@
+GPT SUPPORT V2-01 continuation 3 — publication / SAFE PAUSE
+Repository: scarlel96-design/WHILE-YOU-WERE-AWAY
+Support branch: gpt-support/v2-01-observation-client-gate
+Implementation commit to audit/cherry-pick: 8231f8bd93626316f9d59639ad95c6cd5d7bce84
+Package/evidence commit: 06646bc3d0d5f768a1e57d0f424fac620497b2fa
+Remote support SHA verified by ls-remote: 06646bc3d0d5f768a1e57d0f424fac620497b2fa
+Main remote unchanged: 062797f54ee63a65b2cc79870a619d1eeea0daa1
+Push exit status: 0
+GitHub Contents API inventory:
+[
+  {
+    "path": "dist/support-v2-01/SHA256SUMS.txt",
+    "blob": "804f3eee1ba0f6b6493a158e62718f04c7ece6a8",
+    "size": 113
+  },
+  {
+    "path": "dist/support-v2-01/whileaway-gpt-support-v2-01-continuation-3.zip",
+    "blob": "2018337c587daec7dd6169b9fe21ceb132c7ec45",
+    "size": 2584695
+  }
+]
+Bundle: dist/support-v2-01/whileaway-gpt-support-v2-01-continuation-3.zip
+Bundle bytes: 2584695
+Bundle SHA256: e6f7f1814e57f1be7b0a6b77cf3ff3d42da1e37806603f5c0bf99621b3357ff6
+Final source: 130 GameTests PASS; core 176858 PASS; build PASS; Python 19 PASS.
+Actual client/human: NOT TESTED. Sample evidence gate PARTIAL.
+Support implementation delivered. Named tier-A content audit remains PARTIAL because the archives were not located.
+Contribution effort percentage UNMEASURED; 40 percent threshold not confirmed.
+Compatibility sidecar: 25 protected classes byte-identical. 69 assets byte-identical; memory_route.json differs only by LF/CRLF.
+No asset semantic change. Initial strict byte assertion failed only on that line-ending difference.
+No additional production change followed final gate. This confirmation commit contains metadata only.
+Safe pause trigger: weekly usage observed 97 percent used.
+Next support action: review MAIN adoption diff or ingest actual client evidence; do not start V2-02.
+MAIN first steps: compare actual main HEAD, audit 8231f8b, select that implementation commit, rerun main gate, run real-client matrix.
+Historical Computer Use blocker is repository-independent; no internal tool repair attempted here.
+

@@ -1,0 +1,9 @@
+{
+  "protectedClassesByteIdentical": 25,
+  "assetFilesByteIdentical": 69,
+  "assetLineEndingOnlyDifferences": [
+    "data/whileaway/dimension/memory_route.json"
+  ],
+  "actualAssetSemanticChanges": false,
+  "realClient": "NOT_TESTED"
+}
