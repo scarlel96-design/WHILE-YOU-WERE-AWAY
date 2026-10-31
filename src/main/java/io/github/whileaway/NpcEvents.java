@@ -61,9 +61,7 @@ public final class NpcEvents {
         if(r.checkpoint.checkpoint==4) {
             if(npc.tryOrdinaryTalk(p.serverLevel().getGameTime())) {
                 var network=NarrativeData.get(p.getServer()).returnNetwork();
-                String key=network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown()
-                    ?"story.whileaway.network.aftermath"
-                    :workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
+                String key=ReturnNetworkNpcPolicy.residentDialogue(network.stage,p.isShiftKeyDown(),workingHours(p.serverLevel().getDayTime()));
                 p.displayClientMessage(Component.translatable(key),false);
                 npc.getLookControl().setLookAt(p);
             }

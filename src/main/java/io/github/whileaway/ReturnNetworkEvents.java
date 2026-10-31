@@ -76,7 +76,7 @@ public final class ReturnNetworkEvents {
         if(!issues.isEmpty()){StoryStorage.block(l.getServer(),String.join(";",issues));npc.getNavigation().stop();return true;}
         if(s.stage==ReturnNetworkState.Stage.COMPLETED) {
             // A small new resident habit, not a replay of the event or a new work identity.
-            if(l.getGameTime()%200<30){npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);return true;}
+            if(ReturnNetworkNpcPolicy.owner(s.stage,l.getGameTime())==ReturnNetworkNpcPolicy.Owner.AFTERMATH_LOOK){npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);return true;}
             return false;
         }
         var rt=runtime(l);var p=NpcEvents.witness(l,RELAY);
@@ -102,7 +102,7 @@ public final class ReturnNetworkEvents {
         if(!p.isAlive()||p.isSpectator()||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!StoryStorage.available(p.getServer()))return false;
         var d=NarrativeData.get(p.getServer());var s=d.returnNetwork();var r=d.actors.get(NpcEvents.STORY);
         if(r==null||!StoryActors.canonical(npc,r)||!exactLocation(s,p.serverLevel()))return false;
-        if(s.stage==ReturnNetworkState.Stage.COMPLETED)return false; // Resident dialogue owns completed-event visits.
+        if(!ReturnNetworkNpcPolicy.eventInteractionAllowed(s.stage))return false; // Resident dialogue owns completed-event visits.
         if(s.stage!=ReturnNetworkState.Stage.RESPONSE_OBSERVED||!environmentReady(p.serverLevel(),s)
             ||npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)>1.4)return false;
         if(!s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)&&commit(p,s.shareExperience(),"RN_F_SHARED"))say(p,"shared");

@@ -221,7 +221,7 @@ public final class StoryActors {
         var e=NarrativeData.get(server).entry(r.owner);e.progress=e.progress.complete();e.encounter=null;
         r.checkpoint.advance(4);boolean notice=!r.noticeClaimed;r.noticeClaimed=true;persist(server);emit(server,r,"AFTER_COMPLETE");
         var p=server.getPlayerList().getPlayer(r.owner);
-        if(notice&&p!=null&&r.facts.contains(CHASE_OBSERVED)){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
+        if(ChaseKnowledge.shouldPresentResolution(notice,p!=null,r)){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
             if(StoryConfig.MUSIC.get())StoryEvents.music(p,WhileAway.RESOLVE.get(),.45f);}
     }
     public static void abort(MinecraftServer server,StoryActorRecord r) {

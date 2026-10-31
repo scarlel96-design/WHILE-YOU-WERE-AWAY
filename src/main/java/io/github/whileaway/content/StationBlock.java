@@ -27,9 +27,7 @@ public final class StationBlock extends BaseEntityBlock {
         var entry = NarrativeData.get(serverPlayer.getServer()).entry(serverPlayer.getUUID());
         if (!entry.progress.encounterComplete() || !pos.equals(entry.station)) return InteractionResult.PASS;
         var actor=NarrativeData.get(serverPlayer.getServer()).actors.get(StoryActors.chaseId(serverPlayer.getUUID()));
-        boolean observed=actor!=null&&actor.facts.contains(StoryActors.CHASE_OBSERVED);
-        serverPlayer.displayClientMessage(Component.translatable(observed
-            ?"story.whileaway.station_revisit":"story.whileaway.station_revisit_unseen"), false);
+        serverPlayer.displayClientMessage(Component.translatable(io.github.whileaway.ChaseKnowledge.stationRevisitKey(actor)), false);
         return InteractionResult.SUCCESS;
     }
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {

@@ -1,6 +1,7 @@
 package io.github.whileaway.entity;
 
 import io.github.whileaway.*;
+import io.github.whileaway.support.ReturnerObservationPolicy;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -69,10 +70,11 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
         // Require sustained, unobstructed player view before recording encounter knowledge.
         if(!actorRecord.facts.contains(StoryActors.CHASE_OBSERVED)) {
             Vec3 toward=getEyePosition().subtract(player.getEyePosition());
-            boolean visible=toward.lengthSqr()<=32*32 && toward.lengthSqr()>0.01
-                && player.getLookAngle().dot(toward.normalize())>=0.35 && player.hasLineOfSight(this);
-            observationTicks=visible?observationTicks+1:0;
-            if(observationTicks>=8)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,StoryActors.CHASE_OBSERVED);
+            boolean visible=ReturnerObservationPolicy.withinRange(toward.lengthSqr())
+                && ReturnerObservationPolicy.facing(player.getLookAngle().dot(toward.normalize()))
+                && player.hasLineOfSight(this);
+            observationTicks=ReturnerObservationPolicy.nextStreak(observationTicks,visible);
+            if(ReturnerObservationPolicy.confirmed(observationTicks))StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,StoryActors.CHASE_OBSERVED);
         }
         if (lifetime > 2400) { finish(true); return; }
         if (lifetime % 110 == 0) StoryEvents.sound(player, WhileAway.BREATH.get(), SoundSource.HOSTILE, blockPosition(), .5f);
