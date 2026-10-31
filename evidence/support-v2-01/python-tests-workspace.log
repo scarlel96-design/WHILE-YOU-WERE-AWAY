@@ -1,0 +1,1031 @@
+test_automatic_human_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_automatic_human_result_rejected) ... ERROR
+test_automatic_human_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_automatic_human_result_rejected) ... ERROR
+test_blocked_and_not_tested_must_remain_partial (test_v2_01_client_evidence.EvidenceTests.test_blocked_and_not_tested_must_remain_partial) ... ERROR
+test_blocked_and_not_tested_must_remain_partial (test_v2_01_client_evidence.EvidenceTests.test_blocked_and_not_tested_must_remain_partial) ... ERROR
+test_cli_partial_exit_and_input_preservation (test_v2_01_client_evidence.EvidenceTests.test_cli_partial_exit_and_input_preservation) ... ERROR
+test_cli_partial_exit_and_input_preservation (test_v2_01_client_evidence.EvidenceTests.test_cli_partial_exit_and_input_preservation) ... ERROR
+test_cli_same_file_rejected (test_v2_01_client_evidence.EvidenceTests.test_cli_same_file_rejected) ... ERROR
+test_cli_same_file_rejected (test_v2_01_client_evidence.EvidenceTests.test_cli_same_file_rejected) ... ERROR
+test_duplicate_and_unknown_scenarios_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_and_unknown_scenarios_rejected) ... ERROR
+test_duplicate_and_unknown_scenarios_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_and_unknown_scenarios_rejected) ... ERROR
+test_duplicate_json_key_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_json_key_rejected) ... ERROR
+test_duplicate_json_key_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_json_key_rejected) ... ERROR
+test_every_must_failure_blocks_gate (test_v2_01_client_evidence.EvidenceTests.test_every_must_failure_blocks_gate) ... ERROR
+test_every_must_failure_blocks_gate (test_v2_01_client_evidence.EvidenceTests.test_every_must_failure_blocks_gate) ... ERROR
+test_human_rollup_requires_every_must (test_v2_01_client_evidence.EvidenceTests.test_human_rollup_requires_every_must) ... ERROR
+test_human_rollup_requires_every_must (test_v2_01_client_evidence.EvidenceTests.test_human_rollup_requires_every_must) ... ERROR
+test_invalid_input_preserves_existing_output (test_v2_01_client_evidence.EvidenceTests.test_invalid_input_preserves_existing_output) ... ERROR
+test_invalid_input_preserves_existing_output (test_v2_01_client_evidence.EvidenceTests.test_invalid_input_preserves_existing_output) ... ERROR
+test_invalid_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_invalid_result_rejected) ... ERROR
+test_invalid_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_invalid_result_rejected) ... ERROR
+test_metadata_required_for_executed_scenario (test_v2_01_client_evidence.EvidenceTests.test_metadata_required_for_executed_scenario) ... ERROR
+test_metadata_required_for_executed_scenario (test_v2_01_client_evidence.EvidenceTests.test_metadata_required_for_executed_scenario) ... ERROR
+test_missing_scenarios_are_not_tested (test_v2_01_client_evidence.EvidenceTests.test_missing_scenarios_are_not_tested) ... ERROR
+test_missing_scenarios_are_not_tested (test_v2_01_client_evidence.EvidenceTests.test_missing_scenarios_are_not_tested) ... ERROR
+test_mixed_build_or_jar_rejected (test_v2_01_client_evidence.EvidenceTests.test_mixed_build_or_jar_rejected) ... ERROR
+test_mixed_build_or_jar_rejected (test_v2_01_client_evidence.EvidenceTests.test_mixed_build_or_jar_rejected) ... ERROR
+test_optional_failure_does_not_override_required_gate (test_v2_01_client_evidence.EvidenceTests.test_optional_failure_does_not_override_required_gate) ... ERROR
+test_optional_failure_does_not_override_required_gate (test_v2_01_client_evidence.EvidenceTests.test_optional_failure_does_not_override_required_gate) ... ERROR
+test_pass_requires_evidence (test_v2_01_client_evidence.EvidenceTests.test_pass_requires_evidence) ... ERROR
+test_pass_requires_evidence (test_v2_01_client_evidence.EvidenceTests.test_pass_requires_evidence) ... ERROR
+test_reference_escape_and_input_output_rejected (test_v2_01_client_evidence.EvidenceTests.test_reference_escape_and_input_output_rejected) ... ERROR
+test_reference_escape_and_input_output_rejected (test_v2_01_client_evidence.EvidenceTests.test_reference_escape_and_input_output_rejected) ... ERROR
+test_reference_existence_and_hash (test_v2_01_client_evidence.EvidenceTests.test_reference_existence_and_hash) ... ERROR
+test_reference_existence_and_hash (test_v2_01_client_evidence.EvidenceTests.test_reference_existence_and_hash) ... ERROR
+test_synthetic_human_claim_rejected (test_v2_01_client_evidence.EvidenceTests.test_synthetic_human_claim_rejected) ... ERROR
+test_synthetic_human_claim_rejected (test_v2_01_client_evidence.EvidenceTests.test_synthetic_human_claim_rejected) ... ERROR
+test_synthetic_pass_never_becomes_client_pass (test_v2_01_client_evidence.EvidenceTests.test_synthetic_pass_never_becomes_client_pass) ... ERROR
+test_synthetic_pass_never_becomes_client_pass (test_v2_01_client_evidence.EvidenceTests.test_synthetic_pass_never_becomes_client_pass) ... ERROR
+
+======================================================================
+ERROR: test_automatic_human_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_automatic_human_result_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp6vl87_sm\\run.log'
+
+======================================================================
+ERROR: test_automatic_human_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_automatic_human_result_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp6vl87_sm'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp6vl87_sm'
+
+======================================================================
+ERROR: test_blocked_and_not_tested_must_remain_partial (test_v2_01_client_evidence.EvidenceTests.test_blocked_and_not_tested_must_remain_partial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpvblh1ffs\\run.log'
+
+======================================================================
+ERROR: test_blocked_and_not_tested_must_remain_partial (test_v2_01_client_evidence.EvidenceTests.test_blocked_and_not_tested_must_remain_partial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpvblh1ffs'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpvblh1ffs'
+
+======================================================================
+ERROR: test_cli_partial_exit_and_input_preservation (test_v2_01_client_evidence.EvidenceTests.test_cli_partial_exit_and_input_preservation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp3oo1k38l\\run.log'
+
+======================================================================
+ERROR: test_cli_partial_exit_and_input_preservation (test_v2_01_client_evidence.EvidenceTests.test_cli_partial_exit_and_input_preservation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp3oo1k38l'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp3oo1k38l'
+
+======================================================================
+ERROR: test_cli_same_file_rejected (test_v2_01_client_evidence.EvidenceTests.test_cli_same_file_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpewc5qp9w\\run.log'
+
+======================================================================
+ERROR: test_cli_same_file_rejected (test_v2_01_client_evidence.EvidenceTests.test_cli_same_file_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpewc5qp9w'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpewc5qp9w'
+
+======================================================================
+ERROR: test_duplicate_and_unknown_scenarios_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_and_unknown_scenarios_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpurwpfigj\\run.log'
+
+======================================================================
+ERROR: test_duplicate_and_unknown_scenarios_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_and_unknown_scenarios_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpurwpfigj'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpurwpfigj'
+
+======================================================================
+ERROR: test_duplicate_json_key_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_json_key_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp0129yqqc\\run.log'
+
+======================================================================
+ERROR: test_duplicate_json_key_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_json_key_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp0129yqqc'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp0129yqqc'
+
+======================================================================
+ERROR: test_every_must_failure_blocks_gate (test_v2_01_client_evidence.EvidenceTests.test_every_must_failure_blocks_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpj64d6o6l\\run.log'
+
+======================================================================
+ERROR: test_every_must_failure_blocks_gate (test_v2_01_client_evidence.EvidenceTests.test_every_must_failure_blocks_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpj64d6o6l'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpj64d6o6l'
+
+======================================================================
+ERROR: test_human_rollup_requires_every_must (test_v2_01_client_evidence.EvidenceTests.test_human_rollup_requires_every_must)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpqsebt0e8\\run.log'
+
+======================================================================
+ERROR: test_human_rollup_requires_every_must (test_v2_01_client_evidence.EvidenceTests.test_human_rollup_requires_every_must)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpqsebt0e8'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpqsebt0e8'
+
+======================================================================
+ERROR: test_invalid_input_preserves_existing_output (test_v2_01_client_evidence.EvidenceTests.test_invalid_input_preserves_existing_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp546aqvcf\\run.log'
+
+======================================================================
+ERROR: test_invalid_input_preserves_existing_output (test_v2_01_client_evidence.EvidenceTests.test_invalid_input_preserves_existing_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp546aqvcf'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp546aqvcf'
+
+======================================================================
+ERROR: test_invalid_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_invalid_result_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpa73k7u6k\\run.log'
+
+======================================================================
+ERROR: test_invalid_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_invalid_result_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpa73k7u6k'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpa73k7u6k'
+
+======================================================================
+ERROR: test_metadata_required_for_executed_scenario (test_v2_01_client_evidence.EvidenceTests.test_metadata_required_for_executed_scenario)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmps19nkk5h\\run.log'
+
+======================================================================
+ERROR: test_metadata_required_for_executed_scenario (test_v2_01_client_evidence.EvidenceTests.test_metadata_required_for_executed_scenario)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmps19nkk5h'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmps19nkk5h'
+
+======================================================================
+ERROR: test_missing_scenarios_are_not_tested (test_v2_01_client_evidence.EvidenceTests.test_missing_scenarios_are_not_tested)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpocsgfl_p\\run.log'
+
+======================================================================
+ERROR: test_missing_scenarios_are_not_tested (test_v2_01_client_evidence.EvidenceTests.test_missing_scenarios_are_not_tested)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpocsgfl_p'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpocsgfl_p'
+
+======================================================================
+ERROR: test_mixed_build_or_jar_rejected (test_v2_01_client_evidence.EvidenceTests.test_mixed_build_or_jar_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpkxa1stcp\\run.log'
+
+======================================================================
+ERROR: test_mixed_build_or_jar_rejected (test_v2_01_client_evidence.EvidenceTests.test_mixed_build_or_jar_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpkxa1stcp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpkxa1stcp'
+
+======================================================================
+ERROR: test_optional_failure_does_not_override_required_gate (test_v2_01_client_evidence.EvidenceTests.test_optional_failure_does_not_override_required_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp6hoivbiq\\run.log'
+
+======================================================================
+ERROR: test_optional_failure_does_not_override_required_gate (test_v2_01_client_evidence.EvidenceTests.test_optional_failure_does_not_override_required_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp6hoivbiq'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp6hoivbiq'
+
+======================================================================
+ERROR: test_pass_requires_evidence (test_v2_01_client_evidence.EvidenceTests.test_pass_requires_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpyaipmdgj\\run.log'
+
+======================================================================
+ERROR: test_pass_requires_evidence (test_v2_01_client_evidence.EvidenceTests.test_pass_requires_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpyaipmdgj'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpyaipmdgj'
+
+======================================================================
+ERROR: test_reference_escape_and_input_output_rejected (test_v2_01_client_evidence.EvidenceTests.test_reference_escape_and_input_output_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpbcs97moq\\run.log'
+
+======================================================================
+ERROR: test_reference_escape_and_input_output_rejected (test_v2_01_client_evidence.EvidenceTests.test_reference_escape_and_input_output_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpbcs97moq'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpbcs97moq'
+
+======================================================================
+ERROR: test_reference_existence_and_hash (test_v2_01_client_evidence.EvidenceTests.test_reference_existence_and_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmptd98c3wr\\run.log'
+
+======================================================================
+ERROR: test_reference_existence_and_hash (test_v2_01_client_evidence.EvidenceTests.test_reference_existence_and_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmptd98c3wr'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmptd98c3wr'
+
+======================================================================
+ERROR: test_synthetic_human_claim_rejected (test_v2_01_client_evidence.EvidenceTests.test_synthetic_human_claim_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp52nzm89x\\run.log'
+
+======================================================================
+ERROR: test_synthetic_human_claim_rejected (test_v2_01_client_evidence.EvidenceTests.test_synthetic_human_claim_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp52nzm89x'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmp52nzm89x'
+
+======================================================================
+ERROR: test_synthetic_pass_never_becomes_client_pass (test_v2_01_client_evidence.EvidenceTests.test_synthetic_pass_never_becomes_client_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\tools\validation\test_v2_01_client_evidence.py", line 20, in setUp
+    (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpw_3pdavq\\run.log'
+
+======================================================================
+ERROR: test_synthetic_pass_never_becomes_client_pass (test_v2_01_client_evidence.EvidenceTests.test_synthetic_pass_never_becomes_client_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<frozen os>", line 377, in walk
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpw_3pdavq'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 689, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 413, in walk
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 687, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 928, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 283, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\scarl\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 272, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\build\\support-test-temp\\tmpw_3pdavq'
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.068s
+
+FAILED (errors=38)

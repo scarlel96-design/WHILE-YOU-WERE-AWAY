@@ -1,0 +1,84 @@
+GPT SUPPORT continuation 3 — 2026-10-31
+Branch: gpt-support/v2-01-observation-client-gate
+Main baseline: 062797f54ee63a65b2cc79870a619d1eeea0daa1
+Implementation: 8231f8bd93626316f9d59639ad95c6cd5d7bce84
+Changed field/branch: production observation calculation uses ReturnerObservationPolicy; CHASE_OBSERVED meaning unchanged.
+Knowledge notification/revisit and completed NPC delegation use shared read-only selectors.
+Thresholds: 32 blocks, look dot 0.35, eight ticks, distanceSquared > 0.01. No schema or checkpoint changes.
+
+Required artifacts:
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01\MODIFIED_FILE
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01\DIFF_FILE
+VERIFICATION.txt: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01\VERIFICATION.txt
+ROLLBACK.sh: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01\ROLLBACK.sh
+Baseline Wayfarer SHA256: 69d62b7803daa05ac68910e1b438cafbf83a760054c5fa5170fa19bc89d4fcca
+MODIFIED_FILE SHA256: c4800066c1e4292d2cd1d66bb70c5ebbffd42e87e8a786c197cf3fe57b72b74b
+DIFF_FILE SHA256: 0ad9f0aab8c90dc23dcd7d6f4dc33ffeddedc930d66922aeaf0870b4ed3a8f5e
+
+BASELINE
+Command: .\gradlew.bat --offline --no-daemon runGameTestServer coreTest build --console=plain
+Environment: GRADLE_USER_HOME=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home
+Input: pristine main 062797f in separate support worktree.
+Literal relevant output:
+All 114 required tests passed :)
+PASS core assertions=176858
+BUILD SUCCESSFUL in 1m 7s
+BASELINE_EXIT=0
+Exit status: 0
+Log: baseline-gradle.log
+Preserved adopted baseline JAR SHA256: 8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+Preserved baseline source ZIP SHA256: 758ff53b2a039ec4c13b88a40737ba3dd63d04662e36d8747361df15c6900f38
+
+MODIFIED
+Command: .\gradlew.bat --offline --no-daemon runGameTestServer coreTest build --console=plain
+Environment: same GRADLE_USER_HOME.
+Input: final support source at implementation commit 8231f8b.
+Literal relevant output:
+130 GAME TESTS COMPLETE IN 12.61 s
+All 130 required tests passed :)
+PASS core assertions=176858
+BUILD SUCCESSFUL in 1m 1s
+FINAL_EXIT=0
+Exit status: 0
+Log: final-gradle.log
+Modified candidate JAR SHA256: 8504307b1f89e0c787b4d45b31c30509a10ea49a9329e128ba6028db1d037a98
+
+TOOL VALIDATION
+Command: python -m unittest discover -s tools/validation -p 'test_v2_01_client_evidence.py' -v
+Input: isolated synthetic validator fixtures.
+Literal output: Ran 19 tests in 0.423s; OK
+Exit status: 0
+Log: python-tests-host.log
+Syntax output: PYTHON_SYNTAX_PASS files=2
+Sample command: python tools/validation/v2_01_client_evidence.py tools/validation/v2-01-client-session-template.json evidence/support-v2-01/sample-summary.json
+Literal output: V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED
+Expected exit status: 1
+Sample is synthetic. All 15 scenarios are NOT_TESTED.
+
+ROLLBACK
+Command: & 'C:\Program Files\Git\bin\bash.exe' -c 'chmod +x evidence/support-v2-01/ROLLBACK.sh && evidence/support-v2-01/ROLLBACK.sh evidence/support-v2-01/ROLLBACK_PROBE.jar'
+Input: isolated ROLLBACK_PROBE.jar copied from MODIFIED.jar; preserved BASELINE.jar.
+Literal output:
+ROLLBACK_PACKAGE_RESTORED sha256=8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+ROLLBACK_EXIT=0
+Exit status: 0
+Restored package status: exact adopted baseline bytes. No world/save downgrade.
+Restored SHA256: 8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+MODIFIED_FILE and MODIFIED.jar remain modified.
+
+FAILURE HISTORY
+Initial optional positive entity fixture: 129 passed, one failed. modified-gradle.log is retained.
+Official mock ServerPlayer is always creative in this version. Game mode changes do not override isCreative().
+The final actual entity fixture tests the legitimate creative guard instead. No player hack or guard bypass.
+Positive survival observation: shared policy coverage PASS, actual client NOT_TESTED.
+Sandbox Python temporary directories: WinError 5. Host runner: 19/19 PASS.
+Initial worktree checkout: long paths failed. Command-scoped core.longpaths=true repaired the new checkout.
+
+CLAIMS
+Production behavior: NO intended changes. MAIN diff review required before adoption.
+Save format=5; actorSchema=optional 1; Return Network schema=1; art revision=2.
+New support real client=NOT_TESTED; human experience=NOT_TESTED; audio=NOT HUMAN-VERIFIED.
+Current automated support scope=PASS. V2-01 overall=PARTIAL. No V2-02 or 0.3.2 promotion.
+Named tier-A archives not found: provenance/content audit remains PARTIAL. No old patches handed off.
+Effort contribution percentages=UNMEASURED; no reliable whole-milestone denominator.
+Weekly usage observed 97% used: finish this gate/package/publication, then SAFE PAUSE.

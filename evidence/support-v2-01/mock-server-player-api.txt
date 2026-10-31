@@ -1,0 +1,22 @@
+Compiled from "GameTestHelper.java"
+class net.minecraft.gametest.framework.GameTestHelper$2 extends net.minecraft.server.level.ServerPlayer {
+  net.minecraft.gametest.framework.GameTestHelper$2(net.minecraft.gametest.framework.GameTestHelper, net.minecraft.server.MinecraftServer, net.minecraft.server.level.ServerLevel, com.mojang.authlib.GameProfile, net.minecraft.server.level.ClientInformation);
+    Code:
+       0: aload_0
+       1: aload_2
+       2: aload_3
+       3: aload         4
+       5: aload         5
+       7: invokespecial #1                  // Method net/minecraft/server/level/ServerPlayer."<init>":(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/level/ServerLevel;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/server/level/ClientInformation;)V
+      10: return
+
+  public boolean isSpectator();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public boolean isCreative();
+    Code:
+       0: iconst_1
+       1: ireturn
+}

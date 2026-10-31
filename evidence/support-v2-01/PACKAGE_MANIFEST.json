@@ -1,0 +1,821 @@
+{
+  "baseline": "062797f54ee63a65b2cc79870a619d1eeea0daa1",
+  "implementation": "8231f8bd93626316f9d59639ad95c6cd5d7bce84",
+  "files": [
+    {
+      "path": "docs/SUPPORT_REBASE_REPORT.md",
+      "size": 3418,
+      "sha256": "01e781e059feebd4ad379d56052c9f43de88bc22408141d87c9b61e92abeec05"
+    },
+    {
+      "path": "docs/SUPPORT_V2_01_HANDOFF.md",
+      "size": 9324,
+      "sha256": "39256afe435ccd7aa67b243d334a3c36444d47fbe2df14ca92ccdf9c946c8d2f"
+    },
+    {
+      "path": "docs/SUPPORT_V2_01_TEST_INVENTORY.md",
+      "size": 2926,
+      "sha256": "5b0960da1f5a086cec1b7c8998dbbe893bf62ba0aedc1f873920862ca978220e"
+    },
+    {
+      "path": "docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md",
+      "size": 8178,
+      "sha256": "0bc0ac8bbe2262afe4d44d009b488c66f35f9f5bae0dd5bf790bd5e874854c30"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-10561749041724335809/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-16402892823289661954/whileaway_story.dat",
+      "size": 800,
+      "sha256": "ed1305f10828f6c5317a776da85d9637a5f34381e4c15c90c3d734954a8609e1"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-1652801183285894870/whileaway_story.dat",
+      "size": 89,
+      "sha256": "5f57339915976cc6b6491c51f374aa675cd88698b3005e1f4d37330d7439aad2"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-4675908558655988442/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-4716655438205894229/whileaway_story.dat",
+      "size": 847,
+      "sha256": "6cd80252f15405cb69888f9ef4b1512df16c0b16072782e14014430cd97843e3"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-7889148197136674936/whileaway-quarantine/c0ea4f096b60b6aae46de3c76ca943900e13a4808b13dae987d53c8886edebe3.dat",
+      "size": 749,
+      "sha256": "c0ea4f096b60b6aae46de3c76ca943900e13a4808b13dae987d53c8886edebe3"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-7889148197136674936/whileaway_story.dat",
+      "size": 749,
+      "sha256": "c0ea4f096b60b6aae46de3c76ca943900e13a4808b13dae987d53c8886edebe3"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/integration/story-8513404201413329422/whileaway_story.dat",
+      "size": 851,
+      "sha256": "0da9b6316509f89e787fc63b3cf97d8fd292b67781b247ca50f3e36ab0f15bfc"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/io-probe/durability-5777057164065708211.dat",
+      "size": 331,
+      "sha256": "b2283e7622cf030152c1f23741f8020bf64e4468d2c1f1f0acd19b07fe9b43d0"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-1-cp-0.dat",
+      "size": 519,
+      "sha256": "3d9f695469e7e7f5778d2390de5896b2c75fa7ad056ca5004a5b113e3b1e2cac"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-1-cp-1.dat",
+      "size": 520,
+      "sha256": "6368aa9008881ce8b059e779c8d1b025e4d30537150dd1a4177f18e9e9992589"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-1-cp-2.dat",
+      "size": 521,
+      "sha256": "82b33d3222bee3153888d28cc4062745b79af33ad6ade46f34035b89cb3dcdad"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-1-cp-3.dat",
+      "size": 521,
+      "sha256": "5f57e053db59d0409386e7089ad93cacc16593a2ddd60884af3c7a25dc1a2808"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-1-cp-4.dat",
+      "size": 519,
+      "sha256": "37ae24fd301dec60a7578363fa5c008264cb62abc22f6a813e60e30db105658c"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-2-cp-0.dat",
+      "size": 504,
+      "sha256": "4d17457a7c3ac05ccdc08c7cc1ebb1810e4b48f98a4f20199060464f11e984da"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-2-cp-1.dat",
+      "size": 510,
+      "sha256": "c0c1fae36721440fab4628d58c7d6d1f2d617a25379f5bb78de6b3647cca1eeb"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-2-cp-2.dat",
+      "size": 509,
+      "sha256": "a3ece0e3e14f4a963ddf4877e18f8290a07ccaf82550e64e24827f511a712633"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-2-cp-3.dat",
+      "size": 505,
+      "sha256": "c471b44a756dab8f2abdf375ce0382b74304c4fffc853efe51b077cafc542ab9"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-2-cp-4.dat",
+      "size": 509,
+      "sha256": "fd6c02fc06960889f5f29f95bed17bd43db36713064ebcb8d55d1ddc323dba67"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-3-cp-0.dat",
+      "size": 521,
+      "sha256": "441e9c99980da8e4e9a6074dca8909127126234906ee41b04fb9bb3b1a36fc54"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-3-cp-1.dat",
+      "size": 525,
+      "sha256": "3c5937b023e3693e6bfa87f5c436df3b16999c75d849465ade253c418a1f3ddc"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-3-cp-2.dat",
+      "size": 519,
+      "sha256": "a43a61307ec139c5bffe7436c9d6c141d770a66b295e6650a90ba55e6a3bee3c"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-3-cp-3.dat",
+      "size": 525,
+      "sha256": "467d009294753befe684616199303901fda0a98a0441abfd246e15dd0d535366"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/kind-3-cp-4.dat",
+      "size": 523,
+      "sha256": "302f79ca224440114c92f1f1eba9316f42fdc14b986e9e7d902ef6d67fbbbc36"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/legacy-v2-copy-0.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/legacy-v2-copy-1.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/legacy-v2-copy-2.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/legacy-v3-copy-0.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/legacy-v3-copy-1.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/legacy-v3-copy-2.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/LEGACY.txt",
+      "size": 92,
+      "sha256": "abd71bc9df46844c22ee337b51b4d8f040ca8a646b52e148dfe4489ee92118fc"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/nbt-stress/RESULT.txt",
+      "size": 65,
+      "sha256": "965ff6ef4816fec1cb4235e08ea887e119edce2a4be3dccfe20a6874be586926"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/opening/story-11576016414569729148/whileaway_story.dat",
+      "size": 384,
+      "sha256": "ac32bd068dcba94d883a982c0492a5e6610f010ada53934db64353fbfd2e561d"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-persistence/external-11149475223012534992/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-persistence/malformed-14004133811469081708/return-network.dat",
+      "size": 61,
+      "sha256": "b555ad3ebf9b7b5dc94e4997dde054e561e2f6e4ac349f6542e0706256e89149"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-persistence/reload-1644217843074366761/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-persistence/stale-3103014188636061607/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-schema5/external-9550646550151024293/whileaway_story.dat",
+      "size": 4,
+      "sha256": "9f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-schema5/iofail-1256497692472430071/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-schema5/preserve-3611617848884995754/whileaway_story.dat",
+      "size": 968,
+      "sha256": "a20cd8ec051679ac1c2747c1f9bd1d062f320d9f169e229266a1031615b177a1"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-schema5/reload-12861817092040482219/whileaway_story.dat",
+      "size": 679,
+      "sha256": "ef8740ec22713bd3bf3192fce9d8ea25a949e526b0220d396953f635abaa607f"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/420d6b22-521c-4703-b505-83d114211cf0/return-network-schema5/stale-5325536054584624919/whileaway_story.dat",
+      "size": 679,
+      "sha256": "ef8740ec22713bd3bf3192fce9d8ea25a949e526b0220d396953f635abaa607f"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-10806351260903264168/whileaway-quarantine/f472ad26d38365c0f760a50f01d2797767ee6562d88acfb0f00cfb16d7b468bb.dat",
+      "size": 752,
+      "sha256": "f472ad26d38365c0f760a50f01d2797767ee6562d88acfb0f00cfb16d7b468bb"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-10806351260903264168/whileaway_story.dat",
+      "size": 752,
+      "sha256": "f472ad26d38365c0f760a50f01d2797767ee6562d88acfb0f00cfb16d7b468bb"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-13931306685695475343/whileaway_story.dat",
+      "size": 848,
+      "sha256": "28a5a42821761a6ffd0b17b9aefdecf8944a719c76b01d4564987852d11df13b"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-14464197032639467612/whileaway_story.dat",
+      "size": 797,
+      "sha256": "c2b1a327769877d5b2928bfc084cad63899404f86b82edb3aa47c312dd5baff5"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-16000523218319668397/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-18316268726831293902/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-3197507090306719445/whileaway_story.dat",
+      "size": 853,
+      "sha256": "c3d58164223ee9e5cd04e0c4ff088ac5465e848ea3eed60e15840d6ffcfe68f8"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/integration/story-6739053420423005206/whileaway_story.dat",
+      "size": 89,
+      "sha256": "5f57339915976cc6b6491c51f374aa675cd88698b3005e1f4d37330d7439aad2"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/io-probe/durability-4378307959776852979.dat",
+      "size": 331,
+      "sha256": "b2283e7622cf030152c1f23741f8020bf64e4468d2c1f1f0acd19b07fe9b43d0"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-1-cp-0.dat",
+      "size": 525,
+      "sha256": "a57061ea5dacdc07f0e37b593154e722e7f0f6099b2c3e067dd5f164b1320f0a"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-1-cp-1.dat",
+      "size": 515,
+      "sha256": "55e286e53ce7742a8311cd650a76ce1fb0b7e67eecfd470324a555a8e8c3fa14"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-1-cp-2.dat",
+      "size": 516,
+      "sha256": "5b9904ef09b73ffcf08b62123eb6f067be058f92996ec322625bab79c2de2390"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-1-cp-3.dat",
+      "size": 517,
+      "sha256": "0159b1ef7b03a04806df4a1e9d1f4ac89ac4a73a0af722b8bf8f43fd991cf744"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-1-cp-4.dat",
+      "size": 514,
+      "sha256": "34e62ef4d2dc3ea52ef0a09e3db205c1c3dfb7ac1eed7b79358f1fbb04dee6a2"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-2-cp-0.dat",
+      "size": 503,
+      "sha256": "1637606ed56d72fe278327c48cd31cabb7a01445405b476545a6503ebbd610b8"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-2-cp-1.dat",
+      "size": 509,
+      "sha256": "b07c8d7dcb49ff9ac2cd24c18b0ee970e5884b94696f742252a1d7c38ed753b7"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-2-cp-2.dat",
+      "size": 504,
+      "sha256": "255a9b61cb74adabcb076bc8da572d7043ab0f51b6459c26c6c0949185a0fddd"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-2-cp-3.dat",
+      "size": 505,
+      "sha256": "6fc91ffad022342f3e71bf7482bc265fe63c1c2ec1b7cbaa225b7e37bf9fc90c"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-2-cp-4.dat",
+      "size": 506,
+      "sha256": "e1506e11c33e5341934e7dbc079a1e0f6d0dc5945ca9bfd046760746c2413777"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-3-cp-0.dat",
+      "size": 523,
+      "sha256": "63b65cf0e4e14ca0b6329afe26d5d0a648b2ae3003ccbcef2a40f309b82d082a"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-3-cp-1.dat",
+      "size": 517,
+      "sha256": "df0e86e2124b975e3222239de3893f631acd3653eed0654486f786732fec3026"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-3-cp-2.dat",
+      "size": 520,
+      "sha256": "9f72076bc15307589215c921d2f96fe472be639681bc03d5c939f5a20888e98e"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-3-cp-3.dat",
+      "size": 521,
+      "sha256": "155cb768301fe2908e689149aa2a30d6ec8607918bed7f1d1562118d0e5f9dd1"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/kind-3-cp-4.dat",
+      "size": 522,
+      "sha256": "6f4023b54b554604ed4293afd8cae7073678c1f785b23d4dcde8a84c72f51883"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/legacy-v2-copy-0.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/legacy-v2-copy-1.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/legacy-v2-copy-2.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/legacy-v3-copy-0.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/legacy-v3-copy-1.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/legacy-v3-copy-2.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/LEGACY.txt",
+      "size": 92,
+      "sha256": "abd71bc9df46844c22ee337b51b4d8f040ca8a646b52e148dfe4489ee92118fc"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/nbt-stress/RESULT.txt",
+      "size": 65,
+      "sha256": "965ff6ef4816fec1cb4235e08ea887e119edce2a4be3dccfe20a6874be586926"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/opening/story-17461123672489542081/whileaway_story.dat",
+      "size": 384,
+      "sha256": "446aab897bef829f0b81b2103c05493dab8b93b8462a992599fb823f6ea16285"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-persistence/external-6675926092031448771/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-persistence/malformed-279470712134966037/return-network.dat",
+      "size": 61,
+      "sha256": "b555ad3ebf9b7b5dc94e4997dde054e561e2f6e4ac349f6542e0706256e89149"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-persistence/reload-8454782980787579090/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-persistence/stale-8561235793814933114/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-schema5/external-8516043733650405381/whileaway_story.dat",
+      "size": 4,
+      "sha256": "9f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-schema5/iofail-16224181708612648657/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-schema5/preserve-4238349617485260762/whileaway_story.dat",
+      "size": 968,
+      "sha256": "a20cd8ec051679ac1c2747c1f9bd1d062f320d9f169e229266a1031615b177a1"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-schema5/reload-12833716370930505498/whileaway_story.dat",
+      "size": 679,
+      "sha256": "ef8740ec22713bd3bf3192fce9d8ea25a949e526b0220d396953f635abaa607f"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/4ce1421b-a111-4bfb-9123-4bf83daa5607/return-network-schema5/stale-4737506196212117692/whileaway_story.dat",
+      "size": 679,
+      "sha256": "ef8740ec22713bd3bf3192fce9d8ea25a949e526b0220d396953f635abaa607f"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-12468182561668616259/whileaway-quarantine/065e9a3bcac20b4bf65098e641ac4378a46584077543b1aa709a0ab1cfd1cf61.dat",
+      "size": 755,
+      "sha256": "065e9a3bcac20b4bf65098e641ac4378a46584077543b1aa709a0ab1cfd1cf61"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-12468182561668616259/whileaway_story.dat",
+      "size": 755,
+      "sha256": "065e9a3bcac20b4bf65098e641ac4378a46584077543b1aa709a0ab1cfd1cf61"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-12911722201521763450/whileaway_story.dat",
+      "size": 853,
+      "sha256": "046ba0300cfe21d5de1a5db495e0ffa7d9747161632b4c9bd68ca2b7f27af002"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-13218898683125437084/whileaway_story.dat",
+      "size": 847,
+      "sha256": "f4ce4674de833618514ed3d4452e1e2f9492d64ee0eeae1f505b569a806a7008"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-2399839929090987946/whileaway_story.dat",
+      "size": 89,
+      "sha256": "5f57339915976cc6b6491c51f374aa675cd88698b3005e1f4d37330d7439aad2"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-4046390256613324080/whileaway_story.dat",
+      "size": 796,
+      "sha256": "da28dd8c9aa4c0454d6fa9163d20c355ee3691ba5bae68c69d76b88de977d7f8"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-4384113878679930614/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/integration/story-516497092225826350/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/io-probe/durability-8681323170080330065.dat",
+      "size": 331,
+      "sha256": "b2283e7622cf030152c1f23741f8020bf64e4468d2c1f1f0acd19b07fe9b43d0"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-1-cp-0.dat",
+      "size": 513,
+      "sha256": "e21b3dc1d903e3f8596a52b0c064dc58c15f5072add0b51bf1f71ead88582bb0"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-1-cp-1.dat",
+      "size": 523,
+      "sha256": "07191398c4ab925fcc47b0473b4cdd72caa10a518582e85dcceb24793dba105a"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-1-cp-2.dat",
+      "size": 520,
+      "sha256": "6f6f27d41d5d81e85f68644a645b746956716afe78d12ff6dfab944180216bfc"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-1-cp-3.dat",
+      "size": 516,
+      "sha256": "5bb5dd1aae117a9d3651c6de7225085414c96a049a1a27fed573df835202c95d"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-1-cp-4.dat",
+      "size": 517,
+      "sha256": "b5fdabd5c72ed0248d4248c91297de725fa26c2e741d134d897163e5ffd59d5b"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-2-cp-0.dat",
+      "size": 506,
+      "sha256": "38279ade5eb97f151dafa33cbfb32a72190b7a3b35442f2f5cdf003c90f9db3b"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-2-cp-1.dat",
+      "size": 513,
+      "sha256": "d354896b96995d92878369f0f112036cb46fa9a8f5b2d6e9c7ce2827f176b8d0"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-2-cp-2.dat",
+      "size": 503,
+      "sha256": "d8d92829312ef469e3dc5d5fa90007f8ec0eda4e2fd93a3604499bf3aaf0c37c"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-2-cp-3.dat",
+      "size": 504,
+      "sha256": "1ba3e5df7b26a64b8062ff8344a4ccf140f56f0bfd6e53e724339e10077097ef"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-2-cp-4.dat",
+      "size": 504,
+      "sha256": "475b51e13f4208419d39f14fbf392c96af0ee7a4abd77b093d7d1e60915aac78"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-3-cp-0.dat",
+      "size": 520,
+      "sha256": "9803b49c031d4074300e9d1e6a9b73aa7477a7518fbfb8c968af0994681152c4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-3-cp-1.dat",
+      "size": 522,
+      "sha256": "5a90a16e443b104664ea0e5537662c36e3ecd929fb627f5c377df023f46d4449"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-3-cp-2.dat",
+      "size": 515,
+      "sha256": "7b646f67fc9dd35210b65c2664da4b380e7c20c8918f31876ae5b852e89070a7"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-3-cp-3.dat",
+      "size": 523,
+      "sha256": "cd12c93f8ca14dda66bb958767aaabdd7cd66373fc80893b1c7f884cf03673ef"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/kind-3-cp-4.dat",
+      "size": 521,
+      "sha256": "b6c9bdbdfc975e0772da6258cb63f817f170a379ee5edc64c379f28f11ed2ace"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/legacy-v2-copy-0.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/legacy-v2-copy-1.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/legacy-v2-copy-2.dat",
+      "size": 626,
+      "sha256": "5a6dba37f4dff2a8862341988ae10ea4a7b2c7087365ba4fc4ab501d99037f08"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/legacy-v3-copy-0.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/legacy-v3-copy-1.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/legacy-v3-copy-2.dat",
+      "size": 686,
+      "sha256": "79538439275082745982a482ff267a979b16d0d5a6b7b31e184166fcc64f6674"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/LEGACY.txt",
+      "size": 92,
+      "sha256": "abd71bc9df46844c22ee337b51b4d8f040ca8a646b52e148dfe4489ee92118fc"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/nbt-stress/RESULT.txt",
+      "size": 65,
+      "sha256": "965ff6ef4816fec1cb4235e08ea887e119edce2a4be3dccfe20a6874be586926"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/opening/story-17641159997508936940/whileaway_story.dat",
+      "size": 386,
+      "sha256": "b94edee3bc998a3bc80d382c2ea493e6eeb18faf4ed46a0be5f12864eb3fb419"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-persistence/external-13248754832567599921/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-persistence/malformed-12923660560602511578/return-network.dat",
+      "size": 61,
+      "sha256": "b555ad3ebf9b7b5dc94e4997dde054e561e2f6e4ac349f6542e0706256e89149"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-persistence/reload-16874874994432575228/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-persistence/stale-866079646766246349/return-network.dat",
+      "size": 242,
+      "sha256": "f48b12001dbe7488295450b927e3801c635f9d47dfead992ec28a5f97acefed4"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-schema5/external-17837788546502614634/whileaway_story.dat",
+      "size": 4,
+      "sha256": "9f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-schema5/iofail-9009195475667778267/whileaway_story.dat",
+      "size": 546,
+      "sha256": "1715617daac043cb38ab50aa1803f4beabb96a7cc698fb58d123b898f440e984"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-schema5/preserve-10154384555186081995/whileaway_story.dat",
+      "size": 968,
+      "sha256": "a20cd8ec051679ac1c2747c1f9bd1d062f320d9f169e229266a1031615b177a1"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-schema5/reload-12195426049868905522/whileaway_story.dat",
+      "size": 679,
+      "sha256": "ef8740ec22713bd3bf3192fce9d8ea25a949e526b0220d396953f635abaa607f"
+    },
+    {
+      "path": "evidence/return-network-integration/gametest/cb957b62-e464-4489-9080-9bcfa39e6b47/return-network-schema5/stale-16371056053293843458/whileaway_story.dat",
+      "size": 679,
+      "sha256": "ef8740ec22713bd3bf3192fce9d8ea25a949e526b0220d396953f635abaa607f"
+    },
+    {
+      "path": "evidence/support-v2-01/.gitattributes",
+      "size": 9,
+      "sha256": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992"
+    },
+    {
+      "path": "evidence/support-v2-01/baseline-gradle.log",
+      "size": 18187,
+      "sha256": "1438fde9bbc2fbc42a542b52b08829f573f8e0ba0c140d71c3f83142c11ec1eb"
+    },
+    {
+      "path": "evidence/support-v2-01/BASELINE-source.zip",
+      "size": 442611,
+      "sha256": "758ff53b2a039ec4c13b88a40737ba3dd63d04662e36d8747361df15c6900f38"
+    },
+    {
+      "path": "evidence/support-v2-01/BASELINE.jar",
+      "size": 681703,
+      "sha256": "8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7"
+    },
+    {
+      "path": "evidence/support-v2-01/BASELINE_FILE",
+      "size": 10738,
+      "sha256": "69d62b7803daa05ac68910e1b438cafbf83a760054c5fa5170fa19bc89d4fcca"
+    },
+    {
+      "path": "evidence/support-v2-01/DIFF_FILE",
+      "size": 75269,
+      "sha256": "0ad9f0aab8c90dc23dcd7d6f4dc33ffeddedc930d66922aeaf0870b4ed3a8f5e"
+    },
+    {
+      "path": "evidence/support-v2-01/final-gradle.log",
+      "size": 17023,
+      "sha256": "f662288a734d4ea9f911b6876e9ee085532301aac2d252067f3020c7648aee30"
+    },
+    {
+      "path": "evidence/support-v2-01/IMPLEMENTATION.txt",
+      "size": 190,
+      "sha256": "a3a85ab8691ff5734e38bdb4f52f544b9d4a0bd12a35a5b6c88820f508253888"
+    },
+    {
+      "path": "evidence/support-v2-01/mock-server-player-api.txt",
+      "size": 979,
+      "sha256": "48208c7a388cf0302d9101884f94526762a87a67272843cd55eadf083dc263c5"
+    },
+    {
+      "path": "evidence/support-v2-01/modified-gradle.log",
+      "size": 18521,
+      "sha256": "33a2d223accebacd75bac68753e529d71abe474cc1f0012d9fa943504b5666c6"
+    },
+    {
+      "path": "evidence/support-v2-01/MODIFIED.jar",
+      "size": 694455,
+      "sha256": "8504307b1f89e0c787b4d45b31c30509a10ea49a9329e128ba6028db1d037a98"
+    },
+    {
+      "path": "evidence/support-v2-01/MODIFIED_FILE",
+      "size": 11076,
+      "sha256": "c4800066c1e4292d2cd1d66bb70c5ebbffd42e87e8a786c197cf3fe57b72b74b"
+    },
+    {
+      "path": "evidence/support-v2-01/python-tests-host.log",
+      "size": 2567,
+      "sha256": "0574eb535627be61a8cc076bbad7a690a892096fb2e54207560fc5011dcacbb2"
+    },
+    {
+      "path": "evidence/support-v2-01/python-tests-workspace.log",
+      "size": 78030,
+      "sha256": "926622716346ea8c306c28633cd183f3e21144810849b79a4748ac450d3d87b0"
+    },
+    {
+      "path": "evidence/support-v2-01/python-tests.log",
+      "size": 73812,
+      "sha256": "aac9f9e4652fc6cda385d0efe45fa5da8b9f6e1fd64679e1b95a2274506b9e18"
+    },
+    {
+      "path": "evidence/support-v2-01/ROLLBACK.sh",
+      "size": 539,
+      "sha256": "f273ea4d66578665491c34c2f9e422b584f3ae9433563636ab96012d6074b3da"
+    },
+    {
+      "path": "evidence/support-v2-01/ROLLBACK_PROBE.jar",
+      "size": 681703,
+      "sha256": "8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7"
+    },
+    {
+      "path": "evidence/support-v2-01/sample-summary.json",
+      "size": 10043,
+      "sha256": "13b891bdc7caa9e35b8fc98bbc9101bf15dd9d06ff6cddb80b9b4fb0a7c417fb"
+    },
+    {
+      "path": "evidence/support-v2-01/VERIFICATION.txt",
+      "size": 4995,
+      "sha256": "0bcf4d27a6c9d2490e35741ca5d8c838e919764334c6b60e6f42baa98a231af0"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ChaseKnowledge.java",
+      "size": 711,
+      "sha256": "ea200daa6f9e2a374b455592673bebc8bde6d924f9fc9214b631a39ba573172e"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/content/StationBlock.java",
+      "size": 2360,
+      "sha256": "4ad0ff4206a93f3b032c30467baf833a169d289ab4c6a6ad10ce320029759209"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/entity/Wayfarer.java",
+      "size": 11076,
+      "sha256": "c4800066c1e4292d2cd1d66bb70c5ebbffd42e87e8a786c197cf3fe57b72b74b"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/KnowledgeAndResidentGameTests.java",
+      "size": 6020,
+      "sha256": "076651ff0b19a0f553d56ca6b640dd4c69b2d7efde3b3359acb0fc095e2e41d1"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/NpcEvents.java",
+      "size": 9742,
+      "sha256": "8f0f837b9fa214964667bc823467ce4149a0c4b2995a932bb54a3cca18df4ab4"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnerEntityObservationGameTests.java",
+      "size": 2768,
+      "sha256": "bac818a6a0afd1ac52c5064a04da8877e6f4c0ed2ccc127ed1662bd20fef14f2"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnerObservationGameTests.java",
+      "size": 4009,
+      "sha256": "c659bb3800c97f5ef1b9cc156c7f00e6a31fb9d64d7505856b0ebe77740e43ec"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnNetworkEvents.java",
+      "size": 15702,
+      "sha256": "f9c926ff71fa307111ce2c71e4613cef72b80759c3a8608effe83802d9160b0c"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnNetworkNpcPolicy.java",
+      "size": 1048,
+      "sha256": "5f055d8a02bcbf3cb4254935ffade85a97c3bec0b3ee6d44734e4f9e337e37b2"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/StoryActors.java",
+      "size": 20782,
+      "sha256": "c93910b2a41d00765f28443f6391e27e13ce0cd9c6db05343b38b7efe65c3dc4"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/support/ReturnerObservationPolicy.java",
+      "size": 638,
+      "sha256": "119a04d57dfdfbd0c2d435ccccd835f83d310b4c702e3bc08edce093d00314fc"
+    },
+    {
+      "path": "tools/validation/test_v2_01_client_evidence.py",
+      "size": 7715,
+      "sha256": "86602fc5a08dd1f6deddc0dd91ee12a46c398d1a2d5e32036d1bc9938fa0d2cd"
+    },
+    {
+      "path": "tools/validation/v2-01-client-session-template.json",
+      "size": 8931,
+      "sha256": "48ad21f4eb9d28c8b62a460fa0b3c86996b7bb64ab5360cbc2baf8bdc74314d7"
+    },
+    {
+      "path": "tools/validation/v2_01_client_evidence.py",
+      "size": 7883,
+      "sha256": "f54de65aa1aa62265ae960f4dcba3c71fcd00ec9aca0c19a6d23b98a3d94d636"
+    }
+  ]
+}
