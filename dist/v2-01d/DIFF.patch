@@ -1,0 +1,1758 @@
+diff --git a/docs/V2_01D_PLAYABLE_HANDOFF.md b/docs/V2_01D_PLAYABLE_HANDOFF.md
+new file mode 100644
+index 0000000..84c3a9e
+--- /dev/null
++++ b/docs/V2_01D_PLAYABLE_HANDOFF.md
+@@ -0,0 +1,105 @@
++# V2-01D / V2-02 living-town increment
++
++## Current scope
++
++V2-01 remains PARTIAL. V2-02 begins as a playable-content increment.
++Story save format remains 5. Actor schema remains optional 1. Return Network schema remains 1.
++Version remains 0.3.1-dev.1. Caveman remains HOLD.
++
++## Content
++
++New districts include a small caretaker home around Yeoul's existing residence anchor.
++Its north and east doors preserve the arrival and return-light approaches.
++Yeoul retains the same UUID, instance, generation, facts, and residence binding.
++She checks the approach, tends the light, visits the workshop, rests, and returns home.
++She swings her arm during light work and workshop inspection.
++She reacts to changed return-light equipment without deleting or restoring blocks.
++Active Return Network navigation still takes priority over ordinary routines.
++
++The family room and boarding-house common room contain usable crafting tables and empty barrels.
++Ordinary tables, seats, and bedding provide spaces without story clues.
++The city dimension disables bed use. Bedding therefore uses non-explosive carpet mats instead of vanilla beds.
++The existing workshop gains a smithing table, furnace, storage, and a real vanilla inspection circuit.
++
++## Two optional discoveries
++
++1. Inspect the soil-marked threshold at city coordinates 60,64,73.
++2. Compare the marks outside with the clean indoor floor.
++3. Enter the workshop through its existing southern doorway.
++4. Read the work sheet at 66,65,46.
++5. Operate the vanilla lever at 65,65,46.
++6. Observe the floor lamp below the lever.
++7. Read the work sheet again.
++
++The second description changes only when the real lever and lamp agree.
++Changed or removed equipment produces an uncertain description.
++These discoveries grant no item, campaign fact, checkpoint, or automatic deduction.
++Repeated visits do not create durable receipts.
++Neither discovery uses a quest marker or a mandatory play day.
++
++## Construction compatibility
++
++City construction layout 3 appends the living-space cells to the unchanged revision-2 plan.
++This version identifies the district construction cursor. It is separate from story save format 5.
++Existing layout-1 and layout-2 saves retain their exact plans and cursor meanings.
++Existing cities receive no automatic retrofit or rebuild.
++Only newly constructed layout-3 cities receive this increment.
++Provisional art remains based on revision 2. No final-art pass occurred.
++
++Added cells accept only their expected generated underlay or an already placed target.
++Unexpected blocks remain untouched. The cursor advances past those cells without later forced replacement.
++Blocked paths use the existing navigation waiting policy.
++The implementation adds no teleport fallback or runtime chunk forcing.
++Initial district construction retains its existing bounded chunk-generation path.
++
++Do not load a layout-3 world with older code that supports only layouts 1 and 2.
++Package rollback does not downgrade saves or restore player progress.
++
++## Manual launch
++
++Run from the repository root:
++
++```powershell
++powershell -NoProfile -File tools/play-v2.ps1
++```
++
++The launcher selects the right secondary DISPLAY1 and mutes the isolated profile.
++The profile is `../../work/v2-01d-manual-client`.
++Create a new survival world for the primary path.
++Continue the existing isolated world only when testing its saved Opening resume.
++The launcher does not complete or skip story checkpoints.
++Keep audio readability NOT TESTED during muted runs.
++
++Use the client validation protocol for the full survival and Returner acceptance path.
++The current direct UI run reached a new survival world and initial Opening movement.
++It saved and exited normally. It did not reach Overworld survival or the remaining acceptance path.
++
++## Authored-content preview
++
++```powershell
++powershell -NoProfile -File tools/play-v2.ps1 -Preview
++```
++
++This separate creative fixture prepares a new city and follows Yeoul's actual navigation.
++It uses the existing Opening commit API to prepare the fixture.
++It changes fixture time and positions the fixture player.
++It tests the real switch, captures the workshop, saves, and exits.
++Classify its result as SCRIPTED REAL CLIENT.
++Do not treat it as natural survival, naive play, or human readability evidence.
++The preview remains disabled in normal production launches.
++
++## Support selection
++
++MAIN adopted only the five evidence-tool files and the client protocol from support HEAD 613ff381665d0915ce8c378f1271fb08a3c17615.
++MAIN did not adopt the three behavior-neutral production helpers or their sixteen GameTests.
++The existing inline production rules already implement those decisions.
++MAIN did not merge the support branch or the unverified tier-A bundles.
++The support count of 130 GameTests is not MAIN's test count.
++
++## Acceptance and next content
++
++Keep V2-01 PARTIAL until the complete survival, Returner, recovery, revisit, and reload path is observed.
++Keep human fear pacing and audio readability separate from technical execution.
++Keep V2-02 PARTIAL until the new spaces and daily behavior receive player-experience review.
++Expand ordinary residential use and the workshop's travel connections next.
++Add Doyun and Miru's present-life behavior after this increment's gameplay review.
+diff --git a/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md b/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+new file mode 100644
+index 0000000..cf20dbf
+--- /dev/null
++++ b/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+@@ -0,0 +1,133 @@
++# V2-01 client validation protocol
++
++## Purpose and claim boundary
++
++Use this protocol after MAIN records its build and audits the relevant changes.
++Record actual observations. Do not convert GameTest results into client or human results.
++The evidence tool checks report structure and local file hashes. It does not independently observe Minecraft.
++Treat the historical Computer Use kernel-assets error as a repository-independent blocker unless new evidence proves a repository cause.
++Use direct manual play when Computer Use is unavailable. Do not modify Codex internals to complete this protocol.
++
++## Prepare the isolated client
++
++1. Record the adopted main branch and full implementation SHA.
++2. Verify the selected JAR with `Get-FileHash -Algorithm SHA256 -LiteralPath <JAR>`.
++3. Create a separate Minecraft profile and save directory.
++4. Preserve the user's normal profile, worlds, and global volume.
++5. Set all sound categories to zero before agent-launched testing.
++6. Select the right secondary `DISPLAY1` and verify the actual window bounds.
++7. Create a new survival world for the primary acceptance path.
++8. Copy `tools/validation/v2-01-client-session-template.json` into the evidence directory as `client-session.json`.
++9. Set `evidence_mode` to `REAL_CLIENT` only for actual client observations.
++10. Record `tester_kind` as `HUMAN` or `AUTOMATED` for each executed scenario.
++
++Keep muted visual verification separate from human audio verification.
++Record `audio_readability=NOT_TESTED` when no person heard the scene.
++Use a separate explicitly selected isolated sound-on session for human audio review.
++
++## Primary path and shortcut rules
++
++Play Opening, Overworld, survival, Yeoul, Return Network, NoEvent, Returner, recovery, and revisit in order.
++Do not use debug checkpoints, fabricated story facts, creative mode, or teleport commands in this primary path.
++Collect resources, craft basic tools, make shelter, and resume normal play between authored events.
++Record where discovery stalls. Do not force an event to conceal a progression or readability defect.
++Use isolated copies for secondary negative cases. Label any fixture arrangement or environment manipulation.
++Never use a normal player world for a corruption or destructive fixture.
++
++## Scenario matrix
++
++| Scenario | Start condition and action | Expected invariant and evidence |
++| --- | --- | --- |
++| `new_world_boot` | Start the selected JAR in a fresh survival world. | World loads with the recorded build. Capture profile, world ID, and startup log. |
++| `opening_transition` | Play the first-person fragment through its natural exit. | Overworld commit stays monotonic. Capture transition and fresh-process reopening. |
++| `yeoul_first_contact` | Reach Yeoul through ordinary exploration. | Existing Yeoul participates. Record UUID, instance, generation, and first-contact context. |
++| `return_network_normal_path` | Complete Return-Light, then investigate the relay naturally. | Checkpoints 0–6 progress without duplicate facts. Record signal, interaction, shared experience, and aftermath. |
++| `returner_unobserved_completion` | Leave the figure unobserved while allowing its encounter to finish. | Termination does not create `player_observed_returner` or the resolution notice/music. Record persisted facts separately from absence of a caption. |
++| `returner_positive_observation` | Face a visible Returner within 32 blocks for sustained exposure. | Observation fact appears and survives reload. Record sightline, distance, actor identity, and saved facts. |
++| `observation_interrupted` | Interrupt a partial exposure with a view change or disconnect. | Partial exposure does not combine across interruption. Record before/after facts and fresh exposure. Exact tick boundaries also require automated evidence. |
++| `occluded_returner` | Place an opaque obstruction in a secondary fixture's sightline. | Proximity alone does not grant observation. Record the obstruction and unchanged fact. |
++| `warning_ignored_crisis` | Continue blocking the route after a readable warning in an isolated copy. | A reaction window precedes bounded crisis. Record warning, response interval, escape, and cleanup. |
++| `recovery` | Clear the route or escape the crisis. | Threat cleanup permits ordinary Minecraft play. Record target/audio cleanup and resumed activity. |
++| `station_revisit_observed` | Revisit the original station after an observed encounter. | Physical-trace text appears without forced interpretation, replay, or new durable facts. Repeat the interaction. |
++| `station_revisit_unobserved` | Revisit after unobserved completion or an older save without the fact. | Neutral text appears. Record absence of invented encounter knowledge and repeated-interaction mutations. |
++| `yeoul_post_event_dialogue` | Speak to Yeoul after Return Network completion. Repeat while crouching. | Ordinary dialogue remains available. Crouching selects context dialogue. Neither interaction creates new facts. |
++| `yeoul_daily_route` | Observe work and rest after event completion. | Resident movement resumes outside the existing brief relay glance. Record actual navigation and stable participant identity. |
++| `survival_continuity` | Mine, craft, build, explore, sleep, and return to normal play. | Story staging preserves survival freedom and player-built geometry. Record activities and any interruption. |
++
++The required client gate uses twelve MUST scenarios defined by the directive.
++The three additional scenarios remain visible in the summary even when not executed.
++Do not interpret optional status as evidence that the scenario passed.
++
++## Save and restart observations
++
++1. Save and reopen near the Opening-to-Overworld transition.
++2. Save and reopen after Return Network intervention or response.
++3. Disconnect during a partial Returner exposure in a secondary copy.
++4. Save and reopen after confirmed observation and after encounter termination.
++5. Compare checkpoint, facts, UUID, instance, generation, and completion receipts.
++6. Record the old and new process identifiers when a process restart is claimed.
++
++Never infer saved state from a screen caption alone.
++Keep developer reads of NBT separate from the primary unassisted player actions.
++Keep death, dimension, chunk, and corruption checks risk-based when their production code is unchanged.
++
++## Evidence files and metadata
++
++Use names such as `session-01_returner-positive_01.png` and `session-01_client.log`.
++Store references beneath the directory containing `client-session.json`.
++Use local file paths in `evidence_reference`. The validator rejects missing files and paths outside that directory.
++Record full `build_sha`, `jar_sha256`, world/profile identity, start, observed, expected, tester, and notes.
++Use one build/JAR pair per summary. Split different builds into separate sessions.
++Record human readability, fear pacing, and audio readability independently.
++Set every unexecuted result to `NOT_TESTED`; leave its human fields `NOT_TESTED`.
++
++## Run the strict summary
++
++### Prepare a draft from an existing log
++
++Run this optional command for one explicitly selected log:
++
++```powershell
++python tools/validation/v2_01_client_log_draft.py path/to/client.log evidence/v2-playable-core/session-01
++```
++
++Choose a new output directory. The command rejects an existing directory.
++The command copies the log without changing its bytes.
++The command records marker counts, line numbers, and the copied log's SHA-256.
++The command creates all 15 scenarios as `NOT_TESTED`.
++It leaves evidence references and execution build hashes empty.
++Startup, sound initialization, player joins, and Gradle success do not grant scenario PASS.
++
++Optionally provide both `--target-build-sha FULL_COMMIT` and `--target-jar path/to/candidate.jar`.
++The tool hashes the candidate JAR and records the declared target commit.
++This target identifies the intended build. It does not prove which build produced the log.
++Keep execution metadata empty until an actual run establishes that association.
++Review the log and record actual scenario results with the original evidence requirements.
++Exit 0 means draft creation succeeded. It does not mean client acceptance passed.
++Exit 2 means draft creation failed.
++
++### Validate completed records
++
++Run from the repository root:
++
++```powershell
++python tools/validation/v2_01_client_evidence.py evidence/v2-playable-core/client-session.json evidence/v2-playable-core/client-summary.json
++```
++
++Exit 0 means all reported MUST client scenarios passed structural validation.
++Exit 1 means the valid report has a PARTIAL or FAIL client gate.
++Exit 2 means invalid input. The tool preserves an existing output on invalid input.
++The tool writes a valid summary through a temporary file and atomic replacement.
++Missing scenarios become `NOT_TESTED`. Duplicate scenarios and mixed builds are rejected.
++Synthetic reports never produce a real-client gate PASS.
++Automated records never grant human ratings.
++An unexecuted REAL_CLIENT template reports `REAL_CLIENT=NOT_TESTED` and `V2_01_CLIENT_GATE=PARTIAL`.
++
++## Acceptance
++
++Set a scenario to PASS only when its observation and references support the expected invariant.
++Set FAIL for an observed contradiction. Record reproduction and failure evidence.
++Set BLOCKED when the environment prevents execution. Name the external blocker.
++Set NOT_TESTED when the scenario was not executed.
++Keep V2-01 PARTIAL until MAIN completes actual client acceptance and reviews remaining gameplay issues.
++Do not start V2-02 or promote 0.3.2 from a validator summary alone.
+diff --git a/src/main/java/io/github/whileaway/CityDistrict.java b/src/main/java/io/github/whileaway/CityDistrict.java
+index bb321dc..ae2610c 100644
+--- a/src/main/java/io/github/whileaway/CityDistrict.java
++++ b/src/main/java/io/github/whileaway/CityDistrict.java
+@@ -2,6 +2,7 @@ package io.github.whileaway;
+ 
+ import io.github.whileaway.core.CityLayout;
+ import io.github.whileaway.core.CityArtLayout;
++import io.github.whileaway.core.CityLivingLayout;
+ import net.minecraft.core.*;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.resources.ResourceKey;
+@@ -19,10 +20,12 @@ public final class CityDistrict extends SavedData {
+     public static final ResourceKey<Level> KEY=ResourceKey.create(Registries.DIMENSION,WhileAway.id("quiet_city"));
+     public static final BlockPos ARRIVAL=new BlockPos(40,65,68), RETURN_LIGHT=new BlockPos(40,65,72);
+     private int cursor;
+-    private int layoutVersion=2;
++    private int layoutVersion=CityLivingLayout.VERSION;
+     private boolean started;
+     public int layoutVersion(){return layoutVersion;}
+-    public java.util.List<CityLayout.Cell> plan(){return layoutVersion==1?CityLayout.CELLS:CityArtLayout.CELLS;}
++    public java.util.List<CityLayout.Cell> plan(){return layoutVersion==1?CityLayout.CELLS:layoutVersion==2?CityArtLayout.CELLS:CityLivingLayout.CELLS;}
++    public boolean livingContent(){return layoutVersion==CityLivingLayout.VERSION;}
++    public boolean campaignArt(){return layoutVersion==2||livingContent();}
+     public boolean ready(){return cursor==plan().size();}
+     public int cursor(){return cursor;}
+     public void start(){if(!started){started=true;setDirty();}}
+@@ -31,7 +34,7 @@ public final class CityDistrict extends SavedData {
+     }
+     public static CityDistrict load(CompoundTag t,HolderLookup.Provider registry) {
+         int version=t.getInt("version");
+-        if(version!=1&&version!=2)throw new IllegalStateException("District layout version mismatch");
++        if(version!=1&&version!=2&&version!=CityLivingLayout.VERSION)throw new IllegalStateException("District layout version mismatch");
+         var d=new CityDistrict();d.layoutVersion=version;d.cursor=t.getInt("cursor");d.started=t.getBoolean("started");
+         if(d.cursor<0||d.cursor>d.plan().size())throw new IllegalStateException("District cursor invalid");
+         return d;
+@@ -45,11 +48,20 @@ public final class CityDistrict extends SavedData {
+         while(started&&!ready()&&count<Math.min(512,Math.max(0,budget))) {
+             var c=plan().get(cursor);var pos=new BlockPos(c.x(),CityLayout.BASE_Y+c.y(),c.z());
+             level.getChunkAt(pos);
+-            level.setBlock(pos,state(c.kind()),2);
++            if(livingContent()&&cursor>=CityArtLayout.CELLS.size())placeLivingCell(level,c);
++            else level.setBlock(pos,state(c.kind()),2);
+             cursor++;count++;
+         }
+         if(count>0)setDirty();return count;
+     }
++    /** New construction accepts only the expected original cell or an already placed target. */
++    static boolean placeLivingCell(ServerLevel level,CityLayout.Cell c) {
++        var pos=new BlockPos(c.x(),CityLayout.BASE_Y+c.y(),c.z());
++        var current=level.getBlockState(pos);var target=state(c.kind());
++        if(current.equals(target))return true;
++        if(!current.equals(state(CityLivingLayout.underlay(c))))return false;
++        level.setBlock(pos,target,2);return true;
++    }
+     public static BlockState state(CityLayout.Kind kind) {
+         return switch(kind) {
+             case ROAD -> Blocks.GRAY_CONCRETE.defaultBlockState();
+@@ -86,6 +98,15 @@ public final class CityDistrict extends SavedData {
+             case TRAM -> Blocks.YELLOW_TERRACOTTA.defaultBlockState();
+             case WHEEL -> Blocks.COAL_BLOCK.defaultBlockState();
+             case CLOCK -> Blocks.SMOOTH_QUARTZ.defaultBlockState();
++            case WORKBENCH -> Blocks.CRAFTING_TABLE.defaultBlockState();
++            case STORAGE -> Blocks.BARREL.defaultBlockState();
++            case FURNACE -> Blocks.FURNACE.defaultBlockState();
++            case TOOL_BENCH -> Blocks.SMITHING_TABLE.defaultBlockState();
++            case MAT -> Blocks.WHITE_CARPET.defaultBlockState();
++            case ROUTE_TRACE -> WhileAway.ROUTE_TRACE.get().defaultBlockState();
++            case MAINTENANCE_TAG -> WhileAway.MAINTENANCE_TAG.get().defaultBlockState();
++            case SERVICE_LEVER -> Blocks.LEVER.defaultBlockState().setValue(net.minecraft.world.level.block.LeverBlock.FACE,net.minecraft.world.level.block.state.properties.AttachFace.FLOOR);
++            case SERVICE_LAMP -> Blocks.REDSTONE_LAMP.defaultBlockState();
+         };
+     }
+     @SubscribeEvent public void tick(ServerTickEvent.Post event) {
+diff --git a/src/main/java/io/github/whileaway/CityHorror.java b/src/main/java/io/github/whileaway/CityHorror.java
+index 1166ff5..814531d 100644
+--- a/src/main/java/io/github/whileaway/CityHorror.java
++++ b/src/main/java/io/github/whileaway/CityHorror.java
+@@ -17,7 +17,7 @@ public final class CityHorror {
+         if(!e.cityVisited||(e.cityClues&1)==0||e.cityShockTriggered||!p.isAlive()||p.isSleeping()||p.isSpectator()||p.isCreative()
+             ||p.getHealth()<8||p.serverLevel().getDifficulty()==Difficulty.PEACEFUL||!StoryConfig.ENCOUNTERS.get()
+             ||now<e.readingUntil||now<e.transitAfter||p.blockPosition().distSqr(STAGE)>14*14)return false;
+-        if(CityDistrict.get(p.serverLevel()).layoutVersion()!=2||!CityDistrict.get(p.serverLevel()).ready())return false;
++        if(!CityDistrict.get(p.serverLevel()).campaignArt()||!CityDistrict.get(p.serverLevel()).ready())return false;
+         return SceneRecovery.begin(p,3,STAGE);
+     }
+     @SubscribeEvent public void tick(PlayerTickEvent.Post event) {
+diff --git a/src/main/java/io/github/whileaway/LivingTownGameTests.java b/src/main/java/io/github/whileaway/LivingTownGameTests.java
+new file mode 100644
+index 0000000..659661f
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/LivingTownGameTests.java
+@@ -0,0 +1,70 @@
++package io.github.whileaway;
++
++import io.github.whileaway.core.*;
++import io.github.whileaway.content.LifeObservationBlock;
++import java.util.*;
++import net.minecraft.core.*;
++import net.minecraft.gametest.framework.*;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.world.level.block.*;
++import net.neoforged.neoforge.gametest.*;
++
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class LivingTownGameTests {
++    @GameTest(template="empty") public static void livingConstructionCursorResumesWithoutReorderingLegacy(GameTestHelper h) {
++        var t=new CompoundTag();t.putInt("version",3);t.putBoolean("started",true);
++        int cursor=CityArtLayout.CELLS.size()+17;t.putInt("cursor",cursor);
++        var d=CityDistrict.load(t,h.getLevel().registryAccess());
++        var reloaded=CityDistrict.load(d.save(new CompoundTag(),h.getLevel().registryAccess()),h.getLevel().registryAccess());
++        h.assertTrue(reloaded.cursor()==cursor&&reloaded.plan().get(cursor).equals(CityLivingLayout.ADDITIONS.get(17)),"resume points at the same living-space cell");
++        t.putInt("cursor",CityLivingLayout.CELLS.size());
++        h.assertTrue(CityDistrict.load(t,h.getLevel().registryAccess()).ready(),"completed living district remains completed");
++        t.putInt("cursor",CityLivingLayout.CELLS.size()+1);boolean rejected=false;
++        try{CityDistrict.load(t,h.getLevel().registryAccess());}catch(IllegalStateException expected){rejected=true;}
++        h.assertTrue(rejected,"out-of-range cursor cannot rebuild the district");h.succeed();
++    }
++    @GameTest(template="empty") public static void livingPlacementPreservesPlayerBlocksAndAcceptsReplay(GameTestHelper h) {
++        var p=h.absolutePos(new BlockPos(1,2,1));
++        var c=new CityLayout.Cell(p.getX(),p.getY()-CityLayout.BASE_Y,p.getZ(),CityLayout.Kind.WORKBENCH);
++        h.getLevel().setBlock(p,Blocks.DIAMOND_BLOCK.defaultBlockState(),2);
++        h.assertTrue(!CityDistrict.placeLivingCell(h.getLevel(),c)&&h.getLevel().getBlockState(p).is(Blocks.DIAMOND_BLOCK),"player block survives authored placement");
++        h.getLevel().setBlock(p,CityDistrict.state(CityLivingLayout.underlay(c)),2);
++        h.assertTrue(CityDistrict.placeLivingCell(h.getLevel(),c)&&CityDistrict.placeLivingCell(h.getLevel(),c),"same target can be replayed without duplicate placement");
++        h.assertTrue(h.getLevel().getBlockState(p).is(Blocks.CRAFTING_TABLE),"functional workbench is placed");h.succeed();
++    }
++    @GameTest(template="empty") public static void livingDailyRouteKeepsAllAuthoredDestinationsClear(GameTestHelper h) {
++        var finalCells=new HashMap<BlockPos,CityLayout.Kind>();
++        for(var c:CityLivingLayout.CELLS)finalCells.put(new BlockPos(c.x(),64+c.y(),c.z()),c.kind());
++        var home=new BlockPos(38,65,72);
++        for(long time:new long[]{0,5000,7500,10500,12000,14000}) {
++            var target=NpcEvents.residenceDestination(home,time,true);
++            h.assertTrue(finalCells.getOrDefault(target,CityLayout.Kind.AIR)==CityLayout.Kind.AIR
++                &&finalCells.getOrDefault(target.above(),CityLayout.Kind.AIR)==CityLayout.Kind.AIR,"routine target remains walkable at "+time);
++            h.assertTrue(target.distSqr(home)<48*48,"routine keeps the existing navigation budget");
++        }
++        h.assertTrue(NpcEvents.residenceDestination(home,10500,false).equals(home.east()),"legacy day route unchanged");
++        h.assertTrue(NpcEvents.residenceDestination(home,10500,true).equals(home.offset(22,0,-24)),"new resident visits the real workshop");
++        h.succeed();
++    }
++    @GameTest(template="empty") public static void workshopObservationRequiresActualEquipmentState(GameTestHelper h) {
++        var off=Blocks.LEVER.defaultBlockState();var lamp=Blocks.REDSTONE_LAMP.defaultBlockState();
++        h.assertTrue(LifeObservationBlock.maintenanceKey(off,lamp).endsWith("maintenance_record"),"record alone never invents a response");
++        var on=off.setValue(LeverBlock.POWERED,true);
++        h.assertTrue(LifeObservationBlock.maintenanceKey(on,lamp).endsWith("maintenance_record"),"powered switch alone does not prove a lit lamp");
++        h.assertTrue(LifeObservationBlock.maintenanceKey(on,lamp.setValue(RedstoneLampBlock.LIT,true)).endsWith("maintenance_response"),"matching physical response permits the observation");
++        h.assertTrue(LifeObservationBlock.maintenanceKey(on,Blocks.STONE.defaultBlockState()).endsWith("changed_equipment"),"changed player equipment stays uncertain");h.succeed();
++    }
++    @GameTest(template="empty") public static void workshopVanillaSwitchActuallyLightsTheFloorLamp(GameTestHelper h) {
++        var lamp=h.absolutePos(new BlockPos(2,1,2));var lever=lamp.above();
++        h.getLevel().setBlock(lamp,Blocks.REDSTONE_LAMP.defaultBlockState(),3);
++        h.getLevel().setBlock(lever,CityDistrict.state(CityLayout.Kind.SERVICE_LEVER),3);
++        var player=h.makeMockServerPlayerInLevel();
++        h.getLevel().getBlockState(lever).useWithoutItem(h.getLevel(),player,
++            new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(lever),Direction.UP,lever,false));
++        h.runAfterDelay(4,()->{
++            h.assertTrue(h.getLevel().getBlockState(lamp).getValue(RedstoneLampBlock.LIT),"real vanilla use powers the adjacent lamp");
++            player.discard();h.succeed();
++        });
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/NpcEvents.java b/src/main/java/io/github/whileaway/NpcEvents.java
+index cbcd98e..43bbd29 100644
+--- a/src/main/java/io/github/whileaway/NpcEvents.java
++++ b/src/main/java/io/github/whileaway/NpcEvents.java
+@@ -53,6 +53,16 @@ public final class NpcEvents {
+         long hour=Math.floorMod(dayTime,24000);
+         return hour>=5000&&hour<11000;
+     }
++    static BlockPos residenceDestination(BlockPos home,long dayTime,boolean living) {
++        if(!living)return residenceDestination(home,dayTime);
++        long hour=Math.floorMod(dayTime,24000);
++        if(hour>=10000&&hour<11500)return home.offset(22,0,-24);
++        if(hour>=11500&&hour<13000)return home.offset(-1,0,1);
++        return residenceDestination(home,dayTime);
++    }
++    private static boolean living(ServerLevel level) {
++        return level.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(level).ready()&&CityDistrict.get(level).livingContent();
++    }
+     public static boolean interact(StoryNpc npc,ServerPlayer p) {
+         if(!StoryStorage.available(p.getServer())||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!p.isAlive())return false;
+         var r=NarrativeData.get(p.getServer()).actors.get(STORY);
+@@ -64,6 +74,16 @@ public final class NpcEvents {
+                 String key=network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown()
+                     ?"story.whileaway.network.aftermath"
+                     :workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
++                var light=NpcState.home(r).offset(2,0,0);
++                if(!(network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown())) {
++                    if(p.serverLevel().hasChunkAt(light)&&!NpcEnvironment.isReturnLight(p.serverLevel().getBlockState(light)))
++                        key="story.whileaway.life.yeoul_light_changed";
++                    else if(living(p.serverLevel())) {
++                        long hour=Math.floorMod(p.serverLevel().getDayTime(),24000);
++                        if(hour>=10000&&hour<11500)key="story.whileaway.life.yeoul_tools";
++                        else if(hour>=11500&&hour<13000)key="story.whileaway.life.yeoul_rest";
++                    }
++                }
+                 p.displayClientMessage(Component.translatable(key),false);
+                 npc.getLookControl().setLookAt(p);
+             }
+@@ -83,7 +103,8 @@ public final class NpcEvents {
+         if(!problems.isEmpty()){StoryStorage.block(server,String.join(";",problems));npc.getNavigation().stop();return;}
+         if(r.checkpoint.checkpoint==4 && ReturnNetworkEvents.update(npc,r))return;
+         var home=NpcState.home(r);
+-        var destination=r.checkpoint.checkpoint==4?residenceDestination(home,level.getDayTime()):home;
++        boolean living=r.checkpoint.checkpoint==4&&living(level);
++        var destination=r.checkpoint.checkpoint==4?residenceDestination(home,level.getDayTime(),living):home;
+         var nearby=witness(level,npc.blockPosition());
+         // No off-screen auto-failure. NPC's life may continue when loaded; event movement needs a living witness.
+         if(r.checkpoint.checkpoint<4&&(nearby==null||!nearby.isAlive())){npc.storyNavigation().externalPause(npc);StoryActors.suspend(npc,r,"npc_no_witness");return;}
+@@ -115,6 +136,21 @@ public final class NpcEvents {
+         }
+         if(!arrived)return;
+         npc.getNavigation().stop();
++        if(living) {
++            long hour=Math.floorMod(level.getDayTime(),24000);
++            if(hour>=10000&&hour<11500) {
++                var bench=home.offset(26,0,-34);
++                npc.getLookControl().setLookAt(bench.getX()+.5,bench.getY()+.5,bench.getZ()+.5);
++                if(npc.tickCount%100==0)npc.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
++                return;
++            }
++            if(hour>=11500&&hour<13000) {
++                npc.getLookControl().setLookAt(home.getX()+3.5,home.getY()+1,home.getZ()+4.5);
++                return;
++            }
++            if(hour>=7500&&hour<10000&&npc.tickCount%100==0)
++                npc.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
++        }
+         // Look at the light instead of delivering explanatory monologues. The object must actually exist.
+         var light=home.offset(2,0,0);
+         if(r.checkpoint.checkpoint<4||workingHours(level.getDayTime()))
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+index c70ff4d..95280e0 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+@@ -35,7 +35,7 @@ public final class ReturnNetworkEvents {
+     }
+     public static ReturnNetworkState.Wait waitState(ServerLevel l){return runtime(l).wait;}
+     private static boolean campaignLocation(ServerLevel l) {
+-        return l.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(l).ready()&&CityDistrict.get(l).layoutVersion()==2;
++        return l.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(l).ready()&&CityDistrict.get(l).campaignArt();
+     }
+     private static boolean exactLocation(ReturnNetworkState s,ServerLevel l) {
+         return s.location!=null&&LOCATION.equals(s.location.id())&&s.location.position()==RELAY.asLong()
+diff --git a/src/main/java/io/github/whileaway/StoryGameTests.java b/src/main/java/io/github/whileaway/StoryGameTests.java
+index 6bad6d2..630fcbe 100644
+--- a/src/main/java/io/github/whileaway/StoryGameTests.java
++++ b/src/main/java/io/github/whileaway/StoryGameTests.java
+@@ -154,7 +154,11 @@ public final class StoryGameTests {
+         h.assertTrue(old.ready()&&old.layoutVersion()==1&&old.plan()==CityLayout.CELLS,"completed old plan remains untouched");
+         t.putInt("cursor",100);old=CityDistrict.load(t,h.getLevel().registryAccess());
+         h.assertTrue(old.plan().get(100).equals(CityLayout.CELLS.get(100)),"partial old cursor points at same block");
+-        h.assertTrue(new CityDistrict().layoutVersion()==2,"new worlds get art revision two");h.succeed();
++        t.putInt("version",2);t.putInt("cursor",io.github.whileaway.core.CityArtLayout.CELLS.size());
++        old=CityDistrict.load(t,h.getLevel().registryAccess());
++        h.assertTrue(old.ready()&&old.plan()==io.github.whileaway.core.CityArtLayout.CELLS,"revision two worlds keep their exact completed plan");
++        var fresh=new CityDistrict();
++        h.assertTrue(fresh.layoutVersion()==3&&fresh.plan().subList(0,io.github.whileaway.core.CityArtLayout.CELLS.size()).equals(io.github.whileaway.core.CityArtLayout.CELLS),"new living layout preserves the full revision two prefix");h.succeed();
+     }
+     @GameTest(template="empty")
+     public static void cityHorrorFlagPersists(GameTestHelper h) {
+diff --git a/src/main/java/io/github/whileaway/WhileAway.java b/src/main/java/io/github/whileaway/WhileAway.java
+index e9eda1b..7c32cc8 100644
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -41,6 +41,8 @@ public final class WhileAway {
+     public static final DeferredBlock<NoteBlock> CITY_INTAKE=BLOCKS.register("city_intake_note",()->new NoteBlock("city_intake",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+     public static final DeferredBlock<NoteBlock> CITY_HOME=BLOCKS.register("city_home_note",()->new NoteBlock("city_home",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+     public static final DeferredBlock<NoteBlock> CITY_SIREN=BLOCKS.register("city_siren_note",()->new NoteBlock("city_siren",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
++    public static final DeferredBlock<LifeObservationBlock> ROUTE_TRACE=BLOCKS.register("return_route_trace",()->new LifeObservationBlock(false,BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_STONE_BRICKS)));
++    public static final DeferredBlock<LifeObservationBlock> MAINTENANCE_TAG=BLOCKS.register("maintenance_tag",()->new LifeObservationBlock(true,BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StationEntity>> STATION_ENTITY = BLOCK_ENTITIES.register("station_anchor", () -> BlockEntityType.Builder.of(StationEntity::new, STATION.get()).build(null));
+     public static final DeferredHolder<EntityType<?>, EntityType<Wayfarer>> WAYFARER = ENTITIES.register("wayfarer", () -> EntityType.Builder.<Wayfarer>of(Wayfarer::new, MobCategory.MONSTER).sized(0.75f, 2.6f).clientTrackingRange(10).build("whileaway:wayfarer"));
+     public static final DeferredHolder<EntityType<?>, EntityType<StoryNpc>> STORY_NPC = ENTITIES.register("story_npc", () -> EntityType.Builder.<StoryNpc>of(StoryNpc::new, MobCategory.CREATURE).sized(.6f,1.95f).clientTrackingRange(10).build("whileaway:story_npc"));
+diff --git a/src/main/java/io/github/whileaway/client/LivingTownPreview.java b/src/main/java/io/github/whileaway/client/LivingTownPreview.java
+new file mode 100644
+index 0000000..b565d59
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/client/LivingTownPreview.java
+@@ -0,0 +1,109 @@
++package io.github.whileaway.client;
++
++import io.github.whileaway.*;
++import io.github.whileaway.entity.StoryNpc;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.Screenshot;
++import net.minecraft.client.gui.screens.TitleScreen;
++import net.minecraft.core.BlockPos;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.*;
++import net.minecraft.world.level.*;
++import net.minecraft.world.level.levelgen.WorldOptions;
++import net.minecraft.world.level.levelgen.presets.WorldPresets;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.bus.api.SubscribeEvent;
++import net.neoforged.fml.common.EventBusSubscriber;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Opt-in authored-content fixture. This is not a natural-survival acceptance run. */
++@EventBusSubscriber(modid=WhileAway.ID,value=Dist.CLIENT)
++public final class LivingTownPreview {
++    private static final Path E=Path.of(System.getProperty("whileaway.evidence","evidence/v2-01d/preview"));
++    private static boolean started,queued,done;
++    private static volatile int phase;
++    private static int ticks,frames;
++    private static UUID actor,instance;
++    private static Set<String> facts;
++    private static void check(boolean ok,String why){if(!ok)throw new IllegalStateException(why);}
++    private static void note(String text) throws Exception {
++        Files.createDirectories(E);Files.writeString(E.resolve("preview.txt"),text+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);
++    }
++    @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
++        if(!Boolean.getBoolean("whileaway.townPreview")||done)return;
++        var mc=Minecraft.getInstance();
++        try {
++            if(!started&&mc.screen instanceof TitleScreen) {
++                started=true;note(ClientTestEnvironment.verify(E,"living-preview"));
++                var rules=new GameRules();rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(false,null);
++                mc.createWorldOpenFlows().createFreshLevel("living-preview-"+System.currentTimeMillis(),
++                    new LevelSettings("V2-02 scripted content preview",GameType.CREATIVE,false,Difficulty.NORMAL,true,rules,WorldDataConfiguration.DEFAULT),
++                    new WorldOptions(420142L,false,false),WorldPresets::createNormalWorldDimensions,new TitleScreen());
++            }
++            if(++ticks>5000)throw new IllegalStateException("PREVIEW_TIMEOUT phase="+phase);
++            if(mc.player==null||mc.getSingleplayerServer()==null)return;
++            if(phase==6) {
++                if(++frames==30)Screenshot.grab(E.toFile(),"maintenance-living.png",mc.getMainRenderTarget(),c->{});
++                if(frames<50)return;
++                done=true;mc.getSingleplayerServer().execute(()->{
++                    try{note("PASS SCRIPTED_REAL_CLIENT living spaces, actual NPC rest/home/work route, same identity, circuit; NOT HUMAN PLAYTEST");}
++                    catch(Exception ex){ex.printStackTrace();}
++                    mc.getSingleplayerServer().saveEverything(true,true,true);mc.getSingleplayerServer().halt(false);mc.execute(mc::stop);
++                });return;
++            }
++            if(queued||ticks%10!=0)return;
++            queued=true;mc.getSingleplayerServer().execute(()->{
++                try {
++                    var server=mc.getSingleplayerServer();var p=server.getPlayerList().getPlayer(mc.player.getUUID());
++                    if(p==null||!StoryStorage.available(server))return;
++                    var data=NarrativeData.get(server);var city=server.getLevel(CityDistrict.KEY);
++                    if(phase==0) {
++                        var entry=data.entry(p.getUUID());
++                        while(entry.openingStage!=OpeningStage.COMPLETED)
++                            data.commitOpening(p.getUUID(),entry.openingStage,p.blockPosition(),0,0,server.registryAccess());
++                        CityDistrict.get(city).start();phase=1;note("FIXTURE opening completed through existing commit API; not acceptance evidence");return;
++                    }
++                    if(phase==1) {
++                        if(!CityDistrict.get(city).ready())return;
++                        check(CityDistrict.get(city).livingContent(),"old construction plan selected");
++                        if(!p.teleportTo(city,41.5,65,68.5,Set.of(),45,0))return;
++                        server.overworld().setDayTime(0);phase=2;return;
++                    }
++                    if(p.level()!=city)return;
++                    var r=data.actors.get(NpcEvents.STORY);
++                    if(r==null) {
++                        r=NpcEvents.begin(p,new BlockPos(42,65,68),new BlockPos(38,65,72));
++                        if(r==null) {
++                            if(ticks%100==0)note("NPC_WAIT start="+city.getBlockState(new BlockPos(42,65,68))+" home="+city.getBlockState(new BlockPos(38,65,72))+" floor="+city.getBlockState(new BlockPos(38,64,72)));
++                            return;
++                        }
++                    }
++                    var npc=(StoryNpc)city.getEntity(r.entityId);if(npc==null)return;
++                    if(phase==2) {
++                        if(r.checkpoint.checkpoint==1)NpcEvents.interact(npc,p);
++                        if(r.checkpoint.checkpoint!=4)return;
++                        actor=r.entityId;instance=r.instanceId;facts=Set.copyOf(r.facts);
++                        mc.execute(()->Screenshot.grab(E.toFile(),"caretaker-home.png",mc.getMainRenderTarget(),c->{}));
++                        check(city.getBlockState(new BlockPos(60,64,73)).is(WhileAway.ROUTE_TRACE.get()),"residential observation absent");
++                        check(city.getBlockState(new BlockPos(54,65,64)).is(net.minecraft.world.level.block.Blocks.CRAFTING_TABLE),"usable residential table absent");
++                        server.overworld().setDayTime(12000);phase=3;note("PASS resident settled; residential floor trace and workbench exist");return;
++                    }
++                    check(actor.equals(r.entityId)&&instance.equals(r.instanceId)&&r.generation==0&&facts.equals(r.facts),"daily routine changed identity or facts");
++                    var target=phase==3?new BlockPos(37,65,73):phase==4?new BlockPos(38,65,72):new BlockPos(60,65,48);
++                    if(npc.distanceToSqr(target.getX()+.5,target.getY(),target.getZ()+.5)>1.4)return;
++                    if(phase==3){server.overworld().setDayTime(14000);phase=4;note("PASS actual navigation to rest place");return;}
++                    if(phase==4){server.overworld().setDayTime(10500);phase=5;note("PASS actual navigation home");return;}
++                    var lever=io.github.whileaway.content.LifeObservationBlock.SWITCH;
++                    city.getBlockState(lever).useWithoutItem(city,p,new net.minecraft.world.phys.BlockHitResult(
++                        net.minecraft.world.phys.Vec3.atCenterOf(lever),net.minecraft.core.Direction.UP,lever,false));
++                    check(city.getBlockState(lever.below()).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT),"service switch failed");
++                    note("PASS actual navigation workshop UUID="+actor+" instance="+instance+" generation="+r.generation+" checkpoint="+r.checkpoint.checkpoint);
++                    p.teleportTo(city,60.5,66,51.5,Set.of(),180,10);phase=6;
++                }catch(Exception ex){done=true;ex.printStackTrace();try{note("FAIL "+ex);}catch(Exception ignored){}mc.execute(mc::stop);}
++                finally{queued=false;}
++            });
++        }catch(Exception ex){done=true;ex.printStackTrace();mc.stop();}
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/content/LifeObservationBlock.java b/src/main/java/io/github/whileaway/content/LifeObservationBlock.java
+new file mode 100644
+index 0000000..4b053c2
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/content/LifeObservationBlock.java
+@@ -0,0 +1,40 @@
++package io.github.whileaway.content;
++
++import io.github.whileaway.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.network.chat.Component;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.InteractionResult;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.block.LeverBlock;
++import net.minecraft.world.level.block.RedstoneLampBlock;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.phys.BlockHitResult;
++
++/** Optional physical observations. These objects grant no campaign facts or items. */
++public final class LifeObservationBlock extends Block {
++    public static final BlockPos SWITCH=new BlockPos(65,65,46), LAMP=SWITCH.below();
++    private final boolean maintenance;
++    public LifeObservationBlock(boolean maintenance,Properties properties){super(properties);this.maintenance=maintenance;}
++    public static String maintenanceKey(BlockState lever,BlockState lamp) {
++        if(!lever.is(Blocks.LEVER)||!lamp.is(Blocks.REDSTONE_LAMP))return "story.whileaway.life.changed_equipment";
++        return lever.getValue(LeverBlock.POWERED)&&lamp.getValue(RedstoneLampBlock.LIT)
++            ?"story.whileaway.life.maintenance_response":"story.whileaway.life.maintenance_record";
++    }
++    @Override protected InteractionResult useWithoutItem(BlockState state,Level level,BlockPos pos,Player player,BlockHitResult hit) {
++        if(player instanceof ServerPlayer p) {
++            if(!StoryStorage.available(p.getServer()))return InteractionResult.FAIL;
++            String key="story.whileaway.life.threshold";
++            if(maintenance) {
++                if(!level.dimension().equals(CityDistrict.KEY)||!pos.equals(new BlockPos(66,65,46))
++                    ||!level.hasChunkAt(SWITCH)||!level.hasChunkAt(LAMP))key="story.whileaway.life.changed_equipment";
++                else key=maintenanceKey(level.getBlockState(SWITCH),level.getBlockState(LAMP));
++            }
++            p.displayClientMessage(Component.translatable(key),false);
++        }
++        return InteractionResult.sidedSuccess(level.isClientSide);
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/core/CityLayout.java b/src/main/java/io/github/whileaway/core/CityLayout.java
+index 74ed564..bb888c1 100644
+--- a/src/main/java/io/github/whileaway/core/CityLayout.java
++++ b/src/main/java/io/github/whileaway/core/CityLayout.java
+@@ -5,7 +5,8 @@ import java.util.*;
+ /** Stable v1 district plan. Never reorder this plan without migrating the saved construction cursor. */
+ public final class CityLayout {
+     public enum Kind { ROAD, LINE, PAVING, WALL, TRIM, GLASS, FLOOR, LAMP, POST, BENCH, GATE, INTAKE, HOME, SIREN,
+-        AIR, BRICK, PLASTER, COPPER, DARK, CRACKED, MOSS, GRATE, WARM, RED, CHAIN, CHAIR, WATER, EARTH, WOOD, LEAF, RUBBLE, TRAM, WHEEL, CLOCK }
++        AIR, BRICK, PLASTER, COPPER, DARK, CRACKED, MOSS, GRATE, WARM, RED, CHAIN, CHAIR, WATER, EARTH, WOOD, LEAF, RUBBLE, TRAM, WHEEL, CLOCK,
++        WORKBENCH, STORAGE, FURNACE, TOOL_BENCH, MAT, ROUTE_TRACE, MAINTENANCE_TAG, SERVICE_LEVER, SERVICE_LAMP }
+     public record Cell(int x,int y,int z,Kind kind) {}
+     public record Building(int x,int z,int width,int depth,int floors) {}
+     public static final List<Building> BUILDINGS=List.of(
+diff --git a/src/main/java/io/github/whileaway/core/CityLivingLayout.java b/src/main/java/io/github/whileaway/core/CityLivingLayout.java
+new file mode 100644
+index 0000000..b62a7ce
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/core/CityLivingLayout.java
+@@ -0,0 +1,54 @@
++package io.github.whileaway.core;
++
++import java.util.*;
++import static io.github.whileaway.core.CityLayout.Kind.*;
++import io.github.whileaway.core.CityLayout.*;
++
++/** New-district living spaces. Revision-1 and revision-2 construction orders stay unchanged. */
++public final class CityLivingLayout {
++    public static final int VERSION=3;
++    public static final List<Cell> ADDITIONS=build();
++    public static final List<Cell> CELLS;
++    private static final Map<String,Kind> UNDERLAY=new HashMap<>();
++    static {
++        for(var c:CityArtLayout.CELLS)UNDERLAY.put(key(c),c.kind());
++        var all=new ArrayList<>(CityArtLayout.CELLS);all.addAll(ADDITIONS);CELLS=List.copyOf(all);
++    }
++    private CityLivingLayout() {}
++    private static String key(Cell c){return c.x()+","+c.y()+","+c.z();}
++    public static Kind underlay(Cell c){return UNDERLAY.getOrDefault(key(c),AIR);}
++    private static List<Cell> build() {
++        var cells=new LinkedHashMap<String,Cell>();
++        class Draw {
++            void at(int x,int y,int z,Kind kind){var c=new Cell(x,y,z,kind);cells.put(key(c),c);}
++            void row(int x,int y,int z,int length,Kind kind){for(int i=0;i<length;i++)at(x+i,y,z,kind);}
++        }
++        var d=new Draw();
++        // Yeoul's small caretaker home opens north and east. Keep the light and arrival approach clear.
++        for(int x=35;x<=39;x++)for(int z=70;z<=75;z++) {
++            d.at(x,0,z,FLOOR);d.at(x,5,z,COPPER);
++            for(int y=1;y<=4;y++) {
++                boolean wall=x==35||x==39||z==70||z==75;
++                boolean door=(z==70&&x==38)||(x==39&&z==72)||(z==75&&x==38);
++                if(wall&&!(door&&y<=3))d.at(x,y,z,y==3?GLASS:BRICK);
++            }
++        }
++        d.at(36,1,71,MAT);d.at(36,1,72,MAT);
++        d.at(36,1,74,WORKBENCH);d.at(37,1,74,STORAGE);d.at(37,4,73,WARM);
++        // A rest seat faces the road. The standing space beside it stays empty.
++        d.at(35,1,73,CHAIR);
++        // Family room: usable storage, crafting, and ordinary furniture without a clue at every object.
++        d.at(54,1,64,WORKBENCH);d.at(55,1,64,STORAGE);d.at(66,1,65,STORAGE);
++        d.row(63,1,68,3,BENCH);d.at(63,1,67,CHAIR);d.at(65,1,67,CHAIR);
++        d.at(55,1,66,MAT);d.at(55,1,67,MAT);
++        d.at(60,0,73,ROUTE_TRACE);d.at(60,0,74,EARTH);d.at(60,0,75,EARTH);
++        // The boarding-house common room remains an ordinary player-usable place.
++        d.at(12,1,64,WORKBENCH);d.at(13,1,64,STORAGE);d.row(14,1,69,4,BENCH);
++        d.at(14,1,68,CHAIR);d.at(17,1,68,CHAIR);
++        // Workshop: a real tool bench, furnace, storage, and a player-operated service circuit.
++        d.at(64,1,38,TOOL_BENCH);d.at(65,1,38,WORKBENCH);d.at(66,1,38,FURNACE);
++        d.at(54,1,39,STORAGE);d.at(54,1,40,STORAGE);d.row(57,1,39,3,BENCH);
++        d.at(65,0,46,SERVICE_LAMP);d.at(65,1,46,SERVICE_LEVER);d.at(66,1,46,MAINTENANCE_TAG);
++        return List.copyOf(cells.values());
++    }
++}
+diff --git a/src/main/resources/assets/whileaway/blockstates/maintenance_tag.json b/src/main/resources/assets/whileaway/blockstates/maintenance_tag.json
+new file mode 100644
+index 0000000..25921eb
+--- /dev/null
++++ b/src/main/resources/assets/whileaway/blockstates/maintenance_tag.json
+@@ -0,0 +1 @@
++{"variants": {"": {"model": "whileaway:block/maintenance_tag"}}}
+diff --git a/src/main/resources/assets/whileaway/blockstates/return_route_trace.json b/src/main/resources/assets/whileaway/blockstates/return_route_trace.json
+new file mode 100644
+index 0000000..5336f39
+--- /dev/null
++++ b/src/main/resources/assets/whileaway/blockstates/return_route_trace.json
+@@ -0,0 +1 @@
++{"variants": {"": {"model": "whileaway:block/return_route_trace"}}}
+diff --git a/src/main/resources/assets/whileaway/lang/en_us.json b/src/main/resources/assets/whileaway/lang/en_us.json
+index d0a7104..18b0fe2 100644
+--- a/src/main/resources/assets/whileaway/lang/en_us.json
++++ b/src/main/resources/assets/whileaway/lang/en_us.json
+@@ -86,5 +86,14 @@
+   "story.whileaway.opening.gap": "…You do not remember passing the gate. Your feet keep moving.",
+   "story.whileaway.opening.voice": "A distant voice: 'That route is closed. Keep moving!'",
+   "story.whileaway.opening.last_gap": "…The last thing you heard was a rail signal.",
+-  "story.whileaway.opening.overworld": "You wake in an unfamiliar Overworld. Your life here is yours to make."
++  "story.whileaway.opening.overworld": "You wake in an unfamiliar Overworld. Your life here is yours to make.",
++  "block.whileaway.return_route_trace": "Soil-marked Threshold",
++  "block.whileaway.maintenance_tag": "Maintenance Work Sheet",
++  "story.whileaway.life.threshold": "Soil marks reach the threshold. The same soil is absent inside. The doorway is open.",
++  "story.whileaway.life.maintenance_record": "Work sheet: power disconnected, out of service. The inspection switch and floor lamp remain connected.",
++  "story.whileaway.life.maintenance_response": "The sheet says power was disconnected. Raising the switch lit the floor lamp. No new splice is visible.",
++  "story.whileaway.life.changed_equipment": "The equipment has changed. A direct comparison with the work sheet is uncertain.",
++  "story.whileaway.life.yeoul_tools": "Yeoul: I try to put the tools back. Somehow one always goes missing.",
++  "story.whileaway.life.yeoul_rest": "Yeoul: Just taking a break. You can see the road from here.",
++  "story.whileaway.life.yeoul_light_changed": "Yeoul: The light looks different. I will check what you placed before touching anything."
+ }
+diff --git a/src/main/resources/assets/whileaway/lang/ko_kr.json b/src/main/resources/assets/whileaway/lang/ko_kr.json
+index f962a22..b578f7a 100644
+--- a/src/main/resources/assets/whileaway/lang/ko_kr.json
++++ b/src/main/resources/assets/whileaway/lang/ko_kr.json
+@@ -86,5 +86,14 @@
+   "story.whileaway.opening.gap": "…문을 지난 기억이 없다. 그런데 발은 계속 움직이고 있다.",
+   "story.whileaway.opening.voice": "멀리서 들린다. ‘그쪽 길은 닫혔어. 계속 가!’",
+   "story.whileaway.opening.last_gap": "…마지막으로 들린 것은 철도 신호였다.",
+-  "story.whileaway.opening.overworld": "눈을 뜨자 낯선 오버월드다. 이제는 스스로 살아가야 한다."
++  "story.whileaway.opening.overworld": "눈을 뜨자 낯선 오버월드다. 이제는 스스로 살아가야 한다.",
++  "block.whileaway.return_route_trace": "흙이 밴 문턱",
++  "block.whileaway.maintenance_tag": "정비 작업표",
++  "story.whileaway.life.threshold": "문밖의 흙자국은 문턱까지 이어진다. 실내 바닥에는 같은 흙이 없다. 문은 멀쩡히 열려 있다.",
++  "story.whileaway.life.maintenance_record": "작업표: 전원 분리, 사용 중단. 옆의 점검 스위치와 바닥등은 아직 연결되어 있다.",
++  "story.whileaway.life.maintenance_response": "작업표에는 전원을 끊었다고 적혀 있다. 스위치를 올리자 바닥등이 켜졌다. 선을 다시 이은 흔적은 보이지 않는다.",
++  "story.whileaway.life.changed_equipment": "설비 상태가 달라져 작업표와 직접 비교하기 어렵다.",
++  "story.whileaway.life.yeoul_tools": "여울: 공구를 쓰면 제자리에 두려고 하는데… 꼭 하나씩 없어지더라.",
++  "story.whileaway.life.yeoul_rest": "여울: 잠깐 쉬는 중이야. 여기서는 지나가는 길이 잘 보여.",
++  "story.whileaway.life.yeoul_light_changed": "여울: 등 쪽이 달라졌네. 내가 고치기 전에 네가 둔 물건부터 확인할게."
+ }
+diff --git a/src/main/resources/assets/whileaway/models/block/maintenance_tag.json b/src/main/resources/assets/whileaway/models/block/maintenance_tag.json
+new file mode 100644
+index 0000000..6bb645f
+--- /dev/null
++++ b/src/main/resources/assets/whileaway/models/block/maintenance_tag.json
+@@ -0,0 +1 @@
++{"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/oak_planks"}}
+diff --git a/src/main/resources/assets/whileaway/models/block/return_route_trace.json b/src/main/resources/assets/whileaway/models/block/return_route_trace.json
+new file mode 100644
+index 0000000..ae8c13b
+--- /dev/null
++++ b/src/main/resources/assets/whileaway/models/block/return_route_trace.json
+@@ -0,0 +1 @@
++{"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/chiseled_stone_bricks"}}
+diff --git a/src/main/resources/assets/whileaway/models/item/maintenance_tag.json b/src/main/resources/assets/whileaway/models/item/maintenance_tag.json
+new file mode 100644
+index 0000000..e640589
+--- /dev/null
++++ b/src/main/resources/assets/whileaway/models/item/maintenance_tag.json
+@@ -0,0 +1 @@
++{"parent": "whileaway:block/maintenance_tag"}
+diff --git a/src/main/resources/assets/whileaway/models/item/return_route_trace.json b/src/main/resources/assets/whileaway/models/item/return_route_trace.json
+new file mode 100644
+index 0000000..bdd32ed
+--- /dev/null
++++ b/src/main/resources/assets/whileaway/models/item/return_route_trace.json
+@@ -0,0 +1 @@
++{"parent": "whileaway:block/return_route_trace"}
+diff --git a/tools/ci/v2-playable-manual.init.gradle b/tools/ci/v2-playable-manual.init.gradle
+new file mode 100644
+index 0000000..4618cc8
+--- /dev/null
++++ b/tools/ci/v2-playable-manual.init.gradle
+@@ -0,0 +1,35 @@
++// Isolated manual play. No scripted story driver or checkpoint shortcuts.
++gradle.afterProject { p, state ->
++    if (p != rootProject || !p.plugins.hasPlugin('net.neoforged.moddev')) return
++    ['v2PlayableManual':'../../work/v2-01d-manual-client','v2TownPreview':'../../work/v2-02-preview-client'].each { name, profile ->
++    p.neoForge.runs.create(name) {
++        client()
++        gameDirectory = p.file(profile)
++        if(name=='v2TownPreview') {
++            systemProperty 'whileaway.townPreview','true'
++            systemProperty 'whileaway.evidence',p.file('evidence/v2-01d/preview').absolutePath
++        }
++    }
++    p.tasks.named('run'+name.capitalize()).configure {
++        doFirst {
++            def monitor = new groovy.json.JsonSlurper().parse(p.file('evidence/v2-01d/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED', "-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { key,value -> systemProperty "whileaway.monitor${key}",monitor[value].toString() }
++            def dir = p.file(profile); dir.mkdirs()
++            def options = new File(dir, 'options.txt')
++            def lines = options.exists() ? options.readLines('UTF-8') : []
++            def values = ['narrator':'0','onboardAccessibility':'false','tutorialStep':'none',
++                'pauseOnLostFocus':'true','lang':'ko_kr','renderDistance':'8','simulationDistance':'5',
++                'fullscreen':'false','overrideWidth':'1100','overrideHeight':'700']
++            ['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].each {
++                values["soundCategory_${it}".toString()] = '0.0'
++            }
++            lines.removeAll { values.containsKey(it.split(':',2)[0]) }
++            values.each { key, value -> lines.add("${key}:${value}") }
++            options.setText(lines.join('\n')+'\n','UTF-8')
++            if (!options.text.contains('soundCategory_master:0.0')) throw new GradleException('Mute check failed')
++            logger.lifecycle("V2_MANUAL_MUTED profile=${dir.absolutePath} DISPLAY1=${monitor.x},${monitor.y}")
++        }
++    }
++    }
++}
+diff --git a/tools/play-v2.ps1 b/tools/play-v2.ps1
+new file mode 100644
+index 0000000..cd830e3
+--- /dev/null
++++ b/tools/play-v2.ps1
+@@ -0,0 +1,15 @@
++param([switch]$Preview)
++$ErrorActionPreference='Stop'
++$projectRoot=Split-Path -Parent $PSScriptRoot
++Push-Location $projectRoot
++try {
++    New-Item -ItemType Directory -Force evidence/v2-01d | Out-Null
++    & tools/select-test-monitor.ps1 -OutputPath evidence/v2-01d/monitor.json
++    & tools/build-monitor-agent.ps1
++    if($LASTEXITCODE -ne 0){throw 'Monitor launcher build failed'}
++    $env:GRADLE_USER_HOME=Join-Path (Split-Path -Parent $projectRoot) 'gradle-home'
++    $task=if($Preview){'runV2TownPreview'}else{'runV2PlayableManual'}
++    & .\gradlew.bat --offline --no-daemon --init-script tools/ci/v2-playable-manual.init.gradle $task --console=plain
++    $result=$LASTEXITCODE
++} finally { Pop-Location }
++exit $result
+diff --git a/tools/validation/test_v2_01_client_evidence.py b/tools/validation/test_v2_01_client_evidence.py
+new file mode 100644
+index 0000000..55978fa
+--- /dev/null
++++ b/tools/validation/test_v2_01_client_evidence.py
+@@ -0,0 +1,178 @@
++"""Synthetic validator tests. These results are not real-client evidence."""
++import contextlib
++import copy
++import io
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++import v2_01_client_evidence as validator
++
++
++class EvidenceTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.source = self.root / "session.json"
++        self.output = self.root / "summary.json"
++        (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
++        self.document = {"schema": 1, "evidence_mode": "SYNTHETIC", "scenarios": [self.row(n) for n in validator.SCENARIOS]}
++        self.save()
++
++    def row(self, name):
++        return {"scenario": name, "result": "PASS", "build_sha": "a" * 40, "jar_sha256": "b" * 64,
++                "isolated_profile": "synthetic-profile", "start_condition": "synthetic start",
++                "observed_behavior": "synthetic observation", "expected_behavior": "synthetic expectation",
++                "evidence_reference": ["run.log"], "tester": "validator self-test", "tester_kind": "AUTOMATED", "notes": ""}
++
++    def save(self):
++        self.source.write_text(json.dumps(self.document), encoding="utf-8")
++
++    def summary(self):
++        self.save()
++        return validator.summarize(self.document, self.source, self.output)
++
++    def reject(self, fragment):
++        with self.assertRaisesRegex(validator.InvalidEvidence, fragment):
++            self.summary()
++
++    def test_missing_scenarios_are_not_tested(self):
++        self.document["scenarios"] = []
++        result = self.summary()
++        self.assertEqual(result["counts"], {"NOT_TESTED": 15})
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++        self.assertEqual(result["REAL_CLIENT"], "NOT_TESTED")
++
++    def test_synthetic_pass_never_becomes_client_pass(self):
++        result = self.summary()
++        self.assertEqual(result["reported_evidence_gate"], "PASS")
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++        self.assertEqual(result["HUMAN_EXPERIENCE"], "NOT_TESTED")
++
++    def test_real_client_template_without_executed_rows_is_not_tested(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for row in self.document["scenarios"]:
++            row["result"] = "NOT_TESTED"
++        result = self.summary()
++        self.assertEqual(result["REAL_CLIENT"], "NOT_TESTED")
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++
++    def test_executed_real_client_evidence_retains_partial_status(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        self.document["scenarios"] = self.document["scenarios"][:1]
++        self.assertEqual(self.summary()["REAL_CLIENT"], "PARTIAL")
++
++    def test_every_must_failure_blocks_gate(self):
++        for name in validator.MUST:
++            doc = copy.deepcopy(self.document)
++            next(row for row in doc["scenarios"] if row["scenario"] == name)["result"] = "FAIL"
++            result = validator.summarize(doc, self.source, self.output)
++            self.assertEqual(result["reported_evidence_gate"], "FAIL", name)
++
++    def test_blocked_and_not_tested_must_remain_partial(self):
++        for status in ("BLOCKED", "NOT_TESTED"):
++            self.document["scenarios"][0]["result"] = status
++            self.assertEqual(self.summary()["reported_evidence_gate"], "PARTIAL")
++
++    def test_optional_failure_does_not_override_required_gate(self):
++        next(r for r in self.document["scenarios"] if r["scenario"] == "yeoul_daily_route")["result"] = "FAIL"
++        self.assertEqual(self.summary()["reported_evidence_gate"], "PASS")
++
++    def test_duplicate_and_unknown_scenarios_rejected(self):
++        self.document["scenarios"].append(copy.deepcopy(self.document["scenarios"][0]))
++        self.reject("DUPLICATE_SCENARIO")
++        self.document["scenarios"][-1]["scenario"] = "imagined_success"
++        self.reject("UNKNOWN_SCENARIO")
++
++    def test_invalid_result_rejected(self):
++        self.document["scenarios"][0]["result"] = "probably PASS"
++        self.reject("INVALID_RESULT")
++
++    def test_metadata_required_for_executed_scenario(self):
++        for field in (*validator.TEXT_FIELDS, "build_sha", "jar_sha256", "tester_kind", "isolated_profile"):
++            with self.subTest(field=field):
++                row = self.document["scenarios"][0]
++                old = row.pop(field)
++                self.reject("MISSING|INVALID")
++                row[field] = old
++
++    def test_mixed_build_or_jar_rejected(self):
++        for field, length in (("build_sha", 40), ("jar_sha256", 64)):
++            old = self.document["scenarios"][0][field]
++            self.document["scenarios"][0][field] = "c" * length
++            self.reject("MIXED_BUILD_EVIDENCE")
++            self.document["scenarios"][0][field] = old
++
++    def test_automatic_human_result_rejected(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for field in validator.HUMAN_FIELDS:
++            self.document["scenarios"][0][field] = "PASS"
++            self.reject("HUMAN_RESULT_WITHOUT_HUMAN_RUN")
++            del self.document["scenarios"][0][field]
++
++    def test_synthetic_human_claim_rejected(self):
++        self.document["scenarios"][0].update(tester_kind="HUMAN", human_readability="PASS")
++        self.reject("HUMAN_RESULT_WITHOUT_HUMAN_RUN")
++
++    def test_human_rollup_requires_every_must(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for row in self.document["scenarios"]:
++            row.update(tester_kind="HUMAN", human_readability="PASS")
++        self.assertEqual(self.summary()["HUMAN_EXPERIENCE"], "PASS")
++        self.document["scenarios"][0]["human_readability"] = "NOT_TESTED"
++        self.assertEqual(self.summary()["HUMAN_EXPERIENCE"], "NOT_TESTED")
++        self.document["scenarios"][0]["human_readability"] = "FAIL"
++        self.assertEqual(self.summary()["HUMAN_EXPERIENCE"], "FAIL")
++
++    def test_reference_existence_and_hash(self):
++        result = self.summary()
++        ref = result["scenarios"][0]["verified_references"][0]
++        self.assertEqual(ref["size"], len("SYNTHETIC SELF-TEST ONLY"))
++        self.assertEqual(len(ref["sha256"]), 64)
++        self.document["scenarios"][0]["evidence_reference"] = ["missing.log"]
++        self.reject("INVALID_REFERENCE_TARGET")
++
++    def test_reference_escape_and_input_output_rejected(self):
++        for reference in (str(self.source), str(self.output), "../outside.log"):
++            self.document["scenarios"][0]["evidence_reference"] = [reference]
++            self.reject("INVALID_REFERENCE_TARGET")
++
++    def test_pass_requires_evidence(self):
++        self.document["scenarios"][0]["evidence_reference"] = []
++        self.reject("MISSING_EVIDENCE")
++
++    def test_duplicate_json_key_rejected(self):
++        self.source.write_text('{"schema":1,"schema":1}', encoding="utf-8")
++        with contextlib.redirect_stdout(io.StringIO()) as output:
++            code = validator.main([str(self.source), str(self.output)])
++        self.assertEqual(code, 2)
++        self.assertIn("DUPLICATE_JSON_KEY", output.getvalue())
++
++    def test_invalid_input_preserves_existing_output(self):
++        self.output.write_text("KEEP", encoding="utf-8")
++        self.document["schema"] = 99;self.save()
++        with contextlib.redirect_stdout(io.StringIO()):
++            code = validator.main([str(self.source), str(self.output)])
++        self.assertEqual(code, 2)
++        self.assertEqual(self.output.read_text(), "KEEP")
++
++    def test_cli_partial_exit_and_input_preservation(self):
++        self.document["scenarios"] = [];self.save();before=self.source.read_bytes()
++        with contextlib.redirect_stdout(io.StringIO()):
++            code = validator.main([str(self.source), str(self.output)])
++        self.assertEqual(code, 1)
++        self.assertEqual(self.source.read_bytes(), before)
++        self.assertEqual(json.loads(self.output.read_text())["counts"]["NOT_TESTED"], 15)
++
++    def test_cli_same_file_rejected(self):
++        before = self.source.read_bytes()
++        with contextlib.redirect_stdout(io.StringIO()):
++            code = validator.main([str(self.source), str(self.source)])
++        self.assertEqual(code, 2)
++        self.assertEqual(self.source.read_bytes(), before)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/validation/test_v2_01_client_log_draft.py b/tools/validation/test_v2_01_client_log_draft.py
+new file mode 100644
+index 0000000..e6c84ba
+--- /dev/null
++++ b/tools/validation/test_v2_01_client_log_draft.py
+@@ -0,0 +1,98 @@
++"""Synthetic log ingestion tests. These tests do not execute Minecraft."""
++import contextlib
++import hashlib
++import io
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++import v2_01_client_evidence as validator
++import v2_01_client_log_draft as draft
++
++
++class LogDraftTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.log = self.root / "client.log"
++        self.output = self.root / "draft"
++        self.raw = (b"[12:00:00] [Render thread/INFO] [minecraft/SoundEngine]: Sound engine started\r\n"
++                    b"BUILD SUCCESSFUL\r\nAll scenarios PASS; human audio PASS\r\n")
++        self.log.write_bytes(self.raw)
++
++    def test_success_markers_and_claim_text_never_grant_acceptance(self):
++        review = draft.prepare(self.log, self.output)
++        self.assertFalse(review["inferred_acceptance"])
++        self.assertEqual(review["markers"]["gradle_success"]["count"], 1)
++        session = json.loads((self.output / "client-session.json").read_text())
++        summary = validator.summarize(session, self.output / "client-session.json", self.output / "summary.json")
++        self.assertEqual(summary["counts"], {"NOT_TESTED": 15})
++        self.assertEqual(summary["REAL_CLIENT"], "NOT_TESTED")
++        self.assertEqual(summary["HUMAN_EXPERIENCE"], "NOT_TESTED")
++
++    def test_source_copy_is_byte_exact_and_source_is_unchanged(self):
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual((self.output / "references/source.log").read_bytes(), self.raw)
++        self.assertEqual(self.log.read_bytes(), self.raw)
++        self.assertEqual(review["source_sha256"], hashlib.sha256(self.raw).hexdigest())
++
++    def test_target_jar_is_measured_but_never_attached_to_unexecuted_rows(self):
++        jar = self.root / "candidate.jar"
++        jar.write_bytes(b"SYNTHETIC JAR FIXTURE")
++        review = draft.prepare(self.log, self.output, "planned-profile", "a" * 40, jar)
++        self.assertEqual(review["target_build"]["jar_sha256"], hashlib.sha256(jar.read_bytes()).hexdigest())
++        session = json.loads((self.output / "client-session.json").read_text())
++        self.assertTrue(all(row["build_sha"] is None and row["jar_sha256"] is None for row in session["scenarios"]))
++
++    def test_existing_output_is_preserved(self):
++        self.output.mkdir()
++        sentinel = self.output / "keep.txt"
++        sentinel.write_text("KEEP")
++        with self.assertRaisesRegex(ValueError, "OUTPUT_ALREADY_EXISTS"):
++            draft.prepare(self.log, self.output)
++        self.assertEqual(sentinel.read_text(), "KEEP")
++        self.assertEqual(len(list(self.output.iterdir())), 1)
++
++    def test_missing_log_does_not_publish(self):
++        with self.assertRaises(OSError):
++            draft.prepare(self.root / "missing.log", self.output)
++        self.assertFalse(self.output.exists())
++
++    def test_target_pair_and_hash_are_validated_before_publication(self):
++        for build, jar in (("a" * 40, None), (None, self.log), ("bad", self.log)):
++            with self.subTest(build=build, jar=jar), self.assertRaises(ValueError):
++                draft.prepare(self.log, self.output, build_sha=build, jar=jar)
++            self.assertFalse(self.output.exists())
++
++    def test_server_log_does_not_prove_client_execution(self):
++        self.log.write_text("Preparing start region for dimension minecraft:overworld\nPlayer joined the game\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["source_kind"], "UNCLASSIFIED_LOG")
++        self.assertEqual(review["markers"]["player_join"]["count"], 1)
++        self.assertFalse(review["inferred_acceptance"])
++
++    def test_kernel_failure_is_only_a_log_marker(self):
++        self.log.write_text("failed to write kernel assets: os error 3\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["markers"]["error_or_kernel_failure"]["count"], 1)
++        session = json.loads((self.output / "client-session.json").read_text())
++        self.assertTrue(all(row["result"] == "NOT_TESTED" for row in session["scenarios"]))
++
++    def test_non_utf8_log_keeps_original_hash(self):
++        self.log.write_bytes(b"\xff\xfe\x00\r\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["source_sha256"], hashlib.sha256(self.log.read_bytes()).hexdigest())
++
++    def test_cli_reports_draft_success_and_repeat_failure(self):
++        with contextlib.redirect_stdout(io.StringIO()) as output:
++            first = draft.main([str(self.log), str(self.output)])
++            second = draft.main([str(self.log), str(self.output)])
++        self.assertEqual((first, second), (0, 2))
++        self.assertIn("REAL_CLIENT=NOT_TESTED", output.getvalue())
++        self.assertIn("OUTPUT_ALREADY_EXISTS", output.getvalue())
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/validation/v2-01-client-session-template.json b/tools/validation/v2-01-client-session-template.json
+new file mode 100644
+index 0000000..d5a7a67
+--- /dev/null
++++ b/tools/validation/v2-01-client-session-template.json
+@@ -0,0 +1,276 @@
++{
++  "schema": 1,
++  "evidence_mode": "SYNTHETIC",
++  "scenarios": [
++    {
++      "scenario": "new_world_boot",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: new_world_boot",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "opening_transition",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: opening_transition",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "yeoul_first_contact",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: yeoul_first_contact",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "return_network_normal_path",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: return_network_normal_path",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "returner_unobserved_completion",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: returner_unobserved_completion",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "returner_positive_observation",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: returner_positive_observation",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "observation_interrupted",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: observation_interrupted",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "occluded_returner",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: occluded_returner",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "warning_ignored_crisis",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: warning_ignored_crisis",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "recovery",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: recovery",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "station_revisit_observed",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: station_revisit_observed",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "station_revisit_unobserved",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: station_revisit_unobserved",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "yeoul_post_event_dialogue",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: yeoul_post_event_dialogue",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "yeoul_daily_route",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: yeoul_daily_route",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "survival_continuity",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: survival_continuity",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    }
++  ]
++}
+diff --git a/tools/validation/v2_01_client_evidence.py b/tools/validation/v2_01_client_evidence.py
+new file mode 100644
+index 0000000..b9d9535
+--- /dev/null
++++ b/tools/validation/v2_01_client_evidence.py
+@@ -0,0 +1,164 @@
++"""Validate reported client evidence. Never infer gameplay from automated tests."""
++from __future__ import annotations
++
++import argparse
++from collections import Counter
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import tempfile
++
++SCENARIOS = (
++    "new_world_boot", "opening_transition", "yeoul_first_contact",
++    "return_network_normal_path", "returner_unobserved_completion",
++    "returner_positive_observation", "observation_interrupted", "occluded_returner",
++    "warning_ignored_crisis", "recovery", "station_revisit_observed",
++    "station_revisit_unobserved", "yeoul_post_event_dialogue", "yeoul_daily_route",
++    "survival_continuity",
++)
++MUST = frozenset(SCENARIOS) - {
++    "returner_unobserved_completion", "occluded_returner", "yeoul_daily_route",
++}
++RESULTS = {"PASS", "FAIL", "BLOCKED", "NOT_TESTED"}
++HUMAN_FIELDS = ("human_readability", "fear_pacing", "audio_readability")
++TEXT_FIELDS = ("start_condition", "observed_behavior", "expected_behavior", "tester", "notes")
++
++
++class InvalidEvidence(ValueError):
++    pass
++
++
++def unique_object(pairs):
++    result = {}
++    for key, value in pairs:
++        if key in result:
++            raise InvalidEvidence(f"DUPLICATE_JSON_KEY: {key}")
++        result[key] = value
++    return result
++
++
++def _hash(value, length, label, required):
++    if not required and value in (None, ""):
++        return
++    if not isinstance(value, str) or not re.fullmatch(rf"[0-9a-fA-F]{{{length}}}", value):
++        raise InvalidEvidence(f"INVALID_HASH: {label}")
++
++
++def summarize(document, source: Path, destination: Path):
++    if not isinstance(document, dict) or type(document.get("schema")) is not int or document["schema"] != 1:
++        raise InvalidEvidence("UNSUPPORTED_EVIDENCE_SCHEMA")
++    mode = document.get("evidence_mode")
++    if mode not in ("REAL_CLIENT", "SYNTHETIC"):
++        raise InvalidEvidence("INVALID_EVIDENCE_MODE")
++    rows = document.get("scenarios")
++    if not isinstance(rows, list):
++        raise InvalidEvidence("SCENARIOS_MUST_BE_LIST")
++    source, destination = source.resolve(), destination.resolve()
++    if source == destination:
++        raise InvalidEvidence("OUTPUT_IS_INPUT")
++    root = source.parent
++    found, references = {}, set()
++    for row in rows:
++        if not isinstance(row, dict):
++            raise InvalidEvidence("SCENARIO_MUST_BE_OBJECT")
++        name, result = row.get("scenario"), row.get("result")
++        if not isinstance(name, str) or name not in SCENARIOS:
++            raise InvalidEvidence(f"UNKNOWN_SCENARIO: {name}")
++        if name in found:
++            raise InvalidEvidence(f"DUPLICATE_SCENARIO: {name}")
++        if not isinstance(result, str) or result not in RESULTS:
++            raise InvalidEvidence(f"INVALID_RESULT: {name}")
++        required = result != "NOT_TESTED"
++        for field in TEXT_FIELDS:
++            value = row.get(field)
++            if not isinstance(value, str) or (required and field != "notes" and not value.strip()):
++                raise InvalidEvidence(f"MISSING_METADATA: {name}.{field}")
++        identity = row.get("world_identity") or row.get("isolated_profile")
++        if required and (not isinstance(identity, str) or not identity.strip()):
++            raise InvalidEvidence(f"MISSING_WORLD_IDENTITY: {name}")
++        _hash(row.get("build_sha"), 40, name + ".build_sha", required)
++        _hash(row.get("jar_sha256"), 64, name + ".jar_sha256", required)
++        kind = row.get("tester_kind")
++        if kind not in ("HUMAN", "AUTOMATED", "NOT_RUN") or (required and kind == "NOT_RUN"):
++            raise InvalidEvidence(f"INVALID_TESTER_KIND: {name}")
++        human = {}
++        for field in HUMAN_FIELDS:
++            value = row.get(field, "NOT_TESTED")
++            if value not in ("PASS", "FAIL", "NOT_TESTED"):
++                raise InvalidEvidence(f"INVALID_HUMAN_RESULT: {name}.{field}")
++            if value != "NOT_TESTED" and (kind != "HUMAN" or mode != "REAL_CLIENT" or result == "NOT_TESTED"):
++                raise InvalidEvidence(f"HUMAN_RESULT_WITHOUT_HUMAN_RUN: {name}.{field}")
++            human[field] = value
++        refs = row.get("evidence_reference")
++        if not isinstance(refs, list) or (result == "PASS" and not refs):
++            raise InvalidEvidence(f"MISSING_EVIDENCE: {name}")
++        verified = []
++        for ref in refs:
++            if not isinstance(ref, str) or not ref.strip():
++                raise InvalidEvidence(f"INVALID_REFERENCE: {name}")
++            path = (root / ref).resolve()
++            if not path.is_relative_to(root) or path in (source, destination) or not path.is_file():
++                raise InvalidEvidence(f"INVALID_REFERENCE_TARGET: {name}")
++            references.add(path)
++            verified.append({"path": path.relative_to(root).as_posix(), "size": path.stat().st_size,
++                             "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
++        found[name] = dict(row, supplied=True, **human, verified_references=verified)
++    normalized = [found.get(name, {"scenario": name, "result": "NOT_TESTED", "supplied": False,
++                                 **dict.fromkeys(HUMAN_FIELDS, "NOT_TESTED")}) for name in SCENARIOS]
++    required_rows = [row for row in normalized if row["scenario"] in MUST]
++    for field in ("build_sha", "jar_sha256"):
++        builds = {row[field].lower() for row in found.values() if row["result"] != "NOT_TESTED"}
++        if len(builds) > 1:
++            raise InvalidEvidence(f"MIXED_BUILD_EVIDENCE: {field}")
++    gate = "FAIL" if any(row["result"] == "FAIL" for row in required_rows) else (
++        "PASS" if all(row["result"] == "PASS" for row in required_rows) else "PARTIAL")
++    executed = any(row["result"] != "NOT_TESTED" for row in found.values())
++    human = {}
++    for field in HUMAN_FIELDS:
++        values = [row[field] for row in required_rows]
++        human[field] = "FAIL" if "FAIL" in values else ("PASS" if all(v == "PASS" for v in values) else "NOT_TESTED")
++    return {
++        "schema": 1, "evidence_mode": mode, "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
++        "reported_evidence_gate": gate,
++        "V2_01_CLIENT_GATE": gate if mode == "REAL_CLIENT" else "PARTIAL",
++        "REAL_CLIENT": gate if mode == "REAL_CLIENT" and executed else "NOT_TESTED",
++        "HUMAN_EXPERIENCE": human["human_readability"], "human": human,
++        "counts": dict(Counter(row["result"] for row in normalized)),
++        "missing_scenarios": [name for name in SCENARIOS if name not in found],
++        "scenarios": normalized,
++        "claim_limit": "Checks reported evidence structure and file hashes. Does not independently prove gameplay.",
++    }
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("input", type=Path)
++    parser.add_argument("output", type=Path)
++    args = parser.parse_args(argv)
++    try:
++        raw = args.input.read_bytes()
++        document = json.loads(raw.decode("utf-8-sig"), object_pairs_hook=unique_object)
++        summary = summarize(document, args.input, args.output)
++        args.output.parent.mkdir(parents=True, exist_ok=True)
++        fd, temporary = tempfile.mkstemp(prefix=".client-summary-", dir=args.output.parent)
++        try:
++            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as stream:
++                json.dump(summary, stream, indent=2, ensure_ascii=False)
++                stream.write("\n")
++                stream.flush()
++                os.fsync(stream.fileno())
++            os.replace(temporary, args.output)
++        finally:
++            if os.path.exists(temporary):
++                os.unlink(temporary)
++        print(f"V2_01_CLIENT_GATE={summary['V2_01_CLIENT_GATE']} HUMAN_EXPERIENCE={summary['HUMAN_EXPERIENCE']}")
++        return 0 if summary["V2_01_CLIENT_GATE"] == "PASS" else 1
++    except (OSError, ValueError, TypeError) as error:
++        print(f"INVALID_EVIDENCE: {error}")
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/validation/v2_01_client_log_draft.py b/tools/validation/v2_01_client_log_draft.py
+new file mode 100644
+index 0000000..799ba91
+--- /dev/null
++++ b/tools/validation/v2_01_client_log_draft.py
+@@ -0,0 +1,107 @@
++"""Prepare an untested client evidence draft from one explicitly selected log."""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import shutil
++import tempfile
++
++from v2_01_client_evidence import HUMAN_FIELDS, SCENARIOS
++
++
++MARKERS = {
++    "render_thread": r"\[Render thread/",
++    "sound_engine_started": r"Sound engine started",
++    "world_preparation": r"Preparing start region for dimension",
++    "player_join": r"joined the game",
++    "normal_stop": r"\[minecraft/Minecraft\]: Stopping!",
++    "gradle_success": r"BUILD SUCCESSFUL",
++    "error_or_kernel_failure": r"\[[^\]]*/ERROR\]|failed to write kernel assets|Traceback \(most recent call last\)",
++}
++
++
++def digest(raw):
++    return hashlib.sha256(raw).hexdigest()
++
++
++def prepare(log: Path, output: Path, profile="", build_sha=None, jar: Path | None = None):
++    """Publish a new directory. Never infer acceptance or overwrite an old session."""
++    log, output = log.resolve(), output.resolve()
++    if output.exists():
++        raise ValueError("OUTPUT_ALREADY_EXISTS")
++    if bool(build_sha) != bool(jar):
++        raise ValueError("TARGET_REQUIRES_BUILD_AND_JAR")
++    if build_sha is not None and not re.fullmatch(r"[0-9a-fA-F]{40}", build_sha):
++        raise ValueError("INVALID_TARGET_BUILD_SHA")
++    raw = log.read_bytes()
++    text = raw.decode("utf-8-sig", errors="replace")
++    lines = text.splitlines()
++    target = None
++    if jar is not None:
++        jar_bytes = jar.read_bytes()
++        target = {"build_sha": build_sha.lower(), "jar_sha256": digest(jar_bytes),
++                  "jar_size": len(jar_bytes), "jar_filename": jar.name,
++                  "binding": "USER_DECLARED_TARGET_NOT_EXECUTION_PROOF"}
++    markers = {}
++    for name, pattern in MARKERS.items():
++        matches = [i for i, line in enumerate(lines, 1) if re.search(pattern, line)]
++        markers[name] = {"count": len(matches), "first_line_numbers": matches[:12]}
++    review = {"schema": 1, "source_filename": log.name, "source_sha256": digest(raw),
++              "source_size": len(raw), "line_count": len(lines), "markers": markers,
++              "source_kind": "UNCLASSIFIED_LOG", "inferred_acceptance": False,
++              "target_build": target,
++              "claim_limit": "Log markers do not prove client scenarios, human ratings, or the executed build."}
++    rows = [{"scenario": name, "result": "NOT_TESTED", "build_sha": None, "jar_sha256": None,
++             "isolated_profile": profile, "world_identity": "", "start_condition": "",
++             "observed_behavior": "",
++             "expected_behavior": f"See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: {name}",
++             "evidence_reference": [], "tester": "", "tester_kind": "NOT_RUN", "notes": "",
++             **dict.fromkeys(HUMAN_FIELDS, "NOT_TESTED")} for name in SCENARIOS]
++    session = {"schema": 1, "evidence_mode": "REAL_CLIENT", "log_review": "log-review.json",
++               "candidate_log": "references/source.log", "target_build": target, "scenarios": rows}
++    output.parent.mkdir(parents=True, exist_ok=True)
++    stage = Path(tempfile.mkdtemp(prefix=".v2-client-draft-", dir=output.parent))
++    try:
++        (stage / "references").mkdir()
++        (stage / "references/source.log").write_bytes(raw)
++        for name, content in (("log-review.json", review), ("client-session.json", session)):
++            with (stage / name).open("w", encoding="utf-8", newline="\n") as stream:
++                json.dump(content, stream, indent=2, ensure_ascii=False)
++                stream.write("\n")
++                stream.flush()
++                os.fsync(stream.fileno())
++        if digest((stage / "references/source.log").read_bytes()) != review["source_sha256"]:
++            raise ValueError("LOG_COPY_HASH_MISMATCH")
++        # Check again before publication. os.rename also rejects occupied directories.
++        if output.exists():
++            raise ValueError("OUTPUT_ALREADY_EXISTS")
++        os.rename(stage, output)
++    finally:
++        if stage.exists():
++            shutil.rmtree(stage)
++    return review
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("log", type=Path)
++    parser.add_argument("output_directory", type=Path)
++    parser.add_argument("--profile", default="")
++    parser.add_argument("--target-build-sha")
++    parser.add_argument("--target-jar", type=Path)
++    args = parser.parse_args(argv)
++    try:
++        prepare(args.log, args.output_directory, args.profile, args.target_build_sha, args.target_jar)
++        print("DRAFT_CREATED scenarios=15_NOT_TESTED REAL_CLIENT=NOT_TESTED")
++        return 0
++    except (OSError, ValueError) as error:
++        print(f"DRAFT_ERROR: {error}")
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

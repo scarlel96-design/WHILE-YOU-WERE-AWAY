@@ -1,0 +1,36 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+
+> Task :compileJava
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\client\LivingTownPreview.java:41: error: method createFreshLevel in class WorldOpenFlows cannot be applied to given types;
+                mc.createWorldOpenFlows().createFreshLevel("living-preview-"+System.currentTimeMillis(),
+                                         ^
+  required: String,LevelSettings,WorldOptions,Function<RegistryAccess,WorldDimensions>,Screen
+  found:    String,LevelSettings,WorldOptions,WorldPrese[...]sions
+  reason: actual and formal argument lists differ in length
+1 error
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\client\LivingTownPreview.java:41: error: method createFreshLevel in class WorldOpenFlows cannot be applied to given types;
+                  mc.createWorldOpenFlows().createFreshLevel("living-preview-"+System.currentTimeMillis(),
+                                           ^
+    required: String,LevelSettings,WorldOptions,Function<RegistryAccess,WorldDimensions>,Screen
+    found:    String,LevelSettings,WorldOptions,WorldPrese[...]sions
+    reason: actual and formal argument lists differ in length
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 30s
+2 actionable tasks: 1 executed, 1 up-to-date

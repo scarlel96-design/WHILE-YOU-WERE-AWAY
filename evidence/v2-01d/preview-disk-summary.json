@@ -1,0 +1,33 @@
+{
+  "classification": "SCRIPTED_REAL_CLIENT_DISK_READBACK",
+  "save_format": 5,
+  "actor_schema": 1,
+  "actor_records": 1,
+  "story_id": "npc:yeoul",
+  "entity_uuid": "42c597b5-7a6e-4a26-8e82-767cfc17f439",
+  "instance": "53a42547-6fa9-4645-90ea-9f840890d886",
+  "generation": 0,
+  "checkpoint": 4,
+  "facts": [
+    "npc.arrived",
+    "npc.dialogue=introduction",
+    "npc.goal=choose_evening_routine",
+    "npc.home=10445360758849",
+    "npc.link=return_light_shared",
+    "npc.met=380df991-f603-344c-a090-369bad2a924a",
+    "npc.observed=return_light",
+    "npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/first_conversation",
+    "npc.relationship=player:380df991-f603-344c-a090-369bad2a924a/shared_return_light",
+    "npc.schema=1",
+    "npc.settled",
+    "npc.work=maintain_return_light"
+  ],
+  "position": [
+    60.40392055431457,
+    65.0,
+    48.949656962437935
+  ],
+  "story_sha256": "22a714c34a43dd114069868eff99c2e181a0524824fc608613cf1cbaf8b264b0",
+  "world": "living-preview-1793545403480",
+  "reopen_test": "NOT TESTED"
+}

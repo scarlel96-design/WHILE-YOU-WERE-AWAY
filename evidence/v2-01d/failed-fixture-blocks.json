@@ -1,0 +1,23 @@
+{
+  "38,64,72": {
+    "Name": "minecraft:dark_oak_planks"
+  },
+  "38,65,72": {
+    "Name": "minecraft:air"
+  },
+  "38,66,72": {
+    "Name": "minecraft:air"
+  },
+  "42,64,68": {
+    "Name": "minecraft:gray_concrete"
+  },
+  "42,65,68": {
+    "Name": "minecraft:air"
+  },
+  "42,66,68": {
+    "Name": "minecraft:air"
+  },
+  "40,65,72": {
+    "Name": "whileaway:return_light"
+  }
+}

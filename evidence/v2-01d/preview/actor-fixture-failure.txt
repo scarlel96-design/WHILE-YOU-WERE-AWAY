@@ -1,0 +1,3 @@
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=24408
+FIXTURE opening completed through existing commit API; not acceptance evidence
+FAIL java.lang.IllegalStateException: Yeoul record absent

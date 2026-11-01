@@ -1,0 +1,63 @@
+VERIFICATION — V2-01D / V2-02
+BRANCH=work/v2-playable-core
+BASELINE=062797f54ee63a65b2cc79870a619d1eeea0daa1
+IMPLEMENTATION=f2a979470443f001d80e3722fcabd051db63a950
+CHANGED_FIELD=CityDistrict.version new-construction default 2 -> 3; legacy 1/2 preserved. Story format=5 unchanged.
+MODIFIED_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-01d\whileaway-0.3.1-v2-01d-living-town.jar
+DIFF_FILE=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-01d\DIFF.patch
+VERIFICATION=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-01d\VERIFICATION.txt
+ROLLBACK=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-01d\ROLLBACK.sh
+
+BASELINE
+COMMAND=python dist/v2-01d/package-check.py evidence/v2-01d/BASELINE.jar
+INPUT=preserved baseline JAR
+LITERAL OUTPUT:
+VALID_JAR living_content=False
+SHA256=8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+EXIT=0
+
+MODIFIED
+COMMAND=python dist/v2-01d/package-check.py dist/v2-01d/whileaway-0.3.1-v2-01d-living-town.jar
+INPUT=final built candidate JAR
+LITERAL OUTPUT:
+VALID_JAR living_content=True
+SHA256=3c92f0fb7cf1d7981d3bef1b6cc14787c6eff408d8166cdf87a694c8f6050460
+EXIT=0
+COMMAND=.\gradlew.bat --offline --no-daemon runGameTestServer coreTest build --console=plain
+INPUT=implementation f2a979470443f001d80e3722fcabd051db63a950, GRADLE_USER_HOME=../gradle-home
+LITERAL RESULT LINES:
+All 119 required tests passed :)
+PASS core assertions=176858
+BUILD SUCCESSFUL in 1m 26s
+EXIT=0
+
+ROLLBACK
+COMMAND=& 'C:\Program Files\Git\bin\bash.exe' --noprofile --norc dist/v2-01d/ROLLBACK.sh evidence/v2-01d/rollback-check/rollback.jar
+INPUT=separate copy of modified JAR; BASELINE.jar remains preserved
+LITERAL OUTPUT:
+ROLLBACK_PACKAGE_RESTORED sha256=8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+EXIT=0
+COMMAND=python dist/v2-01d/package-check.py evidence/v2-01d/rollback-check/rollback.jar
+INPUT=restored package copy
+LITERAL OUTPUT:
+VALID_JAR living_content=False
+SHA256=8cd59926e20cfa32ffe4861546fe36d7285ac8306b8b9a5ff3161127132cffd7
+EXIT=0
+RESTORED STATUS=baseline package bytes and class inventory restored. living_content=False.
+The package probe is not a rollback gameplay test. No world was opened or downgraded.
+MODIFIED_FILE remains changed with SHA256=3c92f0fb7cf1d7981d3bef1b6cc14787c6eff408d8166cdf87a694c8f6050460.
+
+OTHER VALIDATION
+Primary baseline launch: .\gradlew.bat --offline --no-daemon --init-script tools/ci/v2-playable-manual.init.gradle runV2PlayableManual --console=plain
+Input: fresh isolated survival world; output: BUILD SUCCESSFUL in 10m 7s; exit=0.
+Observed: first Opening corridor, movement, Save and Quit. Full progression NOT TESTED.
+Content preview: same init script, runV2TownPreview; output: BUILD SUCCESSFUL in 2m 31s; exit=0.
+Required marker: PASS SCRIPTED_REAL_CLIENT living spaces, actual NPC rest/home/work route, same identity, circuit; NOT HUMAN PLAYTEST
+Runtime/JAR: RUNTIME_TO_JAR_CLASS_IDENTITY_PASS count=157.
+Evidence tools: python -m unittest discover -s tools/validation -p 'test_v2_01_client*.py' -v
+Result: Ran 31 tests in 1.945s; OK; exit=0.
+Strict evidence: python tools/validation/v2_01_client_evidence.py evidence/v2-01d/client-session.json evidence/v2-01d/client-summary.json
+Output: V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED; exit=1 expected.
+Client launches: primary 1; content fixture 3 (2 fixture failures, 1 PASS). One compile failure did not launch Minecraft.
+Sound: muted. Human/audio readability NOT TESTED.
+See REPORT.md for scope, source changes, failure history, compatibility, and next gates.

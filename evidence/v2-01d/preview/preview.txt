@@ -1,0 +1,7 @@
+PASS monitor DISPLAY1 right-secondary actual=2680,120 size=854x480; all sound categories=0; pid=66576
+FIXTURE opening completed through existing commit API; not acceptance evidence
+PASS resident settled; residential floor trace and workbench exist
+PASS actual navigation to rest place
+PASS actual navigation home
+PASS actual navigation workshop UUID=42c597b5-7a6e-4a26-8e82-767cfc17f439 instance=53a42547-6fa9-4645-90ea-9f840890d886 generation=0 checkpoint=4
+PASS SCRIPTED_REAL_CLIENT living spaces, actual NPC rest/home/work route, same identity, circuit; NOT HUMAN PLAYTEST
