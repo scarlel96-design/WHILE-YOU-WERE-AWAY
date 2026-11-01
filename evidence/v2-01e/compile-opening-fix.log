@@ -1,0 +1,15 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+
+> Task :compileJava
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\OpeningGameTests.java:23: warning: [removal] makeMockServerPlayerInLevel() in GameTestHelper has been deprecated and marked for removal
+        var player=h.makeMockServerPlayerInLevel();
+                    ^
+1 warning
+
+[Incubating] Problems report is available at: file:///C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 47s
+2 actionable tasks: 1 executed, 1 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.2.1/userguide/configuration_cache_enabling.html

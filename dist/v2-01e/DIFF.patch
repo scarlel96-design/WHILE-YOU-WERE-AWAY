@@ -1,0 +1,274 @@
+diff --git a/src/main/java/io/github/whileaway/OpeningEvents.java b/src/main/java/io/github/whileaway/OpeningEvents.java
+index 535c8f0..8e0a23f 100644
+--- a/src/main/java/io/github/whileaway/OpeningEvents.java
++++ b/src/main/java/io/github/whileaway/OpeningEvents.java
+@@ -152,10 +152,14 @@ public final class OpeningEvents {
+         for(int x=3;x<=10;x++)level.setBlock(new BlockPos(x,WALK_Y,-1),Blocks.RAIL.defaultBlockState(),2);
+         for(int z=-2;z<=2;z++)for(int y=WALK_Y;y<=WALK_Y+2;y++)
+             level.setBlock(new BlockPos(16,y,z),Blocks.IRON_BARS.defaultBlockState(),2);
+-        level.setBlock(new BlockPos(11,WALK_Y,2),Blocks.REDSTONE_LAMP.defaultBlockState(),2);
+-        level.setBlock(LEVER,Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACE,AttachFace.FLOOR)
+-            .setValue(LeverBlock.FACING,Direction.NORTH),2);
++        placeSignal(level,LEVER);
+         level.setBlock(new BlockPos(28,WALK_Y,2),Blocks.OAK_SIGN.defaultBlockState(),2);
+         level.setBlock(MARKER,Blocks.CHISELED_DEEPSLATE.defaultBlockState(),2);
+     }
++
++    static void placeSignal(ServerLevel level,BlockPos lever) {
++        level.setBlock(lever.south(),Blocks.REDSTONE_LAMP.defaultBlockState(),2);
++        level.setBlock(lever,Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACE,AttachFace.FLOOR)
++            .setValue(LeverBlock.FACING,Direction.NORTH),2);
++    }
+ }
+diff --git a/src/main/java/io/github/whileaway/OpeningGameTests.java b/src/main/java/io/github/whileaway/OpeningGameTests.java
+index ea36600..175af23 100644
+--- a/src/main/java/io/github/whileaway/OpeningGameTests.java
++++ b/src/main/java/io/github/whileaway/OpeningGameTests.java
+@@ -16,6 +16,21 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+ @GameTestHolder(WhileAway.ID)
+ @PrefixGameTestTemplate(false)
+ public final class OpeningGameTests {
++    @GameTest(template="empty") public static void openingSignalRespondsToActualLeverUse(GameTestHelper h) {
++        var lever=h.absolutePos(new BlockPos(2,2,2));
++        h.getLevel().setBlock(lever.below(),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
++        OpeningEvents.placeSignal(h.getLevel(),lever);
++        var player=h.makeMockServerPlayerInLevel();
++        h.getLevel().getBlockState(lever).useWithoutItem(h.getLevel(),player,
++            new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(lever),
++                net.minecraft.core.Direction.UP,lever,false));
++        h.runAfterDelay(4,()->{
++            h.assertTrue(h.getLevel().getBlockState(lever.south()).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT),
++                "the authored Opening signal must visibly respond to its real lever");
++            player.discard();h.succeed();
++        });
++    }
++
+     private static Path file() throws Exception {
+         var root=Path.of(System.getProperty("whileaway.testEvidence"),"opening");
+         Files.createDirectories(root);
+diff --git a/tools/ci/v2-01e.init.gradle b/tools/ci/v2-01e.init.gradle
+new file mode 100644
+index 0000000..666054c
+--- /dev/null
++++ b/tools/ci/v2-01e.init.gradle
+@@ -0,0 +1,27 @@
++gradle.afterProject { p,state ->
++    if(p!=rootProject||!p.plugins.hasPlugin('net.neoforged.moddev'))return
++    def input=p.sourceSets.create('playInput') {
++        java.srcDir(p.file('tools/validation/play-input/java'))
++        resources.srcDir(p.file('tools/validation/play-input/resources'))
++        compileClasspath=p.sourceSets.main.compileClasspath
++        runtimeClasspath=output+compileClasspath
++    }
++    p.neoForge.mods.create('wwa_play_input') { sourceSet(input) }
++    p.neoForge.runs.create('v2E') {
++        client()
++        gameDirectory=p.file('../../work/v2-01e-development-client')
++        systemProperty 'whileaway.inputAssist','true'
++    }
++    p.tasks.named('runV2E').configure {
++        dependsOn(p.tasks.named('playInputClasses'))
++        doFirst {
++            def monitor=new groovy.json.JsonSlurper().parse(p.file('evidence/v2-01d/monitor.json'))
++            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
++            def profile=p.file('../../work/v2-01e-development-client');profile.mkdirs()
++            def options=['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:true','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700']
++            ['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].each { options.add("soundCategory_${it}:0.0") }
++            new File(profile,'options.txt').setText(options.join('\n')+'\n','UTF-8')
++            logger.lifecycle('V2_01E_MUTED_ISOLATED_INPUT; input assist excluded from the production JAR')
++        }
++    }
++}
+diff --git a/tools/validation/play-input/java/wwa/input/InputAssist.java b/tools/validation/play-input/java/wwa/input/InputAssist.java
+new file mode 100644
+index 0000000..717a186
+--- /dev/null
++++ b/tools/validation/play-input/java/wwa/input/InputAssist.java
+@@ -0,0 +1,77 @@
++package wwa.input;
++
++import com.google.gson.*;
++import java.nio.file.*;
++import java.util.*;
++import net.minecraft.client.KeyMapping;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.Screenshot;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.fml.common.Mod;
++import net.neoforged.neoforge.common.NeoForge;
++import net.neoforged.neoforge.client.event.ClientTickEvent;
++
++/** Isolated input leases. This module has no campaign or server-state API. */
++@Mod(value="wwa_play_input",dist=Dist.CLIENT)
++public final class InputAssist {
++    private final Set<String> seen=new HashSet<>();
++    private Set<String> held=Set.of();
++    private String dimension="",id="";
++    private int remaining;
++    private long deadline;
++    private final ArrayDeque<JsonObject> pending=new ArrayDeque<>();
++    public InputAssist(){NeoForge.EVENT_BUS.addListener(this::tick);}
++    private Map<String,KeyMapping> keys(Minecraft m){return Map.of(
++        "forward",m.options.keyUp,"back",m.options.keyDown,"left",m.options.keyLeft,"right",m.options.keyRight,
++        "jump",m.options.keyJump,"sprint",m.options.keySprint,"sneak",m.options.keyShift,
++        "attack",m.options.keyAttack,"use",m.options.keyUse);}
++    private void release(Minecraft m){keys(m).values().forEach(k->k.setDown(false));held=Set.of();remaining=0;}
++    private void log(Path dir,String text)throws Exception{Files.writeString(dir.resolve("receipts.log"),text+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}
++    private void snapshot(Minecraft m,Path dir,String name){Screenshot.grab(dir.toFile(),name+".png",m.getMainRenderTarget(),c->{});}
++    private void tick(ClientTickEvent.Pre event){
++        if(!Boolean.getBoolean("whileaway.inputAssist"))return;
++        var m=Minecraft.getInstance();var dir=m.gameDirectory.toPath().resolve("input-assist");
++        try{
++            Files.createDirectories(dir);
++            String current=m.level==null?"":m.level.dimension().location().toString();
++            boolean available=m.player!=null&&m.player.isAlive()&&m.screen==null&&m.isWindowActive();
++            if(!available||!current.equals(dimension)){
++                release(m);pending.clear();dimension=current;
++            }
++            Path command=dir.resolve("command.json");
++            if(Files.exists(command)){
++                var request=JsonParser.parseString(Files.readString(command)).getAsJsonObject();
++                Files.delete(command);
++                String next=request.get("id").getAsString();
++                if(!next.matches("[a-zA-Z0-9_-]{1,60}"))throw new IllegalArgumentException("invalid id");
++                if(seen.add(next)){
++                    id=next;log(dir,"ACCEPT "+id+" screen="+(m.screen==null?"GAME":m.screen.getClass().getSimpleName()));
++                    if(request.has("screenshot"))snapshot(m,dir,id);
++                    if(request.has("release")){release(m);pending.clear();}
++                    if(available){
++                        if(request.has("turnX"))m.player.turn(Math.clamp(request.get("turnX").getAsDouble(),-600,600),Math.clamp(request.get("turnY").getAsDouble(),-600,600));
++                        if(request.has("actions")){
++                            var actions=request.getAsJsonArray("actions");
++                            if(actions.size()>2)throw new IllegalArgumentException("maximum two short leases");
++                            pending.clear();for(var a:actions)pending.add(a.getAsJsonObject());
++                        }
++                    }
++                }
++            }
++            if(!available)return;
++            if(remaining<=0||System.nanoTime()>deadline){
++                if(!pending.isEmpty()){
++                    var a=pending.removeFirst();Set<String> next=new HashSet<>();
++                    for(var k:a.getAsJsonArray("keys")){String key=k.getAsString();if(!keys(m).containsKey(key))throw new IllegalArgumentException("unsupported key");next.add(key);}
++                    for(var k:keys(m).entrySet())k.getValue().setDown(next.contains(k.getKey()));
++                    for(var key:next)if(!held.contains(key))KeyMapping.click(keys(m).get(key).getKey());
++                    held=Set.copyOf(next);remaining=Math.clamp(a.get("ticks").getAsInt(),1,40);deadline=System.nanoTime()+3_000_000_000L;
++                    log(dir,"LEASE "+id+" keys="+held+" ticks="+remaining);
++                }else if(!held.isEmpty()){
++                    release(m);snapshot(m,dir,id+"-end");log(dir,"RELEASE "+id);
++                }
++            }
++            if(remaining>0)remaining--;
++        }catch(Exception ex){release(m);pending.clear();try{log(dir,"ERROR "+ex);}catch(Exception ignored){}}
++    }
++}
+diff --git a/tools/validation/play-input/resources/META-INF/neoforge.mods.toml b/tools/validation/play-input/resources/META-INF/neoforge.mods.toml
+new file mode 100644
+index 0000000..c9170fc
+--- /dev/null
++++ b/tools/validation/play-input/resources/META-INF/neoforge.mods.toml
+@@ -0,0 +1,7 @@
++modLoader="javafml"
++loaderVersion="[4,)"
++license="All Rights Reserved"
++[[mods]]
++modId="wwa_play_input"
++version="0.1"
++displayName="WhileAway isolated input assistance"
+diff --git a/tools/validation/prepare-v2-installed.py b/tools/validation/prepare-v2-installed.py
+new file mode 100644
+index 0000000..9176228
+--- /dev/null
++++ b/tools/validation/prepare-v2-installed.py
+@@ -0,0 +1,91 @@
++"""Prepare one pinned production client. Do not read launcher accounts or user worlds."""
++import argparse,hashlib,json,os,re,shutil,urllib.request,zipfile
++from pathlib import Path
++
++repo=Path(__file__).resolve().parents[2]
++parser=argparse.ArgumentParser(description=__doc__)
++parser.add_argument('--jar',type=Path,default=repo/'evidence/v2-01e/BASELINE.jar')
++parser.add_argument('--sha256',default='3c92f0fb7cf1d7981d3bef1b6cc14787c6eff408d8166cdf87a694c8f6050460')
++parser.add_argument('--label',default='installed')
++options_cli=parser.parse_args()
++assert re.fullmatch(r'[A-Za-z0-9_-]+',options_cli.label),'Invalid evidence label'
++candidate=options_cli.jar.resolve()
++assert hashlib.sha256(candidate.read_bytes()).hexdigest()==options_cli.sha256,'Candidate hash mismatch'
++runtime=repo.parent/'v2-01e-installed-runtime'/'minecraft'
++profile=repo.parent/'v2-01e-installed-client'
++official=Path(os.environ['APPDATA'])/'.minecraft'
++version='neoforge-21.1.249'
++child=json.loads((runtime/'versions'/version/(version+'.json')).read_text(encoding='utf-8-sig'))
++base=json.loads((official/'versions/1.21.1/1.21.1.json').read_text(encoding='utf-8-sig'))
++libraries=runtime/'libraries';natives=profile/'natives';natives.mkdir(parents=True,exist_ok=True)
++def allowed(item):
++    result=not item.get('rules')
++    for rule in item.get('rules',[]):
++        system=rule.get('os',{})
++        if system.get('name','windows')!='windows':continue
++        if system.get('arch') and not re.fullmatch(system['arch'],'amd64'):continue
++        if system.get('version') and not re.search(system['version'],'10.0'):continue
++        if any(rule.get('features',{}).values()):continue
++        result=rule['action']=='allow'
++    return result
++merged={}
++for lib in base['libraries']+child['libraries']:
++    parts=lib['name'].split(':');merged[':'.join(parts[:2]+parts[3:])]=lib
++paths=[]
++for lib in merged.values():
++    if not allowed(lib):continue
++    item=lib.get('downloads',{}).get('artifact')
++    if item is None:raise RuntimeError('Missing artifact metadata: '+lib['name'])
++    dest=libraries/item['path'];dest.parent.mkdir(parents=True,exist_ok=True)
++    if not dest.exists():
++        cached=official/'libraries'/item['path']
++        if cached.exists():shutil.copyfile(cached,dest)
++        else:urllib.request.urlretrieve(item['url'],dest)
++    if item.get('sha1'):assert hashlib.sha1(dest.read_bytes()).hexdigest()==item['sha1'],dest
++    paths.append(str(dest.resolve()))
++    if 'natives-windows' in lib['name']:
++        with zipfile.ZipFile(dest) as z:
++            for name in z.namelist():
++                if name.endswith('.dll'):(natives/Path(name).name).write_bytes(z.read(name))
++gamejar=runtime/'versions'/version/(version+'.jar')
++shutil.copyfile(official/'versions/1.21.1/1.21.1.jar',gamejar)
++assert hashlib.sha1(gamejar.read_bytes()).hexdigest()==base['downloads']['client']['sha1']
++paths.append(str(gamejar.resolve()))
++mods=profile/'mods';mods.mkdir(parents=True,exist_ok=True)
++shutil.copyfile(candidate,mods/'whileaway.jar')
++cache=repo.parent/'gradle-home/caches/modules-2/files-2.1/software.bernie.geckolib/geckolib-neoforge-1.21.1/4.9.2'
++gecko=next(p for p in cache.rglob('*.jar') if '-sources' not in p.name)
++shutil.copyfile(gecko,mods/gecko.name)
++assert {p.name for p in mods.glob('*.jar')}=={'whileaway.jar',gecko.name},'Unexpected isolated-profile mods'
++assets=repo.parent/'gradle-home/caches/neoformruntime/assets'
++values={'auth_player_name':'Dev','version_name':version,'game_directory':str(profile),'assets_root':str(assets),
++        'assets_index_name':base['assetIndex']['id'],'auth_uuid':'380df991f603344ca090369bad2a924a',
++        'auth_access_token':'0','clientid':'0','auth_xuid':'0','user_type':'legacy','version_type':'release',
++        'natives_directory':str(natives),'launcher_name':'V2-01E isolated production smoke','launcher_version':'1',
++        'classpath':os.pathsep.join(paths),'classpath_separator':os.pathsep,'library_directory':str(libraries)}
++def expand(text):
++    for key,value in values.items():text=text.replace('${'+key+'}',value)
++    if '${' in text:raise RuntimeError('Unresolved launch argument')
++    return text
++def arguments(items):
++    result=[]
++    for item in items:
++        if isinstance(item,str):result.append(expand(item))
++        elif allowed(item):
++            value=item['value'];result.extend(expand(x) for x in (value if isinstance(value,list) else [value]))
++    return result
++args=['-Xmx3G','--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',
++      '-javaagent:'+str(repo/'build/monitor-agent.jar')+'=2680,120']
++args+=arguments(base['arguments']['jvm'])+arguments(child['arguments']['jvm'])
++args+=[child['mainClass']]+arguments(base['arguments']['game'])+arguments(child['arguments']['game'])
++args+=['--width','854','--height','480']
++profile.mkdir(exist_ok=True)
++(profile/'launch.args').write_text('\n'.join('"'+x.replace('\\','\\\\').replace('"','\\"')+'"' for x in args)+'\n',encoding='utf-8')
++options=['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:true','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false']
++options+=['soundCategory_'+c+':0.0' for c in ['master','music','record','weather','block','hostile','neutral','player','ambient','voice']]
++(profile/'options.txt').write_text('\n'.join(options)+'\n',encoding='utf-8')
++summary={'launch_target':'forgeclient','development_classpath':False,'input_helper':False,'version':version,
++         'jar_sha256':hashlib.sha256(candidate.read_bytes()).hexdigest(),'mods':[p.name for p in mods.glob('*.jar')],
++         'profile':str(profile),'libraries':len(paths),'assets':str(assets),'status':'PREPARED_NOT_LAUNCHED'}
++(repo/('evidence/v2-01e/'+options_cli.label+'-preparation.json')).write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
++print('PINNED_PRODUCTION_CLIENT_PREPARED libraries='+str(len(paths))+'; NOT LAUNCHED')

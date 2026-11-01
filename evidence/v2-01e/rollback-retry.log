@@ -1,0 +1,6 @@
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-01e\ROLLBACK.ps1 : The term 
+'Get-FileHash' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spellin
+g of the name, or if a path was included, verify that the path is correct and try again.
+    + CategoryInfo          : ObjectNotFound: (Get-FileHash:String) [ROLLBACK.ps1], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException,ROLLBACK.ps1
+ 

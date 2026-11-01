@@ -1,0 +1,11 @@
+{
+  "source_commit": "9b0881a866a1bf85bdcc94da296a86cdff4e2818",
+  "jar_sha256": "5adb5f964d42e1e9355a79fc491db8c32340de5e9a172748a26c8d926c7bcc4a",
+  "compared_entries": 235,
+  "changed_from_baseline": [
+    "io/github/whileaway/OpeningEvents.class",
+    "io/github/whileaway/OpeningGameTests.class"
+  ],
+  "runtime_package_mismatches": [],
+  "input_assist_in_jar": false
+}

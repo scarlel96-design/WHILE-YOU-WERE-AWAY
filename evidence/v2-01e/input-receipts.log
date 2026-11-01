@@ -1,0 +1,172 @@
+ACCEPT opening-walk-1 screen=GAME
+LEASE opening-walk-1 keys=[forward] ticks=40
+RELEASE opening-walk-1
+ACCEPT opening-look-lever screen=GAME
+LEASE opening-look-lever keys=[sneak] ticks=1
+RELEASE opening-look-lever
+ACCEPT opening-use-lever screen=GAME
+LEASE opening-use-lever keys=[use] ticks=2
+RELEASE opening-use-lever
+ACCEPT opening-aim-lever screen=GAME
+LEASE opening-aim-lever keys=[sneak] ticks=1
+RELEASE opening-aim-lever
+ACCEPT opening-lever-press screen=GAME
+LEASE opening-lever-press keys=[use] ticks=2
+RELEASE opening-lever-press
+ACCEPT opening-forward-after-lever screen=GAME
+LEASE opening-forward-after-lever keys=[forward] ticks=40
+LEASE opening-forward-after-lever keys=[forward] ticks=40
+RELEASE opening-forward-after-lever
+ACCEPT opening-final-walk screen=GAME
+LEASE opening-final-walk keys=[forward] ticks=40
+ACCEPT survival-first-log screen=GAME
+LEASE survival-first-log keys=[attack] ticks=40
+LEASE survival-first-log keys=[attack] ticks=40
+RELEASE survival-first-log
+ACCEPT survival-approach-log screen=GAME
+LEASE survival-approach-log keys=[forward] ticks=8
+RELEASE survival-approach-log
+ACCEPT survival-second-log screen=GAME
+LEASE survival-second-log keys=[attack] ticks=40
+LEASE survival-second-log keys=[attack] ticks=40
+RELEASE survival-second-log
+ACCEPT survival-collect-and-look screen=GAME
+LEASE survival-collect-and-look keys=[forward, jump] ticks=8
+RELEASE survival-collect-and-look
+ACCEPT survival-upper-log screen=GAME
+LEASE survival-upper-log keys=[attack] ticks=40
+LEASE survival-upper-log keys=[attack] ticks=40
+RELEASE survival-upper-log
+ACCEPT survival-look-upper-next screen=GAME
+LEASE survival-look-upper-next keys=[sneak] ticks=1
+RELEASE survival-look-upper-next
+ACCEPT survival-third-log screen=GAME
+LEASE survival-third-log keys=[attack] ticks=40
+LEASE survival-third-log keys=[attack] ticks=40
+RELEASE survival-third-log
+ACCEPT survival-aim-ground screen=GAME
+LEASE survival-aim-ground keys=[sneak] ticks=1
+RELEASE survival-aim-ground
+ACCEPT survival-place-table screen=GAME
+LEASE survival-place-table keys=[use] ticks=1
+RELEASE survival-place-table
+ACCEPT survival-open-table screen=GAME
+LEASE survival-open-table keys=[use] ticks=1
+ACCEPT survival-crafted-tools screen=CraftingScreen
+ACCEPT survival-start-mine screen=GAME
+LEASE survival-start-mine keys=[left, jump] ticks=20
+RELEASE survival-start-mine
+ACCEPT survival-mine-1 screen=GAME
+LEASE survival-mine-1 keys=[attack] ticks=40
+LEASE survival-mine-1 keys=[attack] ticks=40
+RELEASE survival-mine-1
+ACCEPT survival-mine-2 screen=GAME
+LEASE survival-mine-2 keys=[attack] ticks=40
+LEASE survival-mine-2 keys=[attack] ticks=40
+RELEASE survival-mine-2
+ACCEPT survival-descend-mine screen=GAME
+LEASE survival-descend-mine keys=[forward] ticks=7
+RELEASE survival-descend-mine
+ACCEPT survival-mine-stone screen=GAME
+LEASE survival-mine-stone keys=[attack] ticks=40
+LEASE survival-mine-stone keys=[attack] ticks=40
+RELEASE survival-mine-stone
+ACCEPT survival-mine-align screen=GAME
+LEASE survival-mine-align keys=[right] ticks=4
+RELEASE survival-mine-align
+ACCEPT survival-rock-sample screen=GAME
+LEASE survival-rock-sample keys=[attack] ticks=40
+LEASE survival-rock-sample keys=[attack] ticks=40
+RELEASE survival-rock-sample
+ACCEPT survival-collect-mine screen=GAME
+LEASE survival-collect-mine keys=[forward] ticks=7
+RELEASE survival-collect-mine
+ACCEPT resume-mine-align screen=GAME
+LEASE resume-mine-align keys=[left] ticks=4
+RELEASE resume-mine-align
+ACCEPT resume-descend-collect screen=GAME
+LEASE resume-descend-collect keys=[forward] ticks=18
+RELEASE resume-descend-collect
+ACCEPT resume-collect-floor screen=GAME
+LEASE resume-collect-floor keys=[forward] ticks=10
+RELEASE resume-collect-floor
+ACCEPT resume-mine-front screen=GAME
+LEASE resume-mine-front keys=[attack] ticks=40
+LEASE resume-mine-front keys=[attack] ticks=40
+RELEASE resume-mine-front
+ACCEPT resume-collect-stone screen=GAME
+LEASE resume-collect-stone keys=[forward] ticks=12
+RELEASE resume-collect-stone
+ACCEPT resume-pillar-dirt screen=GAME
+LEASE resume-pillar-dirt keys=[use, jump] ticks=40
+LEASE resume-pillar-dirt keys=[use, jump] ticks=40
+RELEASE resume-pillar-dirt
+ACCEPT resume-clear-exit screen=GAME
+LEASE resume-clear-exit keys=[attack] ticks=40
+LEASE resume-clear-exit keys=[attack] ticks=40
+RELEASE resume-clear-exit
+ACCEPT resume-open-shaft screen=GAME
+LEASE resume-open-shaft keys=[attack] ticks=40
+LEASE resume-open-shaft keys=[attack] ticks=40
+RELEASE resume-open-shaft
+ACCEPT resume-shaft-look-down screen=GAME
+LEASE resume-shaft-look-down keys=[forward] ticks=1
+RELEASE resume-shaft-look-down
+ACCEPT resume-pillar-surface screen=GAME
+LEASE resume-pillar-surface keys=[use, jump] ticks=40
+LEASE resume-pillar-surface keys=[use, jump] ticks=40
+RELEASE resume-pillar-surface
+ACCEPT resume-level-view screen=GAME
+LEASE resume-level-view keys=[forward] ticks=1
+RELEASE resume-level-view
+ACCEPT resume-clear-headroom screen=GAME
+LEASE resume-clear-headroom keys=[attack] ticks=40
+LEASE resume-clear-headroom keys=[attack] ticks=40
+RELEASE resume-clear-headroom
+ACCEPT resume-tunnel-exit screen=GAME
+LEASE resume-tunnel-exit keys=[forward, jump] ticks=40
+LEASE resume-tunnel-exit keys=[forward, jump] ticks=40
+RELEASE resume-tunnel-exit
+ACCEPT resume-exit-shaft-clear screen=GAME
+LEASE resume-exit-shaft-clear keys=[attack] ticks=40
+LEASE resume-exit-shaft-clear keys=[attack] ticks=40
+RELEASE resume-exit-shaft-clear
+ACCEPT resume-exit-level screen=GAME
+LEASE resume-exit-level keys=[back] ticks=1
+RELEASE resume-exit-level
+ACCEPT resume-pillar-delayed-use screen=GAME
+LEASE resume-pillar-delayed-use keys=[jump] ticks=4
+LEASE resume-pillar-delayed-use keys=[use, jump] ticks=40
+RELEASE resume-pillar-delayed-use
+ACCEPT survival-forest-explore-01 screen=GAME
+LEASE survival-forest-explore-01 keys=[forward, jump] ticks=40
+LEASE survival-forest-explore-01 keys=[forward, jump] ticks=40
+RELEASE survival-forest-explore-01
+ACCEPT survival-forest-explore-02 screen=GAME
+LEASE survival-forest-explore-02 keys=[forward, jump] ticks=40
+LEASE survival-forest-explore-02 keys=[forward, jump] ticks=40
+RELEASE survival-forest-explore-02
+ACCEPT survival-forest-explore-03 screen=DeathScreen
+ACCEPT respawn-clear-leaves screen=GAME
+LEASE respawn-clear-leaves keys=[attack] ticks=32
+LEASE respawn-clear-leaves keys=[forward, jump] ticks=40
+RELEASE respawn-clear-leaves
+ACCEPT respawn-through-leaves screen=GAME
+LEASE respawn-through-leaves keys=[jump, attack, forward] ticks=40
+LEASE respawn-through-leaves keys=[jump, attack, forward] ticks=40
+RELEASE respawn-through-leaves
+ACCEPT respawn-back-clear screen=GAME
+LEASE respawn-back-clear keys=[back] ticks=40
+RELEASE respawn-back-clear
+ACCEPT fixed-opening-approach screen=GAME
+LEASE fixed-opening-approach keys=[forward] ticks=40
+RELEASE fixed-opening-approach
+ACCEPT fixed-opening-aim screen=GAME
+LEASE fixed-opening-aim keys=[back] ticks=1
+RELEASE fixed-opening-aim
+ACCEPT fixed-opening-lever-target screen=GAME
+LEASE fixed-opening-lever-target keys=[back] ticks=1
+RELEASE fixed-opening-lever-target
+ACCEPT fixed-opening-lever-use screen=GAME
+LEASE fixed-opening-lever-use keys=[use] ticks=1
+RELEASE fixed-opening-lever-use

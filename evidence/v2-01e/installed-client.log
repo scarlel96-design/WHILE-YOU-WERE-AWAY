@@ -1,0 +1,110 @@
+[08:07:05.406] [main/INFO] [Launcher/MODLAUNCHER]: ModLauncher running: args [--username, Dev, --version, neoforge-21.1.249, --gameDir, C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-01e-installed-client, --assetsDir, C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\caches\neoformruntime\assets, --assetIndex, 17, --uuid, 380df991f603344ca090369bad2a924a, --accessToken, ❄❄❄❄❄❄❄❄, --clientId, 0, --xuid, 0, --userType, legacy, --versionType, release, --fml.neoForgeVersion, 21.1.249, --fml.fmlVersion, 4.0.44, --fml.mcVersion, 1.21.1, --fml.neoFormVersion, 20240808.144430, --launchTarget, forgeclient, --width, 854, --height, 480] 
+[08:07:05.419] [main/INFO] [Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.5+11-LTS 
+[08:07:05.424] [main/INFO] [Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.5 by Eclipse Adoptium; OS Windows 11 arch amd64 version 10.0 
+[08:07:05.783] [main/INFO] [loading.ImmediateWindowHandler/]: Loading ImmediateWindowProvider fmlearlywindow 
+MONITOR_AGENT configured GLFW creation/placement x=2680 y=120
+[08:07:06.390] [main/INFO] [EARLYDISPLAY/]: Trying GL version 4.6 
+[08:07:06.689] [main/INFO] [EARLYDISPLAY/]: Requested GL version 4.6 got version 4.6 
+[08:07:07.121] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/v2-01e-installed-runtime/minecraft/libraries/net/fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/sponge-mixin-0.15.2+mixin.0.8.7.jar%23175!/ Service=ModLauncher Env=CLIENT 
+[08:07:07.705] [pool-2-thread-1/INFO] [EARLYDISPLAY/]: GL info: Intel(R) UHD Graphics 770 GL version 4.6.0 - Build 32.0.101.7092, Intel 
+[08:07:08.225] [main/INFO] [loading.moddiscovery.ModDiscoverer/SCAN]: Found mod file "client-1.21.1-20240808.144430-srg.jar" [locator: production client provider +net.neoforged:neoforge:21.1.249:client] 
+[08:07:08.295] [main/INFO] [loading.moddiscovery.ModDiscoverer/SCAN]: Found mod file "neoforge-21.1.249-universal.jar" [locator: PathBasedLocator[name=neoforge, paths=[C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-01e-installed-runtime\minecraft\libraries\net\neoforged\neoforge\21.1.249\neoforge-21.1.249-universal.jar]], reader: mod manifest] 
+[08:07:08.328] [main/INFO] [loading.moddiscovery.ModDiscoverer/SCAN]: Found mod file "geckolib-neoforge-1.21.1-4.9.2.jar" [locator: {mods folder locator at C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-01e-installed-client\mods}, reader: mod manifest] 
+[08:07:08.343] [main/INFO] [loading.moddiscovery.ModDiscoverer/SCAN]: Found mod file "whileaway.jar" [locator: {mods folder locator at C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-01e-installed-client\mods}, reader: mod manifest] 
+[08:07:08.675] [main/INFO] [loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection 
+[08:07:08.675] [main/INFO] [loading.moddiscovery.ModDiscoverer/SCAN]: Found gamelibrary file "mixinextras-neoforge-0.5.3.jar" [parent: neoforge-21.1.249-universal.jar, locator: jarinjar, reader: mod manifest] 
+[08:07:08.676] [main/INFO] [loading.moddiscovery.ModDiscoverer/SCAN]: Found library file "net.neoforged.neoforge-coremods-21.1.249.jar" [parent: neoforge-21.1.249-universal.jar, locator: jarinjar, reader: mod manifest] 
+[08:07:08.679] [main/INFO] [loading.moddiscovery.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		GeckoLib 4 4.9.2 (geckolib)
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.249 (neoforge)
+		While You Were Away / 네가 없는 동안 0.3.1-dev.1 (whileaway) 
+[08:07:10.024] [main/INFO] [mixin/]: Compatibility level set to JAVA_17 
+[08:07:10.058] [main/INFO] [LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeclient' with arguments [--version, neoforge-21.1.249, --gameDir, C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-01e-installed-client, --assetsDir, C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home\caches\neoformruntime\assets, --uuid, 380df991f603344ca090369bad2a924a, --username, Dev, --assetIndex, 17, --accessToken, ❄❄❄❄❄❄❄❄, --clientId, 0, --xuid, 0, --userType, legacy, --versionType, release, --width, 854, --height, 480] 
+[08:07:10.489] [main/WARN] [mixin/]: Reference map 'geckolib.refmap.json' for geckolib.mixins.json could not be read. If this is a development environment you can ignore this message 
+WARN StatusConsoleListener Advanced terminal features are not available in this environment
+[08:07:17] [Datafixer Bootstrap/INFO] [mojang/DataFixerBuilder]: 229 Datafixer optimizations took 1202 milliseconds
+[08:07:18] [pool-8-thread-1/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.3).
+[08:07:34] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/v2-01e-installed-runtime/minecraft/libraries/net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar%23190!/assets/.mcassetsroot' uses unexpected schema
+[08:07:34] [Render thread/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/v2-01e-installed-runtime/minecraft/libraries/net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar%23190!/data/.mcassetsroot' uses unexpected schema
+[08:07:34] [Render thread/INFO] [mojang/YggdrasilAuthenticationService]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[08:07:34] [Render thread/INFO] [minecraft/Minecraft]: Setting user: Dev
+[08:07:35] [Render thread/INFO] [minecraft/Minecraft]: Backend library: LWJGL version 3.3.3+5
+[08:07:36] [modloading-worker-0/INFO] [ne.ne.ne.co.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.249, for MC 1.21.1
+[08:07:40] [Render thread/INFO] [minecraft/ReloadableResourceManager]: Reloading ResourceManager: vanilla, mod_resources, mod/geckolib, mod/neoforge, mod/whileaway
+[08:07:40] [Worker-Main-16/INFO] [minecraft/UnihexProvider]: Found unifont_all_no_pua-15.1.05.hex, loading
+[08:07:40] [Worker-Main-4/INFO] [minecraft/UnihexProvider]: Found unifont_jp_patch-15.1.05.hex, loading
+[08:07:45] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:item.goat_horn.play
+[08:07:45] [Render thread/WARN] [minecraft/SoundEngine]: Missing sound for event: minecraft:entity.goat.screaming.horn_break
+[08:07:46] [Render thread/INFO] [mojang/Library]: OpenAL initialized on device OpenAL Soft on ����Ŀ(Creative Pebble X Plus)
+[08:07:46] [Render thread/INFO] [minecraft/SoundEngine]: Sound engine started
+[08:07:47] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x256x4 minecraft:textures/atlas/signs.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 128x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[08:07:48] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[08:07:49] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[08:07:49] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[08:07:49] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 256x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[08:07:49] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[08:07:49] [Render thread/INFO] [minecraft/TextureAtlas]: Created: 1024x512x0 minecraft:textures/atlas/gui.png-atlas
+[08:07:49] [Render thread/WARN] [minecraft/ShaderInstance]: Shader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
+[08:07:49] [Render thread/INFO] [ne.ne.ne.cl.en.an.js.AnimationLoader/]: Loaded 0 entity animations
+[08:08:28] [Render thread/INFO] [minecraft/RecipeManager]: Loaded 1290 recipes
+[08:08:28] [Render thread/INFO] [minecraft/AdvancementTree]: Loaded 1399 advancements
+[08:09:07] [Server thread/INFO] [minecraft/IntegratedServer]: Starting integrated minecraft server version 1.21.1
+[08:09:07] [Server thread/INFO] [minecraft/MinecraftServer]: Generating keypair
+[08:09:15] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[08:09:15] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 2%
+[08:09:15] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 2%
+[08:09:16] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 2%
+[08:09:16] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 2%
+[08:09:17] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 2%
+[08:09:17] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 2%
+[08:09:18] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 18%
+[08:09:18] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 18%
+[08:09:19] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 18%
+[08:09:19] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 51%
+[08:09:20] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 51%
+[08:09:20] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 51%
+[08:09:21] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: ���� ���� �غ� ��: 57%
+[08:09:21] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[08:09:21] [Render thread/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 6497 ms
+[08:09:22] [Server thread/INFO] [minecraft/IntegratedServer]: Changing view distance to 8, from 10
+[08:09:22] [Server thread/INFO] [minecraft/IntegratedServer]: Changing simulation distance to 5, from 0
+[08:09:27] [Server thread/INFO] [minecraft/PlayerList]: Dev[local:E:afe969be] logged in with entity id 39 at (-22.5, 73.0, -142.5)
+[08:09:27] [Server thread/INFO] [minecraft/MinecraftServer]: Dev��(��) ���ӿ� �����߽��ϴ�
+[08:09:28] [Render thread/INFO] [minecraft/AdvancementTree]: Loaded 2 advancements
+[08:09:30] [Server thread/WARN] [minecraft/MinecraftServer]: Can't keep up! Is the server overloaded? Running 2436ms or 48 ticks behind
+[08:10:14] [Render thread/INFO] [minecraft/ChatComponent]: [System] [CHAT] 2026-11-02_08.10.14.png�� ��ũ������ �����߽��ϴ�
+[08:10:32] [Server thread/INFO] [minecraft/IntegratedServer]: Saving and pausing game...
+[08:10:32] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/minecraft:overworld
+[08:10:32] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/minecraft:the_end
+[08:10:32] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/whileaway:quiet_city
+[08:10:32] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/whileaway:memory_route
+[08:10:32] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/minecraft:the_nether
+[08:10:38] [Server thread/INFO] [minecraft/ServerGamePacketListenerImpl]: Dev lost connection: ���� ����
+[08:10:38] [Server thread/INFO] [minecraft/MinecraftServer]: Dev��(��) ������ �������ϴ�
+[08:10:38] [Server thread/INFO] [minecraft/ServerCommonPacketListenerImpl]: Stopping singleplayer server as player logged out
+[08:10:38] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[08:10:38] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[08:10:38] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[08:10:39] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/minecraft:overworld
+[08:10:40] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/minecraft:the_end
+[08:10:40] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/whileaway:quiet_city
+[08:10:40] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/whileaway:memory_route
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[���ο� ����]'/minecraft:the_nether
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (���ο� ����): All chunks are saved
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (quiet_city): All chunks are saved
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (memory_route): All chunks are saved
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[08:10:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[08:11:05] [Render thread/INFO] [minecraft/Minecraft]: Stopping!

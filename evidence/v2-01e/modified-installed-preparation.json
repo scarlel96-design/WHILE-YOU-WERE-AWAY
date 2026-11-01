@@ -1,0 +1,15 @@
+{
+  "launch_target": "forgeclient",
+  "development_classpath": false,
+  "input_helper": false,
+  "version": "neoforge-21.1.249",
+  "jar_sha256": "5adb5f964d42e1e9355a79fc491db8c32340de5e9a172748a26c8d926c7bcc4a",
+  "mods": [
+    "geckolib-neoforge-1.21.1-4.9.2.jar",
+    "whileaway.jar"
+  ],
+  "profile": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-01e-installed-client",
+  "libraries": 107,
+  "assets": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\gradle-home\\caches\\neoformruntime\\assets",
+  "status": "PREPARED_NOT_LAUNCHED"
+}

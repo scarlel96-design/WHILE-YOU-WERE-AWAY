@@ -1,0 +1,5 @@
+*.jar binary
+*.zip binary
+*.patch -text
+*.sh text eol=lf
+*.txt text eol=lf

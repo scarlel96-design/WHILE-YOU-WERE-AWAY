@@ -1,0 +1,13 @@
+Outputting log to file neoforge-21.1.249-installer.jar.log
+JVM info: Eclipse Adoptium - 21.0.5 - 21.0.5+11-LTS
+java.net.preferIPv4Stack=true
+Current Time: 02/11/2026 07:52:08
+Host: maven.neoforged.net [89.222.116.12]
+Host: libraries.minecraft.net [150.171.110.135]
+Host: launchermeta.mojang.com [150.171.110.135]
+Host: piston-meta.mojang.com [150.171.110.135]
+Host: sessionserver.mojang.com [150.171.110.133]
+Found java version 21.0.5
+Target Directory: ..\v2-01e-installed-runtime\minecraft
+There is no minecraft launcher profile in "..\v2-01e-installed-runtime\minecraft", you need to run the launcher first!
+There was an error during installation
