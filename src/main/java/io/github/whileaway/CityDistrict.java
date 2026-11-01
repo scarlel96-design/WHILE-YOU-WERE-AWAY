@@ -2,6 +2,7 @@ package io.github.whileaway;
 
 import io.github.whileaway.core.CityLayout;
 import io.github.whileaway.core.CityArtLayout;
+import io.github.whileaway.core.CityLivingLayout;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -19,10 +20,12 @@ public final class CityDistrict extends SavedData {
     public static final ResourceKey<Level> KEY=ResourceKey.create(Registries.DIMENSION,WhileAway.id("quiet_city"));
     public static final BlockPos ARRIVAL=new BlockPos(40,65,68), RETURN_LIGHT=new BlockPos(40,65,72);
     private int cursor;
-    private int layoutVersion=2;
+    private int layoutVersion=CityLivingLayout.VERSION;
     private boolean started;
     public int layoutVersion(){return layoutVersion;}
-    public java.util.List<CityLayout.Cell> plan(){return layoutVersion==1?CityLayout.CELLS:CityArtLayout.CELLS;}
+    public java.util.List<CityLayout.Cell> plan(){return layoutVersion==1?CityLayout.CELLS:layoutVersion==2?CityArtLayout.CELLS:CityLivingLayout.CELLS;}
+    public boolean livingContent(){return layoutVersion==CityLivingLayout.VERSION;}
+    public boolean campaignArt(){return layoutVersion==2||livingContent();}
     public boolean ready(){return cursor==plan().size();}
     public int cursor(){return cursor;}
     public void start(){if(!started){started=true;setDirty();}}
@@ -31,7 +34,7 @@ public final class CityDistrict extends SavedData {
     }
     public static CityDistrict load(CompoundTag t,HolderLookup.Provider registry) {
         int version=t.getInt("version");
-        if(version!=1&&version!=2)throw new IllegalStateException("District layout version mismatch");
+        if(version!=1&&version!=2&&version!=CityLivingLayout.VERSION)throw new IllegalStateException("District layout version mismatch");
         var d=new CityDistrict();d.layoutVersion=version;d.cursor=t.getInt("cursor");d.started=t.getBoolean("started");
         if(d.cursor<0||d.cursor>d.plan().size())throw new IllegalStateException("District cursor invalid");
         return d;
@@ -45,10 +48,19 @@ public final class CityDistrict extends SavedData {
         while(started&&!ready()&&count<Math.min(512,Math.max(0,budget))) {
             var c=plan().get(cursor);var pos=new BlockPos(c.x(),CityLayout.BASE_Y+c.y(),c.z());
             level.getChunkAt(pos);
-            level.setBlock(pos,state(c.kind()),2);
+            if(livingContent()&&cursor>=CityArtLayout.CELLS.size())placeLivingCell(level,c);
+            else level.setBlock(pos,state(c.kind()),2);
             cursor++;count++;
         }
         if(count>0)setDirty();return count;
+    }
+    /** New construction accepts only the expected original cell or an already placed target. */
+    static boolean placeLivingCell(ServerLevel level,CityLayout.Cell c) {
+        var pos=new BlockPos(c.x(),CityLayout.BASE_Y+c.y(),c.z());
+        var current=level.getBlockState(pos);var target=state(c.kind());
+        if(current.equals(target))return true;
+        if(!current.equals(state(CityLivingLayout.underlay(c))))return false;
+        level.setBlock(pos,target,2);return true;
     }
     public static BlockState state(CityLayout.Kind kind) {
         return switch(kind) {
@@ -86,6 +98,15 @@ public final class CityDistrict extends SavedData {
             case TRAM -> Blocks.YELLOW_TERRACOTTA.defaultBlockState();
             case WHEEL -> Blocks.COAL_BLOCK.defaultBlockState();
             case CLOCK -> Blocks.SMOOTH_QUARTZ.defaultBlockState();
+            case WORKBENCH -> Blocks.CRAFTING_TABLE.defaultBlockState();
+            case STORAGE -> Blocks.BARREL.defaultBlockState();
+            case FURNACE -> Blocks.FURNACE.defaultBlockState();
+            case TOOL_BENCH -> Blocks.SMITHING_TABLE.defaultBlockState();
+            case MAT -> Blocks.WHITE_CARPET.defaultBlockState();
+            case ROUTE_TRACE -> WhileAway.ROUTE_TRACE.get().defaultBlockState();
+            case MAINTENANCE_TAG -> WhileAway.MAINTENANCE_TAG.get().defaultBlockState();
+            case SERVICE_LEVER -> Blocks.LEVER.defaultBlockState().setValue(net.minecraft.world.level.block.LeverBlock.FACE,net.minecraft.world.level.block.state.properties.AttachFace.FLOOR);
+            case SERVICE_LAMP -> Blocks.REDSTONE_LAMP.defaultBlockState();
         };
     }
     @SubscribeEvent public void tick(ServerTickEvent.Post event) {

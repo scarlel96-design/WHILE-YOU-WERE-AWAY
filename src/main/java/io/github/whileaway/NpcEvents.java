@@ -53,6 +53,16 @@ public final class NpcEvents {
         long hour=Math.floorMod(dayTime,24000);
         return hour>=5000&&hour<11000;
     }
+    static BlockPos residenceDestination(BlockPos home,long dayTime,boolean living) {
+        if(!living)return residenceDestination(home,dayTime);
+        long hour=Math.floorMod(dayTime,24000);
+        if(hour>=10000&&hour<11500)return home.offset(22,0,-24);
+        if(hour>=11500&&hour<13000)return home.offset(-1,0,1);
+        return residenceDestination(home,dayTime);
+    }
+    private static boolean living(ServerLevel level) {
+        return level.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(level).ready()&&CityDistrict.get(level).livingContent();
+    }
     public static boolean interact(StoryNpc npc,ServerPlayer p) {
         if(!StoryStorage.available(p.getServer())||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!p.isAlive())return false;
         var r=NarrativeData.get(p.getServer()).actors.get(STORY);
@@ -64,6 +74,16 @@ public final class NpcEvents {
                 String key=network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown()
                     ?"story.whileaway.network.aftermath"
                     :workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
+                var light=NpcState.home(r).offset(2,0,0);
+                if(!(network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown())) {
+                    if(p.serverLevel().hasChunkAt(light)&&!NpcEnvironment.isReturnLight(p.serverLevel().getBlockState(light)))
+                        key="story.whileaway.life.yeoul_light_changed";
+                    else if(living(p.serverLevel())) {
+                        long hour=Math.floorMod(p.serverLevel().getDayTime(),24000);
+                        if(hour>=10000&&hour<11500)key="story.whileaway.life.yeoul_tools";
+                        else if(hour>=11500&&hour<13000)key="story.whileaway.life.yeoul_rest";
+                    }
+                }
                 p.displayClientMessage(Component.translatable(key),false);
                 npc.getLookControl().setLookAt(p);
             }
@@ -83,7 +103,8 @@ public final class NpcEvents {
         if(!problems.isEmpty()){StoryStorage.block(server,String.join(";",problems));npc.getNavigation().stop();return;}
         if(r.checkpoint.checkpoint==4 && ReturnNetworkEvents.update(npc,r))return;
         var home=NpcState.home(r);
-        var destination=r.checkpoint.checkpoint==4?residenceDestination(home,level.getDayTime()):home;
+        boolean living=r.checkpoint.checkpoint==4&&living(level);
+        var destination=r.checkpoint.checkpoint==4?residenceDestination(home,level.getDayTime(),living):home;
         var nearby=witness(level,npc.blockPosition());
         // No off-screen auto-failure. NPC's life may continue when loaded; event movement needs a living witness.
         if(r.checkpoint.checkpoint<4&&(nearby==null||!nearby.isAlive())){npc.storyNavigation().externalPause(npc);StoryActors.suspend(npc,r,"npc_no_witness");return;}
@@ -115,6 +136,21 @@ public final class NpcEvents {
         }
         if(!arrived)return;
         npc.getNavigation().stop();
+        if(living) {
+            long hour=Math.floorMod(level.getDayTime(),24000);
+            if(hour>=10000&&hour<11500) {
+                var bench=home.offset(26,0,-34);
+                npc.getLookControl().setLookAt(bench.getX()+.5,bench.getY()+.5,bench.getZ()+.5);
+                if(npc.tickCount%100==0)npc.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+                return;
+            }
+            if(hour>=11500&&hour<13000) {
+                npc.getLookControl().setLookAt(home.getX()+3.5,home.getY()+1,home.getZ()+4.5);
+                return;
+            }
+            if(hour>=7500&&hour<10000&&npc.tickCount%100==0)
+                npc.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+        }
         // Look at the light instead of delivering explanatory monologues. The object must actually exist.
         var light=home.offset(2,0,0);
         if(r.checkpoint.checkpoint<4||workingHours(level.getDayTime()))

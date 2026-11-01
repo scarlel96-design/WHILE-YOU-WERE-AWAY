@@ -86,5 +86,14 @@
   "story.whileaway.opening.gap": "…You do not remember passing the gate. Your feet keep moving.",
   "story.whileaway.opening.voice": "A distant voice: 'That route is closed. Keep moving!'",
   "story.whileaway.opening.last_gap": "…The last thing you heard was a rail signal.",
-  "story.whileaway.opening.overworld": "You wake in an unfamiliar Overworld. Your life here is yours to make."
+  "story.whileaway.opening.overworld": "You wake in an unfamiliar Overworld. Your life here is yours to make.",
+  "block.whileaway.return_route_trace": "Soil-marked Threshold",
+  "block.whileaway.maintenance_tag": "Maintenance Work Sheet",
+  "story.whileaway.life.threshold": "Soil marks reach the threshold. The same soil is absent inside. The doorway is open.",
+  "story.whileaway.life.maintenance_record": "Work sheet: power disconnected, out of service. The inspection switch and floor lamp remain connected.",
+  "story.whileaway.life.maintenance_response": "The sheet says power was disconnected. Raising the switch lit the floor lamp. No new splice is visible.",
+  "story.whileaway.life.changed_equipment": "The equipment has changed. A direct comparison with the work sheet is uncertain.",
+  "story.whileaway.life.yeoul_tools": "Yeoul: I try to put the tools back. Somehow one always goes missing.",
+  "story.whileaway.life.yeoul_rest": "Yeoul: Just taking a break. You can see the road from here.",
+  "story.whileaway.life.yeoul_light_changed": "Yeoul: The light looks different. I will check what you placed before touching anything."
 }

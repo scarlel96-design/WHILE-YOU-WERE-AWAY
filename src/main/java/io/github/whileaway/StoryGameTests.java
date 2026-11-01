@@ -154,7 +154,11 @@ public final class StoryGameTests {
         h.assertTrue(old.ready()&&old.layoutVersion()==1&&old.plan()==CityLayout.CELLS,"completed old plan remains untouched");
         t.putInt("cursor",100);old=CityDistrict.load(t,h.getLevel().registryAccess());
         h.assertTrue(old.plan().get(100).equals(CityLayout.CELLS.get(100)),"partial old cursor points at same block");
-        h.assertTrue(new CityDistrict().layoutVersion()==2,"new worlds get art revision two");h.succeed();
+        t.putInt("version",2);t.putInt("cursor",io.github.whileaway.core.CityArtLayout.CELLS.size());
+        old=CityDistrict.load(t,h.getLevel().registryAccess());
+        h.assertTrue(old.ready()&&old.plan()==io.github.whileaway.core.CityArtLayout.CELLS,"revision two worlds keep their exact completed plan");
+        var fresh=new CityDistrict();
+        h.assertTrue(fresh.layoutVersion()==3&&fresh.plan().subList(0,io.github.whileaway.core.CityArtLayout.CELLS.size()).equals(io.github.whileaway.core.CityArtLayout.CELLS),"new living layout preserves the full revision two prefix");h.succeed();
     }
     @GameTest(template="empty")
     public static void cityHorrorFlagPersists(GameTestHelper h) {

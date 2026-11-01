@@ -41,6 +41,8 @@ public final class WhileAway {
     public static final DeferredBlock<NoteBlock> CITY_INTAKE=BLOCKS.register("city_intake_note",()->new NoteBlock("city_intake",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
     public static final DeferredBlock<NoteBlock> CITY_HOME=BLOCKS.register("city_home_note",()->new NoteBlock("city_home",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
     public static final DeferredBlock<NoteBlock> CITY_SIREN=BLOCKS.register("city_siren_note",()->new NoteBlock("city_siren",BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
+    public static final DeferredBlock<LifeObservationBlock> ROUTE_TRACE=BLOCKS.register("return_route_trace",()->new LifeObservationBlock(false,BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_STONE_BRICKS)));
+    public static final DeferredBlock<LifeObservationBlock> MAINTENANCE_TAG=BLOCKS.register("maintenance_tag",()->new LifeObservationBlock(true,BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StationEntity>> STATION_ENTITY = BLOCK_ENTITIES.register("station_anchor", () -> BlockEntityType.Builder.of(StationEntity::new, STATION.get()).build(null));
     public static final DeferredHolder<EntityType<?>, EntityType<Wayfarer>> WAYFARER = ENTITIES.register("wayfarer", () -> EntityType.Builder.<Wayfarer>of(Wayfarer::new, MobCategory.MONSTER).sized(0.75f, 2.6f).clientTrackingRange(10).build("whileaway:wayfarer"));
     public static final DeferredHolder<EntityType<?>, EntityType<StoryNpc>> STORY_NPC = ENTITIES.register("story_npc", () -> EntityType.Builder.<StoryNpc>of(StoryNpc::new, MobCategory.CREATURE).sized(.6f,1.95f).clientTrackingRange(10).build("whileaway:story_npc"));

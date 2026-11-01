@@ -5,7 +5,8 @@ import java.util.*;
 /** Stable v1 district plan. Never reorder this plan without migrating the saved construction cursor. */
 public final class CityLayout {
     public enum Kind { ROAD, LINE, PAVING, WALL, TRIM, GLASS, FLOOR, LAMP, POST, BENCH, GATE, INTAKE, HOME, SIREN,
-        AIR, BRICK, PLASTER, COPPER, DARK, CRACKED, MOSS, GRATE, WARM, RED, CHAIN, CHAIR, WATER, EARTH, WOOD, LEAF, RUBBLE, TRAM, WHEEL, CLOCK }
+        AIR, BRICK, PLASTER, COPPER, DARK, CRACKED, MOSS, GRATE, WARM, RED, CHAIN, CHAIR, WATER, EARTH, WOOD, LEAF, RUBBLE, TRAM, WHEEL, CLOCK,
+        WORKBENCH, STORAGE, FURNACE, TOOL_BENCH, MAT, ROUTE_TRACE, MAINTENANCE_TAG, SERVICE_LEVER, SERVICE_LAMP }
     public record Cell(int x,int y,int z,Kind kind) {}
     public record Building(int x,int z,int width,int depth,int floors) {}
     public static final List<Building> BUILDINGS=List.of(

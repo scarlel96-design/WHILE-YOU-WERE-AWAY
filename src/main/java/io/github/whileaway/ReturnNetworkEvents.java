@@ -35,7 +35,7 @@ public final class ReturnNetworkEvents {
     }
     public static ReturnNetworkState.Wait waitState(ServerLevel l){return runtime(l).wait;}
     private static boolean campaignLocation(ServerLevel l) {
-        return l.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(l).ready()&&CityDistrict.get(l).layoutVersion()==2;
+        return l.dimension().equals(CityDistrict.KEY)&&CityDistrict.get(l).ready()&&CityDistrict.get(l).campaignArt();
     }
     private static boolean exactLocation(ReturnNetworkState s,ServerLevel l) {
         return s.location!=null&&LOCATION.equals(s.location.id())&&s.location.position()==RELAY.asLong()

@@ -86,5 +86,14 @@
   "story.whileaway.opening.gap": "…문을 지난 기억이 없다. 그런데 발은 계속 움직이고 있다.",
   "story.whileaway.opening.voice": "멀리서 들린다. ‘그쪽 길은 닫혔어. 계속 가!’",
   "story.whileaway.opening.last_gap": "…마지막으로 들린 것은 철도 신호였다.",
-  "story.whileaway.opening.overworld": "눈을 뜨자 낯선 오버월드다. 이제는 스스로 살아가야 한다."
+  "story.whileaway.opening.overworld": "눈을 뜨자 낯선 오버월드다. 이제는 스스로 살아가야 한다.",
+  "block.whileaway.return_route_trace": "흙이 밴 문턱",
+  "block.whileaway.maintenance_tag": "정비 작업표",
+  "story.whileaway.life.threshold": "문밖의 흙자국은 문턱까지 이어진다. 실내 바닥에는 같은 흙이 없다. 문은 멀쩡히 열려 있다.",
+  "story.whileaway.life.maintenance_record": "작업표: 전원 분리, 사용 중단. 옆의 점검 스위치와 바닥등은 아직 연결되어 있다.",
+  "story.whileaway.life.maintenance_response": "작업표에는 전원을 끊었다고 적혀 있다. 스위치를 올리자 바닥등이 켜졌다. 선을 다시 이은 흔적은 보이지 않는다.",
+  "story.whileaway.life.changed_equipment": "설비 상태가 달라져 작업표와 직접 비교하기 어렵다.",
+  "story.whileaway.life.yeoul_tools": "여울: 공구를 쓰면 제자리에 두려고 하는데… 꼭 하나씩 없어지더라.",
+  "story.whileaway.life.yeoul_rest": "여울: 잠깐 쉬는 중이야. 여기서는 지나가는 길이 잘 보여.",
+  "story.whileaway.life.yeoul_light_changed": "여울: 등 쪽이 달라졌네. 내가 고치기 전에 네가 둔 물건부터 확인할게."
 }

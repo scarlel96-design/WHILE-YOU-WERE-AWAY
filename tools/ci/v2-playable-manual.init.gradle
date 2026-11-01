@@ -1,0 +1,35 @@
+// Isolated manual play. No scripted story driver or checkpoint shortcuts.
+gradle.afterProject { p, state ->
+    if (p != rootProject || !p.plugins.hasPlugin('net.neoforged.moddev')) return
+    ['v2PlayableManual':'../../work/v2-01d-manual-client','v2TownPreview':'../../work/v2-02-preview-client'].each { name, profile ->
+    p.neoForge.runs.create(name) {
+        client()
+        gameDirectory = p.file(profile)
+        if(name=='v2TownPreview') {
+            systemProperty 'whileaway.townPreview','true'
+            systemProperty 'whileaway.evidence',p.file('evidence/v2-01d/preview').absolutePath
+        }
+    }
+    p.tasks.named('run'+name.capitalize()).configure {
+        doFirst {
+            def monitor = new groovy.json.JsonSlurper().parse(p.file('evidence/v2-01d/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED', "-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            ['Left':'left','Top':'top','Width':'width','Height':'height'].each { key,value -> systemProperty "whileaway.monitor${key}",monitor[value].toString() }
+            def dir = p.file(profile); dir.mkdirs()
+            def options = new File(dir, 'options.txt')
+            def lines = options.exists() ? options.readLines('UTF-8') : []
+            def values = ['narrator':'0','onboardAccessibility':'false','tutorialStep':'none',
+                'pauseOnLostFocus':'true','lang':'ko_kr','renderDistance':'8','simulationDistance':'5',
+                'fullscreen':'false','overrideWidth':'1100','overrideHeight':'700']
+            ['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].each {
+                values["soundCategory_${it}".toString()] = '0.0'
+            }
+            lines.removeAll { values.containsKey(it.split(':',2)[0]) }
+            values.each { key, value -> lines.add("${key}:${value}") }
+            options.setText(lines.join('\n')+'\n','UTF-8')
+            if (!options.text.contains('soundCategory_master:0.0')) throw new GradleException('Mute check failed')
+            logger.lifecycle("V2_MANUAL_MUTED profile=${dir.absolutePath} DISPLAY1=${monitor.x},${monitor.y}")
+        }
+    }
+    }
+}
