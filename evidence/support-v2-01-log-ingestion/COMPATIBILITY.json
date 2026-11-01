@@ -1,0 +1,18 @@
+{
+  "baseline": "e5c184bc367c7c3f26a1bd2b551075c07edf50ae",
+  "src_tree": "d51ea9062976c4d4f12423ee6fe547ea2b0d1397",
+  "production_source_unchanged": true,
+  "protected_paths": [
+    "src",
+    "build.gradle",
+    "settings.gradle",
+    "gradle.properties",
+    "AGENTS.md",
+    "dist/support-v2-01",
+    "evidence/support-v2-01"
+  ],
+  "prior_package_unchanged": true,
+  "new_game_client_runs": 0,
+  "REAL_CLIENT": "NOT_TESTED",
+  "HUMAN_EXPERIENCE": "NOT_TESTED"
+}

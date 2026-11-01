@@ -1,0 +1,97 @@
+GPT SUPPORT V2-01 LOG INGESTION — VERIFIED 2026-11-01
+BRANCH: gpt-support/v2-01-observation-client-gate
+BASELINE HEAD: e5c184bc367c7c3f26a1bd2b551075c07edf50ae
+MAIN HEAD: 062797f54ee63a65b2cc79870a619d1eeea0daa1
+CHANGED FIELD: REAL_CLIENT; supplied rows -> at least one executed row.
+Unexecuted template: REAL_CLIENT=NOT_TESTED, V2_01_CLIENT_GATE=PARTIAL.
+Added utility: tools/validation/v2_01_client_log_draft.py.
+Log ingestion never grants scenario PASS or human ratings.
+
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01-log-ingestion\MODIFIED_FILE
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01-log-ingestion\DIFF_FILE
+VERIFICATION.txt: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01-log-ingestion\VERIFICATION.txt
+ROLLBACK.sh: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support\evidence\support-v2-01-log-ingestion\ROLLBACK.sh
+Working directory for commands: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\v2-observation-support
+
+BASELINE TEST COMMAND:
+python -m unittest discover -s tools/validation -p 'test_v2_01_client_evidence.py' -v
+Literal output tail:
+Ran 19 tests in 0.649s
+OK
+Exit status: 0
+Log: baseline-tests.log
+
+BASELINE COMMAND:
+python evidence/support-v2-01-log-ingestion/BASELINE_FILE evidence/support-v2-01-log-ingestion/baseline-not-run.json evidence/support-v2-01-log-ingestion/baseline-probe-final.json
+Input: schema=1, evidence_mode=REAL_CLIENT, all 15 results=NOT_TESTED.
+Literal output: V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED
+Literal JSON result: REAL_CLIENT=PARTIAL
+Exit status: 1 (valid incomplete report).
+
+MODIFIED TEST COMMAND:
+python -m unittest discover -s tools/validation -p 'test_v2_01_client*.py' -v
+Literal output tail:
+Ran 31 tests in 0.561s
+OK
+Exit status: 0
+Log: modified-tests.log
+
+MODIFIED COMMAND:
+python tools/validation/v2_01_client_evidence.py evidence/support-v2-01-log-ingestion/baseline-not-run.json evidence/support-v2-01-log-ingestion/modified-probe.json
+Input: identical baseline-not-run.json.
+Literal output: V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED
+Literal JSON result: REAL_CLIENT=NOT_TESTED
+Exit status: 1 (valid incomplete report).
+
+LOG INGESTION COMMAND:
+python tools/validation/v2_01_client_log_draft.py evidence/v2-playable-core/v2-01b-transaction/client-gradle.log evidence/support-v2-01-log-ingestion/inherited-startup
+Literal output: DRAFT_CREATED scenarios=15_NOT_TESTED REAL_CLIENT=NOT_TESTED
+Exit status: 0 (draft created, not client acceptance).
+Source log SHA-256: 03d9b71babc7b9487be49e05065822459cee2f7ad2cb820b96a3494f3e373442
+
+STRICT DRAFT COMMAND:
+python tools/validation/v2_01_client_evidence.py evidence/support-v2-01-log-ingestion/inherited-startup/client-session.json evidence/support-v2-01-log-ingestion/inherited-startup/client-summary.json
+Literal output: V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED
+Literal JSON result: REAL_CLIENT=NOT_TESTED; counts={"NOT_TESTED":15}
+Exit status: 1 (expected incomplete evidence).
+
+ROLLBACK COMMAND (PowerShell, disposable copy only):
+& 'C:\Program Files\Git\bin\bash.exe' -c 'chmod +x evidence/support-v2-01-log-ingestion/ROLLBACK.sh && evidence/support-v2-01-log-ingestion/ROLLBACK.sh evidence/support-v2-01-log-ingestion/rollback-copy/tool.py'
+Input: modified tool copy at rollback-copy/tool.py.
+Literal output: ROLLBACK_TOOL_RESTORED sha256=f54de65aa1aa62265ae960f4dcba3c71fcd00ec9aca0c19a6d23b98a3d94d636
+Exit status: 0
+
+ROLLBACK PROBE COMMAND:
+python evidence/support-v2-01-log-ingestion/rollback-copy/tool.py evidence/support-v2-01-log-ingestion/baseline-not-run.json evidence/support-v2-01-log-ingestion/rollback-summary.json
+Input: identical baseline-not-run.json.
+Literal output: V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED
+Literal JSON result: REAL_CLIENT=PARTIAL (previous behavior restored).
+Exit status: 1 (valid incomplete report).
+Restored SHA-256: f54de65aa1aa62265ae960f4dcba3c71fcd00ec9aca0c19a6d23b98a3d94d636
+Modified tool remains changed, SHA-256: 3f3343b4b594e08bd090f59c4025fd9d43939322759a4592a3c6abea05f0a9dc
+No world, save, or active production file was rolled back.
+
+COMPATIBILITY COMMAND:
+git diff --exit-code e5c184bc367c7c3f26a1bd2b551075c07edf50ae -- src build.gradle settings.gradle gradle.properties AGENTS.md dist/support-v2-01 evidence/support-v2-01
+Literal output: empty
+Exit status: 0
+Production src tree: d51ea9062976c4d4f12423ee6fe547ea2b0d1397
+GameTest/Core/Gradle: NOT RUN this continuation; previous support evidence remains 130/130, 176858, build PASS.
+New Minecraft launches: 0. Human and audio acceptance: NOT TESTED.
+Computer Use: not retried; historical kernel-assets error is not a repository defect.
+Model contribution percentages: UNMEASURED. Caveman: HOLD, not used.
+
+PUBLICATION: See PUBLICATION.txt for implementation/package commit IDs and verified remote.
+
+CLEANROOM COMMAND (extracted package directory):
+python -m unittest discover -s tools/validation -p 'test_v2_01_client*.py' -v
+Literal output tail:
+Ran 31 tests in 0.710s
+OK
+Exit status: 0
+Log: cleanroom-tests.log
+PACKAGING CORRECTION: Initial Windows ZIP stored ROLLBACK.sh mode 100666.
+Final ZIP explicitly stores ROLLBACK.sh mode 100755.
+Tool/doc/source member bytes remain identical to the tested clean-room package.
+The final archive CRC and every manifest member hash are rechecked.
+PUBLICATION.txt and dist ARTIFACT.json are publication sidecars, outside the ZIP.

@@ -1,0 +1,233 @@
+{
+  "schema": 1,
+  "type": "CUMULATIVE_SUPPORT_SOURCE_PATCH",
+  "main_baseline": "062797f54ee63a65b2cc79870a619d1eeea0daa1",
+  "support_baseline": "e5c184bc367c7c3f26a1bd2b551075c07edf50ae",
+  "implementation_commit": "76125c53d8b5a80fd044ac04fcc3e0d9afc992b7",
+  "files": [
+    {
+      "path": "docs/SUPPORT_REBASE_REPORT.md",
+      "size": 3418,
+      "sha256": "01e781e059feebd4ad379d56052c9f43de88bc22408141d87c9b61e92abeec05"
+    },
+    {
+      "path": "docs/SUPPORT_V2_01_HANDOFF.md",
+      "size": 9716,
+      "sha256": "19b23b92b2adea3813c4d3dfb1dc24118471d5038a3859a38bcdec91c28394e8"
+    },
+    {
+      "path": "docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md",
+      "size": 6316,
+      "sha256": "170066f8e68a0a9cfbed4e701f3d0ce401c8d19196afe95a9c20481b3c12a427"
+    },
+    {
+      "path": "docs/SUPPORT_V2_01_TEST_INVENTORY.md",
+      "size": 3513,
+      "sha256": "f86aef0b904c378fead29511c3711d688a8536a6fa06f1edcc75a943bce2c5a0"
+    },
+    {
+      "path": "docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md",
+      "size": 9511,
+      "sha256": "a2a37b5252771973c2faf50a939e2cb9a87e37e069291795f7e7bd919e789a15"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/.gitattributes",
+      "size": 9,
+      "sha256": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/BASELINE_FILE",
+      "size": 7883,
+      "sha256": "f54de65aa1aa62265ae960f4dcba3c71fcd00ec9aca0c19a6d23b98a3d94d636"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/BASELINE_TEST.py",
+      "size": 7715,
+      "sha256": "86602fc5a08dd1f6deddc0dd91ee12a46c398d1a2d5e32036d1bc9938fa0d2cd"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/COMPATIBILITY.json",
+      "size": 486,
+      "sha256": "83af1bb35e70ad83642a76bc4e414fd3db7d222871c9ec032e7b40f10d478ea1"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/CUMULATIVE_MAIN.patch",
+      "size": 95456,
+      "sha256": "9540ece96e117751a35b8e49473057c10c0c0a3a56ffd204e04ba5ab4f273753"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/DIFF_FILE",
+      "size": 25374,
+      "sha256": "3085f099c00b2a477139170bfb21a7c2ce5b7bae08b4f1a8b53c93231b3ca8e5"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/MODIFIED_FILE",
+      "size": 7962,
+      "sha256": "3f3343b4b594e08bd090f59c4025fd9d43939322759a4592a3c6abea05f0a9dc"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/ROLLBACK.sh",
+      "size": 954,
+      "sha256": "9525e8a4d607734809b2493bf757aba05143eacbb6eb1184b81ff64630202211"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/VERIFICATION.txt",
+      "size": 5580,
+      "sha256": "b4d2525231c52faa2a7cd0a09db414ffb6c42ec19d690acfbce0529db609220b"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/baseline-not-run.json",
+      "size": 8933,
+      "sha256": "653e65ddd28e710aa4f866c8cc2d380216c29b6cfd39ee0b7cdfc00b00def16a"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/baseline-probe-final.json",
+      "size": 10042,
+      "sha256": "ebe3537585e1b0b4f29d4af269763bbbced23a644cf2c84e3677f335115a2aad"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/baseline-summary.json",
+      "size": 10042,
+      "sha256": "ebe3537585e1b0b4f29d4af269763bbbced23a644cf2c84e3677f335115a2aad"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/baseline-tests.log",
+      "size": 2567,
+      "sha256": "a9f832f1e4e25daa810a82e41af53cb26bc4843f0614d697e318ed3f765f18f3"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/cleanroom-tests.log",
+      "size": 4397,
+      "sha256": "f6882448514f176ad2ab604846383cf6354aec30caacf8bf978557d179a747ed"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/inherited-startup/client-session.json",
+      "size": 8760,
+      "sha256": "e1a7e853c2867dabf2e0e333c2492ae871a58ae2145634fd04d2f6b0337ab403"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/inherited-startup/client-summary.json",
+      "size": 10045,
+      "sha256": "b63a8d010f87f2f3142f6a8fa853c55b93bbd3d7809fead77bd67fcccfb32278"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/inherited-startup/log-review.json",
+      "size": 1180,
+      "sha256": "b585b29183b4b1a2af324a280782f55a0e1f4dbac2db8942efa3995eecb05c64"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/inherited-startup/references/source.log",
+      "size": 11476,
+      "sha256": "03d9b71babc7b9487be49e05065822459cee2f7ad2cb820b96a3494f3e373442"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/modified-probe.json",
+      "size": 10045,
+      "sha256": "836f9334d4e36619e0a2d516af6c2bf059484357ede691b4e54570a838d1ce69"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/modified-tests.log",
+      "size": 4397,
+      "sha256": "02d644ff7282e1408cea8414a6b8ae7a3cde89433889b38ec6e1a78247f17131"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/rollback-command.log",
+      "size": 96,
+      "sha256": "f55dd6c206c1738ec5d1570cae935003f63890fb74cc992590bc2ae17ac929d6"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/rollback-copy/tool.py",
+      "size": 7883,
+      "sha256": "f54de65aa1aa62265ae960f4dcba3c71fcd00ec9aca0c19a6d23b98a3d94d636"
+    },
+    {
+      "path": "evidence/support-v2-01-log-ingestion/rollback-summary.json",
+      "size": 10042,
+      "sha256": "ebe3537585e1b0b4f29d4af269763bbbced23a644cf2c84e3677f335115a2aad"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ChaseKnowledge.java",
+      "size": 711,
+      "sha256": "ea200daa6f9e2a374b455592673bebc8bde6d924f9fc9214b631a39ba573172e"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/KnowledgeAndResidentGameTests.java",
+      "size": 6020,
+      "sha256": "076651ff0b19a0f553d56ca6b640dd4c69b2d7efde3b3359acb0fc095e2e41d1"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/NpcEvents.java",
+      "size": 9742,
+      "sha256": "8f0f837b9fa214964667bc823467ce4149a0c4b2995a932bb54a3cca18df4ab4"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnNetworkEvents.java",
+      "size": 15702,
+      "sha256": "f9c926ff71fa307111ce2c71e4613cef72b80759c3a8608effe83802d9160b0c"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnNetworkNpcPolicy.java",
+      "size": 1048,
+      "sha256": "5f055d8a02bcbf3cb4254935ffade85a97c3bec0b3ee6d44734e4f9e337e37b2"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnerEntityObservationGameTests.java",
+      "size": 2768,
+      "sha256": "bac818a6a0afd1ac52c5064a04da8877e6f4c0ed2ccc127ed1662bd20fef14f2"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/ReturnerObservationGameTests.java",
+      "size": 4009,
+      "sha256": "c659bb3800c97f5ef1b9cc156c7f00e6a31fb9d64d7505856b0ebe77740e43ec"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/StoryActors.java",
+      "size": 20782,
+      "sha256": "c93910b2a41d00765f28443f6391e27e13ce0cd9c6db05343b38b7efe65c3dc4"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/content/StationBlock.java",
+      "size": 2360,
+      "sha256": "4ad0ff4206a93f3b032c30467baf833a169d289ab4c6a6ad10ce320029759209"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/entity/Wayfarer.java",
+      "size": 11076,
+      "sha256": "c4800066c1e4292d2cd1d66bb70c5ebbffd42e87e8a786c197cf3fe57b72b74b"
+    },
+    {
+      "path": "src/main/java/io/github/whileaway/support/ReturnerObservationPolicy.java",
+      "size": 638,
+      "sha256": "119a04d57dfdfbd0c2d435ccccd835f83d310b4c702e3bc08edce093d00314fc"
+    },
+    {
+      "path": "tools/validation/test_v2_01_client_evidence.py",
+      "size": 8359,
+      "sha256": "98cf67f1c1b11f492053110c3a1c7701cf22c262e53ecfc7b9199e8b59c4051c"
+    },
+    {
+      "path": "tools/validation/test_v2_01_client_log_draft.py",
+      "size": 4955,
+      "sha256": "c0d93a8c02444fb3ebb1cf740063826f262d9ea042eca06a76725f02f06b37be"
+    },
+    {
+      "path": "tools/validation/v2-01-client-session-template.json",
+      "size": 8931,
+      "sha256": "48ad21f4eb9d28c8b62a460fa0b3c86996b7bb64ab5360cbc2baf8bdc74314d7"
+    },
+    {
+      "path": "tools/validation/v2_01_client_evidence.py",
+      "size": 7962,
+      "sha256": "3f3343b4b594e08bd090f59c4025fd9d43939322759a4592a3c6abea05f0a9dc"
+    },
+    {
+      "path": "tools/validation/v2_01_client_log_draft.py",
+      "size": 4815,
+      "sha256": "814c3555bb82a2dff3fb1ae6a088627e772ba297a474efd766ce6e732977254c"
+    }
+  ],
+  "game_jar": "UNCHANGED: evidence/support-v2-01/MODIFIED.jar",
+  "game_jar_sha256": "8504307b1f89e0c787b4d45b31c30509a10ea49a9329e128ba6028db1d037a98",
+  "new_real_client_runs": 0,
+  "rollback_zip_mode": "100755"
+}

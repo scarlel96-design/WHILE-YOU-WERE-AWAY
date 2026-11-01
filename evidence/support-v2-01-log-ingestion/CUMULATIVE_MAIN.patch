@@ -1,0 +1,1728 @@
+diff --git a/docs/SUPPORT_REBASE_REPORT.md b/docs/SUPPORT_REBASE_REPORT.md
+new file mode 100644
+index 0000000..1003204
+--- /dev/null
++++ b/docs/SUPPORT_REBASE_REPORT.md
+@@ -0,0 +1,44 @@
++# V2-01 support rebase report
++
++## Verified baseline
++
++Main branch: `work/v2-playable-core`.
++Local and remote main SHA: `062797f54ee63a65b2cc79870a619d1eeea0daa1`.
++Support branch: `gpt-support/v2-01-observation-client-gate`.
++Support checkout is separate from the main checkout. Main and master source were not modified.
++
++## Archive availability
++
++`whileaway-gpt-support-tier-a.zip` and `gpt-support-return-network-tier-a.zip` were not found in the workspace or attachment filename inventory.
++Their contents were not supplied in this directive. No content-specific compatibility claim is made for those two archives.
++Disposition: **NEEDS REWORK / provenance review pending**. Do not apply either archive wholesale.
++No matching support paths were found in the tracked tree at `570c4f821c21aa98e4f2ab479dca50a688d7b6d5`.
++
++The available later reference is `dist/return-network-support-v1/whileaway-gpt-support-return-network-closure-v1.zip`.
++Its source, tools, and report are already present in the current main tree. They were inspected in place.
++
++## Capability reconciliation
++
++| Previous capability or file | Decision | Current evidence or required action |
++| --- | --- | --- |
++| Legacy save-format assertions that require format 4 | SUPERSEDED | Main uses format 5 and `ReturnNetworkSchema5GameTests`. Do not reintroduce old constants. |
++| Transaction failure and preservation tests | SUPERSEDED | `ReturnNetworkIntegrationGameTests`, `ReturnNetworkTransactionGameTests`, and `ReturnNetworkPreservationGameTests` already cover stronger boundaries. |
++| Signal semantic model and tests | SUPERSEDED as an incoming patch | `ReturnNetworkSignal`, `ReturnNetworkPlayback`, and their tests are already integrated. Preserve them. |
++| `ReturnNetworkLoadAssessment` | STILL USEFUL | Existing read-only diagnostics distinguish readiness observations. They do not prove live updater execution or actual unload. |
++| `tools/ci/return-network-support.init.gradle` | NEEDS REWORK for this support line | Evidence root is pinned to the old support track. Reuse the idea only with a new evidence root. |
++| `tools/ci/probe-return-network-support.py` | NEEDS REWORK | Hardcoded old hashes and byte-identical runtime assumptions do not describe current production. Preserve as historical evidence. |
++| `tools/ci/package-return-network-support.py` | NEEDS REWORK | Hardcoded `b5d26787` baseline and add-only ZIP logic are unsuitable for behavior-neutral extraction. |
++| Old add-only lexical audit as the new acceptance gate | DROP | It rejects every existing-file change. This directive explicitly permits reviewed extraction. Do not weaken or rewrite the historical audit. |
++| Duplicate persistence runner or schema framework | DROP | Current main already owns durable transactions, readback, quarantine, and migration. No replacement is needed. |
++
++## Current adoption
++
++No old archive was merged, copied over production, or handed off as a current patch.
++This support line adds only current-API helpers, tests, client evidence tooling, and documentation.
++Save format 5, optional Actor schema 1, Return Network schema 1, and checkpoint meanings remain unchanged.
++
++## Remaining provenance gap
++
++The two named tier-A archives remain unavailable for byte-level inspection.
++If they appear later, inspect their manifests against the then-current main SHA before selecting any file.
++Their absence does not authorize speculative patch reconstruction.
+diff --git a/docs/SUPPORT_V2_01_HANDOFF.md b/docs/SUPPORT_V2_01_HANDOFF.md
+new file mode 100644
+index 0000000..a7f1dad
+--- /dev/null
++++ b/docs/SUPPORT_V2_01_HANDOFF.md
+@@ -0,0 +1,139 @@
++# GPT SUPPORT REPORT — V2-01 / continuation 3
++
++## Baseline and ownership
++
++- Main: `work/v2-playable-core` at `062797f54ee63a65b2cc79870a619d1eeea0daa1`, verified locally and remotely.
++- Support: `gpt-support/v2-01-observation-client-gate`, separate checkout `work/v2-observation-support`.
++- Version 0.3.1-dev.1. Save format 5. Actor schema optional 1. Return Network schema 1. Art revision 2.
++- Main production integration remains MAIN-owned. This branch is an adoption candidate, not a main merge.
++- Caveman HOLD. No delegated agents or V2-02 implementation.
++
++## Contribution estimate
++
++Previous percentage, this increment's percentage, and cumulative percentage are **UNMEASURED**.
++The repository contains no effort denominator or comparable time records for the entire V2-01 milestone.
++Seven requested support workstreams now have concrete artifacts: observation, knowledge, NPC ownership, station selection, evidence tool, protocol, and negative regression coverage.
++This inventory is not a claim of 40% effort. The 40% threshold remains unconfirmed.
++Next support candidates are main-adoption diff review and importing actual client logs into the strict evidence format.
++Do not create another general framework to fill an estimated percentage.
++
++## Previous artifacts and inspected files
++
++Read `SUPPORT_REBASE_REPORT.md` for the compatibility decisions.
++The two named tier-A ZIPs were not located. No content-specific audit or merge of those archives occurred.
++Existing current signal/load helpers remain useful. Older format assertions and incoming copies are superseded.
++Old add-only auditing is dropped as a gate for this extraction. Historical files remain unchanged.
++
++Inspected production: Wayfarer, StoryActors, StoryActorRecord, NpcEvents, StoryNpc, StationBlock, ReturnNetworkEvents, ReturnNetworkState, ReturnNetworkFixtures, NarrativeData, OpeningEvents, StoryConfig.
++Inspected tests: ActorGameTests, NpcGameTests, ReturnNetworkIntegrationGameTests, ReturnNetworkSupportGameTests, signal tests, schema/transaction/preservation inventory.
++Inspected tooling: build.gradle and the four existing return-network support tools.
++
++## Production files touched
++
++| File | Reason | Intended behavior change |
++| --- | --- | --- |
++| `entity/Wayfarer.java` | Call the shared range, facing, streak, and confirmation functions. Preserve LOS short-circuit ordering. | NO |
++| `StoryActors.java` | Use the tested notification eligibility predicate. | NO |
++| `content/StationBlock.java` | Use the tested observed/neutral text selector. | NO |
++| `NpcEvents.java` | Use the tested ordinary/context dialogue selector. | NO |
++| `ReturnNetworkEvents.java` | Use the tested completed-event glance and dialogue delegation policy. | NO |
++
++New production helpers: `support/ReturnerObservationPolicy.java`, `ChaseKnowledge.java`, `ReturnNetworkNpcPolicy.java`.
++All helpers are connected to production. They create no persistent facts and do not perform IO.
++The 32-block limit, 0.35 dot threshold, eight ticks, and existing near-zero distance guard remain unchanged.
++No schema, generation, checkpoint, transaction, navigation fallback, or corruption policy changed.
++The existing completed-event relay glance remains present for gameTime modulo 200 below 30.
++It still takes adapter precedence during that short window. The support does not silently redesign that behavior.
++
++## Coverage and limits
++
++- Nine policy GameTests cover positive exposure, tick-eight confirmation, distance/facing boundaries, occlusion input, streak reset, intermittent exposure, and original predicate equivalence.
++- Three knowledge GameTests cover notice eligibility, single persisted observation fact, and immutable neutral/observed station selection.
++- Three NPC policy GameTests cover resident delegation, ordinary/context dialogue, and stable participant identity/facts.
++- One actual Wayfarer negative GameTest covers the supported creative mock through real server ticks and Actor NBT roundtrip.
++- Existing unobserved completion regression is reused, not duplicated.
++- Nineteen Python self-tests cover strict evidence handling and protected human fields.
++
++These are policy/server tests, not real-client play or human observation.
++NPC tests do not prove live movement or delivery of dialogue packets.
++Station tests prove selector immutability. The production diff adds no particles, block writes, or durable mutation.
++
++## Initial failed entity fixture
++
++Symptom: the first optional positive entity fixture did not record observation. The other 129 tests passed.
++Cause: the official `makeMockServerPlayerInLevel()` returns GameTestHelper$2, whose `isCreative()` always returns true.
++Calling `setGameMode(SURVIVAL)` does not override that method.
++Evidence: `evidence/support-v2-01/mock-server-player-api.txt` and `modified-gradle.log`.
++Fix: replace the invalid survival assumption with a negative creative-guard integration test.
++No fake-player subclass, reflection override, player-list hack, or production guard bypass was added.
++Positive survival entity observation remains an actual-client gate. Shared calculation boundaries are automated.
++
++## Client evidence implementation
++
++Tool: `tools/validation/v2_01_client_evidence.py`.
++Template: `tools/validation/v2-01-client-session-template.json`.
++Protocol: `docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md`.
++
++The tool includes all fifteen scenarios and the twelve MUST requirements.
++Missing scenarios remain NOT_TESTED. Any MUST FAIL makes the reported gate FAIL.
++Any other non-PASS MUST result makes the gate PARTIAL.
++Executed records require full build/JAR hashes, identity, start/observed/expected text, tester, notes, and reference metadata.
++PASS requires existing local evidence files. References receive content hashes and sizes.
++Unknown/duplicate scenarios, duplicate JSON keys, mixed builds, missing references, and escaping paths are rejected.
++The tool preserves existing output for invalid input and atomically replaces valid summaries.
++Exit codes: 0 gate PASS; 1 valid PARTIAL/FAIL report; 2 invalid input.
++Human ratings require explicit HUMAN provenance and real-client evidence mode.
++Synthetic self-tests and samples never grant real-client PASS or human ratings.
++The tool validates reported evidence. It does not prove the tester's observations independently.
++
++Sample result: `V2_01_CLIENT_GATE=PARTIAL HUMAN_EXPERIENCE=NOT_TESTED`, expected exit 1.
++Sample output: `evidence/support-v2-01/sample-summary.json`.
++
++## Validation status
++
++Fresh baseline: 114/114 GameTests PASS, 176858 Core assertions PASS, build PASS, exit 0.
++Python: 19/19 PASS on the host runner. Syntax: two Python files parsed successfully.
++First modified GameTest gate: 129 PASS, one invalid mock-survival fixture failed. Preserve that failed log.
++Final gate: 130/130 GameTests PASS, 176858 Core assertions PASS, build PASS, exit 0.
++Final runtime: `BUILD SUCCESSFUL in 1m 1s`. Package hashes are recorded in `evidence/support-v2-01/VERIFICATION.txt`.
++Protected persistence/schema/navigation sources and build.gradle have no diff against main baseline.
++
++Environment failures: initial worktree checkout exceeded Windows path length; command-scoped core.longpaths repaired checkout.
++Sandbox Python TemporaryDirectory cleanup failed with WinError 5. Host execution passed all nineteen tests.
++Neither issue is classified as a Minecraft gameplay defect.
++
++## Human and client gates
++
++New support REAL CLIENT: NOT TESTED. No Minecraft client was launched by this support task.
++HUMAN EXPERIENCE: NOT TESTED. AUDIO READABILITY: NOT HUMAN-VERIFIED.
++Computer Use kernel-assets error is historical, not reattempted or modified here.
++Repository relevance of that blocker: NONE demonstrated.
++Use the manual protocol with the same evidence matrix when Computer Use is unavailable.
++
++## MAIN HANDOFF
++
++1. Compare current main HEAD with this support branch's implementation commit.
++2. Audit only the current support diff. Do not apply the old tier-A bundles.
++3. Select the current helper, production extraction, tests, evidence tool, template, and protocol files.
++4. Recheck that runtime behavior, thresholds, checkpoint meanings, and storage semantics remain unchanged.
++5. Merge or cherry-pick the selected implementation commit through MAIN's normal integration process.
++6. Run the full GameTest/Core/build gate on the resulting main source.
++7. Run actual client scenarios from a fresh world using the protocol and strict evidence tool.
++8. Keep V2-01 PARTIAL until MAIN's client acceptance and gameplay review finish.
++
++Do not cherry-pick historical baselines or evidence-only fixture commits as production changes.
++The support package and publication records identify exact implementation and artifact commits.
++
++## Status and safe pause
++
++GPT SUPPORT IMPLEMENTATION: current implementation delivered; named tier-A archive inspection remains PARTIAL.
++V2-01 AUTOMATED COVERAGE: PASS for this scoped increment; positive survival/client coverage remains open.
++V2-01 CLIENT GATE: NOT TESTED. HUMAN EXPERIENCE: NOT TESTED. REAL CLIENT: NOT TESTED.
++V2-01 campaign milestone remains PARTIAL. Version 0.3.2 is not promoted.
++Weekly usage reached 97% during the previous implementation task. That task finished its gate, package, rollback, and upload.
++The 2026-11-01 continuation observed 1% weekly usage consumed before starting bounded evidence-tool work.
++The continuation adds a log-draft importer and fixes unexecuted REAL_CLIENT reporting.
++Read `docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md` for this continuation's evidence and adoption instructions.
++The importer never grants scenario PASS from log markers.
++Resume MAIN adoption review or actual client acceptance after the support diff review.
++Do not start another large support subsystem from this handoff.
+diff --git a/docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md b/docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md
+new file mode 100644
+index 0000000..78199f2
+--- /dev/null
++++ b/docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md
+@@ -0,0 +1,115 @@
++# GPT SUPPORT REPORT — V2-01 log ingestion continuation
++
++## Baseline
++
++- Main: `work/v2-playable-core` at `062797f54ee63a65b2cc79870a619d1eeea0daa1`.
++- Support: `gpt-support/v2-01-observation-client-gate` at `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
++- Original support implementation: `8231f8bd93626316f9d59639ad95c6cd5d7bce84`.
++- Local and remote support heads matched before edits.
++- Version remains 0.3.1-dev.1. V2-01 remains PARTIAL.
++
++## Work performed
++
++The evidence validator now reports REAL_CLIENT=NOT_TESTED when every scenario is unexecuted.
++The client gate remains PARTIAL because required acceptance evidence is missing.
++The previous implementation reported REAL_CLIENT=PARTIAL for the same unexecuted template.
++
++The new log-draft tool prepares a new session directory from one selected log.
++It preserves the source log bytes and records their SHA-256.
++It records marker counts and bounded line-number lists.
++It does not copy log text into the summary.
++It leaves all scenario results and human ratings NOT_TESTED.
++It rejects an existing output directory and invalid target metadata.
++An optional candidate JAR is hashed without claiming that it produced the log.
++The declared target commit remains user-supplied metadata.
++
++## MAIN adoption review
++
++The current source diff against main contains five existing production call-site edits and three new helper classes.
++The source also contains three added GameTest classes.
++The observation extraction preserves range 32, dot 0.35, eight ticks, and the original evaluation order.
++The knowledge extraction preserves notice gating and observed/unseen station text selection.
++The NPC extraction preserves the completed-event 30/200-tick look habit and resident dialogue delegation.
++These changes remain candidates for MAIN adoption after integration review.
++This continuation adds no production Java change.
++
++Previous support classification remains valid.
++Old tier-A archive contents remain uninspected because the named archives were not located.
++Do not merge those archives or apply superseded persistence assertions.
++Retain the existing SUPPORT_REBASE_REPORT classification.
++
++## Validation
++
++- BASELINE Python: 19 tests PASS.
++- MODIFIED Python: 31 tests PASS, including 12 new tests.
++- Previous support GameTest: 130/130 PASS; not rerun in this tooling-only continuation.
++- Previous support core assertions: 176858 PASS; not rerun here.
++- Previous support Gradle build: PASS; not rerun here.
++- New Minecraft client launches: 0.
++- Human experience: NOT TESTED.
++- Audio readability: NOT HUMAN-VERIFIED.
++
++The inherited `v2-01b-transaction/client-gradle.log` was processed as historical input.
++Its SHA-256 is `03d9b71babc7b9487be49e05065822459cee2f7ad2cb820b96a3494f3e373442`.
++It contains one sound-engine start, one normal-stop marker, and one Gradle-success marker.
++It contains no world-preparation or player-join marker under the tool's narrow matching rules.
++Marker absence does not prove that gameplay never occurred.
++This input grants no scenario PASS.
++The resulting draft and strict summary retain 15 NOT_TESTED scenarios.
++
++## Failure history
++
++An unexecuted REAL_CLIENT template reported REAL_CLIENT=PARTIAL.
++The cause was a check for supplied rows instead of executed rows.
++The validator now checks for a result other than NOT_TESTED.
++Two new tests protect the unexecuted case and the existing partial-execution case.
++
++No new production defect was found in this continuation.
++The previous Computer Use kernel-assets failure remains an external environment blocker.
++This continuation does not retry Computer Use or classify that error as a Minecraft defect.
++
++## Compatibility and remaining work
++
++Save format 5, optional Actor schema 1, and Return Network schema 1 remain unchanged.
++Checkpoint, Actor identity, generation, transaction, and write-guard semantics remain unchanged.
++AGENTS.md, resources, and prior packages remain unchanged.
++The current candidate JAR is the previously verified support artifact.
++This tooling-only continuation creates no replacement game JAR.
++
++Positive survival observation, actual NPC ownership, and player-facing readability remain MAIN client gates.
++All original client scenarios still require actual observations and attributable evidence.
++The evidence tools validate submitted records. They do not certify the truth of gameplay claims.
++
++## Contribution and model record
++
++Previous, additional, and cumulative milestone percentages remain UNMEASURED.
++No measured work denominator supports a 40% claim.
++The delivered scope includes three production helpers, three GameTest classes, evidence tools, and adoption documents.
++This continuation adds one bounded log-draft utility, a report-status fix, and their tests.
++No subagents, Terra, Luna, or Caveman were used in this continuation.
++No model-usage savings or measured time allocation is claimed.
++
++## Artifacts and publication
++
++Evidence directory: `evidence/support-v2-01-log-ingestion/`.
++Package directory: `dist/support-v2-01-log-ingestion/`.
++The evidence includes BASELINE_FILE, MODIFIED_FILE, DIFF_FILE, VERIFICATION.txt, and executable ROLLBACK.sh.
++The rollback test restores a disposable tool copy. It does not modify worlds or the active modified tool.
++PACKAGE_MANIFEST.json records package members and hashes.
++PUBLICATION.txt records the verified remote branch and commits after upload.
++This report and its evidence are uploaded only to the support branch.
++
++## MAIN HANDOFF
++
++1. Compare current main and support HEADs.
++2. Audit original implementation commit `8231f8bd93626316f9d59639ad95c6cd5d7bce84`.
++3. Audit this continuation's tooling and document diff against `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
++4. Select implementation changes without historical evidence-package commits.
++5. Recheck production behavior after adoption.
++6. Run the full required GameTest, core, and build gate on integrated main.
++7. Run client acceptance with the existing protocol and strict evidence tool.
++8. Keep V2-01 PARTIAL until gameplay and human acceptance are established.
++
++GPT SUPPORT IMPLEMENTATION: scoped implementation delivered; historical archive reconciliation remains PARTIAL.
++V2-01 AUTOMATED COVERAGE: PASS for executed support scope; survival/client integration remains PARTIAL.
++V2-01 CLIENT GATE: NOT TESTED. HUMAN EXPERIENCE: NOT TESTED. REAL CLIENT: NOT TESTED.
+diff --git a/docs/SUPPORT_V2_01_TEST_INVENTORY.md b/docs/SUPPORT_V2_01_TEST_INVENTORY.md
+new file mode 100644
+index 0000000..751584f
+--- /dev/null
++++ b/docs/SUPPORT_V2_01_TEST_INVENTORY.md
+@@ -0,0 +1,46 @@
++# V2-01 support test inventory
++
++## Existing baseline inspected before implementation
++
++| Existing coverage | Reuse decision |
++| --- | --- |
++| `ActorGameTests.unobservedArrivalTerminatesWithoutPlayerKnowledge` | Reuse termination and Actor NBT separation. Do not duplicate the test. |
++| `NpcGameTests.settledResidentHasDayWorkNightRestWithoutNewFacts` | Reuse daily time boundaries and ordinary-talk cooldown. |
++| `ReturnNetworkIntegrationGameTests.networkAllDurableBoundariesWithNpcReceipts` | Reuse checkpoint, identity, receipt, disk readback, and duplicate completion tests. |
++| `networkCorruptionMatrixRejectsPermanentInference` | Reuse permanent-fact corruption rejection. |
++| `ReturnNetworkSupportGameTests` | Reuse diagnostic load matrix and immutable identity/facts. Do not call these actual chunk tests. |
++| `ReturnNetworkPlaybackGameTests` and pure signal tests | Reuse emission, observation, restart, and replay contracts. |
++| Schema5, transaction, preservation, Opening tests | Retain all existing tests and protected storage code. |
++
++Fresh support baseline: 114/114 GameTests, 176858 core assertions, and build PASS.
++
++## Added gaps
++
++- Nine observation-policy GameTests cover positive accumulation, tick-eight confirmation, range, facing, LOS, interruption, and original predicate equivalence.
++- Three knowledge GameTests cover notification eligibility, idempotent observation persistence, and neutral/read-only revisit selection.
++- Three ownership GameTests cover completed delegation, ordinary/context dialogue, and unchanged participant/facts.
++- One headless negative integration GameTest uses the actual Wayfarer and Minecraft's supported creative mock ServerPlayer.
++- Twenty-one evidence-validator tests cover completeness, statuses, metadata, references, atomic output, and human-field protection.
++- Ten log-draft tests cover byte preservation, target hashes, existing-output protection, and prevention of inferred acceptance.
++
++The expected GameTest count is 130. Only the execution log establishes the actual count and result.
++
++## Automation limits
++
++Policy tests prove calculations and read-only selection. They do not prove a person's screen view or understanding.
++The entity test proves the creative guard through actual ticks and Actor NBT persistence. Its connection is not a real client.
++The supported mock overrides `isCreative()` to true. Changing game mode does not produce a survival observer.
++An initial positive integration fixture failed for this reason. Its failed log is retained.
++No custom fake-player subclass or internal player-list hack was introduced to bypass that guard.
++Positive survival observation remains a client gate; the shared calculation is covered by policy tests.
++The ownership tests do not prove live NPC navigation or actual dialogue delivery.
++Station selector tests prove no record mutation. Production StationBlock diff review checks the absence of new world writes.
++Actual occlusion/view handling, route readability, warnings, crisis, recovery, and human/audio experience remain client gates.
++
++## Log ingestion continuation, 2026-11-01
++
++The baseline Python gate passed 19 tests before this continuation.
++The updated Python gate passed 31 tests.
++The source and resources remain unchanged from support HEAD `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
++The prior 130 GameTest result remains previous support evidence. This continuation does not rerun that gate.
++The inherited startup log produces 15 NOT_TESTED scenarios and no human or client acceptance claim.
+diff --git a/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md b/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+new file mode 100644
+index 0000000..c56b7d7
+--- /dev/null
++++ b/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+@@ -0,0 +1,133 @@
++# V2-01 client validation protocol
++
++## Purpose and claim boundary
++
++Use this protocol after MAIN audits and adopts the support diff.
++Record actual observations. Do not convert GameTest results into client or human results.
++The evidence tool checks report structure and local file hashes. It does not independently observe Minecraft.
++Treat the historical Computer Use kernel-assets error as a repository-independent blocker unless new evidence proves a repository cause.
++Use direct manual play when Computer Use is unavailable. Do not modify Codex internals to complete this protocol.
++
++## Prepare the isolated client
++
++1. Record the adopted main branch and full implementation SHA.
++2. Verify the selected JAR with `Get-FileHash -Algorithm SHA256 -LiteralPath <JAR>`.
++3. Create a separate Minecraft profile and save directory.
++4. Preserve the user's normal profile, worlds, and global volume.
++5. Set all sound categories to zero before agent-launched testing.
++6. Select the right secondary `DISPLAY1` and verify the actual window bounds.
++7. Create a new survival world for the primary acceptance path.
++8. Copy `tools/validation/v2-01-client-session-template.json` into the evidence directory as `client-session.json`.
++9. Set `evidence_mode` to `REAL_CLIENT` only for actual client observations.
++10. Record `tester_kind` as `HUMAN` or `AUTOMATED` for each executed scenario.
++
++Keep muted visual verification separate from human audio verification.
++Record `audio_readability=NOT_TESTED` when no person heard the scene.
++Use a separate explicitly selected isolated sound-on session for human audio review.
++
++## Primary path and shortcut rules
++
++Play Opening, Overworld, survival, Yeoul, Return Network, NoEvent, Returner, recovery, and revisit in order.
++Do not use debug checkpoints, fabricated story facts, creative mode, or teleport commands in this primary path.
++Collect resources, craft basic tools, make shelter, and resume normal play between authored events.
++Record where discovery stalls. Do not force an event to conceal a progression or readability defect.
++Use isolated copies for secondary negative cases. Label any fixture arrangement or environment manipulation.
++Never use a normal player world for a corruption or destructive fixture.
++
++## Scenario matrix
++
++| Scenario | Start condition and action | Expected invariant and evidence |
++| --- | --- | --- |
++| `new_world_boot` | Start the selected JAR in a fresh survival world. | World loads with the recorded build. Capture profile, world ID, and startup log. |
++| `opening_transition` | Play the first-person fragment through its natural exit. | Overworld commit stays monotonic. Capture transition and fresh-process reopening. |
++| `yeoul_first_contact` | Reach Yeoul through ordinary exploration. | Existing Yeoul participates. Record UUID, instance, generation, and first-contact context. |
++| `return_network_normal_path` | Complete Return-Light, then investigate the relay naturally. | Checkpoints 0–6 progress without duplicate facts. Record signal, interaction, shared experience, and aftermath. |
++| `returner_unobserved_completion` | Leave the figure unobserved while allowing its encounter to finish. | Termination does not create `player_observed_returner` or the resolution notice/music. Record persisted facts separately from absence of a caption. |
++| `returner_positive_observation` | Face a visible Returner within 32 blocks for sustained exposure. | Observation fact appears and survives reload. Record sightline, distance, actor identity, and saved facts. |
++| `observation_interrupted` | Interrupt a partial exposure with a view change or disconnect. | Partial exposure does not combine across interruption. Record before/after facts and fresh exposure. Exact tick boundaries also require automated evidence. |
++| `occluded_returner` | Place an opaque obstruction in a secondary fixture's sightline. | Proximity alone does not grant observation. Record the obstruction and unchanged fact. |
++| `warning_ignored_crisis` | Continue blocking the route after a readable warning in an isolated copy. | A reaction window precedes bounded crisis. Record warning, response interval, escape, and cleanup. |
++| `recovery` | Clear the route or escape the crisis. | Threat cleanup permits ordinary Minecraft play. Record target/audio cleanup and resumed activity. |
++| `station_revisit_observed` | Revisit the original station after an observed encounter. | Physical-trace text appears without forced interpretation, replay, or new durable facts. Repeat the interaction. |
++| `station_revisit_unobserved` | Revisit after unobserved completion or an older save without the fact. | Neutral text appears. Record absence of invented encounter knowledge and repeated-interaction mutations. |
++| `yeoul_post_event_dialogue` | Speak to Yeoul after Return Network completion. Repeat while crouching. | Ordinary dialogue remains available. Crouching selects context dialogue. Neither interaction creates new facts. |
++| `yeoul_daily_route` | Observe work and rest after event completion. | Resident movement resumes outside the existing brief relay glance. Record actual navigation and stable participant identity. |
++| `survival_continuity` | Mine, craft, build, explore, sleep, and return to normal play. | Story staging preserves survival freedom and player-built geometry. Record activities and any interruption. |
++
++The required client gate uses twelve MUST scenarios defined by the directive.
++The three additional scenarios remain visible in the summary even when not executed.
++Do not interpret optional status as evidence that the scenario passed.
++
++## Save and restart observations
++
++1. Save and reopen near the Opening-to-Overworld transition.
++2. Save and reopen after Return Network intervention or response.
++3. Disconnect during a partial Returner exposure in a secondary copy.
++4. Save and reopen after confirmed observation and after encounter termination.
++5. Compare checkpoint, facts, UUID, instance, generation, and completion receipts.
++6. Record the old and new process identifiers when a process restart is claimed.
++
++Never infer saved state from a screen caption alone.
++Keep developer reads of NBT separate from the primary unassisted player actions.
++Keep death, dimension, chunk, and corruption checks risk-based when their production code is unchanged.
++
++## Evidence files and metadata
++
++Use names such as `session-01_returner-positive_01.png` and `session-01_client.log`.
++Store references beneath the directory containing `client-session.json`.
++Use local file paths in `evidence_reference`. The validator rejects missing files and paths outside that directory.
++Record full `build_sha`, `jar_sha256`, world/profile identity, start, observed, expected, tester, and notes.
++Use one build/JAR pair per summary. Split different builds into separate sessions.
++Record human readability, fear pacing, and audio readability independently.
++Set every unexecuted result to `NOT_TESTED`; leave its human fields `NOT_TESTED`.
++
++## Run the strict summary
++
++### Prepare a draft from an existing log
++
++Run this optional command for one explicitly selected log:
++
++```powershell
++python tools/validation/v2_01_client_log_draft.py path/to/client.log evidence/v2-playable-core/session-01
++```
++
++Choose a new output directory. The command rejects an existing directory.
++The command copies the log without changing its bytes.
++The command records marker counts, line numbers, and the copied log's SHA-256.
++The command creates all 15 scenarios as `NOT_TESTED`.
++It leaves evidence references and execution build hashes empty.
++Startup, sound initialization, player joins, and Gradle success do not grant scenario PASS.
++
++Optionally provide both `--target-build-sha FULL_COMMIT` and `--target-jar path/to/candidate.jar`.
++The tool hashes the candidate JAR and records the declared target commit.
++This target identifies the intended build. It does not prove which build produced the log.
++Keep execution metadata empty until an actual run establishes that association.
++Review the log and record actual scenario results with the original evidence requirements.
++Exit 0 means draft creation succeeded. It does not mean client acceptance passed.
++Exit 2 means draft creation failed.
++
++### Validate completed records
++
++Run from the repository root:
++
++```powershell
++python tools/validation/v2_01_client_evidence.py evidence/v2-playable-core/client-session.json evidence/v2-playable-core/client-summary.json
++```
++
++Exit 0 means all reported MUST client scenarios passed structural validation.
++Exit 1 means the valid report has a PARTIAL or FAIL client gate.
++Exit 2 means invalid input. The tool preserves an existing output on invalid input.
++The tool writes a valid summary through a temporary file and atomic replacement.
++Missing scenarios become `NOT_TESTED`. Duplicate scenarios and mixed builds are rejected.
++Synthetic reports never produce a real-client gate PASS.
++Automated records never grant human ratings.
++An unexecuted REAL_CLIENT template reports `REAL_CLIENT=NOT_TESTED` and `V2_01_CLIENT_GATE=PARTIAL`.
++
++## Acceptance
++
++Set a scenario to PASS only when its observation and references support the expected invariant.
++Set FAIL for an observed contradiction. Record reproduction and failure evidence.
++Set BLOCKED when the environment prevents execution. Name the external blocker.
++Set NOT_TESTED when the scenario was not executed.
++Keep V2-01 PARTIAL until MAIN completes actual client acceptance and reviews remaining gameplay issues.
++Do not start V2-02 or promote 0.3.2 from a validator summary alone.
+diff --git a/src/main/java/io/github/whileaway/ChaseKnowledge.java b/src/main/java/io/github/whileaway/ChaseKnowledge.java
+new file mode 100644
+index 0000000..883141b
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ChaseKnowledge.java
+@@ -0,0 +1,18 @@
++package io.github.whileaway;
++
++/** Read-only presentation choices. Encounter completion does not establish observation. */
++public final class ChaseKnowledge {
++    private ChaseKnowledge() {}
++
++    private static boolean observed(StoryActorRecord actor) {
++        return actor != null && actor.facts.contains(StoryActors.CHASE_OBSERVED);
++    }
++
++    public static boolean shouldPresentResolution(boolean notice, boolean playerPresent, StoryActorRecord actor) {
++        return notice && playerPresent && observed(actor);
++    }
++
++    public static String stationRevisitKey(StoryActorRecord actor) {
++        return observed(actor) ? "story.whileaway.station_revisit" : "story.whileaway.station_revisit_unseen";
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/KnowledgeAndResidentGameTests.java b/src/main/java/io/github/whileaway/KnowledgeAndResidentGameTests.java
+new file mode 100644
+index 0000000..7977b67
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/KnowledgeAndResidentGameTests.java
+@@ -0,0 +1,66 @@
++package io.github.whileaway;
++
++import java.util.*;
++import net.minecraft.gametest.framework.*;
++import net.neoforged.neoforge.gametest.*;
++
++/** Read-only production selectors and ownership policy, not live dialogue or navigation. */
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class KnowledgeAndResidentGameTests {
++    private static StoryActorRecord record() {
++        return ReturnNetworkFixtures.resident(new NarrativeData());
++    }
++    @GameTest(template="empty") public static void resolutionRequiresKnowledgeAndUnclaimedNotice(GameTestHelper h) {
++        var r=record();r.facts.add("encounter_complete");var before=r.save();
++        h.assertTrue(!ChaseKnowledge.shouldPresentResolution(true,true,r),"completion alone never authorizes notice/music");
++        h.assertTrue(r.save().equals(before),"eligibility never adds observation");
++        r.facts.add(StoryActors.CHASE_OBSERVED);
++        h.assertTrue(ChaseKnowledge.shouldPresentResolution(true,true,r),"observed encounter allows the existing presentation");
++        h.assertTrue(!ChaseKnowledge.shouldPresentResolution(false,true,r),"claimed notice stays claimed");
++        h.assertTrue(!ChaseKnowledge.shouldPresentResolution(true,false,r),"absent player receives no presentation");h.succeed();
++    }
++    @GameTest(template="empty") public static void observedFactRemainsSingleAfterRoundTrip(GameTestHelper h) {
++        var r=record();r.facts.add(StoryActors.CHASE_OBSERVED);var before=r.save();
++        h.assertTrue(!r.facts.add(StoryActors.CHASE_OBSERVED),"existing set prevents duplicate knowledge");
++        var restored=StoryActorRecord.load(r.save());
++        h.assertTrue(restored.save().equals(before)&&ChaseKnowledge.shouldPresentResolution(true,true,restored),"fact persists independently of presentation");h.succeed();
++    }
++    @GameTest(template="empty") public static void stationRevisitOldMissingAndRepeatedSelectionIsReadOnly(GameTestHelper h) {
++        var r=record();r.facts.add("encounter_complete");var old=StoryActorRecord.load(r.save());var before=old.save();
++        String neutral="story.whileaway.station_revisit_unseen";
++        h.assertTrue(ChaseKnowledge.stationRevisitKey(null).equals(neutral),"absent actor has neutral text");
++        for(int visit=0;visit<3;visit++)h.assertTrue(ChaseKnowledge.stationRevisitKey(old).equals(neutral),"old save never infers knowledge");
++        h.assertTrue(before.equals(old.save()),"revisits preserve every saved field");
++        old.facts.add(StoryActors.CHASE_OBSERVED);before=old.save();
++        h.assertTrue(ChaseKnowledge.stationRevisitKey(old).equals("story.whileaway.station_revisit"),"observation alone selects observed text");
++        h.assertTrue(before.equals(old.save()),"observed selection also remains read-only");h.succeed();
++    }
++    @GameTest(template="empty") public static void completedNetworkDelegatesExceptExistingAftermathLook(GameTestHelper h) {
++        h.assertTrue(ReturnNetworkNpcPolicy.owner(ReturnNetworkState.Stage.NOT_STARTED,0)==ReturnNetworkNpcPolicy.Owner.RESIDENT,"unstarted adapter delegates");
++        h.assertTrue(ReturnNetworkNpcPolicy.owner(ReturnNetworkState.Stage.COMPLETED,30)==ReturnNetworkNpcPolicy.Owner.RESIDENT,"resident route resumes after glance");
++        h.assertTrue(ReturnNetworkNpcPolicy.owner(ReturnNetworkState.Stage.COMPLETED,199)==ReturnNetworkNpcPolicy.Owner.RESIDENT,"resident keeps normal route");
++        h.assertTrue(ReturnNetworkNpcPolicy.owner(ReturnNetworkState.Stage.COMPLETED,200)==ReturnNetworkNpcPolicy.Owner.AFTERMATH_LOOK,"existing periodic look remains unchanged");
++        h.assertTrue(!ReturnNetworkNpcPolicy.eventInteractionAllowed(ReturnNetworkState.Stage.COMPLETED),"completed adapter releases interaction");h.succeed();
++    }
++    @GameTest(template="empty") public static void completedDialogueAndRoutineDoNotChangeFacts(GameTestHelper h) {
++        var r=record();var before=r.save();var home=NpcState.home(r);
++        h.assertTrue(ReturnNetworkNpcPolicy.residentDialogue(ReturnNetworkState.Stage.COMPLETED,false,true).endsWith("ordinary_work"),"completed network permits ordinary work dialogue");
++        h.assertTrue(ReturnNetworkNpcPolicy.residentDialogue(ReturnNetworkState.Stage.COMPLETED,false,false).endsWith("ordinary_rest"),"completed network permits rest dialogue");
++        h.assertTrue(ReturnNetworkNpcPolicy.residentDialogue(ReturnNetworkState.Stage.COMPLETED,true,true).endsWith("aftermath"),"crouching retains context dialogue");
++        NpcEvents.residenceDestination(home,6000);NpcEvents.residenceDestination(home,8000);NpcEvents.residenceDestination(home,12000);
++        h.assertTrue(before.equals(r.save()),"dialogue selection and resident destinations never create facts or replace identity");h.succeed();
++    }
++    @GameTest(template="empty") public static void activeNetworkOwnsAdapterWithoutChangingParticipant(GameTestHelper h) {
++        var r=record();var state=ReturnNetworkState.notStarted().discover(new ReturnNetworkState.Prerequisite(4,true,true,true),UUID.randomUUID(),
++            new ReturnNetworkState.Location(ReturnNetworkEvents.LOCATION,r.dimension,ReturnNetworkEvents.RELAY.asLong()))
++            .join(new ReturnNetworkState.Participant(r.storyId,r.instanceId,r.entityId,r.generation));
++        var before=state.save();var actorBefore=r.save();
++        for(var stage:ReturnNetworkState.Stage.values())if(stage!=ReturnNetworkState.Stage.NOT_STARTED&&stage!=ReturnNetworkState.Stage.COMPLETED) {
++            h.assertTrue(ReturnNetworkNpcPolicy.owner(stage,100)==ReturnNetworkNpcPolicy.Owner.EVENT,"active adapter retains navigation/wait responsibility");
++            h.assertTrue(ReturnNetworkNpcPolicy.residentDialogue(stage,true,true).endsWith("ordinary_work"),"ordinary selector does not fabricate completion");
++        }
++        NpcEvents.residenceDestination(NpcState.home(r),6000);
++        h.assertTrue(state.save().equals(before)&&r.save().equals(actorBefore),"ownership/destination reads preserve participant and facts");h.succeed();
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/NpcEvents.java b/src/main/java/io/github/whileaway/NpcEvents.java
+index cbcd98e..ae0f027 100644
+--- a/src/main/java/io/github/whileaway/NpcEvents.java
++++ b/src/main/java/io/github/whileaway/NpcEvents.java
+@@ -61,9 +61,7 @@ public final class NpcEvents {
+         if(r.checkpoint.checkpoint==4) {
+             if(npc.tryOrdinaryTalk(p.serverLevel().getGameTime())) {
+                 var network=NarrativeData.get(p.getServer()).returnNetwork();
+-                String key=network.stage==ReturnNetworkState.Stage.COMPLETED&&p.isShiftKeyDown()
+-                    ?"story.whileaway.network.aftermath"
+-                    :workingHours(p.serverLevel().getDayTime())?"story.whileaway.yeoul.ordinary_work":"story.whileaway.yeoul.ordinary_rest";
++                String key=ReturnNetworkNpcPolicy.residentDialogue(network.stage,p.isShiftKeyDown(),workingHours(p.serverLevel().getDayTime()));
+                 p.displayClientMessage(Component.translatable(key),false);
+                 npc.getLookControl().setLookAt(p);
+             }
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+index c70ff4d..ab344a7 100644
+--- a/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
++++ b/src/main/java/io/github/whileaway/ReturnNetworkEvents.java
+@@ -76,7 +76,7 @@ public final class ReturnNetworkEvents {
+         if(!issues.isEmpty()){StoryStorage.block(l.getServer(),String.join(";",issues));npc.getNavigation().stop();return true;}
+         if(s.stage==ReturnNetworkState.Stage.COMPLETED) {
+             // A small new resident habit, not a replay of the event or a new work identity.
+-            if(l.getGameTime()%200<30){npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);return true;}
++            if(ReturnNetworkNpcPolicy.owner(s.stage,l.getGameTime())==ReturnNetworkNpcPolicy.Owner.AFTERMATH_LOOK){npc.getLookControl().setLookAt(RELAY.getX()+.5,RELAY.getY()+.5,RELAY.getZ()+.5);return true;}
+             return false;
+         }
+         var rt=runtime(l);var p=NpcEvents.witness(l,RELAY);
+@@ -102,7 +102,7 @@ public final class ReturnNetworkEvents {
+         if(!p.isAlive()||p.isSpectator()||npc.level()!=p.level()||npc.distanceToSqr(p)>36||!StoryStorage.available(p.getServer()))return false;
+         var d=NarrativeData.get(p.getServer());var s=d.returnNetwork();var r=d.actors.get(NpcEvents.STORY);
+         if(r==null||!StoryActors.canonical(npc,r)||!exactLocation(s,p.serverLevel()))return false;
+-        if(s.stage==ReturnNetworkState.Stage.COMPLETED)return false; // Resident dialogue owns completed-event visits.
++        if(!ReturnNetworkNpcPolicy.eventInteractionAllowed(s.stage))return false; // Resident dialogue owns completed-event visits.
+         if(s.stage!=ReturnNetworkState.Stage.RESPONSE_OBSERVED||!environmentReady(p.serverLevel(),s)
+             ||npc.distanceToSqr(STAND.getX()+.5,STAND.getY(),STAND.getZ()+.5)>1.4)return false;
+         if(!s.facts.contains(ReturnNetworkState.Fact.SHARED_EXPERIENCE)&&commit(p,s.shareExperience(),"RN_F_SHARED"))say(p,"shared");
+diff --git a/src/main/java/io/github/whileaway/ReturnNetworkNpcPolicy.java b/src/main/java/io/github/whileaway/ReturnNetworkNpcPolicy.java
+new file mode 100644
+index 0000000..81728b6
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnNetworkNpcPolicy.java
+@@ -0,0 +1,23 @@
++package io.github.whileaway;
++
++/** Existing adapter precedence. These choices do not grant movement or story facts. */
++final class ReturnNetworkNpcPolicy {
++    enum Owner { RESIDENT, EVENT, AFTERMATH_LOOK }
++    private ReturnNetworkNpcPolicy() {}
++
++    static Owner owner(ReturnNetworkState.Stage stage, long gameTime) {
++        if (stage == ReturnNetworkState.Stage.NOT_STARTED) return Owner.RESIDENT;
++        if (stage == ReturnNetworkState.Stage.COMPLETED)
++            return gameTime % 200 < 30 ? Owner.AFTERMATH_LOOK : Owner.RESIDENT;
++        return Owner.EVENT;
++    }
++
++    static boolean eventInteractionAllowed(ReturnNetworkState.Stage stage) {
++        return stage != ReturnNetworkState.Stage.COMPLETED;
++    }
++
++    static String residentDialogue(ReturnNetworkState.Stage stage, boolean crouching, boolean working) {
++        if (stage == ReturnNetworkState.Stage.COMPLETED && crouching) return "story.whileaway.network.aftermath";
++        return working ? "story.whileaway.yeoul.ordinary_work" : "story.whileaway.yeoul.ordinary_rest";
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/ReturnerEntityObservationGameTests.java b/src/main/java/io/github/whileaway/ReturnerEntityObservationGameTests.java
+new file mode 100644
+index 0000000..2e5dbdb
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnerEntityObservationGameTests.java
+@@ -0,0 +1,41 @@
++package io.github.whileaway;
++
++import java.util.*;
++import net.minecraft.core.BlockPos;
++import net.minecraft.gametest.framework.*;
++import net.neoforged.neoforge.gametest.*;
++
++/** Headless entity integration with Minecraft's supported mock ServerPlayer API. */
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class ReturnerEntityObservationGameTests {
++    @GameTest(template="empty",batch="support_observation_entity",timeoutTicks=60)
++    public static void creativeMockNeverGrantsObservation(GameTestHelper h) {
++        var level=h.getLevel();var server=level.getServer();var data=NarrativeData.get(server);
++        // This version's supported mock overrides isCreative() to true, regardless of game mode.
++        var player=h.makeMockServerPlayerInLevel();player.setNoGravity(true);
++        var start=h.absolutePos(new BlockPos(2,3,1));player.setPos(start.getX()+.5,start.getY(),start.getZ()+.5);
++        player.setYRot(0);player.setXRot(0);
++        var entry=data.entry(player.getUUID());entry.openingStage=OpeningStage.COMPLETED;
++        var actor=WhileAway.WAYFARER.get().create(level);actor.setNoAi(true);actor.setNoGravity(true);
++        var pos=start.south(7);actor.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,0,0);
++        actor.bind(player.getUUID(),start.south(20));entry.encounter=actor.getUUID();
++        var record=StoryActors.prepare(actor,StoryActors.chaseId(player.getUUID()),StoryActors.CHASE,"pursuer",UUID.randomUUID(),player.getUUID(),true);
++        h.assertTrue(StoryActors.spawnPrepared(level,record,actor),"production entity spawned through the existing reservation");
++        h.runAtTickTime(12,()->{
++            try {
++                h.assertTrue(player.isCreative()&&actor.tickCount>=8,"supported creative mock and actual entity ticks exercised");
++                h.assertTrue(!record.facts.contains(StoryActors.CHASE_OBSERVED),"creative demonstration never grants encounter knowledge");
++                h.assertTrue(!record.facts.contains("encounter_complete"),"creative presence does not terminate the encounter");
++                var restored=StoryActorRecord.load(record.save());
++                h.assertTrue(!restored.facts.contains(StoryActors.CHASE_OBSERVED)&&restored.entityId.equals(actor.getUUID()),"NBT round trip preserves absence and binding");
++                var before=record.save();
++                h.assertTrue(!ChaseKnowledge.shouldPresentResolution(true,true,record)&&record.save().equals(before),"unobserved eligibility remains read-only");
++                h.succeed();
++            } finally {
++                StoryActors.abort(server,record);data.actors.remove(record.storyId);StoryActors.persist(server);
++                server.getPlayerList().remove(player);
++            }
++        });
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/ReturnerObservationGameTests.java b/src/main/java/io/github/whileaway/ReturnerObservationGameTests.java
+new file mode 100644
+index 0000000..15029f7
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/ReturnerObservationGameTests.java
+@@ -0,0 +1,69 @@
++package io.github.whileaway;
++
++import io.github.whileaway.support.ReturnerObservationPolicy;
++import net.minecraft.gametest.framework.*;
++import net.neoforged.neoforge.gametest.*;
++
++/** Policy tests. These tests do not simulate a player's view in a client. */
++@GameTestHolder(WhileAway.ID)
++@PrefixGameTestTemplate(false)
++public final class ReturnerObservationGameTests {
++    private static int step(int previous, double distanceSquared, double dot, boolean los) {
++        return ReturnerObservationPolicy.nextStreak(previous,
++            ReturnerObservationPolicy.withinRange(distanceSquared) && ReturnerObservationPolicy.facing(dot) && los);
++    }
++
++    @GameTest(template="empty") public static void withinRangeFacingVisibleAccumulates(GameTestHelper h) {
++        int streak=0;
++        for(int tick=1;tick<=8;tick++) {
++            streak=step(streak,100,0.8,true);
++            h.assertTrue(streak==tick,"eligible exposure advances once per tick");
++        }
++        h.succeed();
++    }
++    @GameTest(template="empty") public static void exactlyEightTicksConfirms(GameTestHelper h) {
++        h.assertTrue(!ReturnerObservationPolicy.confirmed(7),"seven does not confirm");
++        h.assertTrue(ReturnerObservationPolicy.confirmed(8),"eight confirms");h.succeed();
++    }
++    @GameTest(template="empty") public static void distanceOutside32Resets(GameTestHelper h) {
++        h.assertTrue(step(7,1024,1,true)==8,"exact 32-block boundary accepted");
++        h.assertTrue(step(7,Math.nextUp(1024d),1,true)==0,"outside boundary resets");
++        h.assertTrue(step(7,0.01,1,true)==0&&step(7,0,1,true)==0,"existing near-zero normalization guard retained");
++        h.assertTrue(step(7,Double.NaN,1,true)==0,"unknown distance never confirms");h.succeed();
++    }
++    @GameTest(template="empty") public static void lookDotBelowThresholdResets(GameTestHelper h) {
++        h.assertTrue(step(7,100,Math.nextDown(0.35),true)==0,"below threshold resets");
++        h.assertTrue(step(7,100,-1,true)==0&&step(7,100,Double.NaN,true)==0,"back-facing or undefined view resets");h.succeed();
++    }
++    @GameTest(template="empty") public static void lookDotBoundaryAccepted(GameTestHelper h) {
++        h.assertTrue(step(7,100,0.35,true)==8,"exact dot threshold accepted");h.succeed();
++    }
++    @GameTest(template="empty") public static void lineOfSightFalseResets(GameTestHelper h) {
++        h.assertTrue(step(7,100,1,false)==0,"occlusion clears the entire streak");h.succeed();
++    }
++    @GameTest(template="empty") public static void singleInterruptedTickResetsEntireStreak(GameTestHelper h) {
++        int streak=7;streak=step(streak,100,1,false);
++        for(int tick=1;tick<=7;tick++) {
++            streak=step(streak,100,1,true);
++            h.assertTrue(!ReturnerObservationPolicy.confirmed(streak),"fresh streak still requires eight ticks");
++        }
++        h.assertTrue(ReturnerObservationPolicy.confirmed(step(streak,100,1,true)),"eighth fresh tick confirms");h.succeed();
++    }
++    @GameTest(template="empty") public static void intermittentVisibilityNeverAccumulates(GameTestHelper h) {
++        int streak=0;
++        for(int cycle=0;cycle<4;cycle++) {
++            for(int tick=0;tick<7;tick++)streak=step(streak,100,1,true);
++            streak=step(streak,100,1,false);
++            h.assertTrue(streak==0&&!ReturnerObservationPolicy.confirmed(streak),"separate exposures never combine");
++        }
++        h.succeed();
++    }
++    @GameTest(template="empty") public static void extractionMatchesOriginalPredicate(GameTestHelper h) {
++        for(double distance:new double[]{0,0.01,Math.nextUp(0.01),100,1024,Math.nextUp(1024d),Double.NaN,Double.POSITIVE_INFINITY})
++            for(double dot:new double[]{-1,Math.nextDown(0.35),0.35,1,Double.NaN})for(boolean los:new boolean[]{false,true}) {
++                boolean original=distance<=32*32&&distance>0.01&&dot>=0.35&&los;
++                h.assertTrue((step(0,distance,dot,los)==1)==original,"original boundary semantics preserved");
++            }
++        h.succeed();
++    }
++}
+diff --git a/src/main/java/io/github/whileaway/StoryActors.java b/src/main/java/io/github/whileaway/StoryActors.java
+index 3d76bb3..8f4309e 100644
+--- a/src/main/java/io/github/whileaway/StoryActors.java
++++ b/src/main/java/io/github/whileaway/StoryActors.java
+@@ -221,7 +221,7 @@ public final class StoryActors {
+         var e=NarrativeData.get(server).entry(r.owner);e.progress=e.progress.complete();e.encounter=null;
+         r.checkpoint.advance(4);boolean notice=!r.noticeClaimed;r.noticeClaimed=true;persist(server);emit(server,r,"AFTER_COMPLETE");
+         var p=server.getPlayerList().getPlayer(r.owner);
+-        if(notice&&p!=null&&r.facts.contains(CHASE_OBSERVED)){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
++        if(ChaseKnowledge.shouldPresentResolution(notice,p!=null,r)){p.displayClientMessage(net.minecraft.network.chat.Component.translatable("story.whileaway.after"),false);
+             if(StoryConfig.MUSIC.get())StoryEvents.music(p,WhileAway.RESOLVE.get(),.45f);}
+     }
+     public static void abort(MinecraftServer server,StoryActorRecord r) {
+diff --git a/src/main/java/io/github/whileaway/content/StationBlock.java b/src/main/java/io/github/whileaway/content/StationBlock.java
+index 609104e..259f1bc 100644
+--- a/src/main/java/io/github/whileaway/content/StationBlock.java
++++ b/src/main/java/io/github/whileaway/content/StationBlock.java
+@@ -27,9 +27,7 @@ public final class StationBlock extends BaseEntityBlock {
+         var entry = NarrativeData.get(serverPlayer.getServer()).entry(serverPlayer.getUUID());
+         if (!entry.progress.encounterComplete() || !pos.equals(entry.station)) return InteractionResult.PASS;
+         var actor=NarrativeData.get(serverPlayer.getServer()).actors.get(StoryActors.chaseId(serverPlayer.getUUID()));
+-        boolean observed=actor!=null&&actor.facts.contains(StoryActors.CHASE_OBSERVED);
+-        serverPlayer.displayClientMessage(Component.translatable(observed
+-            ?"story.whileaway.station_revisit":"story.whileaway.station_revisit_unseen"), false);
++        serverPlayer.displayClientMessage(Component.translatable(io.github.whileaway.ChaseKnowledge.stationRevisitKey(actor)), false);
+         return InteractionResult.SUCCESS;
+     }
+     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+diff --git a/src/main/java/io/github/whileaway/entity/Wayfarer.java b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+index 5f8ea88..f58e39e 100644
+--- a/src/main/java/io/github/whileaway/entity/Wayfarer.java
++++ b/src/main/java/io/github/whileaway/entity/Wayfarer.java
+@@ -1,6 +1,7 @@
+ package io.github.whileaway.entity;
+ 
+ import io.github.whileaway.*;
++import io.github.whileaway.support.ReturnerObservationPolicy;
+ import java.util.UUID;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.nbt.CompoundTag;
+@@ -69,10 +70,11 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
+         // Require sustained, unobstructed player view before recording encounter knowledge.
+         if(!actorRecord.facts.contains(StoryActors.CHASE_OBSERVED)) {
+             Vec3 toward=getEyePosition().subtract(player.getEyePosition());
+-            boolean visible=toward.lengthSqr()<=32*32 && toward.lengthSqr()>0.01
+-                && player.getLookAngle().dot(toward.normalize())>=0.35 && player.hasLineOfSight(this);
+-            observationTicks=visible?observationTicks+1:0;
+-            if(observationTicks>=8)StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,StoryActors.CHASE_OBSERVED);
++            boolean visible=ReturnerObservationPolicy.withinRange(toward.lengthSqr())
++                && ReturnerObservationPolicy.facing(player.getLookAngle().dot(toward.normalize()))
++                && player.hasLineOfSight(this);
++            observationTicks=ReturnerObservationPolicy.nextStreak(observationTicks,visible);
++            if(ReturnerObservationPolicy.confirmed(observationTicks))StoryActors.checkpoint(this,actorRecord,actorRecord.checkpoint.checkpoint,StoryActors.CHASE_OBSERVED);
+         }
+         if (lifetime > 2400) { finish(true); return; }
+         if (lifetime % 110 == 0) StoryEvents.sound(player, WhileAway.BREATH.get(), SoundSource.HOSTILE, blockPosition(), .5f);
+diff --git a/src/main/java/io/github/whileaway/support/ReturnerObservationPolicy.java b/src/main/java/io/github/whileaway/support/ReturnerObservationPolicy.java
+new file mode 100644
+index 0000000..33cf892
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/support/ReturnerObservationPolicy.java
+@@ -0,0 +1,22 @@
++package io.github.whileaway.support;
++
++/** Current Returner exposure rules. Streak progress remains transient. */
++public final class ReturnerObservationPolicy {
++    private ReturnerObservationPolicy() {}
++
++    public static boolean withinRange(double distanceSquared) {
++        return distanceSquared <= 32 * 32 && distanceSquared > 0.01;
++    }
++
++    public static boolean facing(double lookDot) {
++        return lookDot >= 0.35;
++    }
++
++    public static int nextStreak(int previous, boolean eligible) {
++        return eligible ? previous + 1 : 0;
++    }
++
++    public static boolean confirmed(int streak) {
++        return streak >= 8;
++    }
++}
+diff --git a/tools/validation/test_v2_01_client_evidence.py b/tools/validation/test_v2_01_client_evidence.py
+new file mode 100644
+index 0000000..55978fa
+--- /dev/null
++++ b/tools/validation/test_v2_01_client_evidence.py
+@@ -0,0 +1,178 @@
++"""Synthetic validator tests. These results are not real-client evidence."""
++import contextlib
++import copy
++import io
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++import v2_01_client_evidence as validator
++
++
++class EvidenceTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.source = self.root / "session.json"
++        self.output = self.root / "summary.json"
++        (self.root / "run.log").write_text("SYNTHETIC SELF-TEST ONLY", encoding="utf-8")
++        self.document = {"schema": 1, "evidence_mode": "SYNTHETIC", "scenarios": [self.row(n) for n in validator.SCENARIOS]}
++        self.save()
++
++    def row(self, name):
++        return {"scenario": name, "result": "PASS", "build_sha": "a" * 40, "jar_sha256": "b" * 64,
++                "isolated_profile": "synthetic-profile", "start_condition": "synthetic start",
++                "observed_behavior": "synthetic observation", "expected_behavior": "synthetic expectation",
++                "evidence_reference": ["run.log"], "tester": "validator self-test", "tester_kind": "AUTOMATED", "notes": ""}
++
++    def save(self):
++        self.source.write_text(json.dumps(self.document), encoding="utf-8")
++
++    def summary(self):
++        self.save()
++        return validator.summarize(self.document, self.source, self.output)
++
++    def reject(self, fragment):
++        with self.assertRaisesRegex(validator.InvalidEvidence, fragment):
++            self.summary()
++
++    def test_missing_scenarios_are_not_tested(self):
++        self.document["scenarios"] = []
++        result = self.summary()
++        self.assertEqual(result["counts"], {"NOT_TESTED": 15})
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++        self.assertEqual(result["REAL_CLIENT"], "NOT_TESTED")
++
++    def test_synthetic_pass_never_becomes_client_pass(self):
++        result = self.summary()
++        self.assertEqual(result["reported_evidence_gate"], "PASS")
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++        self.assertEqual(result["HUMAN_EXPERIENCE"], "NOT_TESTED")
++
++    def test_real_client_template_without_executed_rows_is_not_tested(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for row in self.document["scenarios"]:
++            row["result"] = "NOT_TESTED"
++        result = self.summary()
++        self.assertEqual(result["REAL_CLIENT"], "NOT_TESTED")
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++
++    def test_executed_real_client_evidence_retains_partial_status(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        self.document["scenarios"] = self.document["scenarios"][:1]
++        self.assertEqual(self.summary()["REAL_CLIENT"], "PARTIAL")
++
++    def test_every_must_failure_blocks_gate(self):
++        for name in validator.MUST:
++            doc = copy.deepcopy(self.document)
++            next(row for row in doc["scenarios"] if row["scenario"] == name)["result"] = "FAIL"
++            result = validator.summarize(doc, self.source, self.output)
++            self.assertEqual(result["reported_evidence_gate"], "FAIL", name)
++
++    def test_blocked_and_not_tested_must_remain_partial(self):
++        for status in ("BLOCKED", "NOT_TESTED"):
++            self.document["scenarios"][0]["result"] = status
++            self.assertEqual(self.summary()["reported_evidence_gate"], "PARTIAL")
++
++    def test_optional_failure_does_not_override_required_gate(self):
++        next(r for r in self.document["scenarios"] if r["scenario"] == "yeoul_daily_route")["result"] = "FAIL"
++        self.assertEqual(self.summary()["reported_evidence_gate"], "PASS")
++
++    def test_duplicate_and_unknown_scenarios_rejected(self):
++        self.document["scenarios"].append(copy.deepcopy(self.document["scenarios"][0]))
++        self.reject("DUPLICATE_SCENARIO")
++        self.document["scenarios"][-1]["scenario"] = "imagined_success"
++        self.reject("UNKNOWN_SCENARIO")
++
++    def test_invalid_result_rejected(self):
++        self.document["scenarios"][0]["result"] = "probably PASS"
++        self.reject("INVALID_RESULT")
++
++    def test_metadata_required_for_executed_scenario(self):
++        for field in (*validator.TEXT_FIELDS, "build_sha", "jar_sha256", "tester_kind", "isolated_profile"):
++            with self.subTest(field=field):
++                row = self.document["scenarios"][0]
++                old = row.pop(field)
++                self.reject("MISSING|INVALID")
++                row[field] = old
++
++    def test_mixed_build_or_jar_rejected(self):
++        for field, length in (("build_sha", 40), ("jar_sha256", 64)):
++            old = self.document["scenarios"][0][field]
++            self.document["scenarios"][0][field] = "c" * length
++            self.reject("MIXED_BUILD_EVIDENCE")
++            self.document["scenarios"][0][field] = old
++
++    def test_automatic_human_result_rejected(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for field in validator.HUMAN_FIELDS:
++            self.document["scenarios"][0][field] = "PASS"
++            self.reject("HUMAN_RESULT_WITHOUT_HUMAN_RUN")
++            del self.document["scenarios"][0][field]
++
++    def test_synthetic_human_claim_rejected(self):
++        self.document["scenarios"][0].update(tester_kind="HUMAN", human_readability="PASS")
++        self.reject("HUMAN_RESULT_WITHOUT_HUMAN_RUN")
++
++    def test_human_rollup_requires_every_must(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for row in self.document["scenarios"]:
++            row.update(tester_kind="HUMAN", human_readability="PASS")
++        self.assertEqual(self.summary()["HUMAN_EXPERIENCE"], "PASS")
++        self.document["scenarios"][0]["human_readability"] = "NOT_TESTED"
++        self.assertEqual(self.summary()["HUMAN_EXPERIENCE"], "NOT_TESTED")
++        self.document["scenarios"][0]["human_readability"] = "FAIL"
++        self.assertEqual(self.summary()["HUMAN_EXPERIENCE"], "FAIL")
++
++    def test_reference_existence_and_hash(self):
++        result = self.summary()
++        ref = result["scenarios"][0]["verified_references"][0]
++        self.assertEqual(ref["size"], len("SYNTHETIC SELF-TEST ONLY"))
++        self.assertEqual(len(ref["sha256"]), 64)
++        self.document["scenarios"][0]["evidence_reference"] = ["missing.log"]
++        self.reject("INVALID_REFERENCE_TARGET")
++
++    def test_reference_escape_and_input_output_rejected(self):
++        for reference in (str(self.source), str(self.output), "../outside.log"):
++            self.document["scenarios"][0]["evidence_reference"] = [reference]
++            self.reject("INVALID_REFERENCE_TARGET")
++
++    def test_pass_requires_evidence(self):
++        self.document["scenarios"][0]["evidence_reference"] = []
++        self.reject("MISSING_EVIDENCE")
++
++    def test_duplicate_json_key_rejected(self):
++        self.source.write_text('{"schema":1,"schema":1}', encoding="utf-8")
++        with contextlib.redirect_stdout(io.StringIO()) as output:
++            code = validator.main([str(self.source), str(self.output)])
++        self.assertEqual(code, 2)
++        self.assertIn("DUPLICATE_JSON_KEY", output.getvalue())
++
++    def test_invalid_input_preserves_existing_output(self):
++        self.output.write_text("KEEP", encoding="utf-8")
++        self.document["schema"] = 99;self.save()
++        with contextlib.redirect_stdout(io.StringIO()):
++            code = validator.main([str(self.source), str(self.output)])
++        self.assertEqual(code, 2)
++        self.assertEqual(self.output.read_text(), "KEEP")
++
++    def test_cli_partial_exit_and_input_preservation(self):
++        self.document["scenarios"] = [];self.save();before=self.source.read_bytes()
++        with contextlib.redirect_stdout(io.StringIO()):
++            code = validator.main([str(self.source), str(self.output)])
++        self.assertEqual(code, 1)
++        self.assertEqual(self.source.read_bytes(), before)
++        self.assertEqual(json.loads(self.output.read_text())["counts"]["NOT_TESTED"], 15)
++
++    def test_cli_same_file_rejected(self):
++        before = self.source.read_bytes()
++        with contextlib.redirect_stdout(io.StringIO()):
++            code = validator.main([str(self.source), str(self.source)])
++        self.assertEqual(code, 2)
++        self.assertEqual(self.source.read_bytes(), before)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/validation/test_v2_01_client_log_draft.py b/tools/validation/test_v2_01_client_log_draft.py
+new file mode 100644
+index 0000000..e6c84ba
+--- /dev/null
++++ b/tools/validation/test_v2_01_client_log_draft.py
+@@ -0,0 +1,98 @@
++"""Synthetic log ingestion tests. These tests do not execute Minecraft."""
++import contextlib
++import hashlib
++import io
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++import v2_01_client_evidence as validator
++import v2_01_client_log_draft as draft
++
++
++class LogDraftTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.log = self.root / "client.log"
++        self.output = self.root / "draft"
++        self.raw = (b"[12:00:00] [Render thread/INFO] [minecraft/SoundEngine]: Sound engine started\r\n"
++                    b"BUILD SUCCESSFUL\r\nAll scenarios PASS; human audio PASS\r\n")
++        self.log.write_bytes(self.raw)
++
++    def test_success_markers_and_claim_text_never_grant_acceptance(self):
++        review = draft.prepare(self.log, self.output)
++        self.assertFalse(review["inferred_acceptance"])
++        self.assertEqual(review["markers"]["gradle_success"]["count"], 1)
++        session = json.loads((self.output / "client-session.json").read_text())
++        summary = validator.summarize(session, self.output / "client-session.json", self.output / "summary.json")
++        self.assertEqual(summary["counts"], {"NOT_TESTED": 15})
++        self.assertEqual(summary["REAL_CLIENT"], "NOT_TESTED")
++        self.assertEqual(summary["HUMAN_EXPERIENCE"], "NOT_TESTED")
++
++    def test_source_copy_is_byte_exact_and_source_is_unchanged(self):
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual((self.output / "references/source.log").read_bytes(), self.raw)
++        self.assertEqual(self.log.read_bytes(), self.raw)
++        self.assertEqual(review["source_sha256"], hashlib.sha256(self.raw).hexdigest())
++
++    def test_target_jar_is_measured_but_never_attached_to_unexecuted_rows(self):
++        jar = self.root / "candidate.jar"
++        jar.write_bytes(b"SYNTHETIC JAR FIXTURE")
++        review = draft.prepare(self.log, self.output, "planned-profile", "a" * 40, jar)
++        self.assertEqual(review["target_build"]["jar_sha256"], hashlib.sha256(jar.read_bytes()).hexdigest())
++        session = json.loads((self.output / "client-session.json").read_text())
++        self.assertTrue(all(row["build_sha"] is None and row["jar_sha256"] is None for row in session["scenarios"]))
++
++    def test_existing_output_is_preserved(self):
++        self.output.mkdir()
++        sentinel = self.output / "keep.txt"
++        sentinel.write_text("KEEP")
++        with self.assertRaisesRegex(ValueError, "OUTPUT_ALREADY_EXISTS"):
++            draft.prepare(self.log, self.output)
++        self.assertEqual(sentinel.read_text(), "KEEP")
++        self.assertEqual(len(list(self.output.iterdir())), 1)
++
++    def test_missing_log_does_not_publish(self):
++        with self.assertRaises(OSError):
++            draft.prepare(self.root / "missing.log", self.output)
++        self.assertFalse(self.output.exists())
++
++    def test_target_pair_and_hash_are_validated_before_publication(self):
++        for build, jar in (("a" * 40, None), (None, self.log), ("bad", self.log)):
++            with self.subTest(build=build, jar=jar), self.assertRaises(ValueError):
++                draft.prepare(self.log, self.output, build_sha=build, jar=jar)
++            self.assertFalse(self.output.exists())
++
++    def test_server_log_does_not_prove_client_execution(self):
++        self.log.write_text("Preparing start region for dimension minecraft:overworld\nPlayer joined the game\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["source_kind"], "UNCLASSIFIED_LOG")
++        self.assertEqual(review["markers"]["player_join"]["count"], 1)
++        self.assertFalse(review["inferred_acceptance"])
++
++    def test_kernel_failure_is_only_a_log_marker(self):
++        self.log.write_text("failed to write kernel assets: os error 3\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["markers"]["error_or_kernel_failure"]["count"], 1)
++        session = json.loads((self.output / "client-session.json").read_text())
++        self.assertTrue(all(row["result"] == "NOT_TESTED" for row in session["scenarios"]))
++
++    def test_non_utf8_log_keeps_original_hash(self):
++        self.log.write_bytes(b"\xff\xfe\x00\r\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["source_sha256"], hashlib.sha256(self.log.read_bytes()).hexdigest())
++
++    def test_cli_reports_draft_success_and_repeat_failure(self):
++        with contextlib.redirect_stdout(io.StringIO()) as output:
++            first = draft.main([str(self.log), str(self.output)])
++            second = draft.main([str(self.log), str(self.output)])
++        self.assertEqual((first, second), (0, 2))
++        self.assertIn("REAL_CLIENT=NOT_TESTED", output.getvalue())
++        self.assertIn("OUTPUT_ALREADY_EXISTS", output.getvalue())
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/validation/v2-01-client-session-template.json b/tools/validation/v2-01-client-session-template.json
+new file mode 100644
+index 0000000..d5a7a67
+--- /dev/null
++++ b/tools/validation/v2-01-client-session-template.json
+@@ -0,0 +1,276 @@
++{
++  "schema": 1,
++  "evidence_mode": "SYNTHETIC",
++  "scenarios": [
++    {
++      "scenario": "new_world_boot",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: new_world_boot",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "opening_transition",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: opening_transition",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "yeoul_first_contact",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: yeoul_first_contact",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "return_network_normal_path",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: return_network_normal_path",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "returner_unobserved_completion",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: returner_unobserved_completion",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "returner_positive_observation",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: returner_positive_observation",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "observation_interrupted",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: observation_interrupted",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "occluded_returner",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: occluded_returner",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "warning_ignored_crisis",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: warning_ignored_crisis",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "recovery",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: recovery",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "station_revisit_observed",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: station_revisit_observed",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "station_revisit_unobserved",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: station_revisit_unobserved",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "yeoul_post_event_dialogue",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: yeoul_post_event_dialogue",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "yeoul_daily_route",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: yeoul_daily_route",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    },
++    {
++      "scenario": "survival_continuity",
++      "result": "NOT_TESTED",
++      "build_sha": null,
++      "jar_sha256": null,
++      "isolated_profile": "",
++      "world_identity": "",
++      "start_condition": "",
++      "observed_behavior": "",
++      "expected_behavior": "See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: survival_continuity",
++      "evidence_reference": [],
++      "tester": "",
++      "tester_kind": "NOT_RUN",
++      "notes": "",
++      "human_readability": "NOT_TESTED",
++      "fear_pacing": "NOT_TESTED",
++      "audio_readability": "NOT_TESTED"
++    }
++  ]
++}
+diff --git a/tools/validation/v2_01_client_evidence.py b/tools/validation/v2_01_client_evidence.py
+new file mode 100644
+index 0000000..b9d9535
+--- /dev/null
++++ b/tools/validation/v2_01_client_evidence.py
+@@ -0,0 +1,164 @@
++"""Validate reported client evidence. Never infer gameplay from automated tests."""
++from __future__ import annotations
++
++import argparse
++from collections import Counter
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import tempfile
++
++SCENARIOS = (
++    "new_world_boot", "opening_transition", "yeoul_first_contact",
++    "return_network_normal_path", "returner_unobserved_completion",
++    "returner_positive_observation", "observation_interrupted", "occluded_returner",
++    "warning_ignored_crisis", "recovery", "station_revisit_observed",
++    "station_revisit_unobserved", "yeoul_post_event_dialogue", "yeoul_daily_route",
++    "survival_continuity",
++)
++MUST = frozenset(SCENARIOS) - {
++    "returner_unobserved_completion", "occluded_returner", "yeoul_daily_route",
++}
++RESULTS = {"PASS", "FAIL", "BLOCKED", "NOT_TESTED"}
++HUMAN_FIELDS = ("human_readability", "fear_pacing", "audio_readability")
++TEXT_FIELDS = ("start_condition", "observed_behavior", "expected_behavior", "tester", "notes")
++
++
++class InvalidEvidence(ValueError):
++    pass
++
++
++def unique_object(pairs):
++    result = {}
++    for key, value in pairs:
++        if key in result:
++            raise InvalidEvidence(f"DUPLICATE_JSON_KEY: {key}")
++        result[key] = value
++    return result
++
++
++def _hash(value, length, label, required):
++    if not required and value in (None, ""):
++        return
++    if not isinstance(value, str) or not re.fullmatch(rf"[0-9a-fA-F]{{{length}}}", value):
++        raise InvalidEvidence(f"INVALID_HASH: {label}")
++
++
++def summarize(document, source: Path, destination: Path):
++    if not isinstance(document, dict) or type(document.get("schema")) is not int or document["schema"] != 1:
++        raise InvalidEvidence("UNSUPPORTED_EVIDENCE_SCHEMA")
++    mode = document.get("evidence_mode")
++    if mode not in ("REAL_CLIENT", "SYNTHETIC"):
++        raise InvalidEvidence("INVALID_EVIDENCE_MODE")
++    rows = document.get("scenarios")
++    if not isinstance(rows, list):
++        raise InvalidEvidence("SCENARIOS_MUST_BE_LIST")
++    source, destination = source.resolve(), destination.resolve()
++    if source == destination:
++        raise InvalidEvidence("OUTPUT_IS_INPUT")
++    root = source.parent
++    found, references = {}, set()
++    for row in rows:
++        if not isinstance(row, dict):
++            raise InvalidEvidence("SCENARIO_MUST_BE_OBJECT")
++        name, result = row.get("scenario"), row.get("result")
++        if not isinstance(name, str) or name not in SCENARIOS:
++            raise InvalidEvidence(f"UNKNOWN_SCENARIO: {name}")
++        if name in found:
++            raise InvalidEvidence(f"DUPLICATE_SCENARIO: {name}")
++        if not isinstance(result, str) or result not in RESULTS:
++            raise InvalidEvidence(f"INVALID_RESULT: {name}")
++        required = result != "NOT_TESTED"
++        for field in TEXT_FIELDS:
++            value = row.get(field)
++            if not isinstance(value, str) or (required and field != "notes" and not value.strip()):
++                raise InvalidEvidence(f"MISSING_METADATA: {name}.{field}")
++        identity = row.get("world_identity") or row.get("isolated_profile")
++        if required and (not isinstance(identity, str) or not identity.strip()):
++            raise InvalidEvidence(f"MISSING_WORLD_IDENTITY: {name}")
++        _hash(row.get("build_sha"), 40, name + ".build_sha", required)
++        _hash(row.get("jar_sha256"), 64, name + ".jar_sha256", required)
++        kind = row.get("tester_kind")
++        if kind not in ("HUMAN", "AUTOMATED", "NOT_RUN") or (required and kind == "NOT_RUN"):
++            raise InvalidEvidence(f"INVALID_TESTER_KIND: {name}")
++        human = {}
++        for field in HUMAN_FIELDS:
++            value = row.get(field, "NOT_TESTED")
++            if value not in ("PASS", "FAIL", "NOT_TESTED"):
++                raise InvalidEvidence(f"INVALID_HUMAN_RESULT: {name}.{field}")
++            if value != "NOT_TESTED" and (kind != "HUMAN" or mode != "REAL_CLIENT" or result == "NOT_TESTED"):
++                raise InvalidEvidence(f"HUMAN_RESULT_WITHOUT_HUMAN_RUN: {name}.{field}")
++            human[field] = value
++        refs = row.get("evidence_reference")
++        if not isinstance(refs, list) or (result == "PASS" and not refs):
++            raise InvalidEvidence(f"MISSING_EVIDENCE: {name}")
++        verified = []
++        for ref in refs:
++            if not isinstance(ref, str) or not ref.strip():
++                raise InvalidEvidence(f"INVALID_REFERENCE: {name}")
++            path = (root / ref).resolve()
++            if not path.is_relative_to(root) or path in (source, destination) or not path.is_file():
++                raise InvalidEvidence(f"INVALID_REFERENCE_TARGET: {name}")
++            references.add(path)
++            verified.append({"path": path.relative_to(root).as_posix(), "size": path.stat().st_size,
++                             "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
++        found[name] = dict(row, supplied=True, **human, verified_references=verified)
++    normalized = [found.get(name, {"scenario": name, "result": "NOT_TESTED", "supplied": False,
++                                 **dict.fromkeys(HUMAN_FIELDS, "NOT_TESTED")}) for name in SCENARIOS]
++    required_rows = [row for row in normalized if row["scenario"] in MUST]
++    for field in ("build_sha", "jar_sha256"):
++        builds = {row[field].lower() for row in found.values() if row["result"] != "NOT_TESTED"}
++        if len(builds) > 1:
++            raise InvalidEvidence(f"MIXED_BUILD_EVIDENCE: {field}")
++    gate = "FAIL" if any(row["result"] == "FAIL" for row in required_rows) else (
++        "PASS" if all(row["result"] == "PASS" for row in required_rows) else "PARTIAL")
++    executed = any(row["result"] != "NOT_TESTED" for row in found.values())
++    human = {}
++    for field in HUMAN_FIELDS:
++        values = [row[field] for row in required_rows]
++        human[field] = "FAIL" if "FAIL" in values else ("PASS" if all(v == "PASS" for v in values) else "NOT_TESTED")
++    return {
++        "schema": 1, "evidence_mode": mode, "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
++        "reported_evidence_gate": gate,
++        "V2_01_CLIENT_GATE": gate if mode == "REAL_CLIENT" else "PARTIAL",
++        "REAL_CLIENT": gate if mode == "REAL_CLIENT" and executed else "NOT_TESTED",
++        "HUMAN_EXPERIENCE": human["human_readability"], "human": human,
++        "counts": dict(Counter(row["result"] for row in normalized)),
++        "missing_scenarios": [name for name in SCENARIOS if name not in found],
++        "scenarios": normalized,
++        "claim_limit": "Checks reported evidence structure and file hashes. Does not independently prove gameplay.",
++    }
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("input", type=Path)
++    parser.add_argument("output", type=Path)
++    args = parser.parse_args(argv)
++    try:
++        raw = args.input.read_bytes()
++        document = json.loads(raw.decode("utf-8-sig"), object_pairs_hook=unique_object)
++        summary = summarize(document, args.input, args.output)
++        args.output.parent.mkdir(parents=True, exist_ok=True)
++        fd, temporary = tempfile.mkstemp(prefix=".client-summary-", dir=args.output.parent)
++        try:
++            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as stream:
++                json.dump(summary, stream, indent=2, ensure_ascii=False)
++                stream.write("\n")
++                stream.flush()
++                os.fsync(stream.fileno())
++            os.replace(temporary, args.output)
++        finally:
++            if os.path.exists(temporary):
++                os.unlink(temporary)
++        print(f"V2_01_CLIENT_GATE={summary['V2_01_CLIENT_GATE']} HUMAN_EXPERIENCE={summary['HUMAN_EXPERIENCE']}")
++        return 0 if summary["V2_01_CLIENT_GATE"] == "PASS" else 1
++    except (OSError, ValueError, TypeError) as error:
++        print(f"INVALID_EVIDENCE: {error}")
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/validation/v2_01_client_log_draft.py b/tools/validation/v2_01_client_log_draft.py
+new file mode 100644
+index 0000000..799ba91
+--- /dev/null
++++ b/tools/validation/v2_01_client_log_draft.py
+@@ -0,0 +1,107 @@
++"""Prepare an untested client evidence draft from one explicitly selected log."""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import shutil
++import tempfile
++
++from v2_01_client_evidence import HUMAN_FIELDS, SCENARIOS
++
++
++MARKERS = {
++    "render_thread": r"\[Render thread/",
++    "sound_engine_started": r"Sound engine started",
++    "world_preparation": r"Preparing start region for dimension",
++    "player_join": r"joined the game",
++    "normal_stop": r"\[minecraft/Minecraft\]: Stopping!",
++    "gradle_success": r"BUILD SUCCESSFUL",
++    "error_or_kernel_failure": r"\[[^\]]*/ERROR\]|failed to write kernel assets|Traceback \(most recent call last\)",
++}
++
++
++def digest(raw):
++    return hashlib.sha256(raw).hexdigest()
++
++
++def prepare(log: Path, output: Path, profile="", build_sha=None, jar: Path | None = None):
++    """Publish a new directory. Never infer acceptance or overwrite an old session."""
++    log, output = log.resolve(), output.resolve()
++    if output.exists():
++        raise ValueError("OUTPUT_ALREADY_EXISTS")
++    if bool(build_sha) != bool(jar):
++        raise ValueError("TARGET_REQUIRES_BUILD_AND_JAR")
++    if build_sha is not None and not re.fullmatch(r"[0-9a-fA-F]{40}", build_sha):
++        raise ValueError("INVALID_TARGET_BUILD_SHA")
++    raw = log.read_bytes()
++    text = raw.decode("utf-8-sig", errors="replace")
++    lines = text.splitlines()
++    target = None
++    if jar is not None:
++        jar_bytes = jar.read_bytes()
++        target = {"build_sha": build_sha.lower(), "jar_sha256": digest(jar_bytes),
++                  "jar_size": len(jar_bytes), "jar_filename": jar.name,
++                  "binding": "USER_DECLARED_TARGET_NOT_EXECUTION_PROOF"}
++    markers = {}
++    for name, pattern in MARKERS.items():
++        matches = [i for i, line in enumerate(lines, 1) if re.search(pattern, line)]
++        markers[name] = {"count": len(matches), "first_line_numbers": matches[:12]}
++    review = {"schema": 1, "source_filename": log.name, "source_sha256": digest(raw),
++              "source_size": len(raw), "line_count": len(lines), "markers": markers,
++              "source_kind": "UNCLASSIFIED_LOG", "inferred_acceptance": False,
++              "target_build": target,
++              "claim_limit": "Log markers do not prove client scenarios, human ratings, or the executed build."}
++    rows = [{"scenario": name, "result": "NOT_TESTED", "build_sha": None, "jar_sha256": None,
++             "isolated_profile": profile, "world_identity": "", "start_condition": "",
++             "observed_behavior": "",
++             "expected_behavior": f"See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: {name}",
++             "evidence_reference": [], "tester": "", "tester_kind": "NOT_RUN", "notes": "",
++             **dict.fromkeys(HUMAN_FIELDS, "NOT_TESTED")} for name in SCENARIOS]
++    session = {"schema": 1, "evidence_mode": "REAL_CLIENT", "log_review": "log-review.json",
++               "candidate_log": "references/source.log", "target_build": target, "scenarios": rows}
++    output.parent.mkdir(parents=True, exist_ok=True)
++    stage = Path(tempfile.mkdtemp(prefix=".v2-client-draft-", dir=output.parent))
++    try:
++        (stage / "references").mkdir()
++        (stage / "references/source.log").write_bytes(raw)
++        for name, content in (("log-review.json", review), ("client-session.json", session)):
++            with (stage / name).open("w", encoding="utf-8", newline="\n") as stream:
++                json.dump(content, stream, indent=2, ensure_ascii=False)
++                stream.write("\n")
++                stream.flush()
++                os.fsync(stream.fileno())
++        if digest((stage / "references/source.log").read_bytes()) != review["source_sha256"]:
++            raise ValueError("LOG_COPY_HASH_MISMATCH")
++        # Check again before publication. os.rename also rejects occupied directories.
++        if output.exists():
++            raise ValueError("OUTPUT_ALREADY_EXISTS")
++        os.rename(stage, output)
++    finally:
++        if stage.exists():
++            shutil.rmtree(stage)
++    return review
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("log", type=Path)
++    parser.add_argument("output_directory", type=Path)
++    parser.add_argument("--profile", default="")
++    parser.add_argument("--target-build-sha")
++    parser.add_argument("--target-jar", type=Path)
++    args = parser.parse_args(argv)
++    try:
++        prepare(args.log, args.output_directory, args.profile, args.target_build_sha, args.target_jar)
++        print("DRAFT_CREATED scenarios=15_NOT_TESTED REAL_CLIENT=NOT_TESTED")
++        return 0
++    except (OSError, ValueError) as error:
++        print(f"DRAFT_ERROR: {error}")
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

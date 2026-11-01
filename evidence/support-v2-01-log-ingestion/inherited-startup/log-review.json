@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "source_filename": "client-gradle.log",
+  "source_sha256": "03d9b71babc7b9487be49e05065822459cee2f7ad2cb820b96a3494f3e373442",
+  "source_size": 11476,
+  "line_count": 98,
+  "markers": {
+    "render_thread": {
+      "count": 30,
+      "first_line_numbers": [
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        68,
+        69,
+        72,
+        73,
+        74
+      ]
+    },
+    "sound_engine_started": {
+      "count": 1,
+      "first_line_numbers": [
+        75
+      ]
+    },
+    "world_preparation": {
+      "count": 0,
+      "first_line_numbers": []
+    },
+    "player_join": {
+      "count": 0,
+      "first_line_numbers": []
+    },
+    "normal_stop": {
+      "count": 1,
+      "first_line_numbers": [
+        92
+      ]
+    },
+    "gradle_success": {
+      "count": 1,
+      "first_line_numbers": [
+        96
+      ]
+    },
+    "error_or_kernel_failure": {
+      "count": 0,
+      "first_line_numbers": []
+    }
+  },
+  "source_kind": "UNCLASSIFIED_LOG",
+  "inferred_acceptance": false,
+  "target_build": null,
+  "claim_limit": "Log markers do not prove client scenarios, human ratings, or the executed build."
+}

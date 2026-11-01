@@ -1,0 +1,10 @@
+{
+  "path": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-observation-support\\dist\\support-v2-01-log-ingestion\\whileaway-gpt-support-v2-01-log-ingestion.zip",
+  "filename": "whileaway-gpt-support-v2-01-log-ingestion.zip",
+  "size": 115514,
+  "sha256": "dfa0a93a30b8fd230df4babd77cd258f1bac8ee38b7e1904aa79eeb2c7adda28",
+  "entries": 45,
+  "implementation_commit": "76125c53d8b5a80fd044ac04fcc3e0d9afc992b7",
+  "cleanroom_source_identity": "PASS",
+  "rollback_zip_mode": "100755"
+}

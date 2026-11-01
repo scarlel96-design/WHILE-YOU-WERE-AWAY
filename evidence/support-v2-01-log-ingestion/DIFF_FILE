@@ -1,0 +1,470 @@
+diff --git a/docs/SUPPORT_V2_01_HANDOFF.md b/docs/SUPPORT_V2_01_HANDOFF.md
+index f305680..a7f1dad 100644
+--- a/docs/SUPPORT_V2_01_HANDOFF.md
++++ b/docs/SUPPORT_V2_01_HANDOFF.md
+@@ -130,5 +130,10 @@ GPT SUPPORT IMPLEMENTATION: current implementation delivered; named tier-A archi
+ V2-01 AUTOMATED COVERAGE: PASS for this scoped increment; positive survival/client coverage remains open.
+ V2-01 CLIENT GATE: NOT TESTED. HUMAN EXPERIENCE: NOT TESTED. REAL CLIENT: NOT TESTED.
+ V2-01 campaign milestone remains PARTIAL. Version 0.3.2 is not promoted.
+-Weekly usage reached 97% used during this task. Finish the in-flight gate, rollback, package, and upload before safe pause.
+-Resume with MAIN diff adoption review or an actual client evidence session. Do not start another large support subsystem.
++Weekly usage reached 97% during the previous implementation task. That task finished its gate, package, rollback, and upload.
++The 2026-11-01 continuation observed 1% weekly usage consumed before starting bounded evidence-tool work.
++The continuation adds a log-draft importer and fixes unexecuted REAL_CLIENT reporting.
++Read `docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md` for this continuation's evidence and adoption instructions.
++The importer never grants scenario PASS from log markers.
++Resume MAIN adoption review or actual client acceptance after the support diff review.
++Do not start another large support subsystem from this handoff.
+diff --git a/docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md b/docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md
+new file mode 100644
+index 0000000..78199f2
+--- /dev/null
++++ b/docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md
+@@ -0,0 +1,115 @@
++# GPT SUPPORT REPORT — V2-01 log ingestion continuation
++
++## Baseline
++
++- Main: `work/v2-playable-core` at `062797f54ee63a65b2cc79870a619d1eeea0daa1`.
++- Support: `gpt-support/v2-01-observation-client-gate` at `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
++- Original support implementation: `8231f8bd93626316f9d59639ad95c6cd5d7bce84`.
++- Local and remote support heads matched before edits.
++- Version remains 0.3.1-dev.1. V2-01 remains PARTIAL.
++
++## Work performed
++
++The evidence validator now reports REAL_CLIENT=NOT_TESTED when every scenario is unexecuted.
++The client gate remains PARTIAL because required acceptance evidence is missing.
++The previous implementation reported REAL_CLIENT=PARTIAL for the same unexecuted template.
++
++The new log-draft tool prepares a new session directory from one selected log.
++It preserves the source log bytes and records their SHA-256.
++It records marker counts and bounded line-number lists.
++It does not copy log text into the summary.
++It leaves all scenario results and human ratings NOT_TESTED.
++It rejects an existing output directory and invalid target metadata.
++An optional candidate JAR is hashed without claiming that it produced the log.
++The declared target commit remains user-supplied metadata.
++
++## MAIN adoption review
++
++The current source diff against main contains five existing production call-site edits and three new helper classes.
++The source also contains three added GameTest classes.
++The observation extraction preserves range 32, dot 0.35, eight ticks, and the original evaluation order.
++The knowledge extraction preserves notice gating and observed/unseen station text selection.
++The NPC extraction preserves the completed-event 30/200-tick look habit and resident dialogue delegation.
++These changes remain candidates for MAIN adoption after integration review.
++This continuation adds no production Java change.
++
++Previous support classification remains valid.
++Old tier-A archive contents remain uninspected because the named archives were not located.
++Do not merge those archives or apply superseded persistence assertions.
++Retain the existing SUPPORT_REBASE_REPORT classification.
++
++## Validation
++
++- BASELINE Python: 19 tests PASS.
++- MODIFIED Python: 31 tests PASS, including 12 new tests.
++- Previous support GameTest: 130/130 PASS; not rerun in this tooling-only continuation.
++- Previous support core assertions: 176858 PASS; not rerun here.
++- Previous support Gradle build: PASS; not rerun here.
++- New Minecraft client launches: 0.
++- Human experience: NOT TESTED.
++- Audio readability: NOT HUMAN-VERIFIED.
++
++The inherited `v2-01b-transaction/client-gradle.log` was processed as historical input.
++Its SHA-256 is `03d9b71babc7b9487be49e05065822459cee2f7ad2cb820b96a3494f3e373442`.
++It contains one sound-engine start, one normal-stop marker, and one Gradle-success marker.
++It contains no world-preparation or player-join marker under the tool's narrow matching rules.
++Marker absence does not prove that gameplay never occurred.
++This input grants no scenario PASS.
++The resulting draft and strict summary retain 15 NOT_TESTED scenarios.
++
++## Failure history
++
++An unexecuted REAL_CLIENT template reported REAL_CLIENT=PARTIAL.
++The cause was a check for supplied rows instead of executed rows.
++The validator now checks for a result other than NOT_TESTED.
++Two new tests protect the unexecuted case and the existing partial-execution case.
++
++No new production defect was found in this continuation.
++The previous Computer Use kernel-assets failure remains an external environment blocker.
++This continuation does not retry Computer Use or classify that error as a Minecraft defect.
++
++## Compatibility and remaining work
++
++Save format 5, optional Actor schema 1, and Return Network schema 1 remain unchanged.
++Checkpoint, Actor identity, generation, transaction, and write-guard semantics remain unchanged.
++AGENTS.md, resources, and prior packages remain unchanged.
++The current candidate JAR is the previously verified support artifact.
++This tooling-only continuation creates no replacement game JAR.
++
++Positive survival observation, actual NPC ownership, and player-facing readability remain MAIN client gates.
++All original client scenarios still require actual observations and attributable evidence.
++The evidence tools validate submitted records. They do not certify the truth of gameplay claims.
++
++## Contribution and model record
++
++Previous, additional, and cumulative milestone percentages remain UNMEASURED.
++No measured work denominator supports a 40% claim.
++The delivered scope includes three production helpers, three GameTest classes, evidence tools, and adoption documents.
++This continuation adds one bounded log-draft utility, a report-status fix, and their tests.
++No subagents, Terra, Luna, or Caveman were used in this continuation.
++No model-usage savings or measured time allocation is claimed.
++
++## Artifacts and publication
++
++Evidence directory: `evidence/support-v2-01-log-ingestion/`.
++Package directory: `dist/support-v2-01-log-ingestion/`.
++The evidence includes BASELINE_FILE, MODIFIED_FILE, DIFF_FILE, VERIFICATION.txt, and executable ROLLBACK.sh.
++The rollback test restores a disposable tool copy. It does not modify worlds or the active modified tool.
++PACKAGE_MANIFEST.json records package members and hashes.
++PUBLICATION.txt records the verified remote branch and commits after upload.
++This report and its evidence are uploaded only to the support branch.
++
++## MAIN HANDOFF
++
++1. Compare current main and support HEADs.
++2. Audit original implementation commit `8231f8bd93626316f9d59639ad95c6cd5d7bce84`.
++3. Audit this continuation's tooling and document diff against `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
++4. Select implementation changes without historical evidence-package commits.
++5. Recheck production behavior after adoption.
++6. Run the full required GameTest, core, and build gate on integrated main.
++7. Run client acceptance with the existing protocol and strict evidence tool.
++8. Keep V2-01 PARTIAL until gameplay and human acceptance are established.
++
++GPT SUPPORT IMPLEMENTATION: scoped implementation delivered; historical archive reconciliation remains PARTIAL.
++V2-01 AUTOMATED COVERAGE: PASS for executed support scope; survival/client integration remains PARTIAL.
++V2-01 CLIENT GATE: NOT TESTED. HUMAN EXPERIENCE: NOT TESTED. REAL CLIENT: NOT TESTED.
+diff --git a/docs/SUPPORT_V2_01_TEST_INVENTORY.md b/docs/SUPPORT_V2_01_TEST_INVENTORY.md
+index 971770b..751584f 100644
+--- a/docs/SUPPORT_V2_01_TEST_INVENTORY.md
++++ b/docs/SUPPORT_V2_01_TEST_INVENTORY.md
+@@ -20,7 +20,8 @@ Fresh support baseline: 114/114 GameTests, 176858 core assertions, and build PAS
+ - Three knowledge GameTests cover notification eligibility, idempotent observation persistence, and neutral/read-only revisit selection.
+ - Three ownership GameTests cover completed delegation, ordinary/context dialogue, and unchanged participant/facts.
+ - One headless negative integration GameTest uses the actual Wayfarer and Minecraft's supported creative mock ServerPlayer.
+-- Nineteen Python tests cover evidence completeness, statuses, metadata, provenance, references, atomic output, and human-field protection.
++- Twenty-one evidence-validator tests cover completeness, statuses, metadata, references, atomic output, and human-field protection.
++- Ten log-draft tests cover byte preservation, target hashes, existing-output protection, and prevention of inferred acceptance.
+ 
+ The expected GameTest count is 130. Only the execution log establishes the actual count and result.
+ 
+@@ -35,3 +36,11 @@ Positive survival observation remains a client gate; the shared calculation is c
+ The ownership tests do not prove live NPC navigation or actual dialogue delivery.
+ Station selector tests prove no record mutation. Production StationBlock diff review checks the absence of new world writes.
+ Actual occlusion/view handling, route readability, warnings, crisis, recovery, and human/audio experience remain client gates.
++
++## Log ingestion continuation, 2026-11-01
++
++The baseline Python gate passed 19 tests before this continuation.
++The updated Python gate passed 31 tests.
++The source and resources remain unchanged from support HEAD `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
++The prior 130 GameTest result remains previous support evidence. This continuation does not rerun that gate.
++The inherited startup log produces 15 NOT_TESTED scenarios and no human or client acceptance claim.
+diff --git a/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md b/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+index 0369051..c56b7d7 100644
+--- a/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
++++ b/docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+@@ -83,6 +83,31 @@ Set every unexecuted result to `NOT_TESTED`; leave its human fields `NOT_TESTED`
+ 
+ ## Run the strict summary
+ 
++### Prepare a draft from an existing log
++
++Run this optional command for one explicitly selected log:
++
++```powershell
++python tools/validation/v2_01_client_log_draft.py path/to/client.log evidence/v2-playable-core/session-01
++```
++
++Choose a new output directory. The command rejects an existing directory.
++The command copies the log without changing its bytes.
++The command records marker counts, line numbers, and the copied log's SHA-256.
++The command creates all 15 scenarios as `NOT_TESTED`.
++It leaves evidence references and execution build hashes empty.
++Startup, sound initialization, player joins, and Gradle success do not grant scenario PASS.
++
++Optionally provide both `--target-build-sha FULL_COMMIT` and `--target-jar path/to/candidate.jar`.
++The tool hashes the candidate JAR and records the declared target commit.
++This target identifies the intended build. It does not prove which build produced the log.
++Keep execution metadata empty until an actual run establishes that association.
++Review the log and record actual scenario results with the original evidence requirements.
++Exit 0 means draft creation succeeded. It does not mean client acceptance passed.
++Exit 2 means draft creation failed.
++
++### Validate completed records
++
+ Run from the repository root:
+ 
+ ```powershell
+@@ -96,6 +121,7 @@ The tool writes a valid summary through a temporary file and atomic replacement.
+ Missing scenarios become `NOT_TESTED`. Duplicate scenarios and mixed builds are rejected.
+ Synthetic reports never produce a real-client gate PASS.
+ Automated records never grant human ratings.
++An unexecuted REAL_CLIENT template reports `REAL_CLIENT=NOT_TESTED` and `V2_01_CLIENT_GATE=PARTIAL`.
+ 
+ ## Acceptance
+ 
+diff --git a/tools/validation/test_v2_01_client_evidence.py b/tools/validation/test_v2_01_client_evidence.py
+index 1e3d6a6..55978fa 100644
+--- a/tools/validation/test_v2_01_client_evidence.py
++++ b/tools/validation/test_v2_01_client_evidence.py
+@@ -51,6 +51,19 @@ class EvidenceTests(unittest.TestCase):
+         self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
+         self.assertEqual(result["HUMAN_EXPERIENCE"], "NOT_TESTED")
+ 
++    def test_real_client_template_without_executed_rows_is_not_tested(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        for row in self.document["scenarios"]:
++            row["result"] = "NOT_TESTED"
++        result = self.summary()
++        self.assertEqual(result["REAL_CLIENT"], "NOT_TESTED")
++        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
++
++    def test_executed_real_client_evidence_retains_partial_status(self):
++        self.document["evidence_mode"] = "REAL_CLIENT"
++        self.document["scenarios"] = self.document["scenarios"][:1]
++        self.assertEqual(self.summary()["REAL_CLIENT"], "PARTIAL")
++
+     def test_every_must_failure_blocks_gate(self):
+         for name in validator.MUST:
+             doc = copy.deepcopy(self.document)
+diff --git a/tools/validation/test_v2_01_client_log_draft.py b/tools/validation/test_v2_01_client_log_draft.py
+new file mode 100644
+index 0000000..e6c84ba
+--- /dev/null
++++ b/tools/validation/test_v2_01_client_log_draft.py
+@@ -0,0 +1,98 @@
++"""Synthetic log ingestion tests. These tests do not execute Minecraft."""
++import contextlib
++import hashlib
++import io
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++import v2_01_client_evidence as validator
++import v2_01_client_log_draft as draft
++
++
++class LogDraftTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++        self.log = self.root / "client.log"
++        self.output = self.root / "draft"
++        self.raw = (b"[12:00:00] [Render thread/INFO] [minecraft/SoundEngine]: Sound engine started\r\n"
++                    b"BUILD SUCCESSFUL\r\nAll scenarios PASS; human audio PASS\r\n")
++        self.log.write_bytes(self.raw)
++
++    def test_success_markers_and_claim_text_never_grant_acceptance(self):
++        review = draft.prepare(self.log, self.output)
++        self.assertFalse(review["inferred_acceptance"])
++        self.assertEqual(review["markers"]["gradle_success"]["count"], 1)
++        session = json.loads((self.output / "client-session.json").read_text())
++        summary = validator.summarize(session, self.output / "client-session.json", self.output / "summary.json")
++        self.assertEqual(summary["counts"], {"NOT_TESTED": 15})
++        self.assertEqual(summary["REAL_CLIENT"], "NOT_TESTED")
++        self.assertEqual(summary["HUMAN_EXPERIENCE"], "NOT_TESTED")
++
++    def test_source_copy_is_byte_exact_and_source_is_unchanged(self):
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual((self.output / "references/source.log").read_bytes(), self.raw)
++        self.assertEqual(self.log.read_bytes(), self.raw)
++        self.assertEqual(review["source_sha256"], hashlib.sha256(self.raw).hexdigest())
++
++    def test_target_jar_is_measured_but_never_attached_to_unexecuted_rows(self):
++        jar = self.root / "candidate.jar"
++        jar.write_bytes(b"SYNTHETIC JAR FIXTURE")
++        review = draft.prepare(self.log, self.output, "planned-profile", "a" * 40, jar)
++        self.assertEqual(review["target_build"]["jar_sha256"], hashlib.sha256(jar.read_bytes()).hexdigest())
++        session = json.loads((self.output / "client-session.json").read_text())
++        self.assertTrue(all(row["build_sha"] is None and row["jar_sha256"] is None for row in session["scenarios"]))
++
++    def test_existing_output_is_preserved(self):
++        self.output.mkdir()
++        sentinel = self.output / "keep.txt"
++        sentinel.write_text("KEEP")
++        with self.assertRaisesRegex(ValueError, "OUTPUT_ALREADY_EXISTS"):
++            draft.prepare(self.log, self.output)
++        self.assertEqual(sentinel.read_text(), "KEEP")
++        self.assertEqual(len(list(self.output.iterdir())), 1)
++
++    def test_missing_log_does_not_publish(self):
++        with self.assertRaises(OSError):
++            draft.prepare(self.root / "missing.log", self.output)
++        self.assertFalse(self.output.exists())
++
++    def test_target_pair_and_hash_are_validated_before_publication(self):
++        for build, jar in (("a" * 40, None), (None, self.log), ("bad", self.log)):
++            with self.subTest(build=build, jar=jar), self.assertRaises(ValueError):
++                draft.prepare(self.log, self.output, build_sha=build, jar=jar)
++            self.assertFalse(self.output.exists())
++
++    def test_server_log_does_not_prove_client_execution(self):
++        self.log.write_text("Preparing start region for dimension minecraft:overworld\nPlayer joined the game\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["source_kind"], "UNCLASSIFIED_LOG")
++        self.assertEqual(review["markers"]["player_join"]["count"], 1)
++        self.assertFalse(review["inferred_acceptance"])
++
++    def test_kernel_failure_is_only_a_log_marker(self):
++        self.log.write_text("failed to write kernel assets: os error 3\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["markers"]["error_or_kernel_failure"]["count"], 1)
++        session = json.loads((self.output / "client-session.json").read_text())
++        self.assertTrue(all(row["result"] == "NOT_TESTED" for row in session["scenarios"]))
++
++    def test_non_utf8_log_keeps_original_hash(self):
++        self.log.write_bytes(b"\xff\xfe\x00\r\n")
++        review = draft.prepare(self.log, self.output)
++        self.assertEqual(review["source_sha256"], hashlib.sha256(self.log.read_bytes()).hexdigest())
++
++    def test_cli_reports_draft_success_and_repeat_failure(self):
++        with contextlib.redirect_stdout(io.StringIO()) as output:
++            first = draft.main([str(self.log), str(self.output)])
++            second = draft.main([str(self.log), str(self.output)])
++        self.assertEqual((first, second), (0, 2))
++        self.assertIn("REAL_CLIENT=NOT_TESTED", output.getvalue())
++        self.assertIn("OUTPUT_ALREADY_EXISTS", output.getvalue())
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/validation/v2_01_client_evidence.py b/tools/validation/v2_01_client_evidence.py
+index e49b335..b9d9535 100644
+--- a/tools/validation/v2_01_client_evidence.py
++++ b/tools/validation/v2_01_client_evidence.py
+@@ -114,6 +114,7 @@ def summarize(document, source: Path, destination: Path):
+             raise InvalidEvidence(f"MIXED_BUILD_EVIDENCE: {field}")
+     gate = "FAIL" if any(row["result"] == "FAIL" for row in required_rows) else (
+         "PASS" if all(row["result"] == "PASS" for row in required_rows) else "PARTIAL")
++    executed = any(row["result"] != "NOT_TESTED" for row in found.values())
+     human = {}
+     for field in HUMAN_FIELDS:
+         values = [row[field] for row in required_rows]
+@@ -122,7 +123,7 @@ def summarize(document, source: Path, destination: Path):
+         "schema": 1, "evidence_mode": mode, "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+         "reported_evidence_gate": gate,
+         "V2_01_CLIENT_GATE": gate if mode == "REAL_CLIENT" else "PARTIAL",
+-        "REAL_CLIENT": gate if mode == "REAL_CLIENT" and found else "NOT_TESTED",
++        "REAL_CLIENT": gate if mode == "REAL_CLIENT" and executed else "NOT_TESTED",
+         "HUMAN_EXPERIENCE": human["human_readability"], "human": human,
+         "counts": dict(Counter(row["result"] for row in normalized)),
+         "missing_scenarios": [name for name in SCENARIOS if name not in found],
+diff --git a/tools/validation/v2_01_client_log_draft.py b/tools/validation/v2_01_client_log_draft.py
+new file mode 100644
+index 0000000..799ba91
+--- /dev/null
++++ b/tools/validation/v2_01_client_log_draft.py
+@@ -0,0 +1,107 @@
++"""Prepare an untested client evidence draft from one explicitly selected log."""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import shutil
++import tempfile
++
++from v2_01_client_evidence import HUMAN_FIELDS, SCENARIOS
++
++
++MARKERS = {
++    "render_thread": r"\[Render thread/",
++    "sound_engine_started": r"Sound engine started",
++    "world_preparation": r"Preparing start region for dimension",
++    "player_join": r"joined the game",
++    "normal_stop": r"\[minecraft/Minecraft\]: Stopping!",
++    "gradle_success": r"BUILD SUCCESSFUL",
++    "error_or_kernel_failure": r"\[[^\]]*/ERROR\]|failed to write kernel assets|Traceback \(most recent call last\)",
++}
++
++
++def digest(raw):
++    return hashlib.sha256(raw).hexdigest()
++
++
++def prepare(log: Path, output: Path, profile="", build_sha=None, jar: Path | None = None):
++    """Publish a new directory. Never infer acceptance or overwrite an old session."""
++    log, output = log.resolve(), output.resolve()
++    if output.exists():
++        raise ValueError("OUTPUT_ALREADY_EXISTS")
++    if bool(build_sha) != bool(jar):
++        raise ValueError("TARGET_REQUIRES_BUILD_AND_JAR")
++    if build_sha is not None and not re.fullmatch(r"[0-9a-fA-F]{40}", build_sha):
++        raise ValueError("INVALID_TARGET_BUILD_SHA")
++    raw = log.read_bytes()
++    text = raw.decode("utf-8-sig", errors="replace")
++    lines = text.splitlines()
++    target = None
++    if jar is not None:
++        jar_bytes = jar.read_bytes()
++        target = {"build_sha": build_sha.lower(), "jar_sha256": digest(jar_bytes),
++                  "jar_size": len(jar_bytes), "jar_filename": jar.name,
++                  "binding": "USER_DECLARED_TARGET_NOT_EXECUTION_PROOF"}
++    markers = {}
++    for name, pattern in MARKERS.items():
++        matches = [i for i, line in enumerate(lines, 1) if re.search(pattern, line)]
++        markers[name] = {"count": len(matches), "first_line_numbers": matches[:12]}
++    review = {"schema": 1, "source_filename": log.name, "source_sha256": digest(raw),
++              "source_size": len(raw), "line_count": len(lines), "markers": markers,
++              "source_kind": "UNCLASSIFIED_LOG", "inferred_acceptance": False,
++              "target_build": target,
++              "claim_limit": "Log markers do not prove client scenarios, human ratings, or the executed build."}
++    rows = [{"scenario": name, "result": "NOT_TESTED", "build_sha": None, "jar_sha256": None,
++             "isolated_profile": profile, "world_identity": "", "start_condition": "",
++             "observed_behavior": "",
++             "expected_behavior": f"See docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md: {name}",
++             "evidence_reference": [], "tester": "", "tester_kind": "NOT_RUN", "notes": "",
++             **dict.fromkeys(HUMAN_FIELDS, "NOT_TESTED")} for name in SCENARIOS]
++    session = {"schema": 1, "evidence_mode": "REAL_CLIENT", "log_review": "log-review.json",
++               "candidate_log": "references/source.log", "target_build": target, "scenarios": rows}
++    output.parent.mkdir(parents=True, exist_ok=True)
++    stage = Path(tempfile.mkdtemp(prefix=".v2-client-draft-", dir=output.parent))
++    try:
++        (stage / "references").mkdir()
++        (stage / "references/source.log").write_bytes(raw)
++        for name, content in (("log-review.json", review), ("client-session.json", session)):
++            with (stage / name).open("w", encoding="utf-8", newline="\n") as stream:
++                json.dump(content, stream, indent=2, ensure_ascii=False)
++                stream.write("\n")
++                stream.flush()
++                os.fsync(stream.fileno())
++        if digest((stage / "references/source.log").read_bytes()) != review["source_sha256"]:
++            raise ValueError("LOG_COPY_HASH_MISMATCH")
++        # Check again before publication. os.rename also rejects occupied directories.
++        if output.exists():
++            raise ValueError("OUTPUT_ALREADY_EXISTS")
++        os.rename(stage, output)
++    finally:
++        if stage.exists():
++            shutil.rmtree(stage)
++    return review
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("log", type=Path)
++    parser.add_argument("output_directory", type=Path)
++    parser.add_argument("--profile", default="")
++    parser.add_argument("--target-build-sha")
++    parser.add_argument("--target-jar", type=Path)
++    args = parser.parse_args(argv)
++    try:
++        prepare(args.log, args.output_directory, args.profile, args.target_build_sha, args.target_jar)
++        print("DRAFT_CREATED scenarios=15_NOT_TESTED REAL_CLIENT=NOT_TESTED")
++        return 0
++    except (OSError, ValueError) as error:
++        print(f"DRAFT_ERROR: {error}")
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
