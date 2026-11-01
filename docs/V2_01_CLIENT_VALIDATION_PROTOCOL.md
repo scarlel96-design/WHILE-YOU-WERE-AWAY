@@ -83,6 +83,31 @@ Set every unexecuted result to `NOT_TESTED`; leave its human fields `NOT_TESTED`
 
 ## Run the strict summary
 
+### Prepare a draft from an existing log
+
+Run this optional command for one explicitly selected log:
+
+```powershell
+python tools/validation/v2_01_client_log_draft.py path/to/client.log evidence/v2-playable-core/session-01
+```
+
+Choose a new output directory. The command rejects an existing directory.
+The command copies the log without changing its bytes.
+The command records marker counts, line numbers, and the copied log's SHA-256.
+The command creates all 15 scenarios as `NOT_TESTED`.
+It leaves evidence references and execution build hashes empty.
+Startup, sound initialization, player joins, and Gradle success do not grant scenario PASS.
+
+Optionally provide both `--target-build-sha FULL_COMMIT` and `--target-jar path/to/candidate.jar`.
+The tool hashes the candidate JAR and records the declared target commit.
+This target identifies the intended build. It does not prove which build produced the log.
+Keep execution metadata empty until an actual run establishes that association.
+Review the log and record actual scenario results with the original evidence requirements.
+Exit 0 means draft creation succeeded. It does not mean client acceptance passed.
+Exit 2 means draft creation failed.
+
+### Validate completed records
+
 Run from the repository root:
 
 ```powershell
@@ -96,6 +121,7 @@ The tool writes a valid summary through a temporary file and atomic replacement.
 Missing scenarios become `NOT_TESTED`. Duplicate scenarios and mixed builds are rejected.
 Synthetic reports never produce a real-client gate PASS.
 Automated records never grant human ratings.
+An unexecuted REAL_CLIENT template reports `REAL_CLIENT=NOT_TESTED` and `V2_01_CLIENT_GATE=PARTIAL`.
 
 ## Acceptance
 

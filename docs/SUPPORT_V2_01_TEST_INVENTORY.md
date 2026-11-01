@@ -20,7 +20,8 @@ Fresh support baseline: 114/114 GameTests, 176858 core assertions, and build PAS
 - Three knowledge GameTests cover notification eligibility, idempotent observation persistence, and neutral/read-only revisit selection.
 - Three ownership GameTests cover completed delegation, ordinary/context dialogue, and unchanged participant/facts.
 - One headless negative integration GameTest uses the actual Wayfarer and Minecraft's supported creative mock ServerPlayer.
-- Nineteen Python tests cover evidence completeness, statuses, metadata, provenance, references, atomic output, and human-field protection.
+- Twenty-one evidence-validator tests cover completeness, statuses, metadata, references, atomic output, and human-field protection.
+- Ten log-draft tests cover byte preservation, target hashes, existing-output protection, and prevention of inferred acceptance.
 
 The expected GameTest count is 130. Only the execution log establishes the actual count and result.
 
@@ -35,3 +36,11 @@ Positive survival observation remains a client gate; the shared calculation is c
 The ownership tests do not prove live NPC navigation or actual dialogue delivery.
 Station selector tests prove no record mutation. Production StationBlock diff review checks the absence of new world writes.
 Actual occlusion/view handling, route readability, warnings, crisis, recovery, and human/audio experience remain client gates.
+
+## Log ingestion continuation, 2026-11-01
+
+The baseline Python gate passed 19 tests before this continuation.
+The updated Python gate passed 31 tests.
+The source and resources remain unchanged from support HEAD `e5c184bc367c7c3f26a1bd2b551075c07edf50ae`.
+The prior 130 GameTest result remains previous support evidence. This continuation does not rerun that gate.
+The inherited startup log produces 15 NOT_TESTED scenarios and no human or client acceptance claim.

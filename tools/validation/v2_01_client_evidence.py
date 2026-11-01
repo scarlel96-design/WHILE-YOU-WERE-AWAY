@@ -114,6 +114,7 @@ def summarize(document, source: Path, destination: Path):
             raise InvalidEvidence(f"MIXED_BUILD_EVIDENCE: {field}")
     gate = "FAIL" if any(row["result"] == "FAIL" for row in required_rows) else (
         "PASS" if all(row["result"] == "PASS" for row in required_rows) else "PARTIAL")
+    executed = any(row["result"] != "NOT_TESTED" for row in found.values())
     human = {}
     for field in HUMAN_FIELDS:
         values = [row[field] for row in required_rows]
@@ -122,7 +123,7 @@ def summarize(document, source: Path, destination: Path):
         "schema": 1, "evidence_mode": mode, "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "reported_evidence_gate": gate,
         "V2_01_CLIENT_GATE": gate if mode == "REAL_CLIENT" else "PARTIAL",
-        "REAL_CLIENT": gate if mode == "REAL_CLIENT" and found else "NOT_TESTED",
+        "REAL_CLIENT": gate if mode == "REAL_CLIENT" and executed else "NOT_TESTED",
         "HUMAN_EXPERIENCE": human["human_readability"], "human": human,
         "counts": dict(Counter(row["result"] for row in normalized)),
         "missing_scenarios": [name for name in SCENARIOS if name not in found],

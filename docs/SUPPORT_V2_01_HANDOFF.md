@@ -130,5 +130,10 @@ GPT SUPPORT IMPLEMENTATION: current implementation delivered; named tier-A archi
 V2-01 AUTOMATED COVERAGE: PASS for this scoped increment; positive survival/client coverage remains open.
 V2-01 CLIENT GATE: NOT TESTED. HUMAN EXPERIENCE: NOT TESTED. REAL CLIENT: NOT TESTED.
 V2-01 campaign milestone remains PARTIAL. Version 0.3.2 is not promoted.
-Weekly usage reached 97% used during this task. Finish the in-flight gate, rollback, package, and upload before safe pause.
-Resume with MAIN diff adoption review or an actual client evidence session. Do not start another large support subsystem.
+Weekly usage reached 97% during the previous implementation task. That task finished its gate, package, rollback, and upload.
+The 2026-11-01 continuation observed 1% weekly usage consumed before starting bounded evidence-tool work.
+The continuation adds a log-draft importer and fixes unexecuted REAL_CLIENT reporting.
+Read `docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md` for this continuation's evidence and adoption instructions.
+The importer never grants scenario PASS from log markers.
+Resume MAIN adoption review or actual client acceptance after the support diff review.
+Do not start another large support subsystem from this handoff.

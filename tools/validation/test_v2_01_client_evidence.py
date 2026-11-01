@@ -51,6 +51,19 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
         self.assertEqual(result["HUMAN_EXPERIENCE"], "NOT_TESTED")
 
+    def test_real_client_template_without_executed_rows_is_not_tested(self):
+        self.document["evidence_mode"] = "REAL_CLIENT"
+        for row in self.document["scenarios"]:
+            row["result"] = "NOT_TESTED"
+        result = self.summary()
+        self.assertEqual(result["REAL_CLIENT"], "NOT_TESTED")
+        self.assertEqual(result["V2_01_CLIENT_GATE"], "PARTIAL")
+
+    def test_executed_real_client_evidence_retains_partial_status(self):
+        self.document["evidence_mode"] = "REAL_CLIENT"
+        self.document["scenarios"] = self.document["scenarios"][:1]
+        self.assertEqual(self.summary()["REAL_CLIENT"], "PARTIAL")
+
     def test_every_must_failure_blocks_gate(self):
         for name in validator.MUST:
             doc = copy.deepcopy(self.document)
