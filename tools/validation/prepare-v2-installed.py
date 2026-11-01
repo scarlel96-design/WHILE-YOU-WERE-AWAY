@@ -1,8 +1,16 @@
 """Prepare one pinned production client. Do not read launcher accounts or user worlds."""
-import hashlib,json,os,re,shutil,urllib.request,zipfile
+import argparse,hashlib,json,os,re,shutil,urllib.request,zipfile
 from pathlib import Path
 
 repo=Path(__file__).resolve().parents[2]
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--jar',type=Path,default=repo/'evidence/v2-01e/BASELINE.jar')
+parser.add_argument('--sha256',default='3c92f0fb7cf1d7981d3bef1b6cc14787c6eff408d8166cdf87a694c8f6050460')
+parser.add_argument('--label',default='installed')
+options_cli=parser.parse_args()
+assert re.fullmatch(r'[A-Za-z0-9_-]+',options_cli.label),'Invalid evidence label'
+candidate=options_cli.jar.resolve()
+assert hashlib.sha256(candidate.read_bytes()).hexdigest()==options_cli.sha256,'Candidate hash mismatch'
 runtime=repo.parent/'v2-01e-installed-runtime'/'minecraft'
 profile=repo.parent/'v2-01e-installed-client'
 official=Path(os.environ['APPDATA'])/'.minecraft'
@@ -44,12 +52,11 @@ shutil.copyfile(official/'versions/1.21.1/1.21.1.jar',gamejar)
 assert hashlib.sha1(gamejar.read_bytes()).hexdigest()==base['downloads']['client']['sha1']
 paths.append(str(gamejar.resolve()))
 mods=profile/'mods';mods.mkdir(parents=True,exist_ok=True)
-candidate=repo/'evidence/v2-01e/BASELINE.jar'
-assert hashlib.sha256(candidate.read_bytes()).hexdigest()=='3c92f0fb7cf1d7981d3bef1b6cc14787c6eff408d8166cdf87a694c8f6050460'
 shutil.copyfile(candidate,mods/'whileaway.jar')
 cache=repo.parent/'gradle-home/caches/modules-2/files-2.1/software.bernie.geckolib/geckolib-neoforge-1.21.1/4.9.2'
 gecko=next(p for p in cache.rglob('*.jar') if '-sources' not in p.name)
 shutil.copyfile(gecko,mods/gecko.name)
+assert {p.name for p in mods.glob('*.jar')}=={'whileaway.jar',gecko.name},'Unexpected isolated-profile mods'
 assets=repo.parent/'gradle-home/caches/neoformruntime/assets'
 values={'auth_player_name':'Dev','version_name':version,'game_directory':str(profile),'assets_root':str(assets),
         'assets_index_name':base['assetIndex']['id'],'auth_uuid':'380df991f603344ca090369bad2a924a',
@@ -80,5 +87,5 @@ options+=['soundCategory_'+c+':0.0' for c in ['master','music','record','weather
 summary={'launch_target':'forgeclient','development_classpath':False,'input_helper':False,'version':version,
          'jar_sha256':hashlib.sha256(candidate.read_bytes()).hexdigest(),'mods':[p.name for p in mods.glob('*.jar')],
          'profile':str(profile),'libraries':len(paths),'assets':str(assets),'status':'PREPARED_NOT_LAUNCHED'}
-(repo/'evidence/v2-01e/installed-preparation.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
+(repo/('evidence/v2-01e/'+options_cli.label+'-preparation.json')).write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
 print('PINNED_PRODUCTION_CLIENT_PREPARED libraries='+str(len(paths))+'; NOT LAUNCHED')

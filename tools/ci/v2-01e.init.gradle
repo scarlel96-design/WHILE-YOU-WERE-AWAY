@@ -21,7 +21,7 @@ gradle.afterProject { p,state ->
             def options=['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:true','lang:ko_kr','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700']
             ['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].each { options.add("soundCategory_${it}:0.0") }
             new File(profile,'options.txt').setText(options.join('\n')+'\n','UTF-8')
-            logger.lifecycle('V2_01E_MUTED_ISOLATED_INPUT; production source and JAR unchanged')
+            logger.lifecycle('V2_01E_MUTED_ISOLATED_INPUT; input assist excluded from the production JAR')
         }
     }
 }
