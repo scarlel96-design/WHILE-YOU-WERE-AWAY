@@ -1,0 +1,36 @@
+test_automatic_human_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_automatic_human_result_rejected) ... ok
+test_blocked_and_not_tested_must_remain_partial (test_v2_01_client_evidence.EvidenceTests.test_blocked_and_not_tested_must_remain_partial) ... ok
+test_cli_partial_exit_and_input_preservation (test_v2_01_client_evidence.EvidenceTests.test_cli_partial_exit_and_input_preservation) ... ok
+test_cli_same_file_rejected (test_v2_01_client_evidence.EvidenceTests.test_cli_same_file_rejected) ... ok
+test_duplicate_and_unknown_scenarios_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_and_unknown_scenarios_rejected) ... ok
+test_duplicate_json_key_rejected (test_v2_01_client_evidence.EvidenceTests.test_duplicate_json_key_rejected) ... ok
+test_every_must_failure_blocks_gate (test_v2_01_client_evidence.EvidenceTests.test_every_must_failure_blocks_gate) ... ok
+test_executed_real_client_evidence_retains_partial_status (test_v2_01_client_evidence.EvidenceTests.test_executed_real_client_evidence_retains_partial_status) ... ok
+test_human_rollup_requires_every_must (test_v2_01_client_evidence.EvidenceTests.test_human_rollup_requires_every_must) ... ok
+test_invalid_input_preserves_existing_output (test_v2_01_client_evidence.EvidenceTests.test_invalid_input_preserves_existing_output) ... ok
+test_invalid_result_rejected (test_v2_01_client_evidence.EvidenceTests.test_invalid_result_rejected) ... ok
+test_metadata_required_for_executed_scenario (test_v2_01_client_evidence.EvidenceTests.test_metadata_required_for_executed_scenario) ... ok
+test_missing_scenarios_are_not_tested (test_v2_01_client_evidence.EvidenceTests.test_missing_scenarios_are_not_tested) ... ok
+test_mixed_build_or_jar_rejected (test_v2_01_client_evidence.EvidenceTests.test_mixed_build_or_jar_rejected) ... ok
+test_optional_failure_does_not_override_required_gate (test_v2_01_client_evidence.EvidenceTests.test_optional_failure_does_not_override_required_gate) ... ok
+test_pass_requires_evidence (test_v2_01_client_evidence.EvidenceTests.test_pass_requires_evidence) ... ok
+test_real_client_template_without_executed_rows_is_not_tested (test_v2_01_client_evidence.EvidenceTests.test_real_client_template_without_executed_rows_is_not_tested) ... ok
+test_reference_escape_and_input_output_rejected (test_v2_01_client_evidence.EvidenceTests.test_reference_escape_and_input_output_rejected) ... ok
+test_reference_existence_and_hash (test_v2_01_client_evidence.EvidenceTests.test_reference_existence_and_hash) ... ok
+test_synthetic_human_claim_rejected (test_v2_01_client_evidence.EvidenceTests.test_synthetic_human_claim_rejected) ... ok
+test_synthetic_pass_never_becomes_client_pass (test_v2_01_client_evidence.EvidenceTests.test_synthetic_pass_never_becomes_client_pass) ... ok
+test_cli_reports_draft_success_and_repeat_failure (test_v2_01_client_log_draft.LogDraftTests.test_cli_reports_draft_success_and_repeat_failure) ... ok
+test_existing_output_is_preserved (test_v2_01_client_log_draft.LogDraftTests.test_existing_output_is_preserved) ... ok
+test_kernel_failure_is_only_a_log_marker (test_v2_01_client_log_draft.LogDraftTests.test_kernel_failure_is_only_a_log_marker) ... ok
+test_missing_log_does_not_publish (test_v2_01_client_log_draft.LogDraftTests.test_missing_log_does_not_publish) ... ok
+test_non_utf8_log_keeps_original_hash (test_v2_01_client_log_draft.LogDraftTests.test_non_utf8_log_keeps_original_hash) ... ok
+test_server_log_does_not_prove_client_execution (test_v2_01_client_log_draft.LogDraftTests.test_server_log_does_not_prove_client_execution) ... ok
+test_source_copy_is_byte_exact_and_source_is_unchanged (test_v2_01_client_log_draft.LogDraftTests.test_source_copy_is_byte_exact_and_source_is_unchanged) ... ok
+test_success_markers_and_claim_text_never_grant_acceptance (test_v2_01_client_log_draft.LogDraftTests.test_success_markers_and_claim_text_never_grant_acceptance) ... ok
+test_target_jar_is_measured_but_never_attached_to_unexecuted_rows (test_v2_01_client_log_draft.LogDraftTests.test_target_jar_is_measured_but_never_attached_to_unexecuted_rows) ... ok
+test_target_pair_and_hash_are_validated_before_publication (test_v2_01_client_log_draft.LogDraftTests.test_target_pair_and_hash_are_validated_before_publication) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.561s
+
+OK
