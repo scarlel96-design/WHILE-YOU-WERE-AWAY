@@ -1,0 +1,42 @@
+V2-01 SUPPORT LOG INGESTION PUBLICATION
+Repository: scarlel96-design/WHILE-YOU-WERE-AWAY
+Branch: gpt-support/v2-01-observation-client-gate
+Starting support HEAD: e5c184bc367c7c3f26a1bd2b551075c07edf50ae
+Implementation commit: 76125c53d8b5a80fd044ac04fcc3e0d9afc992b7
+Package commit: 06e7d27f050d582f3b4f05786ba495e27f95ed72
+Exact-log commit and verified published HEAD: 8c7d7fa9d336a71fe3400b2c56688acbd0f02f4b
+First push command: git -c core.longpaths=true push origin HEAD:refs/heads/gpt-support/v2-01-observation-client-gate
+Result: e5c184b..8c7d7fa, exit 0.
+Remote verification command: git -c core.longpaths=true ls-remote origin refs/heads/gpt-support/v2-01-observation-client-gate refs/heads/work/v2-playable-core
+Literal result:
+8c7d7fa9d336a71fe3400b2c56688acbd0f02f4b refs/heads/gpt-support/v2-01-observation-client-gate
+062797f54ee63a65b2cc79870a619d1eeea0daa1 refs/heads/work/v2-playable-core
+Exit status: 0.
+A subsequent metadata-only commit publishes this sidecar. It does not change src, tools, or adoption documents.
+
+Uploaded paths:
+tools/validation/v2_01_client_evidence.py
+tools/validation/test_v2_01_client_evidence.py
+tools/validation/v2_01_client_log_draft.py
+tools/validation/test_v2_01_client_log_draft.py
+docs/SUPPORT_V2_01_HANDOFF.md
+docs/SUPPORT_V2_01_TEST_INVENTORY.md
+docs/SUPPORT_V2_01_LOG_INGESTION_REPORT.md
+docs/V2_01_CLIENT_VALIDATION_PROTOCOL.md
+evidence/support-v2-01-log-ingestion/
+dist/support-v2-01-log-ingestion/
+
+Final ZIP: whileaway-gpt-support-v2-01-log-ingestion.zip
+Size: 115514 bytes
+SHA-256: dfa0a93a30b8fd230df4babd77cd258f1bac8ee38b7e1904aa79eeb2c7adda28
+Entries: 45. CRC, member hashes, source identity, and executable rollback mode verified.
+Cleanroom: 31 tests PASS. Targeted modified tests: 31 PASS. Baseline tests: 19 PASS.
+Production src tree: d51ea9062976c4d4f12423ee6fe547ea2b0d1397 (unchanged).
+Source whitespace check: git -c core.whitespace=cr-at-eol diff --check e5c184bc367c7c3f26a1bd2b551075c07edf50ae HEAD -- tools/validation docs
+Literal output: empty. Exit status: 0.
+The unscoped artifact whitespace check flagged preserved CRLF bytes and unified-diff context lines.
+Those artifact bytes were preserved. This was not a production source failure.
+No new Gradle, GameTest, or Minecraft client run occurred in this continuation.
+REAL_CLIENT=NOT_TESTED. HUMAN_EXPERIENCE=NOT_TESTED. V2-01=PARTIAL.
+MAIN adoption targets: original source commit 8231f8bd93626316f9d59639ad95c6cd5d7bce84, then tooling commit 76125c53d8b5a80fd044ac04fcc3e0d9afc992b7.
+Do not cherry-pick package/evidence commits as gameplay changes.
