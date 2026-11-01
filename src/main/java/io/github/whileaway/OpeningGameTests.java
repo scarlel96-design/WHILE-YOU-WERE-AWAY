@@ -16,6 +16,21 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder(WhileAway.ID)
 @PrefixGameTestTemplate(false)
 public final class OpeningGameTests {
+    @GameTest(template="empty") public static void openingSignalRespondsToActualLeverUse(GameTestHelper h) {
+        var lever=h.absolutePos(new BlockPos(2,2,2));
+        h.getLevel().setBlock(lever.below(),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
+        OpeningEvents.placeSignal(h.getLevel(),lever);
+        var player=h.makeMockServerPlayerInLevel();
+        h.getLevel().getBlockState(lever).useWithoutItem(h.getLevel(),player,
+            new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(lever),
+                net.minecraft.core.Direction.UP,lever,false));
+        h.runAfterDelay(4,()->{
+            h.assertTrue(h.getLevel().getBlockState(lever.south()).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT),
+                "the authored Opening signal must visibly respond to its real lever");
+            player.discard();h.succeed();
+        });
+    }
+
     private static Path file() throws Exception {
         var root=Path.of(System.getProperty("whileaway.testEvidence"),"opening");
         Files.createDirectories(root);

@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="wwa_play_input"
+version="0.1"
+displayName="WhileAway isolated input assistance"

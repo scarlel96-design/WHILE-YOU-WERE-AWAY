@@ -152,10 +152,14 @@ public final class OpeningEvents {
         for(int x=3;x<=10;x++)level.setBlock(new BlockPos(x,WALK_Y,-1),Blocks.RAIL.defaultBlockState(),2);
         for(int z=-2;z<=2;z++)for(int y=WALK_Y;y<=WALK_Y+2;y++)
             level.setBlock(new BlockPos(16,y,z),Blocks.IRON_BARS.defaultBlockState(),2);
-        level.setBlock(new BlockPos(11,WALK_Y,2),Blocks.REDSTONE_LAMP.defaultBlockState(),2);
-        level.setBlock(LEVER,Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACE,AttachFace.FLOOR)
-            .setValue(LeverBlock.FACING,Direction.NORTH),2);
+        placeSignal(level,LEVER);
         level.setBlock(new BlockPos(28,WALK_Y,2),Blocks.OAK_SIGN.defaultBlockState(),2);
         level.setBlock(MARKER,Blocks.CHISELED_DEEPSLATE.defaultBlockState(),2);
+    }
+
+    static void placeSignal(ServerLevel level,BlockPos lever) {
+        level.setBlock(lever.south(),Blocks.REDSTONE_LAMP.defaultBlockState(),2);
+        level.setBlock(lever,Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACE,AttachFace.FLOOR)
+            .setValue(LeverBlock.FACING,Direction.NORTH),2);
     }
 }
