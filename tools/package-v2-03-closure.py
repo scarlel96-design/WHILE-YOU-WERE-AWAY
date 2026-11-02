@@ -15,7 +15,7 @@ def main():
     modified=OUT/'whileaway-0.3.1-v2-03-content.jar'
     shutil.copy2(ROOT/'build/libs/whileaway-0.3.1-dev.1.jar',modified)
     names=git('ls-files','-z').decode().split('\0')
-    fixtures=['evidence/reuse/baseline/legacy-v'+str(i)+'.dat' for i in (2,3)]
+    fixtures=['evidence/reuse/baseline/legacy-v'+str(i)+'.dat' for i in (2,3)]+['evidence/audio-assets.json']
     names=[n for n in names if n and (n.startswith(('src/','docs/','tools/','gradle/')) or n in fixtures or n in ['AGENTS.md','README.md','LICENSE','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat'])]
     assert len(names)>200,'Source inventory unexpectedly small'
     assert all(n in names for n in fixtures)
