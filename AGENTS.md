@@ -1,3 +1,15 @@
+# Latest continuity rule — 2026-11-02
+
+**Read [docs/PROJECT_CONTINUITY.md](docs/PROJECT_CONTINUITY.md), [docs/DECISION_LOG.md](docs/DECISION_LOG.md), [docs/CONTENT_ROADMAP.md](docs/CONTENT_ROADMAP.md), and [docs/WORK_ORDER_PROTOCOL.md](docs/WORK_ORDER_PROTOCOL.md) before drafting or starting new work orders.** Read the existing design and evidence documents linked there. These are repository continuity documents, not evidence that game features have been implemented.
+
+**Effective only for new work orders after the active V2-03 work.** Do not change the active V2-03 scope or silently reinterpret its acceptance criteria. Current and newly added docs do not change runtime/save data. Source-of-truth precedence and dated overrides are in PROJECT_CONTINUITY.md. Earlier priorities recorded below are historical where they conflict with later approved decisions.
+
+**Active execution policy:** GPT-6.1 SOL/Codex main implementation line only; no compulsory GPT support 40% split. Content first. The user performs the first large human survival/fear/audio playtest when approximately 50–60% of the defined total gameplay content has been implemented. This is not permission to skip build, targeted GameTests, storage/canonical-actor, world-preservation or package integrity checks. Do not run repetitive Computer Use survival mining/hunting/station discovery to close the old V2-01E gameplay gates. Preserve NOT TESTED honestly.
+
+**Creative safeguard:** Strong survival horror, analog-horror grammar, meaningful jump scares, distinctive monsters and sound, expressive compact high-quality structures, world-scale setpieces and lasting safe aftermath; preserve long-form mysteries, present NPC agency, player-past amnesia, distinct Observer/Shadow mystery and five endings. Do not collapse all anomalies into one explanation. Dialogue remains text/chat; no required voice generation. Respect player-authored worlds, controls, privacy and existing safe recovery contracts.
+
+---
+
 # Development continuity
 
 - Keep all agent-launched clients and test programs muted before startup. The user requested silent testing.
