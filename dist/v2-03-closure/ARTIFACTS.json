@@ -1,0 +1,42 @@
+{
+  "baseline": "82beffac6347c60258e4b9db0098eecad423b176",
+  "implementation": "7ff9a930a490f5758d61c0eec8ec6247047c3aec",
+  "artifacts": {
+    "BASELINE-source.zip": {
+      "size": 982951,
+      "sha256": "c7d47351c297a1647eed6216a6172bd78839152d2cc28195eb29099d7bcdaa9d"
+    },
+    "BASELINE.jar": {
+      "size": 705191,
+      "sha256": "7d60cc29edea2b4cd653454c9006e75ebf4fddef999105d2953864c189081cf6"
+    },
+    "DIFF.patch": {
+      "size": 3425577,
+      "sha256": "9408352e3629e39c1b8b57dbb1881eaacc2f0a1331ea288b7276297585ecd6e7"
+    },
+    "ROLLBACK.ps1": {
+      "size": 1549,
+      "sha256": "b74f60ce5da055626a04e814ef968ca20e86ba5f19105d39678df06362288515"
+    },
+    "ROLLBACK.sh": {
+      "size": 264,
+      "sha256": "d47323525a91a10a0b25c1a4386639ea5e6d45f2c35a2ba8323465bf9bb521ef"
+    },
+    "SOURCE_MANIFEST.json": {
+      "size": 51053,
+      "sha256": "38b768666b783005960b867a2188786886afdfe000802d419e91c5ba6f945077"
+    },
+    "VERIFICATION.txt": {
+      "size": 7288,
+      "sha256": "c3cfc19d4c874f47a9510f7dde7926a53263589e0c0bd0493be09d279ca3f514"
+    },
+    "whileaway-0.3.1-v2-03-content-source.zip": {
+      "size": 3656106,
+      "sha256": "ec5237fb1821028c01e32c7c38349f84ca564f23a1799e6a00bed4d1fd6622f4"
+    },
+    "whileaway-0.3.1-v2-03-content.jar": {
+      "size": 3344137,
+      "sha256": "72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05"
+    }
+  }
+}

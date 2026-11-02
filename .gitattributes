@@ -3,3 +3,7 @@
 /evidence/return-network-integration/ROLLBACK.sh text eol=lf
 /dist/return-network-signal/ROLLBACK.sh text eol=lf
 /dist/return-network-signal/DIFF.patch -text
+/dist/v2-03-closure/** -text
+/evidence/v2-03-closure/** -text
+/dist/v2-03-closure/ROLLBACK.sh text eol=lf
+/dist/v2-03-closure/DIFF.patch -diff

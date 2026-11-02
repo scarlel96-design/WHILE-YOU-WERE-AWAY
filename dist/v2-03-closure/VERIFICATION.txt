@@ -1,0 +1,120 @@
+[MAIN GPT-6.1 SOL RESULT — V2-03]
+Branch: work/v2-playable-core
+Baseline source HEAD: 82beffac6347c60258e4b9db0098eecad423b176
+Implementation: 32cf3a4c7f39e71c18c9d93e938bb3ac9f84c4a4
+Packaged source snapshot: 7ff9a930a490f5758d61c0eec8ec6247047c3aec
+Version 0.3.1-dev.1; V2-01/V2-02/V2-03/Campaign PARTIAL; 0.3.2 NOT PROMOTED.
+Save 5; Actor optional 1; Return Network 1; city plan 3; Caveman HOLD.
+
+CHANGED FIELDS / BRANCHES
+RailBeamBlock: facing and segment describe fixed scenery, not story progress.
+RailBeamEntity: client-only visualAngle and movement-stop echo; no custom timer NBT.
+Wayfarer WARNING: transient synchronized presentation flag, not a saved fact.
+Wayfarer controller: idle/walk/turn/warning/hunt; original observation and AI thresholds preserved.
+New optional structure IDs: rail_signal_office / rail_maintenance_passage.
+StoryStorage, NarrativeData, StoryActors, ReturnNetworkEvents and CityDistrict class bytes unchanged.
+
+FOUR PATHS
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-closure\whileaway-0.3.1-v2-03-content.jar
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-closure\DIFF.patch
+VERIFICATION: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-closure\VERIFICATION.txt
+ROLLBACK: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-closure\ROLLBACK.sh
+SOURCE ZIP: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-closure\whileaway-0.3.1-v2-03-content-source.zip
+EXECUTION CWD: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration
+
+BASELINE
+Command: python tools/verify-assets.py dist/v2-03-closure/BASELINE.jar
+Input: preserved baseline JAR; SHA-256 7d60cc29edea2b4cd653454c9006e75ebf4fddef999105d2953864c189081cf6
+Execution: before source changes, using the baseline verifier.
+Literal output: PASS asset assertions=6820; station/animation/localization/OGG/JAR
+Exit status: 0
+Baseline source ZIP SHA-256: c7d47351c297a1647eed6216a6172bd78839152d2cc28195eb29099d7bcdaa9d
+
+MODIFIED
+Command: python tools/verify-assets.py dist/v2-03-closure/whileaway-0.3.1-v2-03-content.jar
+Input: final modified JAR; SHA-256 72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05
+Literal output: PASS asset assertions=10874; station/animation/localization/OGG/JAR
+Exit status: 0
+Command: .\gradlew.bat --offline --no-daemon compileJava coreTest build runGameTestServer --console=plain
+Environment: GRADLE_USER_HOME=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home
+Input: final production source and resources; isolated GameTest world.
+Literal outputs:
+PASS core assertions=176858
+[02:42:23] [Server thread/INFO] [minecraft/GameTestServer]: All 127 required tests passed :)
+BUILD SUCCESSFUL in 1m
+Exit status: 0
+Final gate log: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\evidence\v2-03-closure\final-gate.log
+Unique GameTests: 120 existing + 7 new = 127. Three integrated executions; final source result is 127 PASS.
+Audio decode command: bundled Python 3.12 tools/verify-audio.py with PYTHONPATH=../audio-deps
+Literal output: PASS audio files=10; decoded/finite/duration/mono/44100Hz/peak<0.95; playback=NONE
+Exit status: 0
+Source ZIP SHA-256: ec5237fb1821028c01e32c7c38349f84ca564f23a1799e6a00bed4d1fd6622f4
+
+ROLLBACK
+Preparation: copy MODIFIED_FILE to dist/v2-03-closure/rollback-test.jar.
+Command: & 'C:\Program Files\Git\bin\bash.exe' dist/v2-03-closure/ROLLBACK.sh dist/v2-03-closure/rollback-test.jar
+Input: separate modified JAR copy, SHA-256 72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05
+Literal output: ROLLBACK PASS sha256=7d60cc29edea2b4cd653454c9006e75ebf4fddef999105d2953864c189081cf6 worlds=UNCHANGED
+Exit status: 0
+Restored SHA-256: 7d60cc29edea2b4cd653454c9006e75ebf4fddef999105d2953864c189081cf6
+Restored behavior/status: previous verified package bytes restored; new rail-site/beam resources absent in restored JAR.
+Scope: package restoration only. No Minecraft process or world downgrade test.
+World files: unchanged. MODIFIED_FILE remains changed, SHA-256 72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05.
+
+PACKAGE AUDIT
+PASS baseline classes byte-identical=151/157; changed=6
+
+PASS unchanged io/github/whileaway/NarrativeData.class
+
+PASS unchanged io/github/whileaway/StoryStorage.class
+
+PASS unchanged io/github/whileaway/StoryActors.class
+
+PASS unchanged io/github/whileaway/ReturnNetworkEvents.class
+
+PASS unchanged io/github/whileaway/CityDistrict.class
+
+PASS improved station template preserved byte-for-byte
+
+PASS all final resources match source or expanded build metadata
+
+PASS NpcRenderer method instructions identical; class metadata changed
+
+PASS Renderer method instructions identical; class metadata changed
+
+PASS source ZIP CRC and exact working-tree manifest files=414
+
+PASS production src unchanged since implementation 32cf3a4
+Command: git apply --check --reverse dist/v2-03-closure/DIFF.patch
+Literal output: empty
+Exit status: 0
+
+FAILURE HISTORY
+1. Compile error: getRenderBoundingBox was placed on BlockEntity.
+   Fix: implement the NeoForge renderer extension method on RailBeamRenderer. Compile and final gate PASS.
+2. Standalone JUnit attempt could not access Minecraft BlockEntity on the unit-test classpath.
+   Fix: remove that unrun test. Test the distance fade through the existing real GameTest environment.
+3. Generator edit used Windows default encoding and raised UnicodeDecodeError.
+   Fix: use explicit UTF-8. Regenerate the protection tag and freeze final resources.
+4. Package audit found an earlier protection-tag resource in the candidate JAR.
+   Fix: rebuild and rerun the final gate. All packaged resource bytes now match final input.
+5. Source-package guard incorrectly required a legacy-v1.dat file.
+   Fix: include actual v2/v3 fixtures and audio metadata. Exclude old archive payloads.
+   Final ZIP CRC and 414 source-manifest entries PASS.
+These are authoring/build/package issues, not observed live Minecraft defects.
+
+NOT TESTED
+New real client: 0 runs. Installed-JAR client smoke: NOT TESTED.
+Human fear, visual quality, natural discovery and audio experience: NOT TESTED.
+All-seed terrain/vanilla-structure overlap and third-party-mod placement: NOT TESTED.
+Save schema and existing Actor semantics unchanged. Old-world migration fixtures are automated evidence only.
+Old JAR downgrade for worlds containing rail_memory_beam: unsupported.
+Open continuity audit gaps: GAP-007, GAP-008, GAP-009.
+Next: user review of terrain fit, visual readability, warning sound and route counterplay.
+
+PUBLICATION ENVIRONMENT ISSUE
+Git could not index long generated quarantine paths on Windows.
+No repository or OS long-path settings were changed.
+All 126 raw evidence files were preserved in gametest-evidence.zip with a per-file SHA manifest.
+ZIP CRC and every evidence-file digest passed. Raw local folders remain preserved.
+Artifact attributes preserve exact bytes. ROLLBACK.sh uses LF and executable Git mode.

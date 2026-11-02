@@ -1,0 +1,19 @@
+{
+  "audio.txt": "ac4c4f617011f819b371e9bfdbb3e75863728dd18abbea028d9e646018ba75c1",
+  "BASELINE.txt": "22ff215c7b3093011bad4b46bb704d5274e9d0bf232fce2b1b3c9abfb6616f2e",
+  "compile-1.log": "1cbb13a087a3af33dbe53c2407c85d7c0020fb5498e393de22947d877c58508c",
+  "compile-2.log": "03747cf26f7cbd27d943ccebf82bcf50154a806ecdd5373c8701695f42401268",
+  "design.txt": "9165b0b3937e81a7cc257bb832d6d658b4be49667ed284385a12eed4e9096b7c",
+  "final-gate.log": "9e59c9d55efb6c33ac650bc58a684939ad634fb79d07ab7c0b28d76043c612eb",
+  "gametest-evidence.zip": "cd01fd57fd9ace7303ecd9cfe1162d4454fb484e9323b4790e85eab38e841ffc",
+  "gate-before-protection-tag.log": "08bf62a83bb2e996a0f8e3c5e003e9d9f44034cdf1eb01648e80536a7e7daac8",
+  "milestone-gate.log": "c6bff3071a296eddc5ca4ae299bb044164d90339ac053c0b5a44f21be239759f",
+  "MODIFIED.txt": "667ddc41c36e015257c2080ce2949c1565e73abc0d9c8c03c8ad246159eda308",
+  "package-audit.txt": "8b449249b2c77d09de9acc70e841f15900a6192f5abfa18985229d554378341f",
+  "package.txt": "f27a6820e2d29ffc4dd980ab16affdc832c1d950ce9d93d1615a62aabdfd21f9",
+  "REPORT.md": "803060e3c67170338b502c6281ec2eb96bff20336e2ddb2cdc26672a6473e73b",
+  "ROLLBACK.txt": "f9afc831029d953483724c763c2e6d422b3df4e6562835c9e7922f8a51e5223e",
+  "source-remote.txt": "59fc1f4bdb26fd46da4f44f180d60973b6d691c1b1a4a1c064e6884db411bf50",
+  "source-upload.txt": "c6359ec55585b0b060d3610fe0d42e3c35bbf0ce137c43bac7f75be9c9e04179",
+  "targeted-fade.log": "fa88d0fa513d55f1d3b07c7cb062a249c3d18e6de8cb16289e145f8150c213d7"
+}

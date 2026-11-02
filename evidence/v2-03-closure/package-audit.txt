@@ -1,0 +1,12 @@
+PASS baseline classes byte-identical=151/157; changed=6
+PASS unchanged io/github/whileaway/NarrativeData.class
+PASS unchanged io/github/whileaway/StoryStorage.class
+PASS unchanged io/github/whileaway/StoryActors.class
+PASS unchanged io/github/whileaway/ReturnNetworkEvents.class
+PASS unchanged io/github/whileaway/CityDistrict.class
+PASS improved station template preserved byte-for-byte
+PASS all final resources match source or expanded build metadata
+PASS NpcRenderer method instructions identical; class metadata changed
+PASS Renderer method instructions identical; class metadata changed
+PASS source ZIP CRC and exact working-tree manifest files=414
+PASS production src unchanged since implementation 32cf3a4

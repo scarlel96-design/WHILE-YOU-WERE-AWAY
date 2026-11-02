@@ -1,0 +1,1 @@
+PASS audio files=10; decoded/finite/duration/mono/44100Hz/peak<0.95; playback=NONE
