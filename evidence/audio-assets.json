@@ -40,5 +40,20 @@
     "channels": 1,
     "peak": 0.1766,
     "origin": "original deterministic synthesis; prototype"
+  },
+  "wayfarer_drag": {
+    "seconds": 0.8,
+    "channels": 1,
+    "source": "Original deterministic synthesis; tools/generate-wayfarer-audio.py"
+  },
+  "wayfarer_warning": {
+    "seconds": 2.15,
+    "channels": 1,
+    "source": "Original deterministic synthesis; tools/generate-wayfarer-audio.py"
+  },
+  "wayfarer_depart": {
+    "seconds": 3.6,
+    "channels": 1,
+    "source": "Original deterministic synthesis; tools/generate-wayfarer-audio.py"
   }
 }

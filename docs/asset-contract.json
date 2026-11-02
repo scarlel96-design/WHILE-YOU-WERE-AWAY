@@ -1,27 +1,30 @@
 {
   "schema": 1,
   "namespace": "whileaway",
-  "stage": "function_stabilization",
+  "stage": "v2_03_content_candidate",
   "final_pack_selected": false,
   "external_packs_bundled": [],
   "items": [
     {
       "id": "wayfarer.skin.default",
-      "status": "placeholder",
+      "status": "prototype",
       "source": "src/main/java/io/github/whileaway/client/ClientSetup.java",
-      "marker": "textures/entity/enderman/enderman.png",
-      "runtime": "minecraft:textures/entity/enderman/enderman.png",
+      "marker": "workcoat-v2.png",
+      "runtime": "whileaway:textures/entity/wayfarer/workcoat-v2.png",
       "planned": "whileaway:textures/entity/wayfarer/default.png",
-      "gate": "original skin and resource reload coverage"
+      "gate": "resource inclusion automated; appearance and reload need user playtest",
+      "art_status": "original_candidate",
+      "origin": "Built-in imagegen; original project atlas"
     },
     {
       "id": "wayfarer.skin.apparition",
-      "status": "placeholder",
+      "status": "prototype",
       "source": "src/main/java/io/github/whileaway/client/ClientSetup.java",
-      "marker": "textures/entity/skeleton/skeleton.png",
-      "runtime": "minecraft:textures/entity/skeleton/skeleton.png",
+      "marker": "workcoat-v2.png",
+      "runtime": "same original workcoat; negative entity-ID shortcut removed",
       "planned": "whileaway:textures/entity/wayfarer/apparition.png",
-      "gate": "named skin variant replaces negative entity-id rendering shortcut"
+      "gate": "named apparition variant deferred",
+      "scope_status": "deferred"
     },
     {
       "id": "wayfarer.geometry",

@@ -67,7 +67,24 @@ for b in geo['bones']:check(not b.get('parent') or b['parent'] in bones,'bone pa
 animations=json.loads((R/'assets/whileaway/animations/wayfarer.animation.json').read_text())['animations']
 for name,a in animations.items():
     for bone in a['bones']:check(bone in bones,'animation bone '+bone)
-check(set(animations)=={'animation.wayfarer.idle','animation.wayfarer.walk','animation.wayfarer.hunt'},'AI animation coverage')
+check(set(animations)=={'animation.wayfarer.idle','animation.wayfarer.walk','animation.wayfarer.hunt','animation.wayfarer.warning','animation.wayfarer.turn'},'AI animation coverage')
+for name,extent in [('rail_signal_office',[19,10,17]),('rail_maintenance_passage',[17,9,21])]:
+    site=readnbt(R/('data/whileaway/structure/'+name+'.nbt'))
+    check(site['size']==extent,'rail site extent '+name)
+    positions=set()
+    for b in site['blocks']:
+        check(all(0<=b['pos'][i]<extent[i] for i in range(3)),'rail site bounds')
+        check(tuple(b['pos']) not in positions,'rail site position unique');positions.add(tuple(b['pos']))
+        check(0<=b['state']<len(site['palette']),'rail site palette')
+    check(not site['entities'],'no actor embedded in optional structure')
+    check(not any(p['Name'] in ['whileaway:station_anchor','whileaway:signal_relay'] for p in site['palette']),'optional site cannot impersonate story station')
+texture=R/'assets/whileaway/textures/entity/wayfarer/workcoat-v2.png'
+raw=texture.read_bytes();check(raw[:8]==b'\x89PNG\r\n\x1a\n','original skin PNG')
+w,h=struct.unpack('>II',raw[16:24]);check(w==h and w>=128,'square original atlas')
+for b in geo['bones']:
+    for cube in b.get('cubes',[]):
+        u,v=cube['uv'];x,y,z=cube['size']
+        check(u>=0 and v>=0 and u+2*(x+z)<=128 and v+y+z<=128,'UV inside atlas')
 if len(sys.argv)>1:
     with zipfile.ZipFile(sys.argv[1]) as archive:
         for p in R.rglob('*'):

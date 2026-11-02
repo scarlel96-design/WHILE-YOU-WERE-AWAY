@@ -95,5 +95,9 @@
   "story.whileaway.life.changed_equipment": "설비 상태가 달라져 작업표와 직접 비교하기 어렵다.",
   "story.whileaway.life.yeoul_tools": "여울: 공구를 쓰면 제자리에 두려고 하는데… 꼭 하나씩 없어지더라.",
   "story.whileaway.life.yeoul_rest": "여울: 잠깐 쉬는 중이야. 여기서는 지나가는 길이 잘 보여.",
-  "story.whileaway.life.yeoul_light_changed": "여울: 등 쪽이 달라졌네. 내가 고치기 전에 네가 둔 물건부터 확인할게."
+  "story.whileaway.life.yeoul_light_changed": "여울: 등 쪽이 달라졌네. 내가 고치기 전에 네가 둔 물건부터 확인할게.",
+  "block.whileaway.rail_memory_beam": "낡은 신호 가로보",
+  "subtitle.whileaway.wayfarer_drag": "불균형한 끌림과 발걸음",
+  "subtitle.whileaway.wayfarer_warning": "버티던 관절이 삐걱거림",
+  "subtitle.whileaway.wayfarer_depart": "선로 쪽으로 멀어지는 발걸음"
 }

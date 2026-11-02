@@ -18,6 +18,13 @@
             "math.sin(query.anim_time*45)*7",
             0
           ]
+        },
+        "left_forearm": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(query.anim_time*45)*3"
+          ]
         }
       }
     },
@@ -34,7 +41,7 @@
         },
         "right_leg": {
           "rotation": [
-            "-math.sin(query.anim_time*180)*20",
+            "-math.sin(query.anim_time*180-24)*11-4",
             0,
             0
           ]
@@ -56,6 +63,13 @@
         "right_arm": {
           "rotation": [
             "math.sin(query.anim_time*180-40)*12",
+            0,
+            0
+          ]
+        },
+        "coat_tail": {
+          "rotation": [
+            "math.sin(query.anim_time*180-30)*5",
             0,
             0
           ]
@@ -99,6 +113,74 @@
             -65,
             0,
             15
+          ]
+        }
+      }
+    },
+    "animation.wayfarer.warning": {
+      "loop": true,
+      "animation_length": 2.5,
+      "bones": {
+        "body": {
+          "rotation": [
+            10,
+            -8,
+            -7
+          ]
+        },
+        "head": {
+          "rotation": [
+            -16,
+            26,
+            12
+          ]
+        },
+        "left_forearm": {
+          "rotation": [
+            0,
+            0,
+            -22
+          ]
+        },
+        "right_arm": {
+          "rotation": [
+            -18,
+            0,
+            14
+          ]
+        },
+        "neck": {
+          "rotation": [
+            "math.sin(query.anim_time*72)*2",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.wayfarer.turn": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "body": {
+          "rotation": [
+            4,
+            "math.sin(query.anim_time*180)*12",
+            -3
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            "-math.sin(query.anim_time*180)*19",
+            0
+          ]
+        },
+        "right_foot": {
+          "rotation": [
+            0,
+            -12,
+            0
           ]
         }
       }

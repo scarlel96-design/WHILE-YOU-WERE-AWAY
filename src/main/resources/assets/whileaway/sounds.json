@@ -61,5 +61,32 @@
         "stream": true
       }
     ]
+  },
+  "wayfarer_drag": {
+    "subtitle": "subtitle.whileaway.wayfarer_drag",
+    "sounds": [
+      {
+        "name": "whileaway:wayfarer_drag",
+        "stream": false
+      }
+    ]
+  },
+  "wayfarer_warning": {
+    "subtitle": "subtitle.whileaway.wayfarer_warning",
+    "sounds": [
+      {
+        "name": "whileaway:wayfarer_warning",
+        "stream": false
+      }
+    ]
+  },
+  "wayfarer_depart": {
+    "subtitle": "subtitle.whileaway.wayfarer_depart",
+    "sounds": [
+      {
+        "name": "whileaway:wayfarer_depart",
+        "stream": false
+      }
+    ]
   }
 }

@@ -1,0 +1,8 @@
+{
+  "processors": [
+    {
+      "processor_type": "minecraft:protected_blocks",
+      "value": "#whileaway:rail_site_protected"
+    }
+  ]
+}

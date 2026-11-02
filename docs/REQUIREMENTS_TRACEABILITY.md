@@ -36,7 +36,7 @@
 | WWA-PUZZLE-01 | 공간·기록·시간·음향·레드스톤·Minecraft 시스템 기반 퍼즐 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 35–39 | DESIGN ONLY 또는 기초 단서 | 실제 퍼즐·복구 계약 |
 | WWA-PUZZLE-02 | 전용 아이템·장비·조사수첩·장비 개량·추론 UI, 정답 자동 표시 금지 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 40–47 | 본격 프레임워크 미완료 | 아이템·Evidence 구조 |
 | WWA-WORLD-01 | 작은 규모도 고품질 건축: 실루엣·동선·내부·생활 흔적·지형 결합 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | V2-03 폐역 템플릿 개선 기록; 인간 아트 QA NOT TESTED | 구조물 품질 검수 |
-| WWA-WORLD-02 | 지상/채굴/철도/마을 등 여러 자연 발견 경로, 필수 체크리스트 금지 | CONFIRMED | PROJECT_CONTINUITY 4 | 기존 폐역 생성만 확인; 후속 발견 경로 일부 미구현 | 발견 확률·공정성 |
+| WWA-WORLD-02 | 지상/채굴/철도/마을 등 여러 자연 발견 경로, 필수 체크리스트 금지 | CONFIRMED | PROJECT_CONTINUITY 4 | 폐역·관리소·낮은 정비 통로 생성 연결. V2_03_CONTENT_STATUS 참조. 자연 발견 HUMAN NOT TESTED | 발견 확률·공정성 |
 | WWA-WORLD-03 | 한 장소의 생활·재난·현재·재방문 네 의미 | CONFIRMED | DESIGN_V05 52 | 장소별 구현 미확인 | Three Lives Rule 정합성 |
 | WWA-WORLD-04 | 소규모 공간 이상과 대형 월드 세트피스를 별도 종류로 유지 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | 후보안; 실 구현 미확인 | 월드 스케일 공포 품질 |
 | WWA-WORLD-05 | 대형 사건은 사전 징후·운동·음향·위기·사건 후 안전한 흔적을 결합 | CONFIRMED 방향 | DESIGN_V05, PROJECT_CONTINUITY | DESIGN ONLY | Persistent World-Scar 패턴 |

@@ -33,6 +33,8 @@ public final class WhileAway {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
 
     public static final DeferredBlock<StationBlock> STATION = BLOCKS.register("station_anchor", () -> new StationBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_STONE_BRICKS).strength(4)));
+    public static final DeferredBlock<RailBeamBlock> RAIL_BEAM = BLOCKS.register("rail_memory_beam", () -> new RailBeamBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WEATHERED_CUT_COPPER)));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RailBeamEntity>> RAIL_BEAM_ENTITY = BLOCK_ENTITIES.register("rail_memory_beam", () -> BlockEntityType.Builder.of(RailBeamEntity::new, RAIL_BEAM.get()).build(null));
     public static final DeferredBlock<NoteBlock> WARNING = BLOCKS.register("warning_note", () -> new NoteBlock("warning", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
     public static final DeferredBlock<NoteBlock> EVACUATION = BLOCKS.register("evacuation_note", () -> new NoteBlock("evacuation", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
     public static final DeferredBlock<NoteBlock> PERSONAL = BLOCKS.register("personal_note", () -> new NoteBlock("personal", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
@@ -57,6 +59,9 @@ public final class WhileAway {
     public static final DeferredHolder<SoundEvent, SoundEvent> STEPS = sound("returning_steps");
     public static final DeferredHolder<SoundEvent, SoundEvent> BREATH = sound("wayfarer_breath");
     public static final DeferredHolder<SoundEvent, SoundEvent> ATTACK = sound("wayfarer_attack");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROUTE_WARNING = sound("wayfarer_warning");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAG = sound("wayfarer_drag");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEPART = sound("wayfarer_depart");
     public static final DeferredHolder<SoundEvent, SoundEvent> SIGNAL = sound("signal_wake");
     public static final DeferredHolder<SoundEvent, SoundEvent> RESOLVE = sound("homeward");
     public static final DeferredHolder<SoundEvent, SoundEvent> UNEASE = sound("station_unease");

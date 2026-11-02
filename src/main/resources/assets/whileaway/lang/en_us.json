@@ -95,5 +95,9 @@
   "story.whileaway.life.changed_equipment": "The equipment has changed. A direct comparison with the work sheet is uncertain.",
   "story.whileaway.life.yeoul_tools": "Yeoul: I try to put the tools back. Somehow one always goes missing.",
   "story.whileaway.life.yeoul_rest": "Yeoul: Just taking a break. You can see the road from here.",
-  "story.whileaway.life.yeoul_light_changed": "Yeoul: The light looks different. I will check what you placed before touching anything."
+  "story.whileaway.life.yeoul_light_changed": "Yeoul: The light looks different. I will check what you placed before touching anything.",
+  "block.whileaway.rail_memory_beam": "Weathered Signal Beam",
+  "subtitle.whileaway.wayfarer_drag": "Uneven dragging steps",
+  "subtitle.whileaway.wayfarer_warning": "A strained brace creaks",
+  "subtitle.whileaway.wayfarer_depart": "Steps recede along the track"
 }

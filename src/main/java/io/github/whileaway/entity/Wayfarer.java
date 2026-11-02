@@ -22,26 +22,31 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 /** First encounter: follow a return route and warn before reacting to an obstruction. */
 public final class Wayfarer extends PathfinderMob implements GeoEntity {
     private static final EntityDataAccessor<Boolean> HUNTING = SynchedEntityData.defineId(Wayfarer.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> WARNING = SynchedEntityData.defineId(Wayfarer.class, EntityDataSerializers.BOOLEAN);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.wayfarer.idle");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.wayfarer.walk");
     private static final RawAnimation HUNT = RawAnimation.begin().thenLoop("animation.wayfarer.hunt");
+    private static final RawAnimation WARN = RawAnimation.begin().thenLoop("animation.wayfarer.warning");
+    private static final RawAnimation TURN = RawAnimation.begin().thenLoop("animation.wayfarer.turn");
     private UUID witness;
     private BlockPos home;
     private int lifetime, windup, attackCooldown, huntTicks, warningTicks, clearTicks, observationTicks;
     private boolean checkpointRestored;
+    private boolean draggingFoot;
     public Wayfarer(EntityType<? extends PathfinderMob> type, Level level) { super(type, level); setPersistenceRequired(); xpReward = 0; }
     public static AttributeSupplier.Builder attributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 28).add(Attributes.MOVEMENT_SPEED, 0.22)
             .add(Attributes.ATTACK_DAMAGE, 4).add(Attributes.FOLLOW_RANGE, 32).add(Attributes.KNOCKBACK_RESISTANCE, 0.25);
     }
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b) { super.defineSynchedData(b); b.define(HUNTING, false); }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b) { super.defineSynchedData(b); b.define(HUNTING, false); b.define(WARNING,false); }
     @Override protected void registerGoals() { goalSelector.addGoal(0, new FloatGoal(this)); }
     public void bind(UUID owner, BlockPos station) { witness=owner; home=station.immutable(); }
     public UUID witness() { return witness; }
     @Override public boolean removeWhenFarAway(double distance) { return false; }
     @Override public boolean canBeLeashed() { return false; }
     @Override public void tick() {
+        if(!level().isClientSide)entityData.set(WARNING,false);
         if(level() instanceof ServerLevel level&&!StoryStorage.available(level.getServer())){getNavigation().stop();return;}
         super.tick();
         if (!(level() instanceof ServerLevel server)) return;
@@ -81,7 +86,8 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
         boolean obstructed=blocksReturnRoute(position(),Vec3.atCenterOf(home),player.position())&&hasLineOfSight(player);
         if (!hunting && obstructed && lifetime > 20) {
             getNavigation().stop();getLookControl().setLookAt(player);
-            if (++warningTicks==1)StoryEvents.sound(player,WhileAway.BREATH.get(),SoundSource.HOSTILE,blockPosition(),.8f);
+            entityData.set(WARNING,true);
+            if (++warningTicks==1)StoryEvents.sound(player,WhileAway.ROUTE_WARNING.get(),SoundSource.HOSTILE,blockPosition(),.8f);
             if (warningTicks>=50) {
                 entityData.set(HUNTING,true);windup=30;warningTicks=0;
                 StoryActors.checkpoint(this,actorRecord,2,"pursuit_started");
@@ -133,8 +139,22 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
         }
     }
     private void finish(boolean complete) {
-        if(level() instanceof ServerLevel s && witness!=null){if(StoryStorage.available(s.getServer()))StoryActors.completeChase(this);}
+        if(level() instanceof ServerLevel s && witness!=null){if(StoryStorage.available(s.getServer())){
+            var record=NarrativeData.get(s.getServer()).actors.get(StoryActors.chaseId(witness));
+            boolean heard=record!=null&&StoryActors.canonical(this,record)&&!record.checkpoint.terminal()&&record.facts.contains(StoryActors.CHASE_OBSERVED);
+            StoryActors.completeChase(this);
+            var player=s.getServer().getPlayerList().getPlayer(witness);
+            if(heard&&isRemoved()&&record.checkpoint.terminal()&&player!=null&&player.level()==s)
+                StoryEvents.sound(player,WhileAway.DEPART.get(),SoundSource.HOSTILE,blockPosition(),.35f);
+        }}
         else discard();
+    }
+    @Override protected void playStepSound(BlockPos pos,net.minecraft.world.level.block.state.BlockState state){
+        if(!level().isClientSide){
+            draggingFoot=!draggingFoot;
+            boolean rail=level().getBlockState(pos.above()).is(net.minecraft.tags.BlockTags.RAILS);
+            playSound(WhileAway.DRAG.get(),draggingFoot?.28f:.4f,rail?1.1f:draggingFoot?.75f:.95f);
+        }
     }
     @Override public void die(DamageSource source) { super.die(source); finish(true); }
     @Override public void addAdditionalSaveData(CompoundTag t) {
@@ -151,7 +171,8 @@ public final class Wayfarer extends PathfinderMob implements GeoEntity {
         windup=Math.max(30,t.getInt("Windup")); attackCooldown=Math.max(20,t.getInt("AttackCooldown"));
     }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c) {
-        c.add(new AnimationController<>(this,"body",5,state -> state.setAndContinue(entityData.get(HUNTING)?HUNT:state.isMoving()?WALK:IDLE)));
+        c.add(new AnimationController<>(this,"body",5,state -> state.setAndContinue(entityData.get(HUNTING)?HUNT:entityData.get(WARNING)?WARN:
+            Math.abs(net.minecraft.util.Mth.wrapDegrees(getYRot()-yBodyRot))>18?TURN:state.isMoving()?WALK:IDLE)));
     }
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
 }

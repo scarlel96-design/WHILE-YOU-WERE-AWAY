@@ -14,6 +14,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 @EventBusSubscriber(modid=WhileAway.ID,bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
 public final class ClientSetup {
     @SubscribeEvent public static void renderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(WhileAway.RAIL_BEAM_ENTITY.get(),RailBeamRenderer::new);
         event.registerEntityRenderer(WhileAway.WAYFARER.get(), Renderer::new);
         event.registerEntityRenderer(WhileAway.STORY_NPC.get(), NpcRenderer::new);
     }
@@ -24,9 +25,7 @@ public final class ClientSetup {
     public static final class Model extends GeoModel<Wayfarer> {
         @Override public ResourceLocation getModelResource(Wayfarer entity) { return WhileAway.id("geo/wayfarer.geo.json"); }
         @Override public ResourceLocation getTextureResource(Wayfarer entity) {
-            if(entity.getId()<0)return ResourceLocation.withDefaultNamespace("textures/entity/skeleton/skeleton.png");
-            // Native game texture reference, not a redistributed Mojang asset. Art pass remains pending.
-            return ResourceLocation.withDefaultNamespace("textures/entity/enderman/enderman.png");
+            return WhileAway.id("textures/entity/wayfarer/workcoat-v2.png");
         }
         @Override public ResourceLocation getAnimationResource(Wayfarer entity) { return WhileAway.id("animations/wayfarer.animation.json"); }
     }
