@@ -1,0 +1,9 @@
+.gitattributes text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.log text eol=lf
+*.json text eol=lf
+*.dat -text
+*.dat_old -text
+*.png -text
+*.zip -text

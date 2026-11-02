@@ -1,0 +1,95 @@
+diff --git a/tools/ci/v2-01e.init.gradle b/tools/ci/v2-01e.init.gradle
+index 2026ea5..006d0a9 100644
+--- a/tools/ci/v2-01e.init.gradle
++++ b/tools/ci/v2-01e.init.gradle
+@@ -11,6 +11,8 @@ gradle.afterProject { p,state ->
+         client()
+         gameDirectory=p.file('../../work/v2-01e-development-client')
+         systemProperty 'whileaway.inputAssist','true'
++        systemProperty 'whileaway.testPlayerProtection','true'
++        systemProperty 'whileaway.testPlayerProtectionRoot',p.file('../../work/v2-01e-development-client/saves').absolutePath
+     }
+     p.tasks.named('runV2E').configure {
+         dependsOn(p.tasks.named('playInputClasses'))
+@@ -21,7 +23,7 @@ gradle.afterProject { p,state ->
+             def options=['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:true','lang:ko_kr','gamma:0.98','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700']
+             ['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].each { options.add("soundCategory_${it}:0.0") }
+             new File(profile,'options.txt').setText(options.join('\n')+'\n','UTF-8')
+-            logger.lifecycle('V2_01E_MUTED_ISOLATED_INPUT; input assist excluded from the production JAR')
++            logger.lifecycle('V2_01E_MUTED_ISOLATED_INPUT_DAMAGE_PROTECTED; test helper excluded from the production JAR')
+         }
+     }
+ }
+diff --git a/tools/validation/play-input/java/wwa/input/InputAssist.java b/tools/validation/play-input/java/wwa/input/InputAssist.java
+index 8830013..5b7c926 100644
+--- a/tools/validation/play-input/java/wwa/input/InputAssist.java
++++ b/tools/validation/play-input/java/wwa/input/InputAssist.java
+@@ -7,12 +7,15 @@ import net.minecraft.client.KeyMapping;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.Screenshot;
+ import net.minecraft.client.gui.screens.PauseScreen;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.level.storage.LevelResource;
++import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+ import net.neoforged.api.distmarker.Dist;
+ import net.neoforged.fml.common.Mod;
+ import net.neoforged.neoforge.common.NeoForge;
+ import net.neoforged.neoforge.client.event.ClientTickEvent;
+ 
+-/** Isolated input leases. This module has no campaign or server-state API. */
++/** Isolated input and optional damage protection. Campaign data is not modified. */
+ @Mod(value="wwa_play_input",dist=Dist.CLIENT)
+ public final class InputAssist {
+     private final Set<String> seen=new HashSet<>();
+@@ -22,7 +25,24 @@ public final class InputAssist {
+     private long deadline;
+     private boolean pauseAfter;
+     private final ArrayDeque<JsonObject> pending=new ArrayDeque<>();
+-    public InputAssist(){NeoForge.EVENT_BUS.addListener(this::tick);}
++    public InputAssist(){
++        NeoForge.EVENT_BUS.addListener(this::tick);
++        NeoForge.EVENT_BUS.addListener(this::protectPlayer);
++    }
++    private void protectPlayer(LivingIncomingDamageEvent event){
++        if(!Boolean.getBoolean("whileaway.inputAssist")
++            ||!Boolean.getBoolean("whileaway.testPlayerProtection"))return;
++        if(!(event.getEntity() instanceof ServerPlayer player)||player.server.isDedicatedServer())return;
++        String configured=System.getProperty("whileaway.testPlayerProtectionRoot");
++        if(configured==null)return;
++        Path root=Path.of(configured).toAbsolutePath().normalize();
++        Path world=player.server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
++        if(!world.startsWith(root))return;
++        event.setCanceled(true);
++        try{log(root.getParent().resolve("input-assist"),"DAMAGE_BLOCKED source="
++            +event.getSource().getMsgId()+" amount="+event.getAmount()+" health="+player.getHealth());}
++        catch(Exception ignored){}
++    }
+     private Map<String,KeyMapping> keys(Minecraft m){return Map.of(
+         "forward",m.options.keyUp,"back",m.options.keyDown,"left",m.options.keyLeft,"right",m.options.keyRight,
+         "jump",m.options.keyJump,"sprint",m.options.keySprint,"sneak",m.options.keyShift,
+@@ -69,6 +89,9 @@ public final class InputAssist {
+                 if(!pending.isEmpty()){
+                     var a=pending.removeFirst();Set<String> next=new HashSet<>();
+                     for(var k:a.getAsJsonArray("keys")){String key=k.getAsString();if(!keys(m).containsKey(key))throw new IllegalArgumentException("unsupported key");next.add(key);}
++                    if((next.contains("attack")||next.contains("use"))&&!m.mouseHandler.isMouseGrabbed()){
++                        m.mouseHandler.grabMouse();log(dir,"MOUSE_GRAB "+id);
++                    }
+                     for(var k:keys(m).entrySet())k.getValue().setDown(next.contains(k.getKey()));
+                     for(var key:next)if(!held.contains(key))KeyMapping.click(keys(m).get(key).getKey());
+                     held=Set.copyOf(next);remaining=Math.clamp(a.get("ticks").getAsInt(),1,40);deadline=System.nanoTime()+3_000_000_000L;
+@@ -78,7 +101,14 @@ public final class InputAssist {
+                     if(pauseAfter){pauseAfter=false;m.pauseGame(false);log(dir,"PAUSED "+id);}
+                 }
+             }
+-            if(remaining>0)remaining--;
++            if(remaining>0){
++                for(var key:held){
++                    var mapping=keys(m).get(key);
++                    if(!mapping.isDown())log(dir,"REASSERT "+id+" key="+key);
++                    mapping.setDown(true);
++                }
++                remaining--;
++            }
+         }catch(Exception ex){release(m);pending.clear();pauseAfter=false;try{log(dir,"ERROR "+ex);}catch(Exception ignored){}}
+     }
+ }

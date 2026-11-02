@@ -1,0 +1,86 @@
+{
+  "world": "V2-01E Surface Route",
+  "difficulty": 0,
+  "player": {
+    "Dimension": "minecraft:overworld",
+    "playerGameType": 0,
+    "Health": 20.0,
+    "foodLevel": 20,
+    "Pos": [
+      -318.3623485030904,
+      4.162141421026987,
+      -118.94921650013264
+    ],
+    "Rotation": [
+      -125.25,
+      49.94999694824219
+    ],
+    "abilities": {
+      "invulnerable": 0,
+      "mayfly": 0,
+      "instabuild": 0,
+      "walkSpeed": 0.10000000149011612,
+      "mayBuild": 1,
+      "flying": 0,
+      "flySpeed": 0.05000000074505806
+    },
+    "Inventory": [
+      {
+        "count": 1,
+        "Slot": 0,
+        "id": "minecraft:birch_sapling"
+      },
+      {
+        "count": 1,
+        "Slot": 1,
+        "id": "minecraft:crafting_table"
+      },
+      {
+        "count": 1,
+        "Slot": 2,
+        "components": {
+          "minecraft:damage": 15
+        },
+        "id": "minecraft:wooden_pickaxe"
+      },
+      {
+        "count": 1,
+        "Slot": 3,
+        "components": {
+          "minecraft:damage": 9
+        },
+        "id": "minecraft:wooden_axe"
+      },
+      {
+        "count": 1,
+        "Slot": 4,
+        "id": "minecraft:oak_log"
+      },
+      {
+        "count": 19,
+        "Slot": 5,
+        "id": "minecraft:dirt"
+      },
+      {
+        "count": 3,
+        "Slot": 6,
+        "id": "minecraft:cobblestone"
+      },
+      {
+        "count": 1,
+        "Slot": 7,
+        "id": "minecraft:white_wool"
+      },
+      {
+        "count": 1,
+        "Slot": 8,
+        "id": "minecraft:mutton"
+      },
+      {
+        "count": 1,
+        "Slot": 9,
+        "id": "minecraft:cobbled_deepslate"
+      }
+    ]
+  }
+}

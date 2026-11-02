@@ -1,0 +1,1116 @@
+ACCEPT opening-walk-1 screen=GAME
+LEASE opening-walk-1 keys=[forward] ticks=40
+RELEASE opening-walk-1
+ACCEPT opening-look-lever screen=GAME
+LEASE opening-look-lever keys=[sneak] ticks=1
+RELEASE opening-look-lever
+ACCEPT opening-use-lever screen=GAME
+LEASE opening-use-lever keys=[use] ticks=2
+RELEASE opening-use-lever
+ACCEPT opening-aim-lever screen=GAME
+LEASE opening-aim-lever keys=[sneak] ticks=1
+RELEASE opening-aim-lever
+ACCEPT opening-lever-press screen=GAME
+LEASE opening-lever-press keys=[use] ticks=2
+RELEASE opening-lever-press
+ACCEPT opening-forward-after-lever screen=GAME
+LEASE opening-forward-after-lever keys=[forward] ticks=40
+LEASE opening-forward-after-lever keys=[forward] ticks=40
+RELEASE opening-forward-after-lever
+ACCEPT opening-final-walk screen=GAME
+LEASE opening-final-walk keys=[forward] ticks=40
+ACCEPT survival-first-log screen=GAME
+LEASE survival-first-log keys=[attack] ticks=40
+LEASE survival-first-log keys=[attack] ticks=40
+RELEASE survival-first-log
+ACCEPT survival-approach-log screen=GAME
+LEASE survival-approach-log keys=[forward] ticks=8
+RELEASE survival-approach-log
+ACCEPT survival-second-log screen=GAME
+LEASE survival-second-log keys=[attack] ticks=40
+LEASE survival-second-log keys=[attack] ticks=40
+RELEASE survival-second-log
+ACCEPT survival-collect-and-look screen=GAME
+LEASE survival-collect-and-look keys=[forward, jump] ticks=8
+RELEASE survival-collect-and-look
+ACCEPT survival-upper-log screen=GAME
+LEASE survival-upper-log keys=[attack] ticks=40
+LEASE survival-upper-log keys=[attack] ticks=40
+RELEASE survival-upper-log
+ACCEPT survival-look-upper-next screen=GAME
+LEASE survival-look-upper-next keys=[sneak] ticks=1
+RELEASE survival-look-upper-next
+ACCEPT survival-third-log screen=GAME
+LEASE survival-third-log keys=[attack] ticks=40
+LEASE survival-third-log keys=[attack] ticks=40
+RELEASE survival-third-log
+ACCEPT survival-aim-ground screen=GAME
+LEASE survival-aim-ground keys=[sneak] ticks=1
+RELEASE survival-aim-ground
+ACCEPT survival-place-table screen=GAME
+LEASE survival-place-table keys=[use] ticks=1
+RELEASE survival-place-table
+ACCEPT survival-open-table screen=GAME
+LEASE survival-open-table keys=[use] ticks=1
+ACCEPT survival-crafted-tools screen=CraftingScreen
+ACCEPT survival-start-mine screen=GAME
+LEASE survival-start-mine keys=[left, jump] ticks=20
+RELEASE survival-start-mine
+ACCEPT survival-mine-1 screen=GAME
+LEASE survival-mine-1 keys=[attack] ticks=40
+LEASE survival-mine-1 keys=[attack] ticks=40
+RELEASE survival-mine-1
+ACCEPT survival-mine-2 screen=GAME
+LEASE survival-mine-2 keys=[attack] ticks=40
+LEASE survival-mine-2 keys=[attack] ticks=40
+RELEASE survival-mine-2
+ACCEPT survival-descend-mine screen=GAME
+LEASE survival-descend-mine keys=[forward] ticks=7
+RELEASE survival-descend-mine
+ACCEPT survival-mine-stone screen=GAME
+LEASE survival-mine-stone keys=[attack] ticks=40
+LEASE survival-mine-stone keys=[attack] ticks=40
+RELEASE survival-mine-stone
+ACCEPT survival-mine-align screen=GAME
+LEASE survival-mine-align keys=[right] ticks=4
+RELEASE survival-mine-align
+ACCEPT survival-rock-sample screen=GAME
+LEASE survival-rock-sample keys=[attack] ticks=40
+LEASE survival-rock-sample keys=[attack] ticks=40
+RELEASE survival-rock-sample
+ACCEPT survival-collect-mine screen=GAME
+LEASE survival-collect-mine keys=[forward] ticks=7
+RELEASE survival-collect-mine
+ACCEPT resume-mine-align screen=GAME
+LEASE resume-mine-align keys=[left] ticks=4
+RELEASE resume-mine-align
+ACCEPT resume-descend-collect screen=GAME
+LEASE resume-descend-collect keys=[forward] ticks=18
+RELEASE resume-descend-collect
+ACCEPT resume-collect-floor screen=GAME
+LEASE resume-collect-floor keys=[forward] ticks=10
+RELEASE resume-collect-floor
+ACCEPT resume-mine-front screen=GAME
+LEASE resume-mine-front keys=[attack] ticks=40
+LEASE resume-mine-front keys=[attack] ticks=40
+RELEASE resume-mine-front
+ACCEPT resume-collect-stone screen=GAME
+LEASE resume-collect-stone keys=[forward] ticks=12
+RELEASE resume-collect-stone
+ACCEPT resume-pillar-dirt screen=GAME
+LEASE resume-pillar-dirt keys=[use, jump] ticks=40
+LEASE resume-pillar-dirt keys=[use, jump] ticks=40
+RELEASE resume-pillar-dirt
+ACCEPT resume-clear-exit screen=GAME
+LEASE resume-clear-exit keys=[attack] ticks=40
+LEASE resume-clear-exit keys=[attack] ticks=40
+RELEASE resume-clear-exit
+ACCEPT resume-open-shaft screen=GAME
+LEASE resume-open-shaft keys=[attack] ticks=40
+LEASE resume-open-shaft keys=[attack] ticks=40
+RELEASE resume-open-shaft
+ACCEPT resume-shaft-look-down screen=GAME
+LEASE resume-shaft-look-down keys=[forward] ticks=1
+RELEASE resume-shaft-look-down
+ACCEPT resume-pillar-surface screen=GAME
+LEASE resume-pillar-surface keys=[use, jump] ticks=40
+LEASE resume-pillar-surface keys=[use, jump] ticks=40
+RELEASE resume-pillar-surface
+ACCEPT resume-level-view screen=GAME
+LEASE resume-level-view keys=[forward] ticks=1
+RELEASE resume-level-view
+ACCEPT resume-clear-headroom screen=GAME
+LEASE resume-clear-headroom keys=[attack] ticks=40
+LEASE resume-clear-headroom keys=[attack] ticks=40
+RELEASE resume-clear-headroom
+ACCEPT resume-tunnel-exit screen=GAME
+LEASE resume-tunnel-exit keys=[forward, jump] ticks=40
+LEASE resume-tunnel-exit keys=[forward, jump] ticks=40
+RELEASE resume-tunnel-exit
+ACCEPT resume-exit-shaft-clear screen=GAME
+LEASE resume-exit-shaft-clear keys=[attack] ticks=40
+LEASE resume-exit-shaft-clear keys=[attack] ticks=40
+RELEASE resume-exit-shaft-clear
+ACCEPT resume-exit-level screen=GAME
+LEASE resume-exit-level keys=[back] ticks=1
+RELEASE resume-exit-level
+ACCEPT resume-pillar-delayed-use screen=GAME
+LEASE resume-pillar-delayed-use keys=[jump] ticks=4
+LEASE resume-pillar-delayed-use keys=[use, jump] ticks=40
+RELEASE resume-pillar-delayed-use
+ACCEPT survival-forest-explore-01 screen=GAME
+LEASE survival-forest-explore-01 keys=[forward, jump] ticks=40
+LEASE survival-forest-explore-01 keys=[forward, jump] ticks=40
+RELEASE survival-forest-explore-01
+ACCEPT survival-forest-explore-02 screen=GAME
+LEASE survival-forest-explore-02 keys=[forward, jump] ticks=40
+LEASE survival-forest-explore-02 keys=[forward, jump] ticks=40
+RELEASE survival-forest-explore-02
+ACCEPT survival-forest-explore-03 screen=DeathScreen
+ACCEPT respawn-clear-leaves screen=GAME
+LEASE respawn-clear-leaves keys=[attack] ticks=32
+LEASE respawn-clear-leaves keys=[forward, jump] ticks=40
+RELEASE respawn-clear-leaves
+ACCEPT respawn-through-leaves screen=GAME
+LEASE respawn-through-leaves keys=[jump, attack, forward] ticks=40
+LEASE respawn-through-leaves keys=[jump, attack, forward] ticks=40
+RELEASE respawn-through-leaves
+ACCEPT respawn-back-clear screen=GAME
+LEASE respawn-back-clear keys=[back] ticks=40
+RELEASE respawn-back-clear
+ACCEPT fixed-opening-approach screen=GAME
+LEASE fixed-opening-approach keys=[forward] ticks=40
+RELEASE fixed-opening-approach
+ACCEPT fixed-opening-aim screen=GAME
+LEASE fixed-opening-aim keys=[back] ticks=1
+RELEASE fixed-opening-aim
+ACCEPT fixed-opening-lever-target screen=GAME
+LEASE fixed-opening-lever-target keys=[back] ticks=1
+RELEASE fixed-opening-lever-target
+ACCEPT fixed-opening-lever-use screen=GAME
+LEASE fixed-opening-lever-use keys=[use] ticks=1
+RELEASE fixed-opening-lever-use
+ACCEPT continue-opening-walk screen=GAME
+LEASE continue-opening-walk keys=[forward] ticks=40
+LEASE continue-opening-walk keys=[forward] ticks=40
+RELEASE continue-opening-walk
+ACCEPT continue-opening-exit screen=GAME
+LEASE continue-opening-exit keys=[forward] ticks=40
+ACCEPT continue-survival-clear-spawn screen=GAME
+LEASE continue-survival-clear-spawn keys=[right] ticks=15
+RELEASE continue-survival-clear-spawn
+ACCEPT continue-first-tree-aim screen=GAME
+LEASE continue-first-tree-aim keys=[forward] ticks=1
+RELEASE continue-first-tree-aim
+ACCEPT continue-gather-log-01 screen=GAME
+LEASE continue-gather-log-01 keys=[attack] ticks=40
+LEASE continue-gather-log-01 keys=[attack] ticks=40
+RELEASE continue-gather-log-01
+ACCEPT continue-gather-log-02 screen=GAME
+LEASE continue-gather-log-02 keys=[attack, forward] ticks=40
+LEASE continue-gather-log-02 keys=[attack, forward] ticks=40
+RELEASE continue-gather-log-02
+ACCEPT continue-coast-view screen=GAME
+LEASE continue-coast-view keys=[jump, forward] ticks=25
+RELEASE continue-coast-view
+ACCEPT continue-clear-foliage screen=GAME
+LEASE continue-clear-foliage keys=[forward, attack, jump] ticks=40
+LEASE continue-clear-foliage keys=[forward, attack, jump] ticks=40
+RELEASE continue-clear-foliage
+ACCEPT continue-hill-01 screen=GAME
+LEASE continue-hill-01 keys=[jump, forward] ticks=40
+LEASE continue-hill-01 keys=[jump, forward] ticks=40
+RELEASE continue-hill-01
+ACCEPT continue-hill-tree-view screen=GAME
+LEASE continue-hill-tree-view keys=[back] ticks=10
+RELEASE continue-hill-tree-view
+ACCEPT continue-oak-approach screen=GAME
+LEASE continue-oak-approach keys=[jump, forward] ticks=30
+RELEASE continue-oak-approach
+ACCEPT continue-oak-climb screen=GAME
+LEASE continue-oak-climb keys=[jump, forward] ticks=40
+LEASE continue-oak-climb keys=[jump, forward] ticks=30
+RELEASE continue-oak-climb
+ACCEPT continue-oak-log screen=GAME
+LEASE continue-oak-log keys=[attack, forward] ticks=40
+LEASE continue-oak-log keys=[attack, forward] ticks=40
+RELEASE continue-oak-log
+ACCEPT continue-near-log screen=GAME
+LEASE continue-near-log keys=[attack] ticks=40
+LEASE continue-near-log keys=[attack] ticks=40
+RELEASE continue-near-log
+ACCEPT continue-collect-log screen=GAME
+LEASE continue-collect-log keys=[forward] ticks=8
+RELEASE continue-collect-log
+ACCEPT continue-collect-left-log screen=GAME
+LEASE continue-collect-left-log keys=[left] ticks=8
+RELEASE continue-collect-left-log
+ACCEPT continue-second-oak-log screen=GAME
+LEASE continue-second-oak-log keys=[attack] ticks=40
+LEASE continue-second-oak-log keys=[attack] ticks=40
+RELEASE continue-second-oak-log
+ACCEPT continue-oak-above screen=GAME
+LEASE continue-oak-above keys=[forward] ticks=6
+RELEASE continue-oak-above
+ACCEPT continue-under-oak screen=GAME
+LEASE continue-under-oak keys=[forward] ticks=15
+LEASE continue-under-oak keys=[attack] ticks=40
+RELEASE continue-under-oak
+ACCEPT continue-upper-oak-log screen=GAME
+LEASE continue-upper-oak-log keys=[attack] ticks=40
+LEASE continue-upper-oak-log keys=[attack] ticks=40
+RELEASE continue-upper-oak-log
+ACCEPT continue-upper-oak-close screen=GAME
+LEASE continue-upper-oak-close keys=[attack] ticks=40
+LEASE continue-upper-oak-close keys=[attack] ticks=40
+RELEASE continue-upper-oak-close
+ACCEPT continue-table-aim screen=GAME
+LEASE continue-table-aim keys=[sneak] ticks=6
+RELEASE continue-table-aim
+ACCEPT continue-table-top screen=GAME
+LEASE continue-table-top keys=[sneak] ticks=6
+RELEASE continue-table-top
+ACCEPT continue-place-table screen=GAME
+LEASE continue-place-table keys=[use] ticks=1
+RELEASE continue-place-table
+ACCEPT continue-use-table screen=GAME
+LEASE continue-use-table keys=[use] ticks=1
+ACCEPT continue-crafted-tools screen=CraftingScreen
+ACCEPT continue-recover-table screen=GAME
+LEASE continue-recover-table keys=[attack] ticks=40
+RELEASE continue-recover-table
+ACCEPT continue-forest-return screen=GAME
+LEASE continue-forest-return keys=[jump, forward] ticks=20
+RELEASE continue-forest-return
+ACCEPT continue-back-to-worksite screen=GAME
+LEASE continue-back-to-worksite keys=[back] ticks=20
+RELEASE continue-back-to-worksite
+ACCEPT continue-table-break-full screen=GAME
+LEASE continue-table-break-full keys=[attack] ticks=40
+LEASE continue-table-break-full keys=[attack] ticks=40
+RELEASE continue-table-break-full
+ACCEPT continue-collect-table screen=GAME
+LEASE continue-collect-table keys=[jump, forward] ticks=20
+RELEASE continue-collect-table
+ACCEPT continue-north-path screen=GAME
+LEASE continue-north-path keys=[forward, attack, jump] ticks=40
+LEASE continue-north-path keys=[forward, attack, jump] ticks=40
+RELEASE continue-north-path
+ACCEPT continue-plains-view screen=GAME
+LEASE continue-plains-view keys=[sneak] ticks=6
+RELEASE continue-plains-view
+ACCEPT continue-descend-canopy screen=GAME
+LEASE continue-descend-canopy keys=[forward] ticks=20
+RELEASE continue-descend-canopy
+ACCEPT continue-ridge-route screen=GAME
+LEASE continue-ridge-route keys=[sneak] ticks=6
+RELEASE continue-ridge-route
+ACCEPT continue-ridge-walk screen=GAME
+LEASE continue-ridge-walk keys=[jump, forward] ticks=40
+RELEASE continue-ridge-walk
+ACCEPT continue-plains-descent screen=GAME
+LEASE continue-plains-descent keys=[forward] ticks=40
+RELEASE continue-plains-descent
+ACCEPT continue-out-of-depression screen=GAME
+LEASE continue-out-of-depression keys=[jump, forward] ticks=40
+RELEASE continue-out-of-depression
+ACCEPT continue-sheep-approach screen=GAME
+LEASE continue-sheep-approach keys=[jump, forward] ticks=40
+LEASE continue-sheep-approach keys=[jump, forward] ticks=40
+RELEASE continue-sheep-approach
+ACCEPT continue-sheep-first-hit screen=GAME
+LEASE continue-sheep-first-hit keys=[jump, forward] ticks=30
+LEASE continue-sheep-first-hit keys=[attack] ticks=1
+RELEASE continue-sheep-first-hit
+ACCEPT continue-flat-sheep-approach screen=GAME
+LEASE continue-flat-sheep-approach keys=[forward] ticks=25
+RELEASE continue-flat-sheep-approach
+ACCEPT continue-flat-sheep-hit screen=GAME
+LEASE continue-flat-sheep-hit keys=[forward] ticks=8
+LEASE continue-flat-sheep-hit keys=[attack] ticks=1
+RELEASE continue-flat-sheep-hit
+ACCEPT continue-sheep-target-low screen=GAME
+LEASE continue-sheep-target-low keys=[forward] ticks=10
+LEASE continue-sheep-target-low keys=[attack] ticks=1
+RELEASE continue-sheep-target-low
+ACCEPT continue-explore-plains-01 screen=GAME
+LEASE continue-explore-plains-01 keys=[sprint, forward, jump] ticks=40
+LEASE continue-explore-plains-01 keys=[sprint, forward, jump] ticks=40
+RELEASE continue-explore-plains-01
+ACCEPT continue-explore-plains-02 screen=GAME
+LEASE continue-explore-plains-02 keys=[sprint, forward, jump] ticks=40
+LEASE continue-explore-plains-02 keys=[sprint, forward, jump] ticks=40
+RELEASE continue-explore-plains-02
+ACCEPT continue-queued-pause-smoke screen=GAME
+LEASE continue-queued-pause-smoke keys=[sneak] ticks=4
+RELEASE continue-queued-pause-smoke
+PAUSED continue-queued-pause-smoke
+ACCEPT continue-peaceful-plains-1 screen=GAME
+LEASE continue-peaceful-plains-1 keys=[sprint, jump, forward] ticks=40
+LEASE continue-peaceful-plains-1 keys=[sprint, jump, forward] ticks=40
+RELEASE continue-peaceful-plains-1
+PAUSED continue-peaceful-plains-1
+ACCEPT continue-peaceful-plains-2 screen=GAME
+LEASE continue-peaceful-plains-2 keys=[sprint, jump, forward] ticks=40
+LEASE continue-peaceful-plains-2 keys=[sprint, jump, forward] ticks=40
+RELEASE continue-peaceful-plains-2
+PAUSED continue-peaceful-plains-2
+ACCEPT continue-plains-dig-step screen=GAME
+LEASE continue-plains-dig-step keys=[jump, attack, forward] ticks=40
+LEASE continue-plains-dig-step keys=[jump, attack, forward] ticks=40
+RELEASE continue-plains-dig-step
+PAUSED continue-plains-dig-step
+ACCEPT continue-river-cross screen=GAME
+LEASE continue-river-cross keys=[sprint, jump, forward] ticks=40
+LEASE continue-river-cross keys=[sprint, jump, forward] ticks=40
+RELEASE continue-river-cross
+PAUSED continue-river-cross
+ACCEPT continue-river-bank screen=GAME
+LEASE continue-river-bank keys=[sprint, jump, forward] ticks=40
+LEASE continue-river-bank keys=[sprint, jump, forward] ticks=40
+RELEASE continue-river-bank
+PAUSED continue-river-bank
+ACCEPT continue-grass-bank screen=GAME
+LEASE continue-grass-bank keys=[sprint, jump, forward] ticks=40
+LEASE continue-grass-bank keys=[sprint, jump, forward] ticks=40
+RELEASE continue-grass-bank
+PAUSED continue-grass-bank
+ACCEPT continue-plains-ridge screen=GAME
+ERROR java.lang.NullPointerException: Cannot invoke "com.google.gson.JsonElement.getAsDouble()" because the return value of "com.google.gson.JsonObject.get(String)" is null
+ACCEPT continue-plains-ridge-2 screen=GAME
+LEASE continue-plains-ridge-2 keys=[sprint, jump, forward] ticks=40
+LEASE continue-plains-ridge-2 keys=[sprint, jump, forward] ticks=40
+RELEASE continue-plains-ridge-2
+PAUSED continue-plains-ridge-2
+ACCEPT continue-west-plains screen=GAME
+LEASE continue-west-plains keys=[sprint, jump, forward] ticks=40
+LEASE continue-west-plains keys=[sprint, jump, forward] ticks=40
+RELEASE continue-west-plains
+PAUSED continue-west-plains
+ACCEPT continue-west-animals screen=GAME
+LEASE continue-west-animals keys=[sprint, jump, forward] ticks=40
+LEASE continue-west-animals keys=[sprint, jump, forward] ticks=40
+RELEASE continue-west-animals
+PAUSED continue-west-animals
+ACCEPT continue-cow-approach screen=GAME
+LEASE continue-cow-approach keys=[forward, sprint] ticks=16
+RELEASE continue-cow-approach
+PAUSED continue-cow-approach
+ACCEPT continue-cow-close screen=GAME
+LEASE continue-cow-close keys=[forward, jump] ticks=10
+RELEASE continue-cow-close
+PAUSED continue-cow-close
+ACCEPT continue-cow-strike screen=GAME
+LEASE continue-cow-strike keys=[attack] ticks=8
+RELEASE continue-cow-strike
+PAUSED continue-cow-strike
+ACCEPT continue-cow-strike-2 screen=GAME
+LEASE continue-cow-strike-2 keys=[] ticks=25
+LEASE continue-cow-strike-2 keys=[attack] ticks=8
+RELEASE continue-cow-strike-2
+PAUSED continue-cow-strike-2
+ACCEPT continue-basic-mining screen=GAME
+LEASE continue-basic-mining keys=[attack] ticks=40
+LEASE continue-basic-mining keys=[attack] ticks=40
+RELEASE continue-basic-mining
+PAUSED continue-basic-mining
+ACCEPT continue-basic-mining-2 screen=GAME
+LEASE continue-basic-mining-2 keys=[attack] ticks=40
+LEASE continue-basic-mining-2 keys=[attack] ticks=40
+RELEASE continue-basic-mining-2
+PAUSED continue-basic-mining-2
+ACCEPT continue-delayed-mining screen=GAME
+LEASE continue-delayed-mining keys=[] ticks=6
+LEASE continue-delayed-mining keys=[attack] ticks=40
+RELEASE continue-delayed-mining
+PAUSED continue-delayed-mining
+ACCEPT continue-mine-stone screen=GAME
+LEASE continue-mine-stone keys=[] ticks=6
+LEASE continue-mine-stone keys=[attack] ticks=40
+RELEASE continue-mine-stone
+PAUSED continue-mine-stone
+ACCEPT continue-mine-entry screen=GAME
+LEASE continue-mine-entry keys=[forward] ticks=6
+LEASE continue-mine-entry keys=[attack] ticks=40
+RELEASE continue-mine-entry
+PAUSED continue-mine-entry
+ACCEPT continue-mine-depth screen=GAME
+LEASE continue-mine-depth keys=[] ticks=6
+LEASE continue-mine-depth keys=[attack] ticks=40
+RELEASE continue-mine-depth
+PAUSED continue-mine-depth
+ACCEPT continue-mine-underfoot screen=GAME
+LEASE continue-mine-underfoot keys=[] ticks=6
+LEASE continue-mine-underfoot keys=[attack] ticks=40
+RELEASE continue-mine-underfoot
+PAUSED continue-mine-underfoot
+ACCEPT continue-stone-pickup screen=GAME
+LEASE continue-stone-pickup keys=[] ticks=6
+LEASE continue-stone-pickup keys=[attack, forward] ticks=40
+RELEASE continue-stone-pickup
+PAUSED continue-stone-pickup
+ACCEPT continue-cobble-gather screen=GAME
+LEASE continue-cobble-gather keys=[] ticks=6
+LEASE continue-cobble-gather keys=[attack] ticks=40
+RELEASE continue-cobble-gather
+PAUSED continue-cobble-gather
+ACCEPT continue-cobble-gather-2 screen=GAME
+LEASE continue-cobble-gather-2 keys=[] ticks=6
+LEASE continue-cobble-gather-2 keys=[attack] ticks=40
+RELEASE continue-cobble-gather-2
+PAUSED continue-cobble-gather-2
+ACCEPT continue-pillar-exit-1 screen=GAME
+LEASE continue-pillar-exit-1 keys=[] ticks=6
+LEASE continue-pillar-exit-1 keys=[use, jump] ticks=40
+RELEASE continue-pillar-exit-1
+PAUSED continue-pillar-exit-1
+ACCEPT continue-pillar-exit-2 screen=GAME
+LEASE continue-pillar-exit-2 keys=[use, jump] ticks=40
+LEASE continue-pillar-exit-2 keys=[use, jump] ticks=40
+RELEASE continue-pillar-exit-2
+PAUSED continue-pillar-exit-2
+ACCEPT continue-pillar-exit-3 screen=GAME
+LEASE continue-pillar-exit-3 keys=[] ticks=6
+LEASE continue-pillar-exit-3 keys=[use, jump] ticks=40
+RELEASE continue-pillar-exit-3
+PAUSED continue-pillar-exit-3
+ACCEPT continue-shaft-look screen=GAME
+LEASE continue-shaft-look keys=[sneak] ticks=2
+RELEASE continue-shaft-look
+PAUSED continue-shaft-look
+ACCEPT continue-shaft-ceiling screen=GAME
+LEASE continue-shaft-ceiling keys=[sneak] ticks=2
+RELEASE continue-shaft-ceiling
+PAUSED continue-shaft-ceiling
+ACCEPT continue-shaft-roof-clear screen=GAME
+LEASE continue-shaft-roof-clear keys=[] ticks=6
+LEASE continue-shaft-roof-clear keys=[attack] ticks=40
+RELEASE continue-shaft-roof-clear
+PAUSED continue-shaft-roof-clear
+ACCEPT continue-shaft-roof-open screen=GAME
+LEASE continue-shaft-roof-open keys=[] ticks=6
+LEASE continue-shaft-roof-open keys=[attack] ticks=40
+RELEASE continue-shaft-roof-open
+PAUSED continue-shaft-roof-open
+ACCEPT continue-shaft-look-level screen=GAME
+LEASE continue-shaft-look-level keys=[sneak] ticks=2
+RELEASE continue-shaft-look-level
+PAUSED continue-shaft-look-level
+ACCEPT continue-shaft-pillar-final screen=GAME
+LEASE continue-shaft-pillar-final keys=[] ticks=6
+LEASE continue-shaft-pillar-final keys=[use, jump] ticks=40
+RELEASE continue-shaft-pillar-final
+PAUSED continue-shaft-pillar-final
+ACCEPT continue-surface-safe screen=GAME
+LEASE continue-surface-safe keys=[forward] ticks=12
+RELEASE continue-surface-safe
+PAUSED continue-surface-safe
+ACCEPT resume2-cow-1 screen=GAME
+LEASE resume2-cow-1 keys=[] ticks=6
+LEASE resume2-cow-1 keys=[attack] ticks=8
+RELEASE resume2-cow-1
+PAUSED resume2-cow-1
+ACCEPT resume2-ridge-1 screen=GAME
+LEASE resume2-ridge-1 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-ridge-1 keys=[forward, sprint, jump] ticks=40
+ACCEPT resume2-protected-fall screen=GAME
+LEASE resume2-protected-fall keys=[jump, sprint, forward] ticks=40
+LEASE resume2-protected-fall keys=[jump, sprint, forward] ticks=40
+DAMAGE_BLOCKED source=fall amount=61.0 health=20.0
+RELEASE resume2-protected-fall
+PAUSED resume2-protected-fall
+ACCEPT resume2-waterfall-approach screen=GAME
+LEASE resume2-waterfall-approach keys=[jump, sprint, forward] ticks=40
+LEASE resume2-waterfall-approach keys=[jump, sprint, forward] ticks=40
+RELEASE resume2-waterfall-approach
+PAUSED resume2-waterfall-approach
+ACCEPT resume2-coal screen=GAME
+LEASE resume2-coal keys=[attack] ticks=40
+LEASE resume2-coal keys=[attack] ticks=40
+RELEASE resume2-coal
+PAUSED resume2-coal
+ACCEPT resume2-water-column screen=GAME
+LEASE resume2-water-column keys=[jump, forward] ticks=40
+LEASE resume2-water-column keys=[jump, forward] ticks=40
+RELEASE resume2-water-column
+PAUSED resume2-water-column
+ACCEPT resume2-swim-up-1 screen=GAME
+LEASE resume2-swim-up-1 keys=[jump, forward] ticks=40
+LEASE resume2-swim-up-1 keys=[jump, forward] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+RELEASE resume2-swim-up-1
+PAUSED resume2-swim-up-1
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+ACCEPT resume2-lava-exit screen=GAME
+LEASE resume2-lava-exit keys=[jump, back] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=fall amount=1.0 health=20.0
+LEASE resume2-lava-exit keys=[jump, back] ticks=40
+RELEASE resume2-lava-exit
+PAUSED resume2-lava-exit
+ACCEPT resume2-swim-in-column screen=GAME
+LEASE resume2-swim-in-column keys=[jump, left] ticks=20
+LEASE resume2-swim-in-column keys=[jump] ticks=40
+RELEASE resume2-swim-in-column
+PAUSED resume2-swim-in-column
+ACCEPT resume2-swim-up-2 screen=GAME
+LEASE resume2-swim-up-2 keys=[jump, sprint, forward] ticks=40
+LEASE resume2-swim-up-2 keys=[jump, sprint, forward] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+RELEASE resume2-swim-up-2
+PAUSED resume2-swim-up-2
+ACCEPT resume2-water-safe-rise screen=GAME
+LEASE resume2-water-safe-rise keys=[jump, back] ticks=25
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+LEASE resume2-water-safe-rise keys=[jump] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+RELEASE resume2-water-safe-rise
+PAUSED resume2-water-safe-rise
+ACCEPT resume2-water-direction screen=GAME
+LEASE resume2-water-direction keys=[sneak] ticks=20
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+RELEASE resume2-water-direction
+PAUSED resume2-water-direction
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+ACCEPT resume2-water-left screen=GAME
+LEASE resume2-water-left keys=[jump, left] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+LEASE resume2-water-left keys=[jump, left] ticks=40
+RELEASE resume2-water-left
+PAUSED resume2-water-left
+ACCEPT resume2-blue-rise-1 screen=GAME
+LEASE resume2-blue-rise-1 keys=[jump, forward] ticks=40
+LEASE resume2-blue-rise-1 keys=[jump, forward] ticks=40
+RELEASE resume2-blue-rise-1
+PAUSED resume2-blue-rise-1
+ACCEPT resume2-blue-column-entry screen=GAME
+LEASE resume2-blue-column-entry keys=[jump, right] ticks=20
+LEASE resume2-blue-column-entry keys=[jump] ticks=40
+RELEASE resume2-blue-column-entry
+PAUSED resume2-blue-column-entry
+ACCEPT resume2-blue-rise-2 screen=GAME
+LEASE resume2-blue-rise-2 keys=[jump, forward] ticks=40
+LEASE resume2-blue-rise-2 keys=[jump, forward] ticks=40
+RELEASE resume2-blue-rise-2
+PAUSED resume2-blue-rise-2
+ACCEPT resume2-water-vertical screen=GAME
+LEASE resume2-water-vertical keys=[jump, right] ticks=40
+LEASE resume2-water-vertical keys=[jump] ticks=40
+RELEASE resume2-water-vertical
+PAUSED resume2-water-vertical
+ACCEPT resume2-rise-only screen=GAME
+LEASE resume2-rise-only keys=[jump] ticks=40
+LEASE resume2-rise-only keys=[jump] ticks=40
+RELEASE resume2-rise-only
+PAUSED resume2-rise-only
+ACCEPT resume2-rise-only-2 screen=GAME
+LEASE resume2-rise-only-2 keys=[jump] ticks=40
+LEASE resume2-rise-only-2 keys=[jump] ticks=40
+RELEASE resume2-rise-only-2
+PAUSED resume2-rise-only-2
+ACCEPT resume2-ledge-around screen=GAME
+LEASE resume2-ledge-around keys=[jump, right] ticks=20
+LEASE resume2-ledge-around keys=[jump] ticks=40
+RELEASE resume2-ledge-around
+PAUSED resume2-ledge-around
+ACCEPT resume2-rise-only-3 screen=GAME
+LEASE resume2-rise-only-3 keys=[jump] ticks=40
+LEASE resume2-rise-only-3 keys=[jump] ticks=40
+RELEASE resume2-rise-only-3
+PAUSED resume2-rise-only-3
+ACCEPT resume2-surface-1 screen=GAME
+LEASE resume2-surface-1 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-surface-1
+PAUSED resume2-surface-1
+ACCEPT resume2-surface-2 screen=GAME
+LEASE resume2-surface-2 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-surface-2 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-surface-2
+PAUSED resume2-surface-2
+ACCEPT resume2-plains-3 screen=GAME
+LEASE resume2-plains-3 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-plains-3 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-plains-3
+PAUSED resume2-plains-3
+ACCEPT resume2-plains-4 screen=GAME
+LEASE resume2-plains-4 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-plains-4 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-plains-4
+PAUSED resume2-plains-4
+ACCEPT resume2-hill-5 screen=GAME
+LEASE resume2-hill-5 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-hill-5 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-hill-5
+PAUSED resume2-hill-5
+ACCEPT resume2-sheep-approach screen=GAME
+LEASE resume2-sheep-approach keys=[forward, sprint] ticks=40
+RELEASE resume2-sheep-approach
+PAUSED resume2-sheep-approach
+ACCEPT resume2-sheep-close screen=GAME
+LEASE resume2-sheep-close keys=[forward, sprint] ticks=30
+RELEASE resume2-sheep-close
+PAUSED resume2-sheep-close
+ACCEPT resume2-open-ground-6 screen=GAME
+LEASE resume2-open-ground-6 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-open-ground-6 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-open-ground-6
+PAUSED resume2-open-ground-6
+ACCEPT resume2-coast-left screen=GAME
+LEASE resume2-coast-left keys=[forward, sprint, jump] ticks=40
+LEASE resume2-coast-left keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-coast-left
+PAUSED resume2-coast-left
+ACCEPT resume2-inland-left screen=GAME
+LEASE resume2-inland-left keys=[forward, sprint, jump] ticks=40
+LEASE resume2-inland-left keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-inland-left
+PAUSED resume2-inland-left
+ACCEPT resume2-inland-rise screen=GAME
+LEASE resume2-inland-rise keys=[forward, sprint, jump] ticks=40
+LEASE resume2-inland-rise keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-inland-rise
+PAUSED resume2-inland-rise
+ACCEPT resume2-sheep-near screen=GAME
+LEASE resume2-sheep-near keys=[forward, jump] ticks=12
+LEASE resume2-sheep-near keys=[sneak] ticks=8
+RELEASE resume2-sheep-near
+PAUSED resume2-sheep-near
+ACCEPT resume2-sheep-step screen=GAME
+LEASE resume2-sheep-step keys=[forward, jump] ticks=30
+LEASE resume2-sheep-step keys=[sneak] ticks=8
+RELEASE resume2-sheep-step
+PAUSED resume2-sheep-step
+ACCEPT resume2-sheep-hit screen=GAME
+LEASE resume2-sheep-hit keys=[forward] ticks=10
+LEASE resume2-sheep-hit keys=[attack] ticks=4
+RELEASE resume2-sheep-hit
+PAUSED resume2-sheep-hit
+ACCEPT resume2-sheep-follow-hit screen=GAME
+LEASE resume2-sheep-follow-hit keys=[forward] ticks=12
+LEASE resume2-sheep-follow-hit keys=[attack] ticks=4
+RELEASE resume2-sheep-follow-hit
+PAUSED resume2-sheep-follow-hit
+ACCEPT resume2-sheep-side-hit screen=GAME
+LEASE resume2-sheep-side-hit keys=[attack] ticks=4
+RELEASE resume2-sheep-side-hit
+PAUSED resume2-sheep-side-hit
+ACCEPT resume2-sheep-aimed-hit screen=GAME
+LEASE resume2-sheep-aimed-hit keys=[attack] ticks=4
+RELEASE resume2-sheep-aimed-hit
+PAUSED resume2-sheep-aimed-hit
+ACCEPT resume2-sheep-flank screen=GAME
+LEASE resume2-sheep-flank keys=[sneak] ticks=6
+LEASE resume2-sheep-flank keys=[attack] ticks=4
+RELEASE resume2-sheep-flank
+PAUSED resume2-sheep-flank
+ACCEPT resume2-sheep-body screen=GAME
+LEASE resume2-sheep-body keys=[sneak] ticks=4
+LEASE resume2-sheep-body keys=[attack] ticks=4
+RELEASE resume2-sheep-body
+PAUSED resume2-sheep-body
+ACCEPT resume2-sheep-settle screen=GAME
+LEASE resume2-sheep-settle keys=[sneak] ticks=40
+LEASE resume2-sheep-settle keys=[sneak] ticks=40
+RELEASE resume2-sheep-settle
+PAUSED resume2-sheep-settle
+ACCEPT resume2-sheep-settled-approach screen=GAME
+LEASE resume2-sheep-settled-approach keys=[forward, sprint] ticks=20
+LEASE resume2-sheep-settled-approach keys=[attack] ticks=4
+RELEASE resume2-sheep-settled-approach
+PAUSED resume2-sheep-settled-approach
+ACCEPT resume2-sheep-contact-hit screen=GAME
+LEASE resume2-sheep-contact-hit keys=[attack] ticks=12
+RELEASE resume2-sheep-contact-hit
+PAUSED resume2-sheep-contact-hit
+ACCEPT resume2-sheep-spacing screen=GAME
+LEASE resume2-sheep-spacing keys=[back] ticks=8
+LEASE resume2-sheep-spacing keys=[attack] ticks=8
+RELEASE resume2-sheep-spacing
+PAUSED resume2-sheep-spacing
+ACCEPT resume2-food-pickup screen=GAME
+LEASE resume2-food-pickup keys=[forward] ticks=10
+LEASE resume2-food-pickup keys=[sneak] ticks=8
+RELEASE resume2-food-pickup
+PAUSED resume2-food-pickup
+ACCEPT resume2-north-route-1 screen=GAME
+LEASE resume2-north-route-1 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-north-route-1 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-north-route-1
+PAUSED resume2-north-route-1
+ACCEPT resume2-north-route-2 screen=GAME
+LEASE resume2-north-route-2 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-north-route-2 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-north-route-2
+PAUSED resume2-north-route-2
+ACCEPT resume2-north-route-3 screen=GAME
+LEASE resume2-north-route-3 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-north-route-3 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-north-route-3
+PAUSED resume2-north-route-3
+ACCEPT resume2-north-route-4 screen=GAME
+LEASE resume2-north-route-4 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-north-route-4 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-north-route-4
+PAUSED resume2-north-route-4
+ACCEPT resume2-north-route-5 screen=GAME
+LEASE resume2-north-route-5 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-north-route-5 keys=[forward, sprint, jump] ticks=40
+RELEASE resume2-north-route-5
+PAUSED resume2-north-route-5
+ACCEPT resume2-north-route-6 screen=GAME
+LEASE resume2-north-route-6 keys=[forward, sprint, jump] ticks=40
+LEASE resume2-north-route-6 keys=[forward, sprint, jump] ticks=40
+DAMAGE_BLOCKED source=fall amount=2.0 health=20.0
+RELEASE resume2-north-route-6
+PAUSED resume2-north-route-6
+ACCEPT resume2-cave-rim screen=GAME
+LEASE resume2-cave-rim keys=[forward, sprint, jump] ticks=40
+LEASE resume2-cave-rim keys=[forward, sprint, jump] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=fall amount=31.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+RELEASE resume2-cave-rim
+PAUSED resume2-cave-rim
+ACCEPT resume2-lava-exit screen=GAME
+LEASE resume2-lava-exit keys=[forward, jump] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+LEASE resume2-lava-exit keys=[forward, jump] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+RELEASE resume2-lava-exit
+PAUSED resume2-lava-exit
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+ACCEPT resume2-water-bank screen=GAME
+LEASE resume2-water-bank keys=[forward, jump] ticks=40
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=lava amount=4.0 health=20.0
+DAMAGE_BLOCKED source=onFire amount=1.0 health=20.0
+LEASE resume2-water-bank keys=[forward, jump] ticks=40
+RELEASE resume2-water-bank
+PAUSED resume2-water-bank
+ACCEPT resume2-cave-mining-1 screen=GAME
+LEASE resume2-cave-mining-1 keys=[attack] ticks=40
+LEASE resume2-cave-mining-1 keys=[attack] ticks=40
+RELEASE resume2-cave-mining-1
+PAUSED resume2-cave-mining-1
+ACCEPT resume2-cave-mining-aim screen=GAME
+LEASE resume2-cave-mining-aim keys=[sneak] ticks=6
+LEASE resume2-cave-mining-aim keys=[attack] ticks=40
+RELEASE resume2-cave-mining-aim
+PAUSED resume2-cave-mining-aim
+ACCEPT resume2-deepslate-block screen=GAME
+LEASE resume2-deepslate-block keys=[attack] ticks=40
+LEASE resume2-deepslate-block keys=[attack] ticks=40
+RELEASE resume2-deepslate-block
+PAUSED resume2-deepslate-block
+ACCEPT resume2-mining-mouse-grab screen=GAME
+LEASE resume2-mining-mouse-grab keys=[attack] ticks=40
+LEASE resume2-mining-mouse-grab keys=[attack] ticks=40
+RELEASE resume2-mining-mouse-grab
+PAUSED resume2-mining-mouse-grab
+ACCEPT resume2-mining-focused screen=GAME
+LEASE resume2-mining-focused keys=[attack] ticks=40
+LEASE resume2-mining-focused keys=[attack] ticks=40
+RELEASE resume2-mining-focused
+PAUSED resume2-mining-focused
+ACCEPT resume2-final-mouse-grab screen=GAME
+LEASE resume2-final-mouse-grab keys=[attack] ticks=40
+LEASE resume2-final-mouse-grab keys=[attack] ticks=40
+RELEASE resume2-final-mouse-grab
+PAUSED resume2-final-mouse-grab
+ACCEPT resume2-final-held-mining screen=GAME
+LEASE resume2-final-held-mining keys=[attack] ticks=40
+LEASE resume2-final-held-mining keys=[attack] ticks=40
+RELEASE resume2-final-held-mining
+PAUSED resume2-final-held-mining
+ACCEPT resume2-stone-pickup screen=GAME
+LEASE resume2-stone-pickup keys=[forward] ticks=8
+LEASE resume2-stone-pickup keys=[back, jump] ticks=24
+RELEASE resume2-stone-pickup
+PAUSED resume2-stone-pickup

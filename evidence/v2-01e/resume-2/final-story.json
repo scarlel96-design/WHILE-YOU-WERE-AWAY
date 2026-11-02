@@ -1,0 +1,42 @@
+{
+  "data": {
+    "schema": 5,
+    "actors": [],
+    "players": [
+      {
+        "next": 30911,
+        "readingUntil": 0,
+        "returnPitch": 0.0,
+        "openingReturnPosition": -15393163136953,
+        "openingReturnPitch": 0.0,
+        "openingReturnYaw": 0.0,
+        "openingStage": "COMPLETED",
+        "cityClues": 0,
+        "cityVisited": 0,
+        "transitAfter": 0,
+        "cityShockTriggered": 0,
+        "scenes": [],
+        "investigation": {
+          "checkpoint": 0,
+          "eventId": "city_records",
+          "evidence": 0,
+          "noticeClaimed": 0,
+          "state": "PREPARING",
+          "pendingEvidence": 0
+        },
+        "id": [
+          940439953,
+          -167562164,
+          -1601161573,
+          -1389718966
+        ],
+        "complete": 0,
+        "returnYaw": 0.0,
+        "events": 0,
+        "clues": 0
+      }
+    ],
+    "actorSchema": 1
+  },
+  "DataVersion": 3955
+}

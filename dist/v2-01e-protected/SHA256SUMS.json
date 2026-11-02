@@ -1,0 +1,47 @@
+[
+  {
+    "file": ".gitattributes",
+    "size": 143,
+    "sha256": "3b7a8c08fdbabc0bc829e6aa0c1c7feb4970a9e79de5d3cf2bfdaef7ea6d234f"
+  },
+  {
+    "file": "BASELINE-source.zip",
+    "size": 934282,
+    "sha256": "f3ab52c1fa83b896b89a9cc72765ab2019374d7f8e27c58ed2868d678878a77c"
+  },
+  {
+    "file": "DIFF.patch",
+    "size": 5766,
+    "sha256": "5abd03c3f4d6bda45b74fe56a550e1caf579da903535ee2bae5a0a062089145d"
+  },
+  {
+    "file": "MODIFIED-source.zip",
+    "size": 934799,
+    "sha256": "9dd481cf175aa616063a40b8119d9bbf69e5ac18742b612dfe598ee5c3260e70"
+  },
+  {
+    "file": "ROLLBACK.ps1",
+    "size": 1178,
+    "sha256": "9204001ed3e07e7fbcb39e65b9934790a79eb2fa4b4ab806fd330563aa66333e"
+  },
+  {
+    "file": "ROLLBACK.sh",
+    "size": 228,
+    "sha256": "d9a0a4411300c4cc563b611f9eeeea9f82c82ba7d779b3c5530f020f865db464"
+  },
+  {
+    "file": "SOURCE_MANIFEST.json",
+    "size": 63329,
+    "sha256": "9e2fa95e7373217dcd5fa672580594da4c90793359836a4c924cb277c5af2cc5"
+  },
+  {
+    "file": "VERIFICATION.txt",
+    "size": 12490,
+    "sha256": "b1920c6b73e72f1945e592967d3df32c557a4352dd76241d0a9fc45f859f6f15"
+  },
+  {
+    "file": "whileaway-0.3.1-v2-01e.jar",
+    "size": 704237,
+    "sha256": "5adb5f964d42e1e9355a79fc491db8c32340de5e9a172748a26c8d926c7bcc4a"
+  }
+]

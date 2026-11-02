@@ -1,0 +1,27 @@
+gradle.afterProject { p,state ->
+    if(p!=rootProject||!p.plugins.hasPlugin('net.neoforged.moddev'))return
+    def input=p.sourceSets.create('playInput') {
+        java.srcDir(p.file('tools/validation/play-input/java'))
+        resources.srcDir(p.file('tools/validation/play-input/resources'))
+        compileClasspath=p.sourceSets.main.compileClasspath
+        runtimeClasspath=output+compileClasspath
+    }
+    p.neoForge.mods.create('wwa_play_input') { sourceSet(input) }
+    p.neoForge.runs.create('v2E') {
+        client()
+        gameDirectory=p.file('../../work/v2-01e-development-client')
+        systemProperty 'whileaway.inputAssist','true'
+    }
+    p.tasks.named('runV2E').configure {
+        dependsOn(p.tasks.named('playInputClasses'))
+        doFirst {
+            def monitor=new groovy.json.JsonSlurper().parse(p.file('evidence/v2-01d/monitor.json'))
+            jvmArgs '--add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED',"-javaagent:${p.file('build/monitor-agent.jar').absolutePath}=${monitor.x},${monitor.y}"
+            def profile=p.file('../../work/v2-01e-development-client');profile.mkdirs()
+            def options=['narrator:0','onboardAccessibility:false','tutorialStep:none','pauseOnLostFocus:true','lang:ko_kr','gamma:0.98','renderDistance:8','simulationDistance:5','fullscreen:false','overrideWidth:1100','overrideHeight:700']
+            ['master','music','record','weather','block','hostile','neutral','player','ambient','voice'].each { options.add("soundCategory_${it}:0.0") }
+            new File(profile,'options.txt').setText(options.join('\n')+'\n','UTF-8')
+            logger.lifecycle('V2_01E_MUTED_ISOLATED_INPUT; input assist excluded from the production JAR')
+        }
+    }
+}
