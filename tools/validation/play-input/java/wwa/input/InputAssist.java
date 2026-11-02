@@ -6,6 +6,7 @@ import java.util.*;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -19,6 +20,7 @@ public final class InputAssist {
     private String dimension="",id="";
     private int remaining;
     private long deadline;
+    private boolean pauseAfter;
     private final ArrayDeque<JsonObject> pending=new ArrayDeque<>();
     public InputAssist(){NeoForge.EVENT_BUS.addListener(this::tick);}
     private Map<String,KeyMapping> keys(Minecraft m){return Map.of(
@@ -36,11 +38,14 @@ public final class InputAssist {
             String current=m.level==null?"":m.level.dimension().location().toString();
             boolean available=m.player!=null&&m.player.isAlive()&&m.screen==null&&m.isWindowActive();
             if(!available||!current.equals(dimension)){
-                release(m);pending.clear();dimension=current;
+                release(m);pending.clear();pauseAfter=false;dimension=current;
             }
             Path command=dir.resolve("command.json");
             if(Files.exists(command)){
                 var request=JsonParser.parseString(Files.readString(command)).getAsJsonObject();
+                // Keep explicit input queued only behind the normal pause menu.
+                if(!available&&m.screen instanceof PauseScreen
+                    &&(request.has("actions")||request.has("turnX")))return;
                 Files.delete(command);
                 String next=request.get("id").getAsString();
                 if(!next.matches("[a-zA-Z0-9_-]{1,60}"))throw new IllegalArgumentException("invalid id");
@@ -49,6 +54,7 @@ public final class InputAssist {
                     if(request.has("screenshot"))snapshot(m,dir,id);
                     if(request.has("release")){release(m);pending.clear();}
                     if(available){
+                        pauseAfter=request.has("pauseAfter")&&request.get("pauseAfter").getAsBoolean();
                         if(request.has("turnX"))m.player.turn(Math.clamp(request.get("turnX").getAsDouble(),-600,600),Math.clamp(request.get("turnY").getAsDouble(),-600,600));
                         if(request.has("actions")){
                             var actions=request.getAsJsonArray("actions");
@@ -69,9 +75,10 @@ public final class InputAssist {
                     log(dir,"LEASE "+id+" keys="+held+" ticks="+remaining);
                 }else if(!held.isEmpty()){
                     release(m);snapshot(m,dir,id+"-end");log(dir,"RELEASE "+id);
+                    if(pauseAfter){pauseAfter=false;m.pauseGame(false);log(dir,"PAUSED "+id);}
                 }
             }
             if(remaining>0)remaining--;
-        }catch(Exception ex){release(m);pending.clear();try{log(dir,"ERROR "+ex);}catch(Exception ignored){}}
+        }catch(Exception ex){release(m);pending.clear();pauseAfter=false;try{log(dir,"ERROR "+ex);}catch(Exception ignored){}}
     }
 }
