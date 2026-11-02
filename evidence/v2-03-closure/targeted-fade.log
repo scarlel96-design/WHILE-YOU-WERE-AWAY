@@ -1,0 +1,47 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :createMinecraftArtifacts UP-TO-DATE
+
+> Task :compileJava
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\client\ClientSetup.java:14: warning: [removal] bus() in EventBusSubscriber has been deprecated and marked for removal
+@EventBusSubscriber(modid=WhileAway.ID,bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
+                                       ^
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\client\ClientSetup.java:14: warning: [removal] Bus in EventBusSubscriber has been deprecated and marked for removal
+@EventBusSubscriber(modid=WhileAway.ID,bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
+                                                             ^
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\main\java\io\github\whileaway\OpeningGameTests.java:23: warning: [removal] makeMockServerPlayerInLevel() in GameTestHelper has been deprecated and marked for removal
+        var player=h.makeMockServerPlayerInLevel();
+                    ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+> Task :processResources UP-TO-DATE
+> Task :classes
+
+> Task :compileTestJava FAILED
+C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\test\java\io\github\whileaway\RailBeamPresentationTest.java:9: error: cannot access BlockEntity
+        assertEquals(0,RailBeamEntity.visualAngle(80,0,24));
+                                     ^
+  class file for net.minecraft.world.level.block.entity.BlockEntity not found
+1 error
+
+[Incubating] Problems report is available at: file:///C:/Users/scarl/Documents/Codex/2026-09-08/new-chat/work/return-network-integration/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileTestJava'.
+> Compilation failed; see the compiler output below.
+  C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\src\test\java\io\github\whileaway\RailBeamPresentationTest.java:9: error: cannot access BlockEntity
+          assertEquals(0,RailBeamEntity.visualAngle(80,0,24));
+                                       ^
+    class file for net.minecraft.world.level.block.entity.BlockEntity not found
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+4 actionable tasks: 2 executed, 2 up-to-date
+
+BUILD FAILED in 38s
