@@ -1,3 +1,5 @@
+> **요구사항 추적 의무 — 2026-11-02 추가:** [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md)와 [CONTINUITY_AUDIT.md](CONTINUITY_AUDIT.md)를 먼저 읽는다. 모든 신규 WO는 적용할 WWA-* 요구 ID를 IN/OUT/DEFERRED로 매핑한다. 종료 시 코드 위치·증거·검증 상태·누락 GAP을 갱신한다. **진행 중 V2-03에는 소급 적용하지 않는다.** 이 추적표가 과거 세션 원문을 100% 전수 검증한 것처럼 표시해서는 안 된다.
+
 # WHILE YOU WERE AWAY — 미래 작업지시서·인수인계 규약
 
 적용: **현재 V2-03 완료 이후 신규 작업지시서부터**. 메인 구현 담당: GPT-6.1 SOL / Codex. 이 문서는 새 기능 구현이나 진행률 승격 증거가 아니다.
