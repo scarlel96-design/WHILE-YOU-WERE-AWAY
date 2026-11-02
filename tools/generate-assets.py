@@ -58,6 +58,39 @@ def structure():
         for z in range(1,18):setb(x,6,z,'minecraft:dark_oak_slab',{'type':'bottom','waterlogged':'false'})
     for x,z in ((4,5),(8,13)):
         setb(x,5,z,'minecraft:lantern',{'hanging':'true','waterlogged':'false'})
+    # Keep the released footprint and story coordinates. Rebuild only the template.
+    for x in range(2,11):
+        for z in range(3,16):
+            setb(x,6,z,'minecraft:air')
+            if x in (2,10) or z in (3,15):
+                for y in range(1,6):
+                    material='minecraft:stone_bricks' if y==1 else 'minecraft:bricks'
+                    if y==1 and z in (10,11,12):material='minecraft:cracked_stone_bricks'
+                    setb(x,y,z,material)
+    for x in (2,10):
+        for z in (3,9,15):
+            for y in range(2,6):setb(x,y,z,'minecraft:stripped_spruce_log',{'axis':'y'})
+        for z in (6,7,11,12):
+            for y in (3,4):setb(x,y,z,'minecraft:glass_pane',{'north':'true','south':'true','east':'false','west':'false','waterlogged':'false'})
+    for x in range(1,12):
+        roof=5+min(x-1,11-x,4)
+        for z in range(2,17):
+            if x in (5,6,7):setb(x,roof,z,'minecraft:dark_oak_slab',{'type':'bottom','waterlogged':'false'})
+            else:setb(x,roof,z,'minecraft:dark_oak_stairs',{'facing':'east' if x<6 else 'west','half':'bottom','shape':'straight','waterlogged':'false'})
+        for z in (3,15):
+            for y in range(6,roof):setb(x,y,z,'minecraft:bricks')
+    for z in (3,15):
+        for y in (6,7):setb(6,y,z,'minecraft:glass_pane',{'east':'true','west':'true','north':'false','south':'false','waterlogged':'false'})
+    for z in (5,13):
+        for x in range(3,10):setb(x,6,z,'minecraft:stripped_spruce_log',{'axis':'x'})
+    for z in (2,9,16):
+        for x in range(12,19):setb(x,5,z,'minecraft:stripped_dark_oak_log',{'axis':'x'})
+        setb(13,4,z,'minecraft:lantern',{'hanging':'true','waterlogged':'false'})
+    setb(8,1,10,'minecraft:crafting_table')
+    setb(3,1,14,'minecraft:barrel',{'facing':'up','open':'false'})
+    setb(8,2,10,'minecraft:flower_pot')
+    for x in (5,6):
+        for y in (1,2,3):setb(x,y,3,'minecraft:air')
     setb(6,1,9,'whileaway:station_anchor',extra={'id':(8,'whileaway:station_anchor')})
     setb(3,1,6,'whileaway:warning_note')
     setb(3,1,11,'whileaway:evacuation_note')

@@ -1,0 +1,251 @@
+diff --git a/docs/V2_03_CONTENT_STATUS.md b/docs/V2_03_CONTENT_STATUS.md
+new file mode 100644
+index 0000000..26068db
+--- /dev/null
++++ b/docs/V2_03_CONTENT_STATUS.md
+@@ -0,0 +1,54 @@
++# V2-03 콘텐츠 현황
++
++V2-01E 자동 플레이 작업은 종료했다. 미완료 시나리오는 NOT TESTED다.
++일반 통합 플레이테스트는 사용자가 담당한다.
++
++| 범주 | 구현 범위 | 남은 범위 |
++|---|---|---|
++| 오버월드 탐험 | 기존 자연 생성 폐역 | 신호 관리소·정비 통로와 두 발견 경로 미구현 |
++| 구조물·환경 | 폐역 새 템플릿의 경사지붕·벽체·창·보·작업대·보관통 | 지형별 실제 배치와 건축 품질 HUMAN NOT TESTED |
++| 저녁골 생활 | 기존 plan 3 Residential/Maintenance 및 여울 루틴 | 사용성 미검증, 추가 생활 콘텐츠 미구현 |
++| NPC 관계 | 기존 여울 귀환등·공동 경험 | 도윤·미루 일반 생활과 관계 확장 미구현 |
++| 몬스터·위협 | 기존 귀로꾼 경로·경고·대응 | 이번 외형·애니메이션·음향 개선 미구현 |
++| 환경 공포 | 기존 신호 반응 | 원거리 구조물 움직임·시설 공간음 불일치 미구현 |
++| 오디오·시각 연출 | 기존 모델·애니메이션·원본 음원 | 새 공포 자산 미구현, AUDIO EXPERIENCE NOT TESTED |
++| 미스터리·캠페인 | Opening·Return Network 기존 production 연결 | 전체 자연 플레이와 후속 사건 PARTIAL |
++| 주요 선택·결말 | 설계 | production 완결 미구현 |
++
++## 완성률 산정 기준
++개별 자산이나 테스트 개수를 콘텐츠 완성률로 세지 않는다.
++플레이 구간을 생활·탐험·인물·위협·조사·선택의 작업 단위로 분해한다.
++각 단위에 예상 플레이 비중과 장소·분기 규모를 기록한다.
++계획 전체 단위와 비중이 확정된 후 가중 구현률을 계산한다.
++구현률과 사용자 플레이 검증률은 별도로 집계한다.
++현재 전체 분모와 플레이 비중이 미확정이므로 전체 완성률은 UNKNOWN이다.
++50~60% 구현 후 첫 대규모 사용자 통합 플레이테스트가 목표다.
++이번 폐역 한 종으로 그 목표를 달성했다고 판정하지 않는다.
++
++## 폐역 변경
++기존 19×10×19 크기와 station anchor (6,1,9), relay (8,1,6)를 유지한다.
++기록물 좌표와 기존 보상 상자 NBT도 유지한다.
++벽체는 석재 기단·벽돌·목재 보수 부재로 구성한다.
++경사지붕과 상부 창은 멀리서 구분되는 실루엣을 만든다.
++승강장 보와 달린 조명, 실내 보가 기존 조명을 지지한다.
++제작대·보관통·벤치가 실제 사용 공간을 제공한다.
++기존에 생성된 역은 재건하지 않는다. 템플릿은 이후 자연 생성에 적용된다.
++spacing 20 chunks / separation 8 / salt 74192361을 유지한다.
++바이옴: plains, sunflower_plains, forest, birch_forest, taiga, meadow.
++새 구조물 생성 빈도는 아직 정하지 않았다.
++새 관리소와 통로의 지리적 선로 연결도 아직 구현하지 않았다.
++
++## 사용자 확인 방법
++새 월드 또는 아직 생성되지 않은 청크의 폐역을 방문한다.
++이전 역과 새 역의 지붕·창·승강장·내부 이동을 비교한다.
++다섯 스토리 블록과 상자를 사용한다.
++추가 제작대와 보관통을 사용한다.
++기존 월드의 역과 플레이어 건축이 바뀌지 않았는지 확인한다.
++일반 플레이에서 놓친 구조물은 좌표 지식 없이 찾기 쉬운지도 기록한다.
++건축의 미적 품질과 실제 시선 설계는 HUMAN NOT TESTED다.
++
++## 다음 구현 묶음
++폐역 지형 배치와 내부 동선의 타깃 GameTest를 수행한다.
++그 다음 관리소·정비 통로를 안전한 새 청크 생성 계약과 함께 구현한다.
++환경 공포 두 장면과 귀로꾼 자산 개선은 이어지는 별도 콘텐츠 묶음이다.
++저장·Actor·checkpoint·transaction 의미는 유지한다.
+diff --git a/src/main/resources/data/whileaway/structure/abandoned_station.nbt b/src/main/resources/data/whileaway/structure/abandoned_station.nbt
+index e7817debccf4412bec6050078b3714dc3c3932a0..cd6238e004472e77d8954920bead6d1d98706d09 100644
+GIT binary patch
+literal 9143
+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
+TU*NZ_cJTYZZe(=arTG0nbofrU
+
+literal 8715
+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
+
+diff --git a/tools/generate-assets.py b/tools/generate-assets.py
+index a93c06c..3ae4426 100644
+--- a/tools/generate-assets.py
++++ b/tools/generate-assets.py
+@@ -58,6 +58,39 @@ def structure():
+         for z in range(1,18):setb(x,6,z,'minecraft:dark_oak_slab',{'type':'bottom','waterlogged':'false'})
+     for x,z in ((4,5),(8,13)):
+         setb(x,5,z,'minecraft:lantern',{'hanging':'true','waterlogged':'false'})
++    # Keep the released footprint and story coordinates. Rebuild only the template.
++    for x in range(2,11):
++        for z in range(3,16):
++            setb(x,6,z,'minecraft:air')
++            if x in (2,10) or z in (3,15):
++                for y in range(1,6):
++                    material='minecraft:stone_bricks' if y==1 else 'minecraft:bricks'
++                    if y==1 and z in (10,11,12):material='minecraft:cracked_stone_bricks'
++                    setb(x,y,z,material)
++    for x in (2,10):
++        for z in (3,9,15):
++            for y in range(2,6):setb(x,y,z,'minecraft:stripped_spruce_log',{'axis':'y'})
++        for z in (6,7,11,12):
++            for y in (3,4):setb(x,y,z,'minecraft:glass_pane',{'north':'true','south':'true','east':'false','west':'false','waterlogged':'false'})
++    for x in range(1,12):
++        roof=5+min(x-1,11-x,4)
++        for z in range(2,17):
++            if x in (5,6,7):setb(x,roof,z,'minecraft:dark_oak_slab',{'type':'bottom','waterlogged':'false'})
++            else:setb(x,roof,z,'minecraft:dark_oak_stairs',{'facing':'east' if x<6 else 'west','half':'bottom','shape':'straight','waterlogged':'false'})
++        for z in (3,15):
++            for y in range(6,roof):setb(x,y,z,'minecraft:bricks')
++    for z in (3,15):
++        for y in (6,7):setb(6,y,z,'minecraft:glass_pane',{'east':'true','west':'true','north':'false','south':'false','waterlogged':'false'})
++    for z in (5,13):
++        for x in range(3,10):setb(x,6,z,'minecraft:stripped_spruce_log',{'axis':'x'})
++    for z in (2,9,16):
++        for x in range(12,19):setb(x,5,z,'minecraft:stripped_dark_oak_log',{'axis':'x'})
++        setb(13,4,z,'minecraft:lantern',{'hanging':'true','waterlogged':'false'})
++    setb(8,1,10,'minecraft:crafting_table')
++    setb(3,1,14,'minecraft:barrel',{'facing':'up','open':'false'})
++    setb(8,2,10,'minecraft:flower_pot')
++    for x in (5,6):
++        for y in (1,2,3):setb(x,y,3,'minecraft:air')
+     setb(6,1,9,'whileaway:station_anchor',extra={'id':(8,'whileaway:station_anchor')})
+     setb(3,1,6,'whileaway:warning_note')
+     setb(3,1,11,'whileaway:evacuation_note')

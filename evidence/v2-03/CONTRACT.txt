@@ -1,0 +1,1 @@
+PASS station extent/story-block-state/NBT/entrance/lantern-support/bounds

@@ -1,0 +1,1 @@
+PASS asset assertions=6740; station/animation/localization/OGG
