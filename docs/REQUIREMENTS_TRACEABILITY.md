@@ -1,6 +1,6 @@
 # WHILE YOU WERE AWAY — 요구사항 추적표 / Requirements Traceability Register
 
-상태: **초기 추적표(2026-11-02)**. 과거 41,427줄 분량 대화에서 이미 정리·승인된 주요 설계 및 최신 사용자 지시를 일대일로 매핑하는 기본 틀이다. **전체 원문 모든 문장의 완전 추출이나 게임 구현 완료를 입증하지 않는다.** 향후 작업마다 추가·교차 점검한다.
+상태: **86개 발화 구간 전수 매핑 추가(2026-11-02)**. 과거 41,427줄 분량 대화에서 이미 정리·승인된 주요 설계 및 최신 사용자 지시를 일대일로 매핑하는 기본 틀이다. **86개 대화 구간 전수를 매핑했다. 단, 모든 문장을 원자 기능 요구로 승인했거나 게임 구현을 검증한 것은 아니다.** 향후 작업마다 추가·교차 점검한다.
 
 이 문서는 [PROJECT_CONTINUITY.md](PROJECT_CONTINUITY.md), [DECISION_LOG.md](DECISION_LOG.md), [CONTENT_ROADMAP.md](CONTENT_ROADMAP.md), [DESIGN_V05.md](DESIGN_V05.md), [MYSTERY_RESOURCE_EXTENSION.md](MYSTERY_RESOURCE_EXTENSION.md), [foreshadow-registry.json](foreshadow-registry.json), `AGENTS.md`와 함께 읽는다.
 
@@ -63,16 +63,38 @@
 
 > 이 표의 구현 상태는 **보수적인 요약**이다. 진행 중 개발이 있을 수 있으며, 다음 작업 시작 전 현재 소스·증거를 실제로 검증해 최신 상태로 바꿔야 한다.
 
+## 이전 세션 전수 대조로 추가한 항목
+
+| ID | 요구 | 결정 상태 | 증거 | 구현 | 후속 |
+|---|---|---|---|---|---|
+| WWA-ARC-05 | 싱글플레이를 우선 완성하고 협동 플레이는 별도 확장·검증으로 둔다. | CONFIRMED 설계 방향 | T002 / DESIGN_V05 | HUMAN/멀티플레이 전체 검증 없음 | DEFERRED |
+| WWA-MYS-06 | World·Character·Player Past·Shadow의 네 질문 축 보존. 세 묶음 요약으로 Character 삭제 금지. | CONFIRMED | T030,T051 / DESIGN_V05 13-A-1 | 본편 PARTIAL | 장별 서사 |
+| WWA-FEAR-03 | 플레이 날짜만으로 위협 확대하지 않고 구조물·조사·설비·관계 등 의미 있는 접촉 깊이로 공포 활성화. | CONFIRMED | T018,T031–034 / DESIGN_V05 | 최신 런타임 확인 필요 | Fear Director |
+| WWA-TEST-01 | 주요 심리 공포는 No-Spawn·No-Stinger·Free-Look에서 일부 성립. 별도로 강한 위기와 점프스케어도 허용. | CONFIRMED 품질 목표 | T020,T021,T033 / DESIGN_V04,V05 | HUMAN NOT TESTED | 공포 QA |
+| WWA-CINE-02 | 1인칭 손상 기억 오프닝: 긴박함·흐릿함·자연 오버월드 전환·짧은 두통/혼란 채팅. 몬스터 돌파는 예시이지 확정 장면 아님. | CONFIRMED 원칙, 장면 세부 PROPOSED | T044–048 / DESIGN_V05 | Opening 일부 구현, HUMAN NOT TESTED | 시네마틱 |
+| WWA-REFER-01 | 참고작의 공포·복선·연출 연구는 검증·비평하고 고유 자산/장면을 복제하지 않는다. | CONFIRMED | T006,T019–021,T031–035 | 비교 연구/구현 분리 | 연구 |
+| WWA-OPS-01 | BASELINE/MODIFIED/ROLLBACK과 SHA·패키지·월드 복구를 구별한다. 소스 복원이 월드 롤백은 아님. | CONFIRMED 운영 계약 | T003–004,T008,T010,T012 / AGENTS | 이전 evidence 존재 | 이후 WO |
+| WWA-OPS-03 | 자족적 상세 인수인계. 별도 채팅 원문을 재첨부하지 않아도 새 작업에 필요한 사실·증거·다음 시작점 제공. | CONFIRMED | T009,T022 | 보고 품질은 신규 WO별 검증 | 모든 WO |
+| WWA-OPS-04 | 복사하기 쉬운 텍스트 블록/문서 형식으로 작업지시서를 제공한다. | CONFIRMED | T025 | 형식 규칙 | 이후 지시서 |
+| WWA-OPS-05 | Caveman은 검증 후 HOLD. 유의미한 총사용량 이득/동등한 품질 증거 없이 재개·전면 적용 금지. | CONFIRMED 최신 보류 | T013–014,T023,T042 / CAMPAIGN_PILOT_031 | 과거 제한 비교 | 승인 전 HOLD |
+| WWA-OPS-06 | 5시간·주간 사용량을 고려해 SAFE PAUSE와 정확한 재개 지점 유지. 임의 한도 소진·자동 PC 종료 금지. | CONFIRMED 운영 계약 | T040–043,T049–050 / AGENTS | 주기적 확인 | 이후 WO |
+| WWA-OPS-07 | GitHub를 공식 작업·증거/문서 소스로 쓰고 원격/로컬 차이·정확한 SHA를 표시한다. | CONFIRMED | T056,T060,T073 / AGENTS | 현재 저장소 확인 가능 | 모든 WO |
+| WWA-OPS-08 | GitHub Actions build/GameTest/Windows/Persistence 검증 상태를 PASS/CANCELLED/WAITING/NOT RUN 등으로 구별한다. | CONFIRMED | T067–075 / workflow,evidence | 현재 CI 결과 별도 확인 | 자동 검증 |
+
 ## 미해결·미감사 항목
 
 | GAP-ID | 문제 | 처리 방법 |
 |---|---|---|
-| GAP-001 | 41,427줄 역사 기록과 이 등록부를 **문장/요구 ID 단위로 전수 대조하지 않았다** | 다음 단위 작업에서 원문을 부분별 재검토해 발견한 요구를 새 ID로 등록하고 누락률을 추적. 완전성 검증을 했다고 주장하지 말 것 |
+| GAP-001 | **CLOSED (구간 단위):** 제공 원문 86개 대화 구간 전수 분류·추적 완료. | HISTORICAL_SESSION_AUDIT_20260909_0916.md 참조. 문장 원자화·코드 전수 검증은 별도. |
 | GAP-002 | 장별 사건·몬스터 수·차원 수·세트피스 수량 중 초안 제안과 확정 범위가 혼재 | DESIGN_V05와 명시적 최신 사용자 결정을 비교하고 PROPOSED/CONFIRMED 표시 |
 | GAP-003 | V2-03에서 현재 진행 중인 실제 파일·테스트·콘텐츠 변경의 최신 상태 | 현 작업 종료 보고를 받은 뒤 표의 evidence URL, SHA, 검증 상태 갱신 |
 | GAP-004 | 전체 콘텐츠 50–60%를 계산할 작업 분모/가중치 | 콘텐츠 단위·실제 경로·플레이 비중 확정 후 계산. 그전 UNKNOWN |
 | GAP-005 | 퍼즐·아이템·NPC 관계·대형 공포 장면의 acceptance test 세부 기준과 담당 차기 WO | 각 WO 범위를 정할 때 ID별 구체 수용 조건과 실제 시험 증거 링크 연결 |
 | GAP-006 | 사용자 아트·사운드·공포 감정 평가 | 첫 대규모 사용자 테스트까지 HUMAN NOT TESTED 유지 |
+
+| GAP-007 | 전체 AI 설계 초안의 모든 문장과 기능의 세부 원자화 검증 미완료. | 제안/확정 구분과 장별 상세 수용기준 후속 분해 |
+| GAP-008 | 모든 요구 ID와 최신 Java/JSON/자산·CI 증거의 양방향 1:1 연결 미완료. | 차기 작업별 실제 증거·커밋에 연결 |
+| GAP-009 | 이 대화 파일 밖의 다른 세션과 첨부 자료 전수 감사 범위 외. | 별도 원본·SHA 확보 시 재감사 |
 
 ## 새 요구 추가 템플릿
 

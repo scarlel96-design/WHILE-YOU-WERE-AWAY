@@ -1,0 +1,988 @@
+{
+  "schema": 1,
+  "source": {
+    "name": "ChatGPT_공포모드-지시-구체화_20261102-2211.txt",
+    "bytes": 1254281,
+    "lines": 41427,
+    "sha256": "27197358af6d89f0a88b6ba48ba87c4d3866ba837af09e8bcd230bc99ac3e7ac"
+  },
+  "scope": "all 86 user and 86 assistant message pairs; not every AI proposed atomic requirement",
+  "stats": {
+    "KEEP": 22,
+    "MIXED": 2,
+    "REPORT": 17,
+    "QUESTION": 13,
+    "PROCESS": 13,
+    "SUPERSEDED_CONDITIONAL": 2,
+    "PROPOSAL": 1,
+    "SUPERSEDED": 10,
+    "RESEARCH": 3,
+    "FEEDBACK": 2,
+    "EMPTY": 1
+  },
+  "turns": [
+    {
+      "id": "T001",
+      "date": "2026-09-09",
+      "start": 3,
+      "end": 374,
+      "status": "KEEP",
+      "summary": "기능 우선·미술 후반·강렬한 공포/시네마틱",
+      "req": [
+        "WWA-CORE-03",
+        "WWA-WORLD-01",
+        "WWA-THREAT-03",
+        "WWA-CINE-01"
+      ]
+    },
+    {
+      "id": "T002",
+      "date": "2026-09-09",
+      "start": 375,
+      "end": 2266,
+      "status": "KEEP",
+      "summary": "Java·장편·멀티엔딩·싱글 우선 초기 구상",
+      "req": [
+        "WWA-ARC-01",
+        "WWA-ARC-03",
+        "WWA-ARC-05"
+      ]
+    },
+    {
+      "id": "T003",
+      "date": "2026-09-09",
+      "start": 2267,
+      "end": 3697,
+      "status": "MIXED",
+      "summary": "32개 개발 품질 규약과 아트 순서 일부 갱신",
+      "req": [
+        "WWA-TECH-01",
+        "WWA-WORLD-01",
+        "WWA-OPS-01"
+      ]
+    },
+    {
+      "id": "T004",
+      "date": "2026-09-09",
+      "start": 3698,
+      "end": 4341,
+      "status": "REPORT",
+      "summary": "0.3 아트·검증 당시 결과",
+      "req": [
+        "WWA-TECH-01"
+      ]
+    },
+    {
+      "id": "T005",
+      "date": "2026-09-09",
+      "start": 4342,
+      "end": 4357,
+      "status": "QUESTION",
+      "summary": "다른 스레드 확인 가능 여부",
+      "req": []
+    },
+    {
+      "id": "T006",
+      "date": "2026-09-09",
+      "start": 4358,
+      "end": 5149,
+      "status": "KEEP",
+      "summary": "리소스팩·퍼즐·조사·전용 아이템",
+      "req": [
+        "WWA-ART-01",
+        "WWA-PUZZLE-01",
+        "WWA-PUZZLE-02"
+      ]
+    },
+    {
+      "id": "T007",
+      "date": "2026-09-09",
+      "start": 5150,
+      "end": 6514,
+      "status": "KEEP",
+      "summary": "장기 복선과 중후반 회수",
+      "req": [
+        "WWA-MYS-04"
+      ]
+    },
+    {
+      "id": "T008",
+      "date": "2026-09-09",
+      "start": 6515,
+      "end": 7150,
+      "status": "REPORT",
+      "summary": "0.3.1 당시 복구/설계 33–81",
+      "req": [
+        "WWA-TECH-01",
+        "WWA-MYS-04"
+      ]
+    },
+    {
+      "id": "T009",
+      "date": "2026-09-09",
+      "start": 7151,
+      "end": 7537,
+      "status": "KEEP",
+      "summary": "문서 재첨부가 불필요한 상세 보고",
+      "req": [
+        "WWA-OPS-03"
+      ]
+    },
+    {
+      "id": "T010",
+      "date": "2026-09-10",
+      "start": 7538,
+      "end": 7611,
+      "status": "REPORT",
+      "summary": "저장·사건 복구의 역사적 결과",
+      "req": [
+        "WWA-TECH-01"
+      ]
+    },
+    {
+      "id": "T011",
+      "date": "2026-09-10",
+      "start": 7612,
+      "end": 8543,
+      "status": "PROCESS",
+      "summary": "차기 작업지시서 작성",
+      "req": [
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T012",
+      "date": "2026-09-10",
+      "start": 8544,
+      "end": 9687,
+      "status": "REPORT",
+      "summary": "Actor 추격 복구 역사적 증거",
+      "req": [
+        "WWA-TECH-01"
+      ]
+    },
+    {
+      "id": "T013",
+      "date": "2026-09-10",
+      "start": 9688,
+      "end": 9739,
+      "status": "QUESTION",
+      "summary": "Caveman 저장소 경로 확인",
+      "req": [
+        "WWA-OPS-05"
+      ]
+    },
+    {
+      "id": "T014",
+      "date": "2026-09-10",
+      "start": 9740,
+      "end": 9766,
+      "status": "SUPERSEDED_CONDITIONAL",
+      "summary": "Caveman 검증 뒤 확대; 실험 후 HOLD",
+      "req": [
+        "WWA-OPS-05"
+      ]
+    },
+    {
+      "id": "T015",
+      "date": "2026-09-10",
+      "start": 9767,
+      "end": 9790,
+      "status": "QUESTION",
+      "summary": "추론 강도 선택 문의",
+      "req": []
+    },
+    {
+      "id": "T016",
+      "date": "2026-09-10",
+      "start": 9791,
+      "end": 9832,
+      "status": "PROPOSAL",
+      "summary": "저비용 모델 병행 제안",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T017",
+      "date": "2026-09-10",
+      "start": 9833,
+      "end": 9953,
+      "status": "SUPERSEDED",
+      "summary": "메인/보조 모델 병용, 최신 정책 대체",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T018",
+      "date": "2026-09-10",
+      "start": 9954,
+      "end": 9986,
+      "status": "MIXED",
+      "summary": "조건부 모델 확대·접촉 기반 공포 개시",
+      "req": [
+        "WWA-DEV-01",
+        "WWA-FEAR-03"
+      ]
+    },
+    {
+      "id": "T019",
+      "date": "2026-09-10",
+      "start": 9987,
+      "end": 10113,
+      "status": "RESEARCH",
+      "summary": "인기 공포 모드의 떡밥·신규 연출 연구",
+      "req": [
+        "WWA-REFER-01"
+      ]
+    },
+    {
+      "id": "T020",
+      "date": "2026-09-10",
+      "start": 10114,
+      "end": 10708,
+      "status": "KEEP",
+      "summary": "Belowland형 대형 월드 사건·회상·복선 독창성",
+      "req": [
+        "WWA-WORLD-05",
+        "WWA-CINE-01",
+        "WWA-REFER-01"
+      ]
+    },
+    {
+      "id": "T021",
+      "date": "2026-09-10",
+      "start": 10709,
+      "end": 11707,
+      "status": "KEEP",
+      "summary": "점프스케어 없어도 강한 심리 공포",
+      "req": [
+        "WWA-TEST-01",
+        "WWA-THREAT-03"
+      ]
+    },
+    {
+      "id": "T022",
+      "date": "2026-09-10",
+      "start": 11708,
+      "end": 11785,
+      "status": "PROCESS",
+      "summary": "현재까지 설계를 후속 지시서에 반영",
+      "req": [
+        "WWA-OPS-03",
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T023",
+      "date": "2026-09-11",
+      "start": 11786,
+      "end": 12975,
+      "status": "REPORT",
+      "summary": "Caveman 제한 시험 결과 HOLD",
+      "req": [
+        "WWA-OPS-05"
+      ]
+    },
+    {
+      "id": "T024",
+      "date": "2026-09-11",
+      "start": 12976,
+      "end": 14169,
+      "status": "REPORT",
+      "summary": "v0.4·Wayfarer Actor 안정성 결과",
+      "req": [
+        "WWA-TECH-01",
+        "WWA-LORE-01"
+      ]
+    },
+    {
+      "id": "T025",
+      "date": "2026-09-11",
+      "start": 14170,
+      "end": 15262,
+      "status": "KEEP",
+      "summary": "복사 가능한 작업지시서 텍스트 블록",
+      "req": [
+        "WWA-OPS-04"
+      ]
+    },
+    {
+      "id": "T026",
+      "date": "2026-09-11",
+      "start": 15263,
+      "end": 17092,
+      "status": "REPORT",
+      "summary": "StoryStorage 손상 처리 결과",
+      "req": [
+        "WWA-TECH-01"
+      ]
+    },
+    {
+      "id": "T027",
+      "date": "2026-09-11",
+      "start": 17093,
+      "end": 17124,
+      "status": "QUESTION",
+      "summary": "실제 기능 구현 여부 문의",
+      "req": []
+    },
+    {
+      "id": "T028",
+      "date": "2026-09-11",
+      "start": 17125,
+      "end": 17150,
+      "status": "FEEDBACK",
+      "summary": "기초 인프라와 콘텐츠 개발의 차이",
+      "req": [
+        "WWA-DEV-02"
+      ]
+    },
+    {
+      "id": "T029",
+      "date": "2026-09-15",
+      "start": 17151,
+      "end": 19109,
+      "status": "REPORT",
+      "summary": "NPC 생활/복구 부분 검증 결과",
+      "req": [
+        "WWA-TECH-01",
+        "WWA-NPC-01"
+      ]
+    },
+    {
+      "id": "T030",
+      "date": "2026-09-16",
+      "start": 19110,
+      "end": 19236,
+      "status": "KEEP",
+      "summary": "A Story 이외의 숨은 관찰자 미스터리",
+      "req": [
+        "WWA-MYS-03"
+      ]
+    },
+    {
+      "id": "T031",
+      "date": "2026-09-16",
+      "start": 19237,
+      "end": 19882,
+      "status": "KEEP",
+      "summary": "천천히 진행되는 서사·참고작",
+      "req": [
+        "WWA-ARC-02",
+        "WWA-REFER-01"
+      ]
+    },
+    {
+      "id": "T032",
+      "date": "2026-09-16",
+      "start": 19883,
+      "end": 20719,
+      "status": "KEEP",
+      "summary": "괴물 세부 규칙·극한 심리 공포",
+      "req": [
+        "WWA-THREAT-02",
+        "WWA-THREAT-03"
+      ]
+    },
+    {
+      "id": "T033",
+      "date": "2026-09-16",
+      "start": 20720,
+      "end": 21357,
+      "status": "KEEP",
+      "summary": "스토리 종속 공포 거부·점프스케어 유지",
+      "req": [
+        "WWA-CORE-03",
+        "WWA-THREAT-03"
+      ]
+    },
+    {
+      "id": "T034",
+      "date": "2026-09-16",
+      "start": 21358,
+      "end": 21932,
+      "status": "KEEP",
+      "summary": "평상시 긴장 유지할 효과음·BGM",
+      "req": [
+        "WWA-AUDIO-01",
+        "WWA-FEAR-01"
+      ]
+    },
+    {
+      "id": "T035",
+      "date": "2026-09-16",
+      "start": 21933,
+      "end": 23459,
+      "status": "RESEARCH",
+      "summary": "전체 설계 보강·비판 요청",
+      "req": [
+        "WWA-REFER-01"
+      ]
+    },
+    {
+      "id": "T036",
+      "date": "2026-09-16",
+      "start": 23460,
+      "end": 27362,
+      "status": "PROCESS",
+      "summary": "v0.5 전체 설계·작업 간 연속성",
+      "req": [
+        "WWA-ARC-01",
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T037",
+      "date": "2026-09-16",
+      "start": 27363,
+      "end": 27481,
+      "status": "KEEP",
+      "summary": "본편 여러 시간·심층 비밀 여러 날",
+      "req": [
+        "WWA-ARC-02"
+      ]
+    },
+    {
+      "id": "T038",
+      "date": "2026-09-16",
+      "start": 27482,
+      "end": 27520,
+      "status": "QUESTION",
+      "summary": "45~90분 슬라이스 문구 확인",
+      "req": [
+        "WWA-ARC-02"
+      ]
+    },
+    {
+      "id": "T039",
+      "date": "2026-09-16",
+      "start": 27521,
+      "end": 27565,
+      "status": "REPORT",
+      "summary": "v0.5 슬라이스 문구 수정 결과",
+      "req": [
+        "WWA-ARC-02"
+      ]
+    },
+    {
+      "id": "T040",
+      "date": "2026-09-16",
+      "start": 27566,
+      "end": 27601,
+      "status": "QUESTION",
+      "summary": "사용량 한도·개발 기간 추정",
+      "req": [
+        "WWA-OPS-06"
+      ]
+    },
+    {
+      "id": "T041",
+      "date": "2026-09-16",
+      "start": 27602,
+      "end": 27709,
+      "status": "RESEARCH",
+      "summary": "5시간 사용량 기준 작업량 조사",
+      "req": [
+        "WWA-OPS-06"
+      ]
+    },
+    {
+      "id": "T042",
+      "date": "2026-09-16",
+      "start": 27710,
+      "end": 28319,
+      "status": "SUPERSEDED_CONDITIONAL",
+      "summary": "Caveman 확대 사전 검증 후 HOLD",
+      "req": [
+        "WWA-OPS-05"
+      ]
+    },
+    {
+      "id": "T043",
+      "date": "2026-09-16",
+      "start": 28320,
+      "end": 29150,
+      "status": "KEEP",
+      "summary": "사용량에 따른 작업 분할·안전 중단",
+      "req": [
+        "WWA-OPS-06"
+      ]
+    },
+    {
+      "id": "T044",
+      "date": "2026-09-16",
+      "start": 29151,
+      "end": 29610,
+      "status": "KEEP",
+      "summary": "첫 진입 전 손상된 기억 연출",
+      "req": [
+        "WWA-MYS-02",
+        "WWA-CINE-02"
+      ]
+    },
+    {
+      "id": "T045",
+      "date": "2026-09-16",
+      "start": 29611,
+      "end": 29826,
+      "status": "KEEP",
+      "summary": "잡음은 손상된 기억의 감각",
+      "req": [
+        "WWA-CINE-02"
+      ]
+    },
+    {
+      "id": "T046",
+      "date": "2026-09-16",
+      "start": 29827,
+      "end": 29903,
+      "status": "KEEP",
+      "summary": "1인칭 급박한 회상; 전투 장면은 예시",
+      "req": [
+        "WWA-MYS-02",
+        "WWA-CINE-02"
+      ]
+    },
+    {
+      "id": "T047",
+      "date": "2026-09-16",
+      "start": 29904,
+      "end": 30080,
+      "status": "KEEP",
+      "summary": "기억상실·오버월드 전환·두통 채팅",
+      "req": [
+        "WWA-CINE-02",
+        "WWA-MYS-02"
+      ]
+    },
+    {
+      "id": "T048",
+      "date": "2026-09-16",
+      "start": 30081,
+      "end": 32027,
+      "status": "PROCESS",
+      "summary": "플레이어 과거를 전체 설계에 반영",
+      "req": [
+        "WWA-MYS-02",
+        "WWA-OPS-03"
+      ]
+    },
+    {
+      "id": "T049",
+      "date": "2026-09-16",
+      "start": 32028,
+      "end": 32062,
+      "status": "REPORT",
+      "summary": "당시 주간 사용량 부족 상황",
+      "req": [
+        "WWA-OPS-06"
+      ]
+    },
+    {
+      "id": "T050",
+      "date": "2026-09-16",
+      "start": 32063,
+      "end": 32088,
+      "status": "FEEDBACK",
+      "summary": "간단한 문서 작업 비용 구별",
+      "req": [
+        "WWA-OPS-06"
+      ]
+    },
+    {
+      "id": "T051",
+      "date": "2026-09-16",
+      "start": 32089,
+      "end": 32160,
+      "status": "REPORT",
+      "summary": "13-A와 네 축 미스터리 설계 반영",
+      "req": [
+        "WWA-MYS-06"
+      ]
+    },
+    {
+      "id": "T052",
+      "date": "2026-09-16",
+      "start": 32161,
+      "end": 32391,
+      "status": "SUPERSEDED",
+      "summary": "보조 GPT 30–40% 제안 후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T053",
+      "date": "2026-09-16",
+      "start": 32392,
+      "end": 32609,
+      "status": "QUESTION",
+      "summary": "당시 소스와 작업본 검색 요청",
+      "req": [
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T054",
+      "date": "2026-09-16",
+      "start": 32610,
+      "end": 32761,
+      "status": "REPORT",
+      "summary": "당시 로컬 소스·산출물 인수인계",
+      "req": [
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T055",
+      "date": "2026-09-16",
+      "start": 32762,
+      "end": 32793,
+      "status": "EMPTY",
+      "summary": "추출 파일에 (No content)",
+      "req": []
+    },
+    {
+      "id": "T056",
+      "date": "2026-09-16",
+      "start": 32794,
+      "end": 32967,
+      "status": "KEEP",
+      "summary": "공식 영문명과 GitHub 결과 업로드",
+      "req": [
+        "WWA-OPS-07"
+      ]
+    },
+    {
+      "id": "T057",
+      "date": "2026-09-16",
+      "start": 32968,
+      "end": 33324,
+      "status": "QUESTION",
+      "summary": "음악·모델·NPC 자산 제작 범위",
+      "req": [
+        "WWA-ART-01"
+      ]
+    },
+    {
+      "id": "T058",
+      "date": "2026-09-16",
+      "start": 33325,
+      "end": 33377,
+      "status": "KEEP",
+      "summary": "대사는 실제 음성 대신 Minecraft 채팅",
+      "req": [
+        "WWA-AUDIO-03"
+      ]
+    },
+    {
+      "id": "T059",
+      "date": "2026-09-16",
+      "start": 33378,
+      "end": 33436,
+      "status": "PROCESS",
+      "summary": "후속 작업 순서 결정",
+      "req": [
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T060",
+      "date": "2026-09-16",
+      "start": 33437,
+      "end": 33476,
+      "status": "KEEP",
+      "summary": "GitHub 저장소 최신 상태 확인",
+      "req": [
+        "WWA-OPS-07"
+      ]
+    },
+    {
+      "id": "T061",
+      "date": "2026-09-16",
+      "start": 33477,
+      "end": 33520,
+      "status": "PROCESS",
+      "summary": "간단 문서 변경은 간단한 지시",
+      "req": [
+        "WWA-OPS-06"
+      ]
+    },
+    {
+      "id": "T062",
+      "date": "2026-09-16",
+      "start": 33521,
+      "end": 33584,
+      "status": "REPORT",
+      "summary": "DESIGN_V05 수정 당시 결과",
+      "req": [
+        "WWA-MYS-02"
+      ]
+    },
+    {
+      "id": "T063",
+      "date": "2026-09-16",
+      "start": 33585,
+      "end": 33611,
+      "status": "PROCESS",
+      "summary": "문서·원격 반영 재확인",
+      "req": [
+        "WWA-OPS-07"
+      ]
+    },
+    {
+      "id": "T064",
+      "date": "2026-09-16",
+      "start": 33612,
+      "end": 33637,
+      "status": "PROCESS",
+      "summary": "정해진 순서로 구현 착수",
+      "req": [
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T065",
+      "date": "2026-09-16",
+      "start": 33638,
+      "end": 33674,
+      "status": "QUESTION",
+      "summary": "커넥터 쓰기 가능 여부 문의",
+      "req": []
+    },
+    {
+      "id": "T066",
+      "date": "2026-09-16",
+      "start": 33675,
+      "end": 33759,
+      "status": "QUESTION",
+      "summary": "GitHub 토큰 권한 문의 (비밀 저장 금지)",
+      "req": [
+        "WWA-OPS-07"
+      ]
+    },
+    {
+      "id": "T067",
+      "date": "2026-09-16",
+      "start": 33760,
+      "end": 33938,
+      "status": "PROCESS",
+      "summary": "Actions로 build/GameTest 검증",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T068",
+      "date": "2026-09-16",
+      "start": 33939,
+      "end": 34123,
+      "status": "PROCESS",
+      "summary": "CI 확장 검토",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T069",
+      "date": "2026-09-16",
+      "start": 34124,
+      "end": 34208,
+      "status": "PROCESS",
+      "summary": "gametest.yml과 별도 CI 구성",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T070",
+      "date": "2026-09-16",
+      "start": 34209,
+      "end": 35090,
+      "status": "PROCESS",
+      "summary": "CI 스크립트 상세 작성",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T071",
+      "date": "2026-09-16",
+      "start": 35091,
+      "end": 35143,
+      "status": "QUESTION",
+      "summary": "YAML 수정 위치 문의",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T072",
+      "date": "2026-09-16",
+      "start": 35144,
+      "end": 35185,
+      "status": "QUESTION",
+      "summary": "명령 실행 위치 문의",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T073",
+      "date": "2026-09-16",
+      "start": 35186,
+      "end": 35214,
+      "status": "REPORT",
+      "summary": "원격·로컬 불일치 당시 보고",
+      "req": [
+        "WWA-OPS-07"
+      ]
+    },
+    {
+      "id": "T074",
+      "date": "2026-09-16",
+      "start": 35215,
+      "end": 35410,
+      "status": "REPORT",
+      "summary": "ReturnNetwork persistence CI 결과",
+      "req": [
+        "WWA-TECH-01",
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T075",
+      "date": "2026-09-16",
+      "start": 35411,
+      "end": 35490,
+      "status": "REPORT",
+      "summary": "Linux·Windows·Deep Persistence 당시 보고",
+      "req": [
+        "WWA-OPS-08"
+      ]
+    },
+    {
+      "id": "T076",
+      "date": "2026-09-16",
+      "start": 35491,
+      "end": 36498,
+      "status": "PROCESS",
+      "summary": "다음 작업지시서 요청",
+      "req": [
+        "WWA-DEV-05"
+      ]
+    },
+    {
+      "id": "T077",
+      "date": "2026-09-16",
+      "start": 36499,
+      "end": 36695,
+      "status": "SUPERSEDED",
+      "summary": "메인 Codex·보조 GPT 분리 운영, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T078",
+      "date": "2026-09-16",
+      "start": 36696,
+      "end": 36957,
+      "status": "REPORT",
+      "summary": "보조 세션 persistence 역사적 결과",
+      "req": [
+        "WWA-TECH-01"
+      ]
+    },
+    {
+      "id": "T079",
+      "date": "2026-09-16",
+      "start": 36958,
+      "end": 36989,
+      "status": "QUESTION",
+      "summary": "보조 보고와 다음 지시서 구분",
+      "req": [
+        "WWA-OPS-03"
+      ]
+    },
+    {
+      "id": "T080",
+      "date": "2026-09-16",
+      "start": 36990,
+      "end": 37007,
+      "status": "SUPERSEDED",
+      "summary": "보조 세션 명시 운영, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T081",
+      "date": "2026-09-16",
+      "start": 37008,
+      "end": 37625,
+      "status": "SUPERSEDED",
+      "summary": "보조 작업지시서 수정, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T082",
+      "date": "2026-09-16",
+      "start": 37626,
+      "end": 37765,
+      "status": "SUPERSEDED",
+      "summary": "보조 30–40% 작업, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T083",
+      "date": "2026-09-16",
+      "start": 37766,
+      "end": 38780,
+      "status": "SUPERSEDED",
+      "summary": "보조 지시서 수정, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T084",
+      "date": "2026-09-16",
+      "start": 38781,
+      "end": 39605,
+      "status": "SUPERSEDED",
+      "summary": "보조 세션 명시, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T085",
+      "date": "2026-09-16",
+      "start": 39606,
+      "end": 39686,
+      "status": "SUPERSEDED",
+      "summary": "메인/보조 40% handoff, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    },
+    {
+      "id": "T086",
+      "date": "2026-09-16",
+      "start": 39687,
+      "end": 41427,
+      "status": "SUPERSEDED",
+      "summary": "보조 구현 지속, 이후 폐지",
+      "req": [
+        "WWA-DEV-01"
+      ]
+    }
+  ]
+}

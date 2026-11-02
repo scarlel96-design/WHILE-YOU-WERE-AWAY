@@ -1,5 +1,7 @@
 # Latest continuity rule — 2026-11-02
 
+**Full attached-session audit (86 turn pairs):** Read `docs/HISTORICAL_SESSION_AUDIT_20260909_0916.md` and `docs/REQUIREMENTS_TRACEABILITY.md` (55 actual IDs). Keep GAP-007–009 open. Do not revive superseded support-agent staffing. No retroactive V2-03 scope change.
+
 **Read [docs/REQUIREMENTS_TRACEABILITY.md](docs/REQUIREMENTS_TRACEABILITY.md) and [docs/CONTINUITY_AUDIT.md](docs/CONTINUITY_AUDIT.md) before new work orders. Every work order after V2-03 must track WWA-* IDs with IN/OUT/DEFERRED and evidence links. Open GAPs remain visible.**
 
 **Read [docs/PROJECT_CONTINUITY.md](docs/PROJECT_CONTINUITY.md), [docs/DECISION_LOG.md](docs/DECISION_LOG.md), [docs/CONTENT_ROADMAP.md](docs/CONTENT_ROADMAP.md), and [docs/WORK_ORDER_PROTOCOL.md](docs/WORK_ORDER_PROTOCOL.md) before drafting or starting new work orders.** Read the existing design and evidence documents linked there. These are repository continuity documents, not evidence that game features have been implemented.
