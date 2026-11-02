@@ -6,3 +6,4 @@ Protection actual fall/lava/fire PASS. Input continuous mining remains PARTIAL.
 Original V2-01E Signal Fix 47 files unchanged.
 Source ZIP 9dd481cf175aa616063a40b8119d9bbf69e5ac18742b612dfe598ee5c3260e70.
 Read REPORT.md for commands, rollback and exact next step.
+Implementation/artifact remote verified: 1f84a9a9937552c7b77d9ece92eb564e895fe1a5.

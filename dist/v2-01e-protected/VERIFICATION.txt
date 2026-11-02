@@ -161,7 +161,12 @@ Caveman은 사용하지 않았다.
 자동 PC 종료와 reset credit 사용은 수행하지 않았다.
 
 GITHUB
-UPLOAD_PENDING. 이 문서의 후속 업로드 확인 기록과 최종 응답에 실제 remote HEAD를 기록한다.
+구현·산출물 업로드 확인: 1f84a9a9937552c7b77d9ece92eb564e895fe1a5. git push exit 0. git ls-remote 일치.
+후속 커밋은 이 업로드 기록과 문서 메타데이터만 갱신한다.
+Source ZIP 374개 항목은 구현 HEAD와 줄바꿈 정규화 후 일치한다.
+원시 바이트의 줄바꿈 차이는 source-head-comparison.json에 기록했다.
+기록 전체 whitespace 검사는 raw 로그와 patch context의 후행 공백을 보고했다.
+로그·patch를 제외한 staged whitespace 검사는 exit 0이었다.
 업로드 대상: 위 테스트 helper 2개, dist/v2-01e-protected, evidence/v2-01e/resume-2.
 기존 unrelated untracked 15개는 그대로 보존한다.
 
