@@ -1,0 +1,15 @@
+{
+  "branch": "work/v2-playable-core",
+  "implementation_commit": "ebbe3805d2db3e802d56f6063a41e7e76887f7dc",
+  "verified_remote": "ebbe3805d2db3e802d56f6063a41e7e76887f7dc",
+  "push_exit": 0,
+  "remote_check_exit": 0,
+  "paths": [
+    "src/main/resources/data/whileaway/structure/abandoned_station.nbt",
+    "tools/generate-assets.py",
+    "docs/V2_03_CONTENT_STATUS.md",
+    "dist/v2-03",
+    "evidence/v2-03"
+  ],
+  "status": "PARTIAL; safe pause at usage threshold"
+}

@@ -1,8 +1,8 @@
 [
   {
     "file": ".gitattributes",
-    "size": 151,
-    "sha256": "24b5d05b6737eb65331fd3c8b715271f5194b1de73870baf1be71cb7bdb00959"
+    "size": 143,
+    "sha256": "1990eed810ecc4c42462edb91a09a1be81e0f818f3e63e3b97cbb9fadd2becc6"
   },
   {
     "file": "BASELINE-source.zip",
@@ -31,8 +31,8 @@
   },
   {
     "file": "VERIFICATION.txt",
-    "size": 6819,
-    "sha256": "1a6fd8bd7fee51f3a827b7c1d6e6360a086330475839169751e861b38a807954"
+    "size": 6978,
+    "sha256": "99187c09a140ad505f7e18dd5df389f169714fc61b29694dc42fb0f4ed981f15"
   },
   {
     "file": "whileaway-0.3.1-v2-03-source.zip",

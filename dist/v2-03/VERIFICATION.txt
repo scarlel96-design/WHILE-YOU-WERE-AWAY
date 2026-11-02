@@ -106,5 +106,7 @@ Keep general playtesting user-owned. Do not resume V2-01E auto-mining or explora
 
 GITHUB
 Upload target: scarlel96-design/WHILE-YOU-WERE-AWAY, work/v2-playable-core.
-Upload pending at report creation. The subsequent upload record identifies the verified commit.
+Implementation and artifacts pushed and remotely verified: ebbe3805d2db3e802d56f6063a41e7e76887f7dc.
+git push exit 0. git ls-remote returned the same SHA.
+A subsequent metadata-only commit records this confirmation. Production resources remain unchanged.
 Preserve the 15 unrelated untracked paths.
