@@ -1,0 +1,154 @@
+{
+  "source": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-01e-installed-client\\saves\\새로운 세계",
+  "copy": "C:\\Users\\scarl\\Documents\\Codex\\2026-09-08\\new-chat\\work\\v2-01e-installed-client\\saves\\V2-01E Installed Modified Copy",
+  "files": [
+    {
+      "path": "icon.png",
+      "sha256": "3d723623db8a0faf460c15b1311c51ac18680e1fbc5e131796abd05ba4bbf1ab"
+    },
+    {
+      "path": "level.dat",
+      "sha256": "c00d0f8abba0cb451f00b0aba292a4193c3e65ecc09c497d2ed80316b657f1e0"
+    },
+    {
+      "path": "level.dat_old",
+      "sha256": "60b29fdf941194f8bd793578e5fe3a3d8e5c560b8696be0a049c2f39224360cf"
+    },
+    {
+      "path": "session.lock",
+      "sha256": "51643361c79ecaef25a8de802de24f570ba25d9c2df1d22d94fade11b4f466cc"
+    },
+    {
+      "path": "advancements\\380df991-f603-344c-a090-369bad2a924a.json",
+      "sha256": "335412f12cc770c645f08b9f5751d7e4e1d1e210eb92156e7af503235d6b9694"
+    },
+    {
+      "path": "data\\neoforge_data_attachments.dat",
+      "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+    },
+    {
+      "path": "data\\raids.dat",
+      "sha256": "06bbf13fa1ac164843a6a3613eb5cec6ddeba67c1e9405348f90889396e370ee"
+    },
+    {
+      "path": "data\\random_sequences.dat",
+      "sha256": "fd90b2eb5cd0bc000e2eb0dafebb369aa347deb8fcef99d46a1aa98541c90c40"
+    },
+    {
+      "path": "data\\whileaway_story.dat",
+      "sha256": "4b36db5cc481e3f60e68e611ffa9b12823fa8b35354f39a5d669458e9270d174"
+    },
+    {
+      "path": "entities\\r.-1.-1.mca",
+      "sha256": "942b75670f19c5b06823b8c7fa24070d25633a5d646e46a35def67c2a8a1f297"
+    },
+    {
+      "path": "entities\\r.0.-1.mca",
+      "sha256": "e6dbeb219434e5ba4dcd4cccc75592173883d29a758501e8c74f3b49a98c07f0"
+    },
+    {
+      "path": "playerdata\\380df991-f603-344c-a090-369bad2a924a.dat",
+      "sha256": "cef59a1f38c68714285daf92fae3fd08a77e8ebd712b40902cf202230c3a416b"
+    },
+    {
+      "path": "playerdata\\380df991-f603-344c-a090-369bad2a924a.dat_old",
+      "sha256": "3055ba6b39ba69fce1422e66873db8d64fb319369f6eea7d35576bd4f868799b"
+    },
+    {
+      "path": "region\\r.-1.-1.mca",
+      "sha256": "75559a32b92c31c9307448f5515278c53ba1501d7e3bbc5f8d2d71b89a3e5716"
+    },
+    {
+      "path": "region\\r.-1.0.mca",
+      "sha256": "fbc2cd90c7ba82fa81059f643a66049d3adcbd4d567cf6dfa3ee99033a7f690a"
+    },
+    {
+      "path": "region\\r.0.-1.mca",
+      "sha256": "a3f28fb99b74cdae6565e61f0216e48ae5a789c1e29084e7315f0f60827c97ec"
+    },
+    {
+      "path": "region\\r.0.0.mca",
+      "sha256": "bbbfa6fb1f7b9bdacb5b2a0e5c7d8367cef635019b5a875370d18216e949c543"
+    },
+    {
+      "path": "serverconfig\\readme.txt",
+      "sha256": "b1022ab932f8f0ea0cf78d9f312e95b85a4f96f59ca430e63f9a435e512d1186"
+    },
+    {
+      "path": "stats\\380df991-f603-344c-a090-369bad2a924a.json",
+      "sha256": "60ba4c0d6d0939d754d112428b2437d313bf707a6b351b37f361f324e696b79b"
+    },
+    {
+      "path": "dimensions\\whileaway\\quiet_city\\data\\neoforge_data_attachments.dat",
+      "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+    },
+    {
+      "path": "dimensions\\whileaway\\quiet_city\\data\\raids.dat",
+      "sha256": "06bbf13fa1ac164843a6a3613eb5cec6ddeba67c1e9405348f90889396e370ee"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\data\\neoforge_data_attachments.dat",
+      "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\data\\raids.dat",
+      "sha256": "06bbf13fa1ac164843a6a3613eb5cec6ddeba67c1e9405348f90889396e370ee"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\entities\\r.-1.-1.mca",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\entities\\r.-1.0.mca",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\entities\\r.0.-1.mca",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\entities\\r.0.0.mca",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\poi\\r.-1.-1.mca",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\poi\\r.0.-1.mca",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\region\\r.-1.-1.mca",
+      "sha256": "26e21c10e6cf71f4ee253935873c2ad3aa96349032d5e4fe13db019cbf5a5d74"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\region\\r.-1.0.mca",
+      "sha256": "936e414ff0dfbb45b51cf040e06c3332efab09c403d9d97b408b76322838a702"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\region\\r.0.-1.mca",
+      "sha256": "3585a2e417b087a78a1b51190e20409ef7e79140759bafc241654a5d4c567c5b"
+    },
+    {
+      "path": "dimensions\\whileaway\\memory_route\\region\\r.0.0.mca",
+      "sha256": "04745a8d541d9cff861fa956ff195986e79a79c2176d1a55f4f97d52c438b941"
+    },
+    {
+      "path": "DIM1\\data\\neoforge_data_attachments.dat",
+      "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+    },
+    {
+      "path": "DIM1\\data\\raids_end.dat",
+      "sha256": "06bbf13fa1ac164843a6a3613eb5cec6ddeba67c1e9405348f90889396e370ee"
+    },
+    {
+      "path": "DIM-1\\data\\neoforge_data_attachments.dat",
+      "sha256": "95486bd4cbd73d4d98f343e42a5792ef5315214015acca508842844d73247562"
+    },
+    {
+      "path": "DIM-1\\data\\raids.dat",
+      "sha256": "06bbf13fa1ac164843a6a3613eb5cec6ddeba67c1e9405348f90889396e370ee"
+    }
+  ]
+}

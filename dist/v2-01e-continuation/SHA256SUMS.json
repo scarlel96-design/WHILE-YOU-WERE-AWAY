@@ -1,0 +1,34 @@
+{
+  ".gitattributes": {
+    "bytes": 116,
+    "sha256": "09ce1653b4020f9123ace7e6c22c78d86dc9bdc964a5f4e6e7aeba99aef7d69a"
+  },
+  "DIFF.patch": {
+    "bytes": 4841,
+    "sha256": "c4a3a2ea92a9e8bdf06e6eac5d1f879b31caa869b3c6508fc80da22dc13eaef9"
+  },
+  "ROLLBACK.ps1": {
+    "bytes": 1138,
+    "sha256": "69fdfe8646796550aa9c8b73506dc44b72cf2fa10d7242c2c371fb593e4d58c0"
+  },
+  "ROLLBACK.sh": {
+    "bytes": 219,
+    "sha256": "0d1f9e9590834de990704ca0e7593a634e8e07d5ca502a8667d15ba9011643c1"
+  },
+  "SOURCE_MANIFEST.json": {
+    "bytes": 44695,
+    "sha256": "196e4bb5c8b3f8d2e573b06b37400a1120c7352cf292d68706af4faa6e7586e5"
+  },
+  "VERIFICATION.txt": {
+    "bytes": 8876,
+    "sha256": "6db06f699cd422b71476a2e981b05b33ec6862f237265c364afb2be187c8c96e"
+  },
+  "whileaway-0.3.1-v2-01e-continuation-source.zip": {
+    "bytes": 934282,
+    "sha256": "f3ab52c1fa83b896b89a9cc72765ab2019374d7f8e27c58ed2868d678878a77c"
+  },
+  "whileaway-0.3.1-v2-01e-continuation.jar": {
+    "bytes": 704237,
+    "sha256": "5adb5f964d42e1e9355a79fc491db8c32340de5e9a172748a26c8d926c7bcc4a"
+  }
+}
