@@ -1,0 +1,93 @@
+# WHILE YOU WERE AWAY — 요구사항 추적표 / Requirements Traceability Register
+
+상태: **초기 추적표(2026-11-02)**. 과거 41,427줄 분량 대화에서 이미 정리·승인된 주요 설계 및 최신 사용자 지시를 일대일로 매핑하는 기본 틀이다. **전체 원문 모든 문장의 완전 추출이나 게임 구현 완료를 입증하지 않는다.** 향후 작업마다 추가·교차 점검한다.
+
+이 문서는 [PROJECT_CONTINUITY.md](PROJECT_CONTINUITY.md), [DECISION_LOG.md](DECISION_LOG.md), [CONTENT_ROADMAP.md](CONTENT_ROADMAP.md), [DESIGN_V05.md](DESIGN_V05.md), [MYSTERY_RESOURCE_EXTENSION.md](MYSTERY_RESOURCE_EXTENSION.md), [foreshadow-registry.json](foreshadow-registry.json), `AGENTS.md`와 함께 읽는다.
+
+## 사용 규칙과 정확한 상태 구분
+
+- 각 항목의 **요구 결정 상태**는 `CONFIRMED`(사용자가 확정), `PROPOSED`(논의/제안), `SUPERSEDED`(나중 결정으로 대체), `UNRESOLVED`(확정되지 않음) 중 하나다.
+- **구현/검증 상태**는 별도 관리한다: `DESIGN ONLY`, `PARTIAL`, `IMPLEMENTED UNVERIFIED`, `AUTOMATED VERIFIED`, `HUMAN VERIFIED`, `NOT TESTED`, `UNKNOWN`. 설계 CONFIRMED는 구현 PASS와 다르다.
+- 표의 **적용 계획**은 미래 작업의 빠뜨리지 않기 위한 연결이며, 실제 파일 수정이나 코드 구현을 증명하지 않는다.
+- 범위 내에 있는 항목은 구현 파일/테스트 로그/커밋 URL까지 추적한다. 범위 밖 항목은 **DEFERRED + 다음 대상**을 기록하며 조용히 삭제하지 않는다.
+- 진행 중인 V2-03은 변경하지 않는다. 이 규칙은 **V2-03 이후에 새로 작성하는 작업지시서부터** 적용한다.
+- 항목이 제안인지 확정인지 모호하면 `UNRESOLVED`를 사용한다. AI가 임의로 설정을 고정하지 않는다.
+- 정확한 엔딩/Actor/Return Network 구현 상태는 최신 원격 소스·검증 증거로 재확인한다. 이전 작업 결과나 ChatGPT 기억을 증거로 대신하지 않는다.
+
+## 요구사항 추적 매트릭스
+
+| ID | 확정 요구·비협상 제약 | 요구 상태 | 설계·결정 출처 | 구현 증거·현재 검증 상태 | 다음 단계/누락 위험 |
+|---|---|---|---|---|---|
+| WWA-CORE-01 | 오버월드 생존·건축·채광·제작·농사·탐험을 기본 경험으로 유지 | CONFIRMED | PROJECT_CONTINUITY 2, DESIGN_V05 1–2 | 부분 구현; 자연 전체 플레이 NOT TESTED | 오버월드 구조물과 생활 루프 |
+| WWA-CORE-02 | 저녁골은 중요하지만 월드 전체를 대체하는 고립된 어드벤처 맵이 아님 | CONFIRMED | FUNCTION_FIRST, DESIGN_V05 | 도시/오버월드 부분 연결 | 돌아갈 이유, 자유 이동 |
+| WWA-CORE-03 | 작품은 Fear, Mystery, Character, Minecraft Life 네 축; Fear는 스토리 부속품이 아님 | CONFIRMED | DESIGN_V05 0–2, PROJECT_CONTINUITY 2 | 디자인 확정, 인간 공포 검증 NOT TESTED | Fear 콘텐츠 우선 |
+| WWA-ARC-01 | 프롤로그+7장 및 장편 캠페인 | CONFIRMED | DESIGN_V05 | 본편 후속 챕터 설계·구현 부분 | 장별 콘텐츠 매핑 |
+| WWA-ARC-02 | 일반 엔딩은 여러 시간, 거의 모든 비밀은 여러 날 탐구 규모 | CONFIRMED 목표 | DESIGN_V05, DECISION_LOG | 실측 없음 | 실시간 강제 대기 없음 |
+| WWA-ARC-03 | BAD 2, NORMAL 2, HIDDEN HAPPY 1 및 엔딩 후 월드 변화 | CONFIRMED | DESIGN_V05, PROJECT_CONTINUITY 3 | 엔딩 설계, 실제 완결 NOT TESTED | 조건/후일담 개별 추적 |
+| WWA-ARC-04 | 히든 엔딩은 선악 숫자·100% 수집이 아닌 조사/실험/관계/정착 준비 | CONFIRMED | DESIGN_V05, MYSTERY_RESOURCE_EXTENSION 53, 75 | 설계 | 주요 선택·불변식 |
+| WWA-LORE-01 | 연속기는 Continuity Graph와 빈자리 관계를 보존하려 함 | CONFIRMED | DESIGN_V04, DESIGN_V05 | 설계 | 관계 모델과 엔딩 |
+| WWA-LORE-02 | 마지막 정상 하루는 실재하지 않은 여러 날의 합성본 | CONFIRMED | DESIGN_V04, DESIGN_V05 | 설계 | 기록·환경의 사전 반증 |
+| WWA-LORE-03 | 현재 인격의 변화할 권리; 완전한 원본 부활 불가 | CONFIRMED | DESIGN_V05 | 설계 | NPC와 결말에서 보존 |
+| WWA-MYS-01 | 저녁골/연속기 A Story의 인과·비밀 층위 | CONFIRMED | DESIGN_V05 | 일부 실게임 단서 | 장별 복선·회수 |
+| WWA-MYS-02 | Player Past: 1인칭 기억 파편, 기억상실, 오버월드 전환과 후반 재해석 | CONFIRMED | DESIGN_V05, DECISION_LOG | Opening 일부 구현; 종합 HUMAN NOT TESTED | 향후 구조물과 오프닝 복선 연결 |
+| WWA-MYS-03 | Observer/Shadow Mystery는 별도 계층·만능 원인/전투 보스 금지 | CONFIRMED | DESIGN_V05, PROJECT_CONTINUITY 3 | 주로 설계 | 독립적 징후와 미회수 경계 |
+| WWA-MYS-04 | A/B/C 등급 복선; 노출→반증→회수→재해석, 재방문 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 59–81 | foreshadow-registry 일부 PARTIAL | ID로 구조물·NPC·사운드 매핑 |
+| WWA-MYS-05 | 외부 공략 없이 접근 가능한 증거 및 중복 단서·재확인 경로 | CONFIRMED | DESIGN_V05, MYSTERY_RESOURCE_EXTENSION 38–41 | 전체 조사 체계 미완성 | 독립 경로/소프트락 검사 |
+| WWA-PUZZLE-01 | 공간·기록·시간·음향·레드스톤·Minecraft 시스템 기반 퍼즐 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 35–39 | DESIGN ONLY 또는 기초 단서 | 실제 퍼즐·복구 계약 |
+| WWA-PUZZLE-02 | 전용 아이템·장비·조사수첩·장비 개량·추론 UI, 정답 자동 표시 금지 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 40–47 | 본격 프레임워크 미완료 | 아이템·Evidence 구조 |
+| WWA-WORLD-01 | 작은 규모도 고품질 건축: 실루엣·동선·내부·생활 흔적·지형 결합 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | V2-03 폐역 템플릿 개선 기록; 인간 아트 QA NOT TESTED | 구조물 품질 검수 |
+| WWA-WORLD-02 | 지상/채굴/철도/마을 등 여러 자연 발견 경로, 필수 체크리스트 금지 | CONFIRMED | PROJECT_CONTINUITY 4 | 기존 폐역 생성만 확인; 후속 발견 경로 일부 미구현 | 발견 확률·공정성 |
+| WWA-WORLD-03 | 한 장소의 생활·재난·현재·재방문 네 의미 | CONFIRMED | DESIGN_V05 52 | 장소별 구현 미확인 | Three Lives Rule 정합성 |
+| WWA-WORLD-04 | 소규모 공간 이상과 대형 월드 세트피스를 별도 종류로 유지 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | 후보안; 실 구현 미확인 | 월드 스케일 공포 품질 |
+| WWA-WORLD-05 | 대형 사건은 사전 징후·운동·음향·위기·사건 후 안전한 흔적을 결합 | CONFIRMED 방향 | DESIGN_V05, PROJECT_CONTINUITY | DESIGN ONLY | Persistent World-Scar 패턴 |
+| WWA-WORLD-06 | 사용자 월드/집/아이템 보존, 실제 지형 변형은 통제·복구 가능해야 함 | CONFIRMED | AGENTS, PROJECT_CONTINUITY | 관련 기존 검증 일부; 신규 효과 검증 필요 | 저장·청크·멀티플레이 |
+| WWA-THREAT-01 | 귀로꾼은 귀환 경로를 따르는 존재; 방해·경고·위험·회복 인과 유지 | CONFIRMED | DESIGN_V04, DESIGN_V05 | 기초 기능 부분 구현; 최종 아트 미완료 | AI 계약 + 모델·소리 |
+| WWA-THREAT-02 | 괴물마다 다른 실루엣·동작·음향·대응 규칙; 단순 몬스터 수 채우기 금지 | CONFIRMED | PROJECT_CONTINUITY 4, DESIGN_V05 | 귀로꾼 중심 PARTIAL | Threat 정체성·AI |
+| WWA-THREAT-03 | 공포는 실제로 강해야 함; 생존 위협·추격·규칙 있는 점프스케어도 필요 | CONFIRMED | DESIGN_V05, DECISION_LOG | 인간 공포 체감 NOT TESTED | 대표 공포·위험·회복 QA |
+| WWA-FEAR-01 | Fear Director의 휴식·전조·강도·발견 깊이·반복 피로 관리 | CONFIRMED | DESIGN_V05 | 구현 범위 최신 확인 필요 | 상태/쿨다운/중복 억제 |
+| WWA-FEAR-02 | 모든 불안이 공격으로 이어지지 않으며 안전한 휴식처가 실제로 존재 | CONFIRMED | DESIGN_V05, PROJECT_CONTINUITY | 전체 플레이 NOT TESTED | 공포 템포·거점 보호 |
+| WWA-AUDIO-01 | BGM·공간 음향·환경음·Presence/Threat·침묵·모티프 통합 | CONFIRMED | DESIGN_V05, PROJECT_CONTINUITY 4 | 프로토타입 자산, 청감 NOT TESTED | 동적 오디오 디렉션 |
+| WWA-AUDIO-02 | 실제 경고 소리는 신뢰 가능, 청각 대체 단서/자막 제공 | CONFIRMED | DESIGN_V05, MYSTERY_RESOURCE_EXTENSION | 전반 검증 미완료 | 위험 접근성 |
+| WWA-AUDIO-03 | 시나리오 인물의 말은 Minecraft 채팅 텍스트; 음성 녹음 필수 아님 | CONFIRMED | DECISION_LOG | 구체 연출별 확인 필요 | 대사/자막 표준 |
+| WWA-ART-01 | 최종 리소스팩은 적법한 기존 자산 선택 또는 전용 제작; 전체 최종 폴리싱은 후반 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 33–34, PROJECT_CONTINUITY 6 | asset-contract 임시 자산 | 저작권·리소스 계약 |
+| WWA-CINE-01 | 1인칭/조작 가능 기억·회상·장면 전환·NPC 블로킹·조명·사운드 브리지 | CONFIRMED | PROJECT_CONTINUITY 4, DESIGN_V05 | Opening 일부 구현, 최종 품질 미검증 | 인게임 시네마틱 |
+| WWA-NPC-01 | 여울·도윤·미루는 플레이어 없이도 일상·선호·의견·동선을 가진다 | CONFIRMED | DESIGN_V05, PROJECT_CONTINUITY 3 | 여울 일부, 도윤·미루 확장 미완 | 인물별 행동/관계 |
+| WWA-NPC-02 | 대화/선물 점수만이 아닌 공동 작업·건축·실제 현재의 선택으로 관계 형성 | CONFIRMED | DESIGN_V05 | 부분 | 생활과 엔딩 연결 |
+| WWA-TECH-01 | Actor identity, schema, checkpoints, transactions, migrations, 구조물 버전·월드 안전 | CONFIRMED | AGENTS, 최신 evidence | 일부 자동 검증; 전체 완료 미선언 | 모든 신규 변경의 필수 회귀 게이트 |
+| WWA-TECH-02 | 공포 연출로 OS·개인 파일·오디오 시스템 설정·게임 저장을 실제로 망가뜨리지 않음 | CONFIRMED | PROJECT_CONTINUITY 7 | 정책 | 코드 검토/패키지 검증 |
+| WWA-DEV-01 | 메인 GPT-6.1 SOL/Codex 단독 구현 작업선, 별도 40% 보조 작업선 폐지 | CONFIRMED | DECISION_LOG | 정책 | 지시서 시작시 점검 |
+| WWA-DEV-02 | 실제 장시간 자동 생존 탐험 반복 금지; 사용자가 50–60% 시점 대규모 플레이 담당 | CONFIRMED | PROJECT_CONTINUITY 6 | V2-01E 종료; % UNKNOWN | 새 WO 자동 QA 분리 |
+| WWA-DEV-03 | 컴파일·타깃 GameTest·기본 저장·월드 보존 검증 지속 | CONFIRMED | WORK_ORDER_PROTOCOL | 새 WO마다 확인 | 자동 검증 증거 |
+| WWA-DEV-04 | 현재 V2-03 미수정; 새로운 방향은 이후 작업지시서부터 적용 | CONFIRMED | DECISION_LOG | 적용 정책 | 차기 WO에서 적용 |
+| WWA-DEV-05 | 요구/결정/콘텐츠/검증 증거는 GitHub에서 지속 추적 | CONFIRMED | PROJECT_CONTINUITY, WORK_ORDER_PROTOCOL | 문서화 진행 중 | 매 WO 갱신 의무 |
+
+> 이 표의 구현 상태는 **보수적인 요약**이다. 진행 중 개발이 있을 수 있으며, 다음 작업 시작 전 현재 소스·증거를 실제로 검증해 최신 상태로 바꿔야 한다.
+
+## 미해결·미감사 항목
+
+| GAP-ID | 문제 | 처리 방법 |
+|---|---|---|
+| GAP-001 | 41,427줄 역사 기록과 이 등록부를 **문장/요구 ID 단위로 전수 대조하지 않았다** | 다음 단위 작업에서 원문을 부분별 재검토해 발견한 요구를 새 ID로 등록하고 누락률을 추적. 완전성 검증을 했다고 주장하지 말 것 |
+| GAP-002 | 장별 사건·몬스터 수·차원 수·세트피스 수량 중 초안 제안과 확정 범위가 혼재 | DESIGN_V05와 명시적 최신 사용자 결정을 비교하고 PROPOSED/CONFIRMED 표시 |
+| GAP-003 | V2-03에서 현재 진행 중인 실제 파일·테스트·콘텐츠 변경의 최신 상태 | 현 작업 종료 보고를 받은 뒤 표의 evidence URL, SHA, 검증 상태 갱신 |
+| GAP-004 | 전체 콘텐츠 50–60%를 계산할 작업 분모/가중치 | 콘텐츠 단위·실제 경로·플레이 비중 확정 후 계산. 그전 UNKNOWN |
+| GAP-005 | 퍼즐·아이템·NPC 관계·대형 공포 장면의 acceptance test 세부 기준과 담당 차기 WO | 각 WO 범위를 정할 때 ID별 구체 수용 조건과 실제 시험 증거 링크 연결 |
+| GAP-006 | 사용자 아트·사운드·공포 감정 평가 | 첫 대규모 사용자 테스트까지 HUMAN NOT TESTED 유지 |
+
+## 새 요구 추가 템플릿
+
+| ID | 사용자 결정 한 문장 | CONFIRMED/PROPOSED/SUPERSEDED/UNRESOLVED | 날짜·출처 링크 | 디자인·코드·시험 위치 | 단계 / 검증 / 해당 WO |
+|---|---|---|---|---|---|
+| WWA-AREA-NNN | 구체 행동 또는 불변식 | 상태 | 결정 출처 | 경로·SHA | PLANNED/PARTIAL/검증 증거 |
+
+## 작업 종료 시 누락 방지 체크
+
+- 이번 작업의 **IN 항목 ID**를 모두 기록했는가? 구현 위치·테스트·증거가 있는가?
+- **OUT/DEFERRED 항목 ID**가 다음 작업까지 살아 있는가? 사라진 항목은 없는가?
+- 새 결정은 DECISION_LOG에 추가하고 이전 결정의 효력을 표기했는가?
+- 새 구조물·기록·음향·괴물에 기존 장기 복선/스토리의 연결 ID가 있는가?
+- 최신 코드에 존재하지 않는 기능을 자동/인간 VERIFIED로 올리지 않았는가?
+- V2-03과 같이 **이미 진행 중인 작업의 범위를 새 문서로 소급 변경하지 않았는가?**
+- 실측하지 않은 공포·청각·미학·완성률을 사실로 주장하지 않았는가?
+
+일치하지 않는 항목이 있으면 누락·충돌을 명시하고, **완료 보고에서 열린 GAP-ID를 남긴다**. 문서를 조용히 삭제하지 않는다.
