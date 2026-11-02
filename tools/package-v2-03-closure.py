@@ -15,8 +15,9 @@ def main():
     modified=OUT/'whileaway-0.3.1-v2-03-content.jar'
     shutil.copy2(ROOT/'build/libs/whileaway-0.3.1-dev.1.jar',modified)
     names=git('ls-files','-z').decode().split('\0')
-    names=[n for n in names if n and (n.startswith(('src/','docs/','tools/','gradle/')) or n in ['AGENTS.md','README.md','LICENSE','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat'])]
+    names=[n for n in names if n and (n.startswith(('src/','docs/','tools/','gradle/','evidence/reuse/baseline/')) or n in ['AGENTS.md','README.md','LICENSE','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat'])]
     assert len(names)>200,'Source inventory unexpectedly small'
+    assert all('evidence/reuse/baseline/legacy-v'+str(i)+'.dat' in names for i in range(1,4))
     source_manifest={'implementation_commit':head,'files':{n:sha(ROOT/n) for n in names}}
     (OUT/'SOURCE_MANIFEST.json').write_text(json.dumps(source_manifest,indent=2)+'\n',encoding='utf-8')
     with zipfile.ZipFile(OUT/'whileaway-0.3.1-v2-03-content-source.zip','w',zipfile.ZIP_DEFLATED) as z:
