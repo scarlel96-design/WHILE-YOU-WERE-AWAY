@@ -10,6 +10,8 @@
 
 요약 문서는 원문 전체의 완전한 대체물이 아니다. [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md)의 항목 ID를 작업 범위·코드·검증 증거에 연결하고, [CONTINUITY_AUDIT.md](CONTINUITY_AUDIT.md)의 열린 GAP을 계속 관리한다. 현재 작업인 V2-03에 소급 적용하지 않는다. 누락이 발견되면 지우지 않고 기록한다.
 
+**원본 41,427행 전수 대화 구간 감사:** [HISTORICAL_SESSION_AUDIT_20260909_0916.md](HISTORICAL_SESSION_AUDIT_20260909_0916.md)를 읽고, 실제 요구 55개는 [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md)를 확인한다. 다른 세션과 외부 첨부는 별도 범위다.
+
 ## 1. 읽는 순서와 충돌 해결
 
 1. 각 작업을 시작하기 전 실제 원격 브랜치·HEAD·소스·테스트 증거를 조회한다. **런타임 구현 사실은 현재 코드와 실행 증거만이 증명**한다.
@@ -32,6 +34,7 @@
 ## 3. 반드시 보존할 세계관과 미스터리
 
 - **A Story / 저녁골·연속기:** Continuity Graph는 원본 개인보다 **사람·장소·역할·빈자리의 관계**를 보존하려 한다. 「마지막 정상적인 하루」는 실재한 완전한 하루가 아니라 여러 날짜가 합성된 기록이다. 연속기는 무한 부활 장치가 아니다. 현재 잔존 인격은 변화할 수 있는 별개의 존재다.
+- **네 축의 질문:** `DESIGN_V05.md` 13-A-1은 World·Character·Player Past와 더 깊은 Shadow를 구별한다. A Story/Player Past/Shadow 묶음에서 Character Mystery를 생략하지 않는다.
 - **Player Past Mystery:** 플레이어는 세계에 처음 생겨난 빈 인물이 아니다. 이전 사건에 휘말렸으나 기억 일부를 잃었다. 초기 1인칭 기억 파편과 자연스러운 오버월드 전환을 보존한다. 과거의 의미는 장편 탐험·재방문 중 점차 드러난다. **미래의 비밀을 지금 임의로 확정하지 않는다.**
 - **Shadow / Observer Mystery:** 본편과 평행한 미해결 계층이다. Observer는 모든 괴물의 주인, 연속기 제작자, 저녁골 붕괴의 만능 원인, 전투형 보스가 아니다. 모든 비밀을 하나로 합치지 않는다.
 - **귀로꾼(기존 엔티티 Wayfarer/Returner):** 돌아가는 **경로와 행동**이 중심이다. 경로 방해 시 관찰 가능한 경고·위기·회복이 발생한다. 이유 없는 무작위 스토커나 플레이어 사냥 AI로 바꾸지 않는다. Return Network는 별도 사건/설비 연동 체계이며 귀로꾼 AI와 혼동하지 않는다.

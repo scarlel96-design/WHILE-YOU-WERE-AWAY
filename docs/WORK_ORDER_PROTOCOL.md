@@ -4,6 +4,8 @@
 
 적용: **현재 V2-03 완료 이후 신규 작업지시서부터**. 메인 구현 담당: GPT-6.1 SOL / Codex. 이 문서는 새 기능 구현이나 진행률 승격 증거가 아니다.
 
+> **전체 대화 감사 반영:** [HISTORICAL_SESSION_AUDIT_20260909_0916.md](HISTORICAL_SESSION_AUDIT_20260909_0916.md)의 T001–T086 및 55개 WWA-ID를 확인한다. 해당하는 ID와 실제 구현/검증 증거, 범위 밖 DEFERRED, 미해결 GAP를 인수인계에 연결한다. V2-03에는 소급하지 않는다.
+
 ## 1. 시작 시 필수 재조회
 
 1. GitHub 저장소 `scarlel96-design/WHILE-YOU-WERE-AWAY`의 최신 브랜치·HEAD를 확인한다. 예전 SHA를 무조건 최신값으로 쓰지 않는다.
