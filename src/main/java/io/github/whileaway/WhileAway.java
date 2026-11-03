@@ -30,6 +30,8 @@ public final class WhileAway {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, ID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, ID);
+    public static final DeferredRegister<net.minecraft.world.level.levelgen.structure.StructureType<?>> STRUCTURES = DeferredRegister.create(Registries.STRUCTURE_TYPE, ID);
+    public static final DeferredHolder<net.minecraft.world.level.levelgen.structure.StructureType<?>,net.minecraft.world.level.levelgen.structure.StructureType<RailSiteStructure>> RAIL_SITE = STRUCTURES.register("rail_site",()->()->RailSiteStructure.CODEC);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
 
     public static final DeferredBlock<StationBlock> STATION = BLOCKS.register("station_anchor", () -> new StationBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_STONE_BRICKS).strength(4)));
@@ -78,6 +80,7 @@ public final class WhileAway {
         BLOCKS.getEntries().forEach(b -> ITEMS.registerSimpleBlockItem(b.getId().getPath(), b));
         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus); BLOCK_ENTITIES.register(bus);
         SOUNDS.register(bus); TABS.register(bus);
+        STRUCTURES.register(bus);
         bus.addListener(this::attributes);
         container.registerConfig(ModConfig.Type.SERVER, StoryConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);

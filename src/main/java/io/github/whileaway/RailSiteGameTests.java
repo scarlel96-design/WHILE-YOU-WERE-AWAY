@@ -82,8 +82,17 @@ public final class RailSiteGameTests {
             h.assertTrue(access.registryOrThrow(Registries.STRUCTURE_SET).containsKey(WhileAway.id(name)),"placement registered");
             var structure=access.registryOrThrow(Registries.STRUCTURE).get(WhileAway.id(name));
             var context=new Structure.GenerationContext(access,generator,generator.getBiomeSource(),level.getChunkSource().randomState(),level.getStructureManager(),74192362L,new net.minecraft.world.level.ChunkPos(0,0),level,b->true);
-            var point=((net.minecraft.world.level.levelgen.structure.structures.JigsawStructure)structure).findGenerationPoint(context);
+            var point=((RailSiteStructure)structure).findGenerationPoint(context);
             h.assertTrue(point.isPresent()&&!point.orElseThrow().getPiecesBuilder().build().pieces().isEmpty(),"optional site emits real pieces");
+            var chosen=point.orElseThrow();
+            h.assertTrue(chosen.getPiecesBuilder()==chosen.getPiecesBuilder(),"layout rotation and pieces are reused");
+            var serialization=net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext.fromLevel(level);
+            var start=new StructureStart(structure,new net.minecraft.world.level.ChunkPos(0,0),0,chosen.getPiecesBuilder().build());
+            var saved=start.createTag(serialization,new net.minecraft.world.level.ChunkPos(0,0));
+            h.assertTrue(saved.getString("id").equals("whileaway:"+name),"existing structure start identity remains stable");
+            var loaded=StructureStart.loadStaticStart(serialization,saved,74192362L);
+            h.assertTrue(loaded!=null&&loaded.isValid()&&loaded.getPieces().size()==1,"existing piece NBT reloads without regeneration");
+            h.assertTrue(loaded.getPieces().getFirst().getBoundingBox().equals(start.getPieces().getFirst().getBoundingBox()),"stored piece coordinates preserved");
         }h.succeed();
     }
     @GameTest(template="empty")
@@ -114,4 +123,35 @@ public final class RailSiteGameTests {
         beam.stepEcho(false,false,1232);
         for(int i=1233;i<1250;i++)h.assertTrue(!beam.stepEcho(false,true,i),"lost eligibility cancels armed echo");h.succeed();
     }
+    @GameTest(template="empty")
+    public static void terrainGuardRejectsWaterAndCliffsWithoutPlacement(GameTestHelper h){
+        var box=new BoundingBox(0,60,0,18,69,16);
+        h.assertTrue(RailSiteStructure.terrainFits(box,(x,z)->70,(x,z)->70),"dry level ground accepted");
+        h.assertTrue(RailSiteStructure.terrainFits(box,(x,z)->70+x/9,(x,z)->70+x/9),"two-block grade accepted");
+        h.assertTrue(!RailSiteStructure.terrainFits(box,(x,z)->70+x/6,(x,z)->70+x/6),"three-block grade rejected");
+        h.assertTrue(!RailSiteStructure.terrainFits(box,(x,z)->70,(x,z)->65),"water above floor rejected");
+        var calls=new int[1];
+        h.assertTrue(RailSiteStructure.terrainFits(box,(x,z)->{calls[0]++;return 70;},(x,z)->{calls[0]++;return 70;}),"bounded sampling");
+        h.assertTrue(calls[0]==50,"at most 25 paired terrain probes");
+        h.assertTrue(!RailSiteStructure.terrainFits(new BoundingBox(0,60,0,33,69,16),(x,z)->70,(x,z)->70),"oversized layout deferred");h.succeed();
+    }
+    @GameTest(template="empty",timeoutTicks=1200)
+    public static void actualOverworldNoiseHasAcceptedAndDeferredSites(GameTestHelper h){
+        var level=h.getLevel();var access=level.registryAccess();
+        var preset=access.registryOrThrow(Registries.WORLD_PRESET).get(net.minecraft.world.level.levelgen.presets.WorldPresets.NORMAL.location());
+        var generator=(net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator)preset.overworld().orElseThrow().generator();
+        var random=net.minecraft.world.level.levelgen.RandomState.create(generator.generatorSettings().value(),access.lookupOrThrow(Registries.NOISE),203L);
+        int accepted=0,rejected=0,candidates=0;
+        for(int i=0;i<64&&!(accepted>0&&rejected>0);i++){
+            int x=(i%8-4)*512,z=(i/8-4)*512;candidates++;
+            var box=new BoundingBox(x,60,z,x+18,69,z+16);
+            boolean fits=RailSiteStructure.terrainFits(box,
+                (a,b)->generator.getBaseHeight(a,b,net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG,level,random),
+                (a,b)->generator.getBaseHeight(a,b,net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG,level,random));
+            if(fits)accepted++;else rejected++;
+        }
+        h.assertTrue(accepted>0&&rejected>0,"real Overworld noise must provide both usable and deferred terrain");
+        System.out.println("PASS rail terrain noise seed=203 candidates="+candidates+" accepted="+accepted+" rejected="+rejected+"; chunk placement=NONE");h.succeed();
+    }
+
 }

@@ -75,7 +75,7 @@ def site(name,size,passage=False):
     root={'DataVersion':(3,3955),'size':(9,(3,list(size))),'palette':(9,(10,palette)),'blocks':(9,(10,list(blocks.values()))),'entities':(9,(10,[]))}
     nbt(Path('data/whileaway/structure/'+name+'.nbt'),root)
     write(Path('data/whileaway/worldgen/template_pool/'+name+'.json'),{'name':'whileaway:'+name,'fallback':'minecraft:empty','elements':[{'weight':1,'element':{'element_type':'minecraft:single_pool_element','location':'whileaway:'+name,'processors':'whileaway:rail_sites','projection':'rigid'}}]})
-    write(Path('data/whileaway/worldgen/structure/'+name+'.json'),{'type':'minecraft:jigsaw','biomes':'#whileaway:has_rail_site','step':'surface_structures','spawn_overrides':{},'terrain_adaptation':'beard_thin','start_pool':'whileaway:'+name,'size':1,'start_height':{'absolute':-3 if passage else 0},'project_start_to_heightmap':'WORLD_SURFACE_WG','max_distance_from_center':32,'use_expansion_hack':False})
+    write(Path('data/whileaway/worldgen/structure/'+name+'.json'),{'type':'whileaway:rail_site','layout':{'biomes':'#whileaway:has_rail_site','step':'surface_structures','spawn_overrides':{},'terrain_adaptation':'beard_thin','start_pool':'whileaway:'+name,'size':1,'start_height':{'absolute':-3 if passage else 0},'project_start_to_heightmap':'WORLD_SURFACE_WG','max_distance_from_center':32,'use_expansion_hack':False}})
     write(Path('data/whileaway/worldgen/structure_set/'+name+'.json'),{'structures':[{'structure':'whileaway:'+name,'weight':1}],'placement':{'type':'minecraft:random_spread','spacing':40 if passage else 32,'separation':16 if passage else 12,'salt':74192363 if passage else 74192362,'exclusion_zone':{'other_set':'minecraft:villages','chunk_count':6}}})
     print(name,len(blocks),'blocks')
 

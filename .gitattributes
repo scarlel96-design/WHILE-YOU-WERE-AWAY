@@ -7,3 +7,7 @@
 /evidence/v2-03-closure/** -text
 /dist/v2-03-closure/ROLLBACK.sh text eol=lf
 /dist/v2-03-closure/DIFF.patch -diff
+/dist/v2-03-terrain/** -text
+/evidence/v2-03-terrain/** -text
+/dist/v2-03-terrain/ROLLBACK.sh text eol=lf
+/dist/v2-03-terrain/DIFF.patch -diff

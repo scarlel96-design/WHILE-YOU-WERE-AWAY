@@ -1,18 +1,27 @@
 """Package the verified V2-03 source and JAR. Never modify world files."""
 from pathlib import Path
-import hashlib,json,shutil,subprocess,zipfile
-ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'dist/v2-03-closure'
+import hashlib,json,shutil,subprocess,zipfile,sys
+ROOT=Path(__file__).resolve().parents[1]
+TERRAIN='--terrain' in sys.argv
+OUT=ROOT/('dist/v2-03-terrain' if TERRAIN else 'dist/v2-03-closure')
+NAME='whileaway-0.3.1-v2-03-terrain' if TERRAIN else 'whileaway-0.3.1-v2-03-content'
 BASE='82beffac6347c60258e4b9db0098eecad423b176'
 BASE_JAR='7d60cc29edea2b4cd653454c9006e75ebf4fddef999105d2953864c189081cf6'
 BASE_SOURCE='c7d47351c297a1647eed6216a6172bd78839152d2cc28195eb29099d7bcdaa9d'
+if TERRAIN:
+    BASE='06229b928586550a7985220d2d465c0faf4232f8'
+    BASE_JAR='72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05'
+    BASE_SOURCE='ec5237fb1821028c01e32c7c38349f84ca564f23a1799e6a00bed4d1fd6622f4'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT)
 def main():
+    if not TERRAIN and (OUT/(NAME+'.jar')).exists():
+        raise SystemExit('Preserved closure package. Select --terrain for continuation.')
     OUT.mkdir(exist_ok=True,parents=True)
     assert sha(OUT/'BASELINE.jar')==BASE_JAR
     assert sha(OUT/'BASELINE-source.zip')==BASE_SOURCE
     head=git('rev-parse','HEAD').decode().strip()
-    modified=OUT/'whileaway-0.3.1-v2-03-content.jar'
+    modified=OUT/(NAME+'.jar')
     shutil.copy2(ROOT/'build/libs/whileaway-0.3.1-dev.1.jar',modified)
     names=git('ls-files','-z').decode().split('\0')
     fixtures=['evidence/reuse/baseline/legacy-v'+str(i)+'.dat' for i in (2,3)]+['evidence/audio-assets.json']
@@ -21,7 +30,7 @@ def main():
     assert all(n in names for n in fixtures)
     source_manifest={'implementation_commit':head,'files':{n:sha(ROOT/n) for n in names}}
     (OUT/'SOURCE_MANIFEST.json').write_text(json.dumps(source_manifest,indent=2)+'\n',encoding='utf-8')
-    with zipfile.ZipFile(OUT/'whileaway-0.3.1-v2-03-content-source.zip','w',zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(OUT/(NAME+'-source.zip'),'w',zipfile.ZIP_DEFLATED) as z:
         for n in names:
             info=zipfile.ZipInfo(n,(2026,11,3,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
             info.external_attr=(0o100755 if n=='gradlew' else 0o100644)<<16
@@ -36,7 +45,7 @@ function Hash([string]$Path) {
     finally { $algorithm.Dispose() }
 }
 $source=Join-Path $PSScriptRoot 'BASELINE.jar'
-$modified=Join-Path $PSScriptRoot 'whileaway-0.3.1-v2-03-content.jar'
+$modified=Join-Path $PSScriptRoot '@FILE@'
 if((Hash $source) -ne '@BASE@'){throw 'Baseline hash mismatch'}
 $resolved=(Resolve-Path -LiteralPath $Target).ProviderPath
 if([IO.Path]::GetExtension($resolved) -ne '.jar'){throw 'Target must be an existing JAR copy'}
@@ -48,7 +57,7 @@ Copy-Item -LiteralPath $source -Destination $resolved
 if((Hash $resolved) -ne '@BASE@'){throw 'Restored hash mismatch'}
 Write-Output 'ROLLBACK PASS sha256=@BASE@ worlds=UNCHANGED'
 """
-    (OUT/'ROLLBACK.ps1').write_text(ps.replace('@BASE@',BASE_JAR).replace('@MODIFIED@',sha(modified)),encoding='utf-8')
+    (OUT/'ROLLBACK.ps1').write_text(ps.replace('@BASE@',BASE_JAR).replace('@MODIFIED@',sha(modified)).replace('@FILE@',modified.name),encoding='utf-8')
     (OUT/'ROLLBACK.sh').write_text("""#!/usr/bin/env bash
 set -euo pipefail
 HERE=$(cd -- "$(dirname -- "$0")" && pwd)
@@ -59,6 +68,6 @@ exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$HERE/ROLLBACK.ps1
     result={p.name:{'size':p.stat().st_size,'sha256':sha(p)} for p in OUT.iterdir() if p.is_file() and p.name!='ARTIFACTS.json'}
     (OUT/'ARTIFACTS.json').write_text(json.dumps({'baseline':BASE,'implementation':head,'artifacts':result},indent=2)+'\n',encoding='utf-8')
     print('PASS packaged implementation='+head)
-    for name in ['whileaway-0.3.1-v2-03-content.jar','whileaway-0.3.1-v2-03-content-source.zip']:
+    for name in [NAME+'.jar',NAME+'-source.zip']:
         print(name+' sha256='+result[name]['sha256']+' bytes='+str(result[name]['size']))
 if __name__=='__main__':main()
