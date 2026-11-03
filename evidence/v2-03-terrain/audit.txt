@@ -1,0 +1,8 @@
+PASS baseline classes byte-identical=159/161
+Changed baseline classes: ['io/github/whileaway/RailSiteGameTests.class', 'io/github/whileaway/WhileAway.class']
+PASS storage, Actor identity, Wayfarer AI and Return Network class bytes unchanged
+PASS all existing structure NBT, textures and OGG bytes unchanged
+PASS all final packaged resources match final inputs
+PASS source ZIP CRC and working-tree manifest files=415
+PASS restored JAR lacks new terrain guard; modified JAR remains changed
+PASS reverse patch check; exit=0

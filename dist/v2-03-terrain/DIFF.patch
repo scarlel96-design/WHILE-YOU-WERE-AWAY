@@ -1,0 +1,323 @@
+diff --git a/docs/V2_03_CONTENT_STATUS.md b/docs/V2_03_CONTENT_STATUS.md
+index 3946068..85fd50b 100644
+--- a/docs/V2_03_CONTENT_STATUS.md
++++ b/docs/V2_03_CONTENT_STATUS.md
+@@ -137,3 +137,25 @@ HUMAN EXPERIENCE / ART QUALITY / AUDIO EXPERIENCE는 NOT TESTED다.
+ 후속 콘텐츠 후보는 발견 실패를 줄이는 간접 탐색 단서와 생활 기반 재방문이다.
+ 대형 세트피스·새 Threat·최종 아트·0.3.2 승격은 이번 범위 밖이다.
+ 연속성 감사의 GAP-007·008·009는 열린 상태다.
++
++## 2026-11-03 지형 배치 보강
++
++새 시설 두 종은 rail_site 전용 생성 처리를 거친다.
++내부 템플릿·회전·pool·구조물 ID는 그대로 유지한다.
++실제 회전된 템플릿 범위에서 5×5 지점을 검사한다.
++WORLD_SURFACE_WG와 OCEAN_FLOOR_WG 높이가 다르면 후보를 건너뛴다.
++표본 지점의 최대 높이 차이가 2블록을 넘으면 후보를 건너뛴다.
++이는 청크를 로드하지 않는 생성기 높이 계산이다. 실제 블록을 수정하지 않는다.
++지형에 맞추려고 플레이어 블록을 지우거나 시설을 강제 재생성하지 않는다.
++기존에 생성된 시설은 저장된 piece 좌표를 사용한다.
++지형 검사는 앞으로 생성할 후보에만 적용한다.
++25개 표본 사이의 작은 골짜기와 모든 구조물 중첩까지 보장하지 않는다.
++자연 발견·화면 품질·청감은 계속 HUMAN NOT TESTED다.
++새 산출물과 검증 기록은 dist/v2-03-terrain 및 evidence/v2-03-terrain에 보존한다.
++이전 dist/v2-03-closure 패키지는 덮어쓰지 않는다.
++
++자동 검증: GameTest 129/129, Core assertions 176,858, build PASS.
++실제 오버월드 noise seed 203의 37개 후보에서 1개 허용·36개 보류를 확인했다.
++이 표본은 전체 생성 확률이나 사용자 발견 성공률을 뜻하지 않는다.
++기존 structure ID·piece 좌표의 NBT 재로딩 검사도 통과했다.
++새 실클라이언트 실행은 0회다.
+diff --git a/src/main/java/io/github/whileaway/RailSiteGameTests.java b/src/main/java/io/github/whileaway/RailSiteGameTests.java
+index 5e7d341..9d6b4da 100644
+--- a/src/main/java/io/github/whileaway/RailSiteGameTests.java
++++ b/src/main/java/io/github/whileaway/RailSiteGameTests.java
+@@ -82,8 +82,17 @@ public final class RailSiteGameTests {
+             h.assertTrue(access.registryOrThrow(Registries.STRUCTURE_SET).containsKey(WhileAway.id(name)),"placement registered");
+             var structure=access.registryOrThrow(Registries.STRUCTURE).get(WhileAway.id(name));
+             var context=new Structure.GenerationContext(access,generator,generator.getBiomeSource(),level.getChunkSource().randomState(),level.getStructureManager(),74192362L,new net.minecraft.world.level.ChunkPos(0,0),level,b->true);
+-            var point=((net.minecraft.world.level.levelgen.structure.structures.JigsawStructure)structure).findGenerationPoint(context);
++            var point=((RailSiteStructure)structure).findGenerationPoint(context);
+             h.assertTrue(point.isPresent()&&!point.orElseThrow().getPiecesBuilder().build().pieces().isEmpty(),"optional site emits real pieces");
++            var chosen=point.orElseThrow();
++            h.assertTrue(chosen.getPiecesBuilder()==chosen.getPiecesBuilder(),"layout rotation and pieces are reused");
++            var serialization=net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext.fromLevel(level);
++            var start=new StructureStart(structure,new net.minecraft.world.level.ChunkPos(0,0),0,chosen.getPiecesBuilder().build());
++            var saved=start.createTag(serialization,new net.minecraft.world.level.ChunkPos(0,0));
++            h.assertTrue(saved.getString("id").equals("whileaway:"+name),"existing structure start identity remains stable");
++            var loaded=StructureStart.loadStaticStart(serialization,saved,74192362L);
++            h.assertTrue(loaded!=null&&loaded.isValid()&&loaded.getPieces().size()==1,"existing piece NBT reloads without regeneration");
++            h.assertTrue(loaded.getPieces().getFirst().getBoundingBox().equals(start.getPieces().getFirst().getBoundingBox()),"stored piece coordinates preserved");
+         }h.succeed();
+     }
+     @GameTest(template="empty")
+@@ -114,4 +123,35 @@ public final class RailSiteGameTests {
+         beam.stepEcho(false,false,1232);
+         for(int i=1233;i<1250;i++)h.assertTrue(!beam.stepEcho(false,true,i),"lost eligibility cancels armed echo");h.succeed();
+     }
++    @GameTest(template="empty")
++    public static void terrainGuardRejectsWaterAndCliffsWithoutPlacement(GameTestHelper h){
++        var box=new BoundingBox(0,60,0,18,69,16);
++        h.assertTrue(RailSiteStructure.terrainFits(box,(x,z)->70,(x,z)->70),"dry level ground accepted");
++        h.assertTrue(RailSiteStructure.terrainFits(box,(x,z)->70+x/9,(x,z)->70+x/9),"two-block grade accepted");
++        h.assertTrue(!RailSiteStructure.terrainFits(box,(x,z)->70+x/6,(x,z)->70+x/6),"three-block grade rejected");
++        h.assertTrue(!RailSiteStructure.terrainFits(box,(x,z)->70,(x,z)->65),"water above floor rejected");
++        var calls=new int[1];
++        h.assertTrue(RailSiteStructure.terrainFits(box,(x,z)->{calls[0]++;return 70;},(x,z)->{calls[0]++;return 70;}),"bounded sampling");
++        h.assertTrue(calls[0]==50,"at most 25 paired terrain probes");
++        h.assertTrue(!RailSiteStructure.terrainFits(new BoundingBox(0,60,0,33,69,16),(x,z)->70,(x,z)->70),"oversized layout deferred");h.succeed();
++    }
++    @GameTest(template="empty",timeoutTicks=1200)
++    public static void actualOverworldNoiseHasAcceptedAndDeferredSites(GameTestHelper h){
++        var level=h.getLevel();var access=level.registryAccess();
++        var preset=access.registryOrThrow(Registries.WORLD_PRESET).get(net.minecraft.world.level.levelgen.presets.WorldPresets.NORMAL.location());
++        var generator=(net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator)preset.overworld().orElseThrow().generator();
++        var random=net.minecraft.world.level.levelgen.RandomState.create(generator.generatorSettings().value(),access.lookupOrThrow(Registries.NOISE),203L);
++        int accepted=0,rejected=0,candidates=0;
++        for(int i=0;i<64&&!(accepted>0&&rejected>0);i++){
++            int x=(i%8-4)*512,z=(i/8-4)*512;candidates++;
++            var box=new BoundingBox(x,60,z,x+18,69,z+16);
++            boolean fits=RailSiteStructure.terrainFits(box,
++                (a,b)->generator.getBaseHeight(a,b,net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG,level,random),
++                (a,b)->generator.getBaseHeight(a,b,net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG,level,random));
++            if(fits)accepted++;else rejected++;
++        }
++        h.assertTrue(accepted>0&&rejected>0,"real Overworld noise must provide both usable and deferred terrain");
++        System.out.println("PASS rail terrain noise seed=203 candidates="+candidates+" accepted="+accepted+" rejected="+rejected+"; chunk placement=NONE");h.succeed();
++    }
++
+ }
+diff --git a/src/main/java/io/github/whileaway/WhileAway.java b/src/main/java/io/github/whileaway/WhileAway.java
+index 9bc81ec..c03c7dc 100644
+--- a/src/main/java/io/github/whileaway/WhileAway.java
++++ b/src/main/java/io/github/whileaway/WhileAway.java
+@@ -30,6 +30,8 @@ public final class WhileAway {
+     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, ID);
+     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ID);
+     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, ID);
++    public static final DeferredRegister<net.minecraft.world.level.levelgen.structure.StructureType<?>> STRUCTURES = DeferredRegister.create(Registries.STRUCTURE_TYPE, ID);
++    public static final DeferredHolder<net.minecraft.world.level.levelgen.structure.StructureType<?>,net.minecraft.world.level.levelgen.structure.StructureType<RailSiteStructure>> RAIL_SITE = STRUCTURES.register("rail_site",()->()->RailSiteStructure.CODEC);
+     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
+ 
+     public static final DeferredBlock<StationBlock> STATION = BLOCKS.register("station_anchor", () -> new StationBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_STONE_BRICKS).strength(4)));
+@@ -78,6 +80,7 @@ public final class WhileAway {
+         BLOCKS.getEntries().forEach(b -> ITEMS.registerSimpleBlockItem(b.getId().getPath(), b));
+         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus); BLOCK_ENTITIES.register(bus);
+         SOUNDS.register(bus); TABS.register(bus);
++        STRUCTURES.register(bus);
+         bus.addListener(this::attributes);
+         container.registerConfig(ModConfig.Type.SERVER, StoryConfig.SPEC);
+         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+diff --git a/src/main/java/io/github/whileaway/content/RailSiteStructure.java b/src/main/java/io/github/whileaway/content/RailSiteStructure.java
+new file mode 100644
+index 0000000..28db1ce
+--- /dev/null
++++ b/src/main/java/io/github/whileaway/content/RailSiteStructure.java
+@@ -0,0 +1,54 @@
++package io.github.whileaway.content;
++
++import com.mojang.datafixers.util.Either;
++import com.mojang.serialization.MapCodec;
++import io.github.whileaway.WhileAway;
++import java.util.Optional;
++import java.util.function.IntBinaryOperator;
++import net.minecraft.world.level.levelgen.Heightmap;
++import net.minecraft.world.level.levelgen.structure.*;
++import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
++
++/** Skip wet or steep rail-site candidates before any block placement. */
++public final class RailSiteStructure extends Structure {
++    public static final MapCodec<RailSiteStructure> CODEC=JigsawStructure.CODEC.codec()
++        .fieldOf("layout").xmap(RailSiteStructure::new,site->site.layout);
++    private final JigsawStructure layout;
++
++    public RailSiteStructure(JigsawStructure layout){
++        super(layout.getModifiedStructureSettings());
++        this.layout=layout;
++    }
++
++    @Override public Optional<GenerationStub> findGenerationPoint(GenerationContext context){
++        var candidate=layout.findGenerationPoint(context);
++        if(candidate.isEmpty())return Optional.empty();
++        var builder=candidate.orElseThrow().getPiecesBuilder();
++        var pieces=builder.build().pieces();
++        // These two sites use one bounded template, not an expanding rail network.
++        if(pieces.size()!=1)return Optional.empty();
++        var box=pieces.getFirst().getBoundingBox();
++        boolean fits=terrainFits(box,
++            (x,z)->context.chunkGenerator().getBaseHeight(x,z,Heightmap.Types.WORLD_SURFACE_WG,context.heightAccessor(),context.randomState()),
++            (x,z)->context.chunkGenerator().getBaseHeight(x,z,Heightmap.Types.OCEAN_FLOOR_WG,context.heightAccessor(),context.randomState()));
++        if(!fits)return Optional.empty();
++        // Reuse the chosen rotation and pieces. Do not consume the layout RNG twice.
++        return Optional.of(new GenerationStub(candidate.orElseThrow().position(),Either.right(builder)));
++    }
++
++    public static boolean terrainFits(BoundingBox box,IntBinaryOperator surface,IntBinaryOperator solidFloor){
++        if(box.getXSpan()>32||box.getZSpan()>32)return false;
++        int low=Integer.MAX_VALUE,high=Integer.MIN_VALUE;
++        for(int ix=0;ix<5;ix++)for(int iz=0;iz<5;iz++){
++            int x=box.minX()+ix*(box.getXSpan()-1)/4;
++            int z=box.minZ()+iz*(box.getZSpan()-1)/4;
++            int y=surface.applyAsInt(x,z);
++            if(y!=solidFloor.applyAsInt(x,z))return false;
++            low=Math.min(low,y);high=Math.max(high,y);
++            if(high-low>2)return false;
++        }
++        return true;
++    }
++
++    @Override public StructureType<?> type(){return WhileAway.RAIL_SITE.get();}
++}
+diff --git a/src/main/resources/data/whileaway/worldgen/structure/rail_maintenance_passage.json b/src/main/resources/data/whileaway/worldgen/structure/rail_maintenance_passage.json
+index 207077a..cde95be 100644
+--- a/src/main/resources/data/whileaway/worldgen/structure/rail_maintenance_passage.json
++++ b/src/main/resources/data/whileaway/worldgen/structure/rail_maintenance_passage.json
+@@ -1,15 +1,17 @@
+ {
+-  "type": "minecraft:jigsaw",
+-  "biomes": "#whileaway:has_rail_site",
+-  "step": "surface_structures",
+-  "spawn_overrides": {},
+-  "terrain_adaptation": "beard_thin",
+-  "start_pool": "whileaway:rail_maintenance_passage",
+-  "size": 1,
+-  "start_height": {
+-    "absolute": -3
+-  },
+-  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+-  "max_distance_from_center": 32,
+-  "use_expansion_hack": false
++  "type": "whileaway:rail_site",
++  "layout": {
++    "biomes": "#whileaway:has_rail_site",
++    "step": "surface_structures",
++    "spawn_overrides": {},
++    "terrain_adaptation": "beard_thin",
++    "start_pool": "whileaway:rail_maintenance_passage",
++    "size": 1,
++    "start_height": {
++      "absolute": -3
++    },
++    "project_start_to_heightmap": "WORLD_SURFACE_WG",
++    "max_distance_from_center": 32,
++    "use_expansion_hack": false
++  }
+ }
+diff --git a/src/main/resources/data/whileaway/worldgen/structure/rail_signal_office.json b/src/main/resources/data/whileaway/worldgen/structure/rail_signal_office.json
+index f45c0ff..dbb4800 100644
+--- a/src/main/resources/data/whileaway/worldgen/structure/rail_signal_office.json
++++ b/src/main/resources/data/whileaway/worldgen/structure/rail_signal_office.json
+@@ -1,15 +1,17 @@
+ {
+-  "type": "minecraft:jigsaw",
+-  "biomes": "#whileaway:has_rail_site",
+-  "step": "surface_structures",
+-  "spawn_overrides": {},
+-  "terrain_adaptation": "beard_thin",
+-  "start_pool": "whileaway:rail_signal_office",
+-  "size": 1,
+-  "start_height": {
+-    "absolute": 0
+-  },
+-  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+-  "max_distance_from_center": 32,
+-  "use_expansion_hack": false
++  "type": "whileaway:rail_site",
++  "layout": {
++    "biomes": "#whileaway:has_rail_site",
++    "step": "surface_structures",
++    "spawn_overrides": {},
++    "terrain_adaptation": "beard_thin",
++    "start_pool": "whileaway:rail_signal_office",
++    "size": 1,
++    "start_height": {
++      "absolute": 0
++    },
++    "project_start_to_heightmap": "WORLD_SURFACE_WG",
++    "max_distance_from_center": 32,
++    "use_expansion_hack": false
++  }
+ }
+diff --git a/tools/generate-rail-sites.py b/tools/generate-rail-sites.py
+index cb084f4..9631c2b 100644
+--- a/tools/generate-rail-sites.py
++++ b/tools/generate-rail-sites.py
+@@ -75,7 +75,7 @@ def site(name,size,passage=False):
+     root={'DataVersion':(3,3955),'size':(9,(3,list(size))),'palette':(9,(10,palette)),'blocks':(9,(10,list(blocks.values()))),'entities':(9,(10,[]))}
+     nbt(Path('data/whileaway/structure/'+name+'.nbt'),root)
+     write(Path('data/whileaway/worldgen/template_pool/'+name+'.json'),{'name':'whileaway:'+name,'fallback':'minecraft:empty','elements':[{'weight':1,'element':{'element_type':'minecraft:single_pool_element','location':'whileaway:'+name,'processors':'whileaway:rail_sites','projection':'rigid'}}]})
+-    write(Path('data/whileaway/worldgen/structure/'+name+'.json'),{'type':'minecraft:jigsaw','biomes':'#whileaway:has_rail_site','step':'surface_structures','spawn_overrides':{},'terrain_adaptation':'beard_thin','start_pool':'whileaway:'+name,'size':1,'start_height':{'absolute':-3 if passage else 0},'project_start_to_heightmap':'WORLD_SURFACE_WG','max_distance_from_center':32,'use_expansion_hack':False})
++    write(Path('data/whileaway/worldgen/structure/'+name+'.json'),{'type':'whileaway:rail_site','layout':{'biomes':'#whileaway:has_rail_site','step':'surface_structures','spawn_overrides':{},'terrain_adaptation':'beard_thin','start_pool':'whileaway:'+name,'size':1,'start_height':{'absolute':-3 if passage else 0},'project_start_to_heightmap':'WORLD_SURFACE_WG','max_distance_from_center':32,'use_expansion_hack':False}})
+     write(Path('data/whileaway/worldgen/structure_set/'+name+'.json'),{'structures':[{'structure':'whileaway:'+name,'weight':1}],'placement':{'type':'minecraft:random_spread','spacing':40 if passage else 32,'separation':16 if passage else 12,'salt':74192363 if passage else 74192362,'exclusion_zone':{'other_set':'minecraft:villages','chunk_count':6}}})
+     print(name,len(blocks),'blocks')
+ 
+diff --git a/tools/package-v2-03-closure.py b/tools/package-v2-03-closure.py
+index 0d57eb3..182096a 100644
+--- a/tools/package-v2-03-closure.py
++++ b/tools/package-v2-03-closure.py
+@@ -1,18 +1,27 @@
+ """Package the verified V2-03 source and JAR. Never modify world files."""
+ from pathlib import Path
+-import hashlib,json,shutil,subprocess,zipfile
+-ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'dist/v2-03-closure'
++import hashlib,json,shutil,subprocess,zipfile,sys
++ROOT=Path(__file__).resolve().parents[1]
++TERRAIN='--terrain' in sys.argv
++OUT=ROOT/('dist/v2-03-terrain' if TERRAIN else 'dist/v2-03-closure')
++NAME='whileaway-0.3.1-v2-03-terrain' if TERRAIN else 'whileaway-0.3.1-v2-03-content'
+ BASE='82beffac6347c60258e4b9db0098eecad423b176'
+ BASE_JAR='7d60cc29edea2b4cd653454c9006e75ebf4fddef999105d2953864c189081cf6'
+ BASE_SOURCE='c7d47351c297a1647eed6216a6172bd78839152d2cc28195eb29099d7bcdaa9d'
++if TERRAIN:
++    BASE='06229b928586550a7985220d2d465c0faf4232f8'
++    BASE_JAR='72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05'
++    BASE_SOURCE='ec5237fb1821028c01e32c7c38349f84ca564f23a1799e6a00bed4d1fd6622f4'
+ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+ def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT)
+ def main():
++    if not TERRAIN and (OUT/(NAME+'.jar')).exists():
++        raise SystemExit('Preserved closure package. Select --terrain for continuation.')
+     OUT.mkdir(exist_ok=True,parents=True)
+     assert sha(OUT/'BASELINE.jar')==BASE_JAR
+     assert sha(OUT/'BASELINE-source.zip')==BASE_SOURCE
+     head=git('rev-parse','HEAD').decode().strip()
+-    modified=OUT/'whileaway-0.3.1-v2-03-content.jar'
++    modified=OUT/(NAME+'.jar')
+     shutil.copy2(ROOT/'build/libs/whileaway-0.3.1-dev.1.jar',modified)
+     names=git('ls-files','-z').decode().split('\0')
+     fixtures=['evidence/reuse/baseline/legacy-v'+str(i)+'.dat' for i in (2,3)]+['evidence/audio-assets.json']
+@@ -21,7 +30,7 @@ def main():
+     assert all(n in names for n in fixtures)
+     source_manifest={'implementation_commit':head,'files':{n:sha(ROOT/n) for n in names}}
+     (OUT/'SOURCE_MANIFEST.json').write_text(json.dumps(source_manifest,indent=2)+'\n',encoding='utf-8')
+-    with zipfile.ZipFile(OUT/'whileaway-0.3.1-v2-03-content-source.zip','w',zipfile.ZIP_DEFLATED) as z:
++    with zipfile.ZipFile(OUT/(NAME+'-source.zip'),'w',zipfile.ZIP_DEFLATED) as z:
+         for n in names:
+             info=zipfile.ZipInfo(n,(2026,11,3,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+             info.external_attr=(0o100755 if n=='gradlew' else 0o100644)<<16
+@@ -36,7 +45,7 @@ function Hash([string]$Path) {
+     finally { $algorithm.Dispose() }
+ }
+ $source=Join-Path $PSScriptRoot 'BASELINE.jar'
+-$modified=Join-Path $PSScriptRoot 'whileaway-0.3.1-v2-03-content.jar'
++$modified=Join-Path $PSScriptRoot '@FILE@'
+ if((Hash $source) -ne '@BASE@'){throw 'Baseline hash mismatch'}
+ $resolved=(Resolve-Path -LiteralPath $Target).ProviderPath
+ if([IO.Path]::GetExtension($resolved) -ne '.jar'){throw 'Target must be an existing JAR copy'}
+@@ -48,7 +57,7 @@ Copy-Item -LiteralPath $source -Destination $resolved
+ if((Hash $resolved) -ne '@BASE@'){throw 'Restored hash mismatch'}
+ Write-Output 'ROLLBACK PASS sha256=@BASE@ worlds=UNCHANGED'
+ """
+-    (OUT/'ROLLBACK.ps1').write_text(ps.replace('@BASE@',BASE_JAR).replace('@MODIFIED@',sha(modified)),encoding='utf-8')
++    (OUT/'ROLLBACK.ps1').write_text(ps.replace('@BASE@',BASE_JAR).replace('@MODIFIED@',sha(modified)).replace('@FILE@',modified.name),encoding='utf-8')
+     (OUT/'ROLLBACK.sh').write_text("""#!/usr/bin/env bash
+ set -euo pipefail
+ HERE=$(cd -- "$(dirname -- "$0")" && pwd)
+@@ -59,6 +68,6 @@ exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$HERE/ROLLBACK.ps1
+     result={p.name:{'size':p.stat().st_size,'sha256':sha(p)} for p in OUT.iterdir() if p.is_file() and p.name!='ARTIFACTS.json'}
+     (OUT/'ARTIFACTS.json').write_text(json.dumps({'baseline':BASE,'implementation':head,'artifacts':result},indent=2)+'\n',encoding='utf-8')
+     print('PASS packaged implementation='+head)
+-    for name in ['whileaway-0.3.1-v2-03-content.jar','whileaway-0.3.1-v2-03-content-source.zip']:
++    for name in [NAME+'.jar',NAME+'-source.zip']:
+         print(name+' sha256='+result[name]['sha256']+' bytes='+str(result[name]['size']))
+ if __name__=='__main__':main()

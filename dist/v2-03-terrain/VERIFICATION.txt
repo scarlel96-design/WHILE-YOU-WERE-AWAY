@@ -1,0 +1,85 @@
+[MAIN GPT-6.1 SOL RESULT — V2-03 / TERRAIN CONTINUATION]
+Branch: work/v2-playable-core
+Baseline HEAD: 06229b928586550a7985220d2d465c0faf4232f8
+Implementation/source snapshot: 43339bf9576c31d68f5f4d63a4a6ff829195e491
+Version: 0.3.1-dev.1; V2-01/V2-02/V2-03/Campaign PARTIAL.
+Save 5; Actor optional 1; Return Network 1; city plan 3; Caveman HOLD; 0.3.2 NOT PROMOTED.
+
+CHANGED BRANCH / FIELDS
+RailSiteStructure.findGenerationPoint: retain the single chosen Jigsaw piece only when terrainFits returns true.
+terrainFits: at most 25 paired height probes; wet sample or grade >2 blocks returns false.
+Worldgen JSON type: minecraft:jigsaw -> whileaway:rail_site.
+Existing Jigsaw settings moved under layout. Structure IDs, templates, pools and start-height values preserved.
+Only future generation candidates use the guard. Existing structure-start NBT retains its ID and piece coordinates.
+No StoryStorage schema, Actor identity, checkpoint, transaction, client signal or Wayfarer AI changes.
+
+FOUR PATHS
+MODIFIED_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-terrain\whileaway-0.3.1-v2-03-terrain.jar
+DIFF_FILE: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-terrain\DIFF.patch
+VERIFICATION: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-terrain\VERIFICATION.txt
+ROLLBACK: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-terrain\ROLLBACK.sh
+SOURCE ZIP: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration\dist\v2-03-terrain\whileaway-0.3.1-v2-03-terrain-source.zip
+EXECUTION CWD: C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\return-network-integration
+
+BASELINE
+Command: python tools/verify-assets.py dist/v2-03-terrain/BASELINE.jar
+Input: preserved published JAR; SHA-256 72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05
+Literal output: PASS asset assertions=10874; station/animation/localization/OGG/JAR
+Exit status: 0
+Baseline source ZIP SHA-256: ec5237fb1821028c01e32c7c38349f84ca564f23a1799e6a00bed4d1fd6622f4
+Original dist/v2-03-closure artifacts retained unchanged.
+
+MODIFIED
+Command: python tools/verify-assets.py dist/v2-03-terrain/whileaway-0.3.1-v2-03-terrain.jar
+Input: final modified JAR; SHA-256 bbc8ffdf438d9394fcfb57fe1103c4677f1deb1ad394fe415424410ee17b4283
+Literal output: PASS asset assertions=10874; station/animation/localization/OGG/JAR
+Exit status: 0
+Command: .\gradlew.bat --offline --no-daemon compileJava coreTest build runGameTestServer --console=plain
+Environment: GRADLE_USER_HOME=C:\Users\scarl\Documents\Codex\2026-09-08\new-chat\work\gradle-home
+Input: final source/resources; new isolated GameTest world.
+Literal outputs:
+PASS core assertions=176858
+PASS rail terrain noise seed=203 candidates=37 accepted=1 rejected=36; chunk placement=NONE
+[12:44:50] [Server thread/INFO] [minecraft/GameTestServer]: All 129 required tests passed :)
+BUILD SUCCESSFUL in 1m 1s
+Exit status: 0
+Integrated gate executions this continuation: 1. Unique GameTests: 127 retained + 2 new.
+Real Overworld generator height calculations were used. Natural chunk placement was not executed by the noise probe.
+Source ZIP SHA-256: 9af36e2aad15002a79d13466fb06ce86c2472584c9567cc6d07cb034414e6314
+
+ROLLBACK
+Preparation: copy MODIFIED_FILE to dist/v2-03-terrain/rollback-test.jar.
+Command: & 'C:\Program Files\Git\bin\bash.exe' dist/v2-03-terrain/ROLLBACK.sh dist/v2-03-terrain/rollback-test.jar
+Input: separate modified JAR copy, SHA-256 bbc8ffdf438d9394fcfb57fe1103c4677f1deb1ad394fe415424410ee17b4283
+Literal output: ROLLBACK PASS sha256=72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05 worlds=UNCHANGED
+Exit status: 0
+Restored behavior/status: previous verified package bytes restored; RailSiteStructure.class absent in restored JAR.
+Restored SHA-256: 72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05
+World files unchanged. No world downgrade or real-client rollback run.
+MODIFIED_FILE remains changed, SHA-256 bbc8ffdf438d9394fcfb57fe1103c4677f1deb1ad394fe415424410ee17b4283.
+
+AUDIT
+PASS baseline classes byte-identical=159/161
+Changed baseline classes: ['io/github/whileaway/RailSiteGameTests.class', 'io/github/whileaway/WhileAway.class']
+PASS storage, Actor identity, Wayfarer AI and Return Network class bytes unchanged
+PASS all existing structure NBT, textures and OGG bytes unchanged
+PASS all final packaged resources match final inputs
+PASS source ZIP CRC and working-tree manifest files=415
+PASS restored JAR lacks new terrain guard; modified JAR remains changed
+PASS reverse patch check; exit=0
+Command: git apply --check --reverse dist/v2-03-terrain/DIFF.patch
+Literal output: empty
+Exit status: 0
+Original raw GameTest evidence retained locally and mirrored in gametest-evidence.zip with per-file digests.
+
+FAILURES / LIMITS
+Normal network lookup failed with getaddrinfo thread startup error; host-approved Git lookup succeeded.
+No compile, GameTest or build failure occurred in this continuation.
+The terrain sampler is not a human playtest or an all-seed placement proof.
+Small gaps between sample columns, actual discovery frequency and other-structure overlap remain NOT TESTED.
+Previously generated user worlds were not opened or modified.
+New real client: 0; HUMAN EXPERIENCE / ART QUALITY / AUDIO EXPERIENCE: NOT TESTED.
+Existing structure-start format was round-tripped in GameTest; real prior-version world loading remains NOT TESTED.
+World downgrade compatibility: NOT TESTED. Rollback means package replacement only.
+Open continuity gaps: GAP-007, GAP-008, GAP-009.
+Next: user terrain-fit and discovery/readability feedback; preserve current content and saves.

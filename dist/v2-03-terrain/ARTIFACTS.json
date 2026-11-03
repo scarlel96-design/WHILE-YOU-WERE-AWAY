@@ -1,0 +1,42 @@
+{
+  "baseline": "06229b928586550a7985220d2d465c0faf4232f8",
+  "implementation": "43339bf9576c31d68f5f4d63a4a6ff829195e491",
+  "artifacts": {
+    "BASELINE-source.zip": {
+      "size": 3656106,
+      "sha256": "ec5237fb1821028c01e32c7c38349f84ca564f23a1799e6a00bed4d1fd6622f4"
+    },
+    "BASELINE.jar": {
+      "size": 3344137,
+      "sha256": "72fa3adc7e35802145d9e67b7d3d2eedd8d0da7e863fc4ca7e56de9072d75b05"
+    },
+    "DIFF.patch": {
+      "size": 20963,
+      "sha256": "d2cbb9e3ef47159bc5051354c9f32676954c6fb676ba63b4aebba3f0c4177668"
+    },
+    "ROLLBACK.ps1": {
+      "size": 1549,
+      "sha256": "a7e81ab29dbe2a9dedfd93e41b4f7db9427758504c59be5619fec9411a5a623e"
+    },
+    "ROLLBACK.sh": {
+      "size": 264,
+      "sha256": "d47323525a91a10a0b25c1a4386639ea5e6d45f2c35a2ba8323465bf9bb521ef"
+    },
+    "SOURCE_MANIFEST.json": {
+      "size": 51194,
+      "sha256": "bba0ae1f37467a5530bb3c5ecb44fc384e90c7a4b865fd75a4a1079d7183c74d"
+    },
+    "VERIFICATION.txt": {
+      "size": 5771,
+      "sha256": "f7e16ba74744120e4cd48364ada24e51ee89dc6939256ee5ba4d966d8bf5b1f5"
+    },
+    "whileaway-0.3.1-v2-03-terrain-source.zip": {
+      "size": 3659361,
+      "sha256": "9af36e2aad15002a79d13466fb06ce86c2472584c9567cc6d07cb034414e6314"
+    },
+    "whileaway-0.3.1-v2-03-terrain.jar": {
+      "size": 3350093,
+      "sha256": "bbc8ffdf438d9394fcfb57fe1103c4677f1deb1ad394fe415424410ee17b4283"
+    }
+  }
+}

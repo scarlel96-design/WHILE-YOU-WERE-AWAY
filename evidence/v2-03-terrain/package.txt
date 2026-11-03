@@ -1,0 +1,3 @@
+PASS packaged implementation=43339bf9576c31d68f5f4d63a4a6ff829195e491
+whileaway-0.3.1-v2-03-terrain.jar sha256=bbc8ffdf438d9394fcfb57fe1103c4677f1deb1ad394fe415424410ee17b4283 bytes=3350093
+whileaway-0.3.1-v2-03-terrain-source.zip sha256=9af36e2aad15002a79d13466fb06ce86c2472584c9567cc6d07cb034414e6314 bytes=3659361
