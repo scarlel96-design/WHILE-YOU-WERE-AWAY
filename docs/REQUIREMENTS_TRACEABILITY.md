@@ -36,9 +36,9 @@
 | WWA-PUZZLE-01 | 공간·기록·시간·음향·레드스톤·Minecraft 시스템 기반 퍼즐 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 35–39 | DESIGN ONLY 또는 기초 단서 | 실제 퍼즐·복구 계약 |
 | WWA-PUZZLE-02 | 전용 아이템·장비·조사수첩·장비 개량·추론 UI, 정답 자동 표시 금지 | CONFIRMED | MYSTERY_RESOURCE_EXTENSION 40–47 | 본격 프레임워크 미완료 | 아이템·Evidence 구조 |
 | WWA-WORLD-01 | 작은 규모도 고품질 건축: 실루엣·동선·내부·생활 흔적·지형 결합 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | V2-03 폐역 템플릿 개선 기록; 인간 아트 QA NOT TESTED | 구조물 품질 검수 |
-| WWA-WORLD-02 | 지상/채굴/철도/마을 등 여러 자연 발견 경로, 필수 체크리스트 금지 | CONFIRMED | PROJECT_CONTINUITY 4 | 폐역·관리소·낮은 정비 통로 생성 연결. V2_03_CONTENT_STATUS 참조. 자연 발견 HUMAN NOT TESTED | 발견 확률·공정성 |
+| WWA-WORLD-02 | 지상/채굴/철도/마을 등 여러 자연 발견 경로, 필수 체크리스트 금지 | CONFIRMED | PROJECT_CONTINUITY 4 | V2-03 폐역·관리소·통로 자연 생성 연결과 rail_site 필터. seed=203 후보 1/37 허용, 실제 배치·발견 NOT TESTED. [검토](V2_03_REVIEW_20261103.md) | 다수 시드/바이옴 실제 배치·발견성 확보 |
 | WWA-WORLD-03 | 한 장소의 생활·재난·현재·재방문 네 의미 | CONFIRMED | DESIGN_V05 52 | 장소별 구현 미확인 | Three Lives Rule 정합성 |
-| WWA-WORLD-04 | 소규모 공간 이상과 대형 월드 세트피스를 별도 종류로 유지 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | 후보안; 실 구현 미확인 | 월드 스케일 공포 품질 |
+| WWA-WORLD-04 | 소규모 공간 이상과 대형 월드 세트피스를 별도 종류로 유지 | CONFIRMED | PROJECT_CONTINUITY 4, DECISION_LOG | V2-03 관리소 원거리 가로보 소형 이상현상 구현. 대형 지속 상흔은 DESIGN ONLY; 시각 체감 NOT TESTED | 대형 세트피스 별도 구현 |
 | WWA-WORLD-05 | 대형 사건은 사전 징후·운동·음향·위기·사건 후 안전한 흔적을 결합 | CONFIRMED 방향 | DESIGN_V05, PROJECT_CONTINUITY | DESIGN ONLY | Persistent World-Scar 패턴 |
 | WWA-WORLD-06 | 사용자 월드/집/아이템 보존, 실제 지형 변형은 통제·복구 가능해야 함 | CONFIRMED | AGENTS, PROJECT_CONTINUITY | 관련 기존 검증 일부; 신규 효과 검증 필요 | 저장·청크·멀티플레이 |
 | WWA-THREAT-01 | 귀로꾼은 귀환 경로를 따르는 존재; 방해·경고·위험·회복 인과 유지 | CONFIRMED | DESIGN_V04, DESIGN_V05 | 기초 기능 부분 구현; 최종 아트 미완료 | AI 계약 + 모델·소리 |
@@ -87,7 +87,7 @@
 |---|---|---|
 | GAP-001 | **CLOSED (구간 단위):** 제공 원문 86개 대화 구간 전수 분류·추적 완료. | HISTORICAL_SESSION_AUDIT_20260909_0916.md 참조. 문장 원자화·코드 전수 검증은 별도. |
 | GAP-002 | 장별 사건·몬스터 수·차원 수·세트피스 수량 중 초안 제안과 확정 범위가 혼재 | DESIGN_V05와 명시적 최신 사용자 결정을 비교하고 PROPOSED/CONFIRMED 표시 |
-| GAP-003 | V2-03에서 현재 진행 중인 실제 파일·테스트·콘텐츠 변경의 최신 상태 | 현 작업 종료 보고를 받은 뒤 표의 evidence URL, SHA, 검증 상태 갱신 |
+| GAP-003 | **CLOSED (보고/변경 상태 수준):** V2-03 최종 HEAD·지형 코드·GameTest 증거·미완료 인간 검증을 2026-11-03 확인 | [V2_03_REVIEW_20261103.md](V2_03_REVIEW_20261103.md). 전체 요구/코드 양방향 감사(GAP-008)는 OPEN |
 | GAP-004 | 전체 콘텐츠 50–60%를 계산할 작업 분모/가중치 | 콘텐츠 단위·실제 경로·플레이 비중 확정 후 계산. 그전 UNKNOWN |
 | GAP-005 | 퍼즐·아이템·NPC 관계·대형 공포 장면의 acceptance test 세부 기준과 담당 차기 WO | 각 WO 범위를 정할 때 ID별 구체 수용 조건과 실제 시험 증거 링크 연결 |
 | GAP-006 | 사용자 아트·사운드·공포 감정 평가 | 첫 대규모 사용자 테스트까지 HUMAN NOT TESTED 유지 |
@@ -95,6 +95,8 @@
 | GAP-007 | 전체 AI 설계 초안의 모든 문장과 기능의 세부 원자화 검증 미완료. | 제안/확정 구분과 장별 상세 수용기준 후속 분해 |
 | GAP-008 | 모든 요구 ID와 최신 Java/JSON/자산·CI 증거의 양방향 1:1 연결 미완료. | 차기 작업별 실제 증거·커밋에 연결 |
 | GAP-009 | 이 대화 파일 밖의 다른 세션과 첨부 자료 전수 감사 범위 외. | 별도 원본·SHA 확보 시 재감사 |
+
+| GAP-010 | V2-03 rail_site 후보 37개 중 1개만 허용; 실제 자연 청크 배치·발견 밀도 UNKNOWN. 물/식생/높이맵 원인 미구분 | V2-04 제한적 멀티시드 월드젠 통합 검사, 안전한 발견 단서·구조물 개선 |
 
 ## 새 요구 추가 템플릿
 
